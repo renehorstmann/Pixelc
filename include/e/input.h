@@ -30,8 +30,6 @@ extern bool e_input_space;
 extern bool e_input_accel_active;
 extern float e_input_accel[3];
 
-extern const mat4 *e_input_camera_p_inv_ptr;
-
 
 
 void e_input_init();

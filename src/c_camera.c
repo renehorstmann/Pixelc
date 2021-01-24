@@ -7,25 +7,24 @@
 #include "c_camera.h"
 
 
-mat4 camera_v;
-mat4 camera_v_inv;
-mat4 camera_p;
-mat4 camera_p_inv;
-mat4 camera_vp;
-//mat4 camera_vp_inv;
+mat4 c_camera_v;
+mat4 c_camera_v_inv;
+mat4 c_camera_p;
+mat4 c_camera_p_inv;
+mat4 c_camera_vp;
+//mat4 c_camera_vp_inv;
 
-void camera_init() {
-    camera_v = mat4_eye();
-    camera_v_inv = mat4_eye();
-    camera_p = mat4_eye();
-    camera_p_inv = mat4_eye();
-    camera_vp = mat4_eye();
-//    camera_vp_inv = mat4_eye();
 
-    e_input_camera_p_inv_ptr = &camera_p_inv;
+void c_camera_init() {
+    c_camera_v = mat4_eye();
+    c_camera_v_inv = mat4_eye();
+    c_camera_p = mat4_eye();
+    c_camera_p_inv = mat4_eye();
+    c_camera_vp = mat4_eye();
+//    c_camera_vp_inv = mat4_eye();
 }
 
-void camera_update() {
+void c_camera_update() {
     int wnd_width = e_window_size[0];
     int wnd_height = e_window_size[1];
     
@@ -38,19 +37,19 @@ void camera_update() {
         height = 200 * wnd_height / wnd_width;
     }
 
-    camera_v_inv = mat4_inv(camera_v);
+    c_camera_v_inv = mat4_inv(c_camera_v);
 
-    camera_p = mat4_camera_ortho(-width / 2, width / 2, -height / 2, height / 2, -1, 1);
-    camera_p_inv = mat4_inv(camera_p);
+    c_camera_p = mat4_camera_ortho(-width / 2, width / 2, -height / 2, height / 2, -1, 1);
+    c_camera_p_inv = mat4_inv(c_camera_p);
 
-    camera_vp = mat4_mul_mat(camera_p, camera_v_inv);
-//    camera_vp_inv = mat4_inv(camera_vp);
+    c_camera_vp = mat4_mul_mat(c_camera_p, c_camera_v_inv);
+//    c_camera_vp_inv = mat4_inv(c_camera_vp);
 }
 
-void camera_set_pos(float x, float y) {
-    u_pose_set_xy(&camera_v, x, y);
+void c_camera_set_pos(float x, float y) {
+    u_pose_set_xy(&c_camera_v, x, y);
 }
 
-void camera_set_angle(float alpha) {
-    u_pose_set_angle(&camera_v, alpha);
+void c_camera_set_angle(float alpha) {
+    u_pose_set_angle(&c_camera_v, alpha);
 }

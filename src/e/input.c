@@ -14,9 +14,6 @@ bool e_input_space;
 
 bool e_input_accel_active;
 float e_input_accel[3];
-const mat4 *e_input_camera_p_inv_ptr;
-
-static const mat4 camera_p_inv_init = MAT4_INIT_EYE;
 
 static struct {
     void (*cb)(ePointer_s, void *);
@@ -26,12 +23,6 @@ static struct {
 
 static int reg_pointer_e_size = 0;
 
-static void to_perspective(float gl_x, float gl_y, float *x, float *y) {
-    vec4 res = mat4_mul_vec(*e_input_camera_p_inv_ptr, (vec4) {{gl_x, gl_y, 0, 1}});
-    *x = res.x;
-    *y = res.y;
-}
-
 static ePointer_s pointer_mouse(enum ePointerAction action) {
     ePointer_s res;
     res.action = action;
@@ -40,10 +31,9 @@ static ePointer_s pointer_mouse(enum ePointerAction action) {
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    float gl_x = (2.0f * x) / e_window_size[0] - 1.0f;
-    float gl_y = 1.0f - (2.0f * y) / e_window_size[1];
+    res.x = (2.0f * x) / e_window_size[0] - 1.0f;
+    res.y = 1.0f - (2.0f * y) / e_window_size[1];
 
-    to_perspective(gl_x, gl_y, &res.x, &res.y);
     return res;
 }
 
@@ -52,10 +42,9 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, i
     res.action = action;
     res.id = finger_id;
 
-    float gl_x = 2.0f * x - 1.0f;
-    float gl_y = 1.0f - 2.0f * y;
+    res.x = 2.0f * x - 1.0f;
+    res.y = 1.0f - 2.0f * y;
 
-    to_perspective(gl_x, gl_y, &res.x, &res.y);
     return res;
 }
 
@@ -150,7 +139,6 @@ static void input_handle_sensors(SDL_Event *event) {
 #endif
 
 void e_input_init() {
-	e_input_camera_p_inv_ptr = &camera_p_inv_init;
 
 #ifdef GLES
 	int num_sensors = SDL_NumSensors();
