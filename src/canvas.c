@@ -62,6 +62,10 @@ void canvas_init() {
         r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
         L.layers[i].ro.rect.pose = L.pose;
     }
+
+    for(int i=0; i<L.rows*L.cols; i++) {
+        *layer_pixel_index(canvas_current_layer(), i) = (color) {64, 0, 0, 255};
+    }
 }
 
 void canvas_update(float dtime) {

@@ -3,30 +3,33 @@
 #include "r/r.h"
 #include "u/u.h"
 
+#include "brush.h"
 #include "c_camera.h"
-#include "c_input.h"
 #include "canvas.h"
+#include "input.h"
 
 
 static void main_loop(float delta_time);
 
 
 int main() {
-    puts("Pixelc");
-    
+    SDL_Log("Pixelc");
+
+    // init e (environment)
     e_window_init("Pixelc");
     e_input_init();
     e_gui_init();
 
+    // init r (render)
     r_render_init(e_window);
-
-    // init
     r_text_default_font = TTF_OpenFont("res/fnf.ttf", 64);
+
+
+    // init systems
+    brush_init();
     c_camera_init();
-    c_camera_set_pos(10, 20);
-    c_camera_set_angle(M_PI * 0.1);
     canvas_init();
-    c_input_init();
+    input_init();
 
 
     e_window_main_loop(main_loop);
@@ -38,7 +41,7 @@ int main() {
 
 
 static void main_loop(float delta_time) {
-    
+    // e updates
     e_window_update();
     e_input_update();
     
@@ -56,7 +59,6 @@ static void main_loop(float delta_time) {
 
     // swap buffers
     r_render_end_frame();
-    
 
     // check for opengl errors:
     r_render_error_check();

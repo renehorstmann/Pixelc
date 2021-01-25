@@ -18,3 +18,7 @@ void layer_kill(Layer *self) {
 color *layer_pixel(Layer *self, int row, int col) {
     return &self->data[col + row * canvas_cols()];
 }
+
+color *layer_pixel_index(Layer *self, int index) {
+    return &self->data[index];
+}
