@@ -7,6 +7,8 @@
 #include "c_camera.h"
 #include "canvas.h"
 #include "input.h"
+#include "hud_camera.h"
+#include "palette.h"
 
 
 static void main_loop(float delta_time);
@@ -30,6 +32,8 @@ int main() {
     c_camera_init();
     canvas_init();
     input_init();
+    hud_camera_init();
+    palette_init();
 
 
     e_window_main_loop(main_loop);
@@ -49,11 +53,14 @@ static void main_loop(float delta_time) {
     // simulate
     c_camera_update();
     canvas_update(delta_time);
+    hud_camera_update();
+    palette_update(delta_time);
 
     // render
     r_render_begin_frame(e_window_size[0], e_window_size[1]);
 
     canvas_render();
+    palette_render();
 
     e_gui_render();
 

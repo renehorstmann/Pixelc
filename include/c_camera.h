@@ -14,6 +14,9 @@ void c_camera_init();
 
 void c_camera_update();
 
+float c_camera_width();
+float c_camera_height();
+
 void c_camera_set_pos(float x, float y);
 
 void c_camera_set_angle(float alpha);
