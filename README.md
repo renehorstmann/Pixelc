@@ -6,9 +6,19 @@ In active devolpment
 
 ## Todo
 - Code Structure
+  - Render Object naming? rRoSingle
   - Color utilities file
   - texture utils
   - canvas data class
+  - brush.h
+    - takes input and calls canvas draw functions
+  - canvas.h
+    - holds and draws layers
+  - layer.h
+    - class that holds memory and stuff
+  - palette.h
+  - input.h
+    - gets input and calls palette and brush input stuff
 - Color Palette
 - Selected Color overlay
 - Grid Overlay
