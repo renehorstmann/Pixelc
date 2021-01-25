@@ -6,7 +6,6 @@ In active devolpment
 
 ## Todo
 - Code Structure
-  - texture utils
   - canvas data class
   - brush.h
     - takes input and calls canvas draw functions
