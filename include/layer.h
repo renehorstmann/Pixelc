@@ -5,11 +5,10 @@
 
 typedef struct {
     color *data;
-    int rows, cols;
     uint8_t alpha;
 } Layer;
 
-void layer_init(Layer *self, int rows, int cols);
+void layer_init(Layer *self);
 
 void layer_kill(Layer *self);
 

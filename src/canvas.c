@@ -46,7 +46,7 @@ void canvas_init() {
     L.current_layer = 0;
 
     for(int i=0; i<L.layers_size; i++) {
-        layer_init(&L.layers[i], L.rows, L.cols);
+        layer_init(&L.layers[i]);
 
         L.layer_texs[i] = r_texture_init(L.cols, L.rows, L.layers[i].data);
         r_texture_filter_nearest(L.layer_texs[i]);
