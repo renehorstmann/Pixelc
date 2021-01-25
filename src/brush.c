@@ -8,6 +8,8 @@
 
 static struct {
    color current_color;
+   enum brushmodes mode;
+   bool drawing;
 } L;
 
 static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
@@ -23,8 +25,8 @@ static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
     *col = (rect_pos.x + 1) / 2 * canvas_cols();
 }
 
-void brush_pointer_event(ePointer_s pointer) {
-    if(!(pointer.action == E_POINTER_DOWN || pointer.action == E_POINTER_MOVE))
+static void dot_mode(ePointer_s pointer) {
+    if(pointer.action != E_POINTER_DOWN)
         return;
 
     int r, c;
@@ -35,11 +37,46 @@ void brush_pointer_event(ePointer_s pointer) {
     }
 }
 
+static void free_mode(ePointer_s pointer) {
+    if(pointer.action == E_POINTER_DOWN) {
+        L.drawing = true;
+    } else if(pointer.action != E_POINTER_MOVE) {
+        L.drawing = false;
+        return;
+    }
+    if(!L.drawing)
+        return;
+
+    int r, c;
+    get_tex_coords(pointer, &r, &c);
+
+    if(c>=0 && c<canvas_cols() && r>=0 && r < canvas_rows()) {
+        *layer_pixel(canvas_current_layer(), r, c) = L.current_color;
+    }
+}
+
+void brush_pointer_event(ePointer_s pointer) {
+    switch(L.mode) {
+        case BRUSH_MODE_DOT:
+            dot_mode(pointer);
+            break;
+        case BRUSH_MODE_FREE:
+            free_mode(pointer);
+            break;
+    }
+}
+
 
 void brush_init() {
     L.current_color = COLOR_RED;
+    L.mode = BRUSH_MODE_FREE;
 }
 
 void brush_set_color(color col) {
     L.current_color = col;
+}
+
+void brush_set_mode(enum brushmodes mode) {
+    L.mode = mode;
+    L.drawing = false;
 }
