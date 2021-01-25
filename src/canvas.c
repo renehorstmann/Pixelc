@@ -8,47 +8,63 @@
 #include "canvas.h"
 
 
-static color *data;
-static int cols, rows;
-static GLuint tex;
-static rRoSingle render;
+static struct {
+    Layer *layers;
+    rRoSingle *layer_ros;
+    GLuint *layer_texs;
+
+    int layers_size;
+    int current_layer;
+
+    int rows, cols;
+} L;
 
 
 mat4 canvas_get_pose() {
-    return render.rect.pose;
+    return L.layer_ros[0].rect.pose;
 }
 
-int canvas_get_rows() {
-    return rows;
+int canvas_cols() {
+    return L.cols;
 }
-int canvas_get_cols() {
-    return cols;
+int canvas_rows() {
+    return L.rows;
 }
 
-void canvas_set_color(int x, int y, color c) {
-    ((color *) data)[x + y * cols] = c;
+Layer *canvas_current_layer() {
+    return &L.layers[L.current_layer];
 }
 
 void canvas_init() {
-    cols = 31;
-    rows = 31;
-    data = New0(color, cols * rows);  //rgba
+    L.cols = 32;
+    L.rows = 32;
 
-    for(int i=0; i<31*31; i++)
-        canvas_set_color(i, 0, (color) {128, 128, 0, 255});
+    L.layers = New0(Layer, 1);
+    L.layer_ros = New0(rRoSingle, 1);
+    L.layer_texs = New0(GLuint, 1);
+    L.layers_size = 1;
+    L.current_layer = 0;
 
-    tex = r_texture_init(cols, rows, data);
-    r_texture_filter_nearest(tex);
+    for(int i=0; i<L.layers_size; i++) {
+        layer_init(&L.layers[i], L.rows, L.cols);
 
+        L.layer_texs[i] = r_texture_init(L.cols, L.rows, L.layers[i].data);
+        r_texture_filter_nearest(L.layer_texs[i]);
 
-    r_ro_single_init(&render, &c_camera_vp.m00, tex);
-    u_pose_set(&render.rect.pose, 0, 0, 80, 80, 0);
+        r_ro_single_init(&L.layer_ros[i], &c_camera_vp.m00, L.layer_texs[i]);
+        u_pose_set(&L.layer_ros[i].rect.pose, 0, 0, 80, 80, 0);
+    }
 }
 
 void canvas_update(float dtime) {
-    r_texture_update(tex, cols, rows, data);
+    for(int i=0; i<L.layers_size; i++) {
+        r_texture_update(L.layer_texs[i], L.cols, L.rows, L.layers[i].data);
+        // todo alpha...
+    }
 }
 
 void canvas_render() {
-    r_ro_single_render(&render);
+    for(int i=0; i<L.layers_size; i++) {
+        r_ro_single_render(&L.layer_ros[i]);
+    }
 }

@@ -2,17 +2,17 @@
 #define PIXELC_CANVAS_H
 
 #include <stdint.h>
-#include "color.h"
 #include "mathc/types/float.h"
+#include "layer.h"
 
 void canvas_init();
 
 mat4 canvas_get_pose();
 
-int canvas_get_rows();
-int canvas_get_cols();
+int canvas_cols();
+int canvas_rows();
 
-void canvas_set_color(int x, int y, color c);
+Layer *canvas_current_layer();
 
 void canvas_update(float dtime);
 

@@ -10,17 +10,19 @@
 SDL_Window *e_window;
 int e_window_size[2];
 
-static bool running;
+static struct {
+    bool running;
 
-static eWindowMainLoopFn main_loop_fn;
-static Uint32 last_time;
+    eWindowMainLoopFn main_loop_fn;
+    Uint32 last_time;
+} L;
 
 static void loop() {
 	Uint32 time = SDL_GetTicks();
-    float dtime = (time - last_time) / 1000.0f;
-    last_time = time;
+    float dtime = (time - L.last_time) / 1000.0f;
+    L.last_time = time;
     
-    main_loop_fn(dtime);
+    L.main_loop_fn(dtime);
 }
 
 
@@ -79,7 +81,7 @@ void e_window_init(const char *name) {
 
 void e_window_kill() {
 	SDL_Log("Window killed");
-	running = false;
+	L.running = false;
 }
 
 void e_window_update() {
@@ -87,14 +89,14 @@ void e_window_update() {
 }
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {
-    main_loop_fn = main_loop;
-    running = true;
-    last_time = SDL_GetTicks();
+    L.main_loop_fn = main_loop;
+    L.running = true;
+    L.last_time = SDL_GetTicks();
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(loop, 0, true);
 #else
-    while (running)
+    while (L.running)
         loop();
 #endif
 

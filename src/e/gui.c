@@ -10,13 +10,14 @@
 
 struct nk_context *e_gui_ctx;
 
-static int auto_offset;
-
+static struct {
+    int auto_offset
+} L;
 
 static struct nk_rect window_rect(float w, float h) {
-    int row = auto_offset / 3;
-    int col = auto_offset % 3;
-    auto_offset++;
+    int row = L.auto_offset / 3;
+    int col = L.auto_offset % 3;
+    L.auto_offset++;
     return nk_rect(50 + col * 100, 50 + row * 200, w, h);
 }
 
@@ -89,6 +90,6 @@ void e_gui_test() {
 }
 
 void e_gui_render() {
-    auto_offset = 0;
+    L.auto_offset = 0;
     nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
 }

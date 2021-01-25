@@ -34,11 +34,11 @@ void pointer_event(ePointer_s pointer, void *user_data) {
     printf("rect_pos: ");
     vec4_println(rect_pos);
 
-    int x = (rect_pos.x + 1) / 2 * canvas_get_cols();
-    int y = (1 - rect_pos.y) / 2 * canvas_get_rows();
+    int c = (rect_pos.x + 1) / 2 * canvas_cols();
+    int r = (1 - rect_pos.y) / 2 * canvas_rows();
 
-    if(x>=0 && x<canvas_get_cols() && y>=0 && y<canvas_get_rows()) {
-        canvas_set_color(x, y, (color) {0, 255, 0, 255});
+    if(c>=0 && c<canvas_cols() && r>=0 && r < canvas_rows()) {
+        *layer_pixel(canvas_current_layer(), r, c) = (color) {0, 255, 0, 255};
     }
 }
 

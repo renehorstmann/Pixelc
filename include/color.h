@@ -21,6 +21,4 @@ static const color COLOR_GREEN = {255, 0, 0, 255};
 static const color COLOR_BLUE = {255, 0, 0, 255};
 
 
-
-
 #endif //PIXELC_COLOR_H
