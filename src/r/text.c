@@ -3,12 +3,18 @@
 
 TTF_Font *r_text_default_font;
 
-GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text) {
+GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h) {
 
     // SDL_ttf seems to render in BGRA format, so we just swap r and b
     SDL_Surface *img = TTF_RenderText_Blended(font, text,
             (SDL_Color) {color.v2*255, color.v1*255, color.v0*255, color.v3*255});
-    return r_texture_from_img(img);
+    GLuint tex = r_texture_init_img(img);
+    if(opt_out_w)
+        *opt_out_w = img->w;
+    if(opt_out_h)
+        *opt_out_h = img->h;
+    SDL_FreeSurface(img);
+    return tex;
 }
 
 
@@ -37,9 +43,8 @@ static void u_pose_set_size(mat4 *p, float w, float h) {
 
 void r_ro_text_init(rRoText *self, const float *vp, vec4 color, const char *text) {
     self->font = r_text_default_font;
-    r_ro_single_init(&self->r, vp, r_text_create_texture(self->font, color, text));
     int w, h;
-    r_texture_get_size(self->r.tex, &w, &h);
+    r_ro_single_init(&self->r, vp, r_text_create_texture(self->font, color, text, &w, &h));
     self->ratio = (float) w / h;
 }
 
@@ -56,9 +61,8 @@ void r_ro_text_set_size(rRoText *self, float h) {
 }
 
 void r_ro_text_set_text(rRoText *self, vec4 color, const char *text) {
-    r_ro_single_set_texture(&self->r, r_text_create_texture(self->font, color, text));
     int w, h;
-    r_texture_get_size(self->r.tex, &w, &h);
+    r_ro_single_set_texture(&self->r, r_text_create_texture(self->font, color, text, &w, &h));
     self->ratio = (float) w / h;
     r_ro_text_set_size(self, u_pose_get_h(self->r.rect.pose));
 }

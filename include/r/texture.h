@@ -5,16 +5,17 @@
 #include <stdbool.h>
 #include "core.h"
 
-#define R_MAX_TEXTURES 1000
+GLuint r_texture_init(int width, int height, const void *buffer);
 
-GLuint r_texture_from_img(SDL_Surface *img);
+GLuint r_texture_init_img(SDL_Surface *img);
 
-GLuint r_texture_from_file(const char *file);
+GLuint r_texture_init_file(const char *file, int *opt_out_w, int *opt_out_h);
 
-GLuint r_texture_init_empty(bool filter);
+void r_texture_update(GLuint tex, int width, int height, const void *buffer);
 
-void r_texture_update(GLuint tex, int width, int height, const uint8_t *buffer);
+void r_texture_filter_linear(GLuint tex);
 
-void r_texture_get_size(GLuint tex, int *w, int *h);
+void r_texture_filter_nearest(GLuint tex);
+
 
 #endif //R_TEXTURE_H

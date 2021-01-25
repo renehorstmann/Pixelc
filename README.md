@@ -6,8 +6,6 @@ In active devolpment
 
 ## Todo
 - Code Structure
-  - Render Object naming? rRoSingle
-  - Color utilities file
   - texture utils
   - canvas data class
   - brush.h

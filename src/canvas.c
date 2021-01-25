@@ -8,7 +8,7 @@
 #include "canvas.h"
 
 
-static uint8_t *data;
+static color *data;
 static int cols, rows;
 static GLuint tex;
 static rRoSingle render;
@@ -25,31 +25,20 @@ int canvas_get_cols() {
     return cols;
 }
 
-void canvas_set_color(int x, int y, uint32_t color) {
-    ((uint32_t *) data)[x + y * cols] = color;
-}
-
-void canvas_set_color_rgba(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t alpha) {
-    uint32_t color;
-    uint8_t *buf = (uint8_t *) &color;
-    buf[0] = r;
-    buf[1] = g;
-    buf[2] = b;
-    buf[3] = alpha;
-    canvas_set_color(x, y, color);
+void canvas_set_color(int x, int y, color c) {
+    ((color *) data)[x + y * cols] = c;
 }
 
 void canvas_init() {
     cols = 31;
     rows = 31;
-    data = New0(uint8_t, cols * rows * 4);  //rgba
+    data = New0(color, cols * rows);  //rgba
 
     for(int i=0; i<31*31; i++)
-        canvas_set_color_rgba(i, 0, 128, 128, 0, 255);
+        canvas_set_color(i, 0, (color) {128, 128, 0, 255});
 
-    canvas_set_color_rgba(15, 15, 0, 0, 0, 255);
-
-    tex = r_texture_init_empty(false);
+    tex = r_texture_init(cols, rows, data);
+    r_texture_filter_nearest(tex);
 
 
     r_ro_single_init(&render, &c_camera_vp.m00, tex);

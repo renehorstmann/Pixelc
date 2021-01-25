@@ -8,7 +8,7 @@
 
 extern TTF_Font *r_text_default_font;
 
-GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text);
+GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h);
 
 typedef struct {
 	rRoSingle r;

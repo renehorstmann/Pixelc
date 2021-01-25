@@ -2,6 +2,7 @@
 #include "c_input.h"
 #include "mathc/float.h"
 
+#include "color.h"
 #include "c_camera.h"
 #include "canvas.h"
 
@@ -37,7 +38,7 @@ void pointer_event(ePointer_s pointer, void *user_data) {
     int y = (1 - rect_pos.y) / 2 * canvas_get_rows();
 
     if(x>=0 && x<canvas_get_cols() && y>=0 && y<canvas_get_rows()) {
-        canvas_set_color_rgba(x, y, 0, 255, 0, 255);
+        canvas_set_color(x, y, (color) {0, 255, 0, 255});
     }
 }
 
