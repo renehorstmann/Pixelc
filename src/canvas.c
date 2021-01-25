@@ -8,20 +8,27 @@
 #include "canvas.h"
 
 
-static struct {
-    Layer *layers;
-    rRoSingle *layer_ros;
-    GLuint *layer_texs;
+typedef struct {
+    Layer layer;
+    rRoSingle ro;
+    GLuint tex;
+} RoLayer;
 
+static struct {
+    int rows, cols;
+
+    mat4 pose;
+
+    RoLayer *layers;
     int layers_size;
     int current_layer;
 
-    int rows, cols;
+
 } L;
 
 
-mat4 canvas_get_pose() {
-    return L.layer_ros[0].rect.pose;
+mat4 canvas_pose() {
+    return L.pose;
 }
 
 int canvas_cols() {
@@ -32,39 +39,42 @@ int canvas_rows() {
 }
 
 Layer *canvas_current_layer() {
-    return &L.layers[L.current_layer];
+    return &L.layers[L.current_layer].layer;
 }
 
 void canvas_init() {
     L.cols = 32;
     L.rows = 32;
 
-    L.layers = New0(Layer, 1);
-    L.layer_ros = New0(rRoSingle, 1);
-    L.layer_texs = New0(GLuint, 1);
+    L.pose = mat4_eye();
+    u_pose_set(&L.pose, 0, 0, 80, 80, 0);
+
+    L.layers = New0(RoLayer, 1);
     L.layers_size = 1;
     L.current_layer = 0;
 
     for(int i=0; i<L.layers_size; i++) {
-        layer_init(&L.layers[i]);
+        layer_init(&L.layers[i].layer);
 
-        L.layer_texs[i] = r_texture_init(L.cols, L.rows, L.layers[i].data);
-        r_texture_filter_nearest(L.layer_texs[i]);
+        L.layers[i].tex = r_texture_init(L.cols, L.rows, L.layers[i].layer.data);
+        r_texture_filter_nearest(L.layers[i].tex);
 
-        r_ro_single_init(&L.layer_ros[i], &c_camera_vp.m00, L.layer_texs[i]);
-        u_pose_set(&L.layer_ros[i].rect.pose, 0, 0, 80, 80, 0);
+        r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
+        L.layers[i].ro.rect.pose = L.pose;
     }
 }
 
 void canvas_update(float dtime) {
     for(int i=0; i<L.layers_size; i++) {
-        r_texture_update(L.layer_texs[i], L.cols, L.rows, L.layers[i].data);
-        // todo alpha...
+        r_texture_update(L.layers[i].tex, L.cols, L.rows, L.layers[i].layer.data);
+
+        // set alpha
+        L.layers[i].ro.rect.color.w = L.layers[i].layer.alpha * (1.0f/255.0f);
     }
 }
 
 void canvas_render() {
     for(int i=0; i<L.layers_size; i++) {
-        r_ro_single_render(&L.layer_ros[i]);
+        r_ro_single_render(&L.layers[i].ro);
     }
 }

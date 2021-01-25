@@ -27,7 +27,7 @@ void pointer_event(ePointer_s pointer, void *user_data) {
 //    vec4_println(tex_pos);
 
     // screen_to_rect = inv(pose) @ v @ inv(p) @ screen_pos
-    mat4 pose_inv = mat4_inv(canvas_get_pose());
+    mat4 pose_inv = mat4_inv(canvas_pose());
     mat4 pose_inv_v = mat4_mul_mat(pose_inv, c_camera_v);
     mat4 screen_to_rect = mat4_mul_mat(pose_inv_v, c_camera_p_inv);
     vec4 rect_pos = mat4_mul_vec(screen_to_rect, screen_pos);

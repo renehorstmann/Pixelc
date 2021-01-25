@@ -7,7 +7,7 @@
 
 void canvas_init();
 
-mat4 canvas_get_pose();
+mat4 canvas_pose();
 
 int canvas_cols();
 int canvas_rows();
