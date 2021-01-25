@@ -11,7 +11,7 @@
 
 enum ePointerAction {E_POINTER_DOWN, E_POINTER_MOVE, E_POINTER_UP, E_POINTER_NUM_ACTIONS};
 
-typedef struct ePointer_s {
+typedef struct {
     float x, y;
     enum ePointerAction action;
     int id;

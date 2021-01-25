@@ -5,21 +5,21 @@
 #include "core.h"
 #include "rect.h"
 
-typedef struct rSingle {
+typedef struct {
     rRect_s rect;
     const float *vp;
     GLuint program;
     GLuint vao;
     GLuint tex;
     bool owns_tex;
-} rSingle;
+} rRoSingle;
 
-void r_single_init(rSingle *self, const float *vp, GLuint tex_sink);
+void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink);
 
-void r_single_kill(rSingle *self);
+void r_ro_single_kill(rRoSingle *self);
 
-void r_single_render(rSingle *self);
+void r_ro_single_render(rRoSingle *self);
 
-void r_single_set_texture(rSingle *self, GLuint tex);
+void r_ro_single_set_texture(rRoSingle *self, GLuint tex);
 
 #endif //R_SINGLE_H

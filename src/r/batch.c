@@ -13,7 +13,7 @@ static void init_rects(rRect_s *instances, int num) {
     }
 }
 
-void r_batch_init(rBatch *self, int num, const float *vp, GLuint tex_sink) {
+void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink) {
     self->rects = New(rRect_s, num);
     init_rects(self->rects, num);
 
@@ -82,14 +82,14 @@ void r_batch_init(rBatch *self, int num, const float *vp, GLuint tex_sink) {
     }
 }
 
-void r_batch_kill(rBatch *self) {
+void r_ro_batch_kill(rRoBatch *self) {
     free(self->rects);
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     glDeleteBuffers(1, &self->vbo);
     if(self->owns_tex)
         glDeleteTextures(1, &self->tex);
-    *self = (rBatch) {0};
+    *self = (rRoBatch) {0};
 }
 
 static int clamp_range(int i, int begin, int end) {
@@ -100,7 +100,7 @@ static int clamp_range(int i, int begin, int end) {
 	return i;
 }
 
-void r_batch_update(rBatch *self, int offset, int size) {
+void r_ro_batch_update(rRoBatch *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
     
     offset = clamp_range(offset, 0, self->num);
@@ -131,7 +131,7 @@ void r_batch_update(rBatch *self, int offset, int size) {
 
 
 
-void r_batch_render(rBatch *self) {
+void r_ro_batch_render(rRoBatch *self) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
@@ -149,7 +149,7 @@ void r_batch_render(rBatch *self) {
     glUseProgram(0);
 }
 
-void r_batch_set_texture(rBatch *self, GLuint tex) {
+void r_ro_batch_set_texture(rRoBatch *self, GLuint tex) {
     if(self->owns_tex)
         glDeleteTextures(1, &self->tex);
     self->tex = tex;

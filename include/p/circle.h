@@ -8,7 +8,7 @@
 #include "core.h"
 
 
-typedef struct pCircle_s {
+typedef struct {
 	float x, y, r;
 } pCircle_s;
 

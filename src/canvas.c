@@ -11,7 +11,7 @@
 static uint8_t *data;
 static int cols, rows;
 static GLuint tex;
-static rSingle render;
+static rRoSingle render;
 
 
 mat4 canvas_get_pose() {
@@ -52,7 +52,7 @@ void canvas_init() {
     tex = r_texture_init_empty(false);
 
 
-    r_single_init(&render, &c_camera_vp.m00, tex);
+    r_ro_single_init(&render, &c_camera_vp.m00, tex);
     u_pose_set(&render.rect.pose, 0, 0, 80, 80, 0);
 }
 
@@ -61,5 +61,5 @@ void canvas_update(float dtime) {
 }
 
 void canvas_render() {
-    r_single_render(&render);
+    r_ro_single_render(&render);
 }

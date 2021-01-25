@@ -5,12 +5,12 @@
 
 GLuint r_compile_shader(GLint type, const char *src);
 
-typedef struct r_shader_source_s {
+typedef struct {
     GLint type;
     const char *src;
-} r_shader_source_s;
+} rShaderSource_s;
 
-GLuint r_compile_glsl(r_shader_source_s *sources, int n);
+GLuint r_compile_glsl(rShaderSource_s *sources, int n);
 
 GLuint r_compile_shader_from_file(const char *file);
 

@@ -3,7 +3,7 @@
 
 #include "mathc/types/float.h"
 
-typedef struct rRect_s {
+typedef struct {
     mat4 pose;
     mat4 uv;
     vec4 color;

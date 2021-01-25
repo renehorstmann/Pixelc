@@ -51,7 +51,7 @@ GLuint r_compile_shader(GLint type, const char *src) {
 }
 
 
-GLuint r_compile_glsl(r_shader_source_s *sources, int n) {
+GLuint r_compile_glsl(rShaderSource_s *sources, int n) {
     GLuint program = 0;
     GLuint shaders[n];
 

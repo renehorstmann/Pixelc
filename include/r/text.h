@@ -10,20 +10,20 @@ extern TTF_Font *r_text_default_font;
 
 GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text);
 
-typedef struct rText {
-	rSingle r;
+typedef struct {
+	rRoSingle r;
 	TTF_Font *font;
 	float ratio;    // width / height
-} rText;
+} rRoText;
 
-void r_text_init(rText *self, const float *vp, vec4 color, const char *text);
+void r_ro_text_init(rRoText *self, const float *vp, vec4 color, const char *text);
 
-void r_text_kill(rText *self);
+void r_ro_text_kill(rRoText *self);
 
-void r_text_render(rText *self);
+void r_ro_text_render(rRoText *self);
 
-void r_text_set_size(rText *self, float h);
+void r_ro_text_set_size(rRoText *self, float h);
 
-void r_text_set_text(rText *self, vec4 color, const char *text);
+void r_ro_text_set_text(rRoText *self, vec4 color, const char *text);
 
 #endif //R_TEXT_H

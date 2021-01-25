@@ -6,7 +6,7 @@
 #include "rect.h"
 
 
-typedef struct rBatch {
+typedef struct {
     rRect_s *rects;
     int num;
     const float *vp;
@@ -15,16 +15,16 @@ typedef struct rBatch {
     GLuint vbo;
     GLuint tex;
     bool owns_tex;
-} rBatch;
+} rRoBatch;
 
-void r_batch_init(rBatch *self, int num, const float *vp, GLuint tex_sink);
+void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink);
 
-void r_batch_kill(rBatch *self);
+void r_ro_batch_kill(rRoBatch *self);
 
-void r_batch_update(rBatch *self, int offset, int size);
+void r_ro_batch_update(rRoBatch *self, int offset, int size);
 
-void r_batch_render(rBatch *self);
+void r_ro_batch_render(rRoBatch *self);
 
-void r_batch_set_texture(rBatch *self, GLuint tex);
+void r_ro_batch_set_texture(rRoBatch *self, GLuint tex);
 
 #endif //R_BATCH_H

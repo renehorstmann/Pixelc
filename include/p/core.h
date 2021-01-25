@@ -3,7 +3,7 @@
 
 #define P_MAX_INDICES 256
 
-typedef struct pIndices_s {
+typedef struct {
 	int data[P_MAX_INDICES];
 	int num;
 } pIndices_s;

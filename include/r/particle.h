@@ -5,7 +5,7 @@
 #include "mathc/types/float.h"
 #include "core.h"
 
-typedef struct rParticleRect_s {
+typedef struct {
     mat4 pose;
     mat4 uv;
     vec4 speed;
@@ -18,7 +18,7 @@ typedef struct rParticleRect_s {
     float start_time;
 } rParticleRect_s;
 
-typedef struct rParticle {
+typedef struct {
     rParticleRect_s *rects;
     int num;
     const float *vp;
@@ -27,16 +27,16 @@ typedef struct rParticle {
     GLuint vbo;
     GLuint tex;
     bool owns_tex;
-} rParticle;
+} rRoParticle;
 
-void r_particle_init(rParticle *self, int num, const float *vp, GLuint tex_sink);
+void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_sink);
 
-void r_particle_kill(rParticle *self);
+void r_ro_particle_kill(rRoParticle *self);
 
-void r_particle_update(rParticle *self, int offset, int size);
+void r_ro_particle_update(rRoParticle *self, int offset, int size);
 
-void r_particle_render(rParticle *self, float time);
+void r_ro_particle_render(rRoParticle *self, float time);
 
-void r_particle_set_texture(rParticle *self, GLuint tex);
+void r_ro_particle_set_texture(rRoParticle *self, GLuint tex);
 
 #endif //R_PARTICLE_H
