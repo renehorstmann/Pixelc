@@ -15,6 +15,10 @@ float hud_camera_width();
 
 float hud_camera_height();
 
+static bool hud_camera_is_portrait_mode() {
+    return hud_camera_height() > hud_camera_width();
+}
+
 static float hud_camera_top() {
     return +hud_camera_height() / 2;
 }

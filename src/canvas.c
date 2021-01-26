@@ -47,7 +47,6 @@ void canvas_init() {
     L.rows = 16;
 
     L.pose = mat4_eye();
-    u_pose_set(&L.pose, -20, 20, 80, 80, 0);
 
     L.layers = New0(RoLayer, 1);
     L.layers_size = 1;
@@ -60,7 +59,6 @@ void canvas_init() {
         r_texture_filter_nearest(L.layers[i].tex);
 
         r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
-        L.layers[i].ro.rect.pose = L.pose;
     }
 
     for(int i=0; i<L.rows*L.cols; i++) {
@@ -69,11 +67,17 @@ void canvas_init() {
 }
 
 void canvas_update(float dtime) {
+    if(c_camera_is_portrait_mode())
+        u_pose_set(&L.pose, 0, c_camera_top() - 85, 80, 80, 0);
+    else
+        u_pose_set(&L.pose, c_camera_left() + 85, 0, 80, 80, 0);
+
     for(int i=0; i<L.layers_size; i++) {
         r_texture_update(L.layers[i].tex, L.cols, L.rows, L.layers[i].layer.data);
 
-        // set alpha
+        // set alpha and pose
         L.layers[i].ro.rect.color.w = L.layers[i].layer.alpha * (1.0f/255.0f);
+        L.layers[i].ro.rect.pose = L.pose;
     }
 }
 

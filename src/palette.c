@@ -16,11 +16,6 @@ static struct {
     float last_screen_ratio_for_updates;
 } L;
 
-static bool is_portrait_mode() {
-    return hud_camera_height() > hud_camera_width();
-}
-
-
 
 static bool in_rect(ePointer_s pointer, mat4 pose) {
     vec4 screen_pos = {{pointer.x, pointer.y, 0, 1}};
@@ -42,7 +37,7 @@ static mat4 setup_palette_color_pose(int i) {
     int r = i / cols;
     int c = i % cols;
     u_pose_set_size(&pose, 8, 8);
-    if(is_portrait_mode()) {
+    if(hud_camera_is_portrait_mode()) {
         u_pose_set_xy(&pose, -90 + c * 20, hud_camera_bottom() + 10 + r * 20);
     } else {
         u_pose_set_xy(&pose, hud_camera_right() - 10 - r * 20, -90 + c * 20);
