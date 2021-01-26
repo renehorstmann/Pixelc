@@ -1,4 +1,4 @@
-#include "r/single.h"
+#include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "utilc/alloc.h"
@@ -62,7 +62,7 @@ void canvas_init() {
     }
 
     for(int i=0; i<L.rows*L.cols; i++) {
-        *layer_pixel_index(canvas_current_layer(), i) = (color) {64, 0, 0, 255};
+        *layer_pixel_index(canvas_current_layer(), i) = (color) {32, 32, 32, 255};
     }
 }
 

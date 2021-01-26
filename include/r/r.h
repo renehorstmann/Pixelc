@@ -6,9 +6,9 @@
 #include "texture.h"
 #include "shader.h"
 #include "rect.h"
-#include "single.h"
-#include "batch.h"
-#include "particle.h"
+#include "ro_single.h"
+#include "ro_batch.h"
+#include "ro_particle.h"
 #include "text.h"
 
 #endif //R_R_H

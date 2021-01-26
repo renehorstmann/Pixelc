@@ -2,7 +2,7 @@
 #include "utilc/alloc.h"
 #include "utilc/assume.h"
 #include "r/r.h"
-#include "r/particle.h"
+#include "r/ro_particle.h"
 
 
 static void init_rects(rParticleRect_s *instances, int num) {

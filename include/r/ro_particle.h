@@ -1,5 +1,5 @@
-#ifndef R_PARTICLE_H
-#define R_PARTICLE_H
+#ifndef R_RO_PARTICLE_H
+#define R_RO_PARTICLE_H
 
 #include <stdbool.h>
 #include "mathc/types/float.h"
@@ -39,4 +39,4 @@ void r_ro_particle_render(rRoParticle *self, float time);
 
 void r_ro_particle_set_texture(rRoParticle *self, GLuint tex);
 
-#endif //R_PARTICLE_H
+#endif //R_RO_PARTICLE_H

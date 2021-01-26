@@ -1,7 +1,7 @@
 #include "mathc/float.h"
 #include "utilc/alloc.h"
 #include "r/r.h"
-#include "r/batch.h"
+#include "r/ro_batch.h"
 
 
 static void init_rects(rRect_s *instances, int num) {

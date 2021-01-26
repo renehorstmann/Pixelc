@@ -1,5 +1,5 @@
-#ifndef R_BATCH_H
-#define R_BATCH_H
+#ifndef R_RO_BATCH_H
+#define R_RO_BATCH_H
 
 #include <stdbool.h>
 #include "core.h"
@@ -27,4 +27,4 @@ void r_ro_batch_render(rRoBatch *self);
 
 void r_ro_batch_set_texture(rRoBatch *self, GLuint tex);
 
-#endif //R_BATCH_H
+#endif //R_RO_BATCH_H

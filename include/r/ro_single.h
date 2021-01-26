@@ -1,5 +1,5 @@
-#ifndef R_SINGLE_H
-#define R_SINGLE_H
+#ifndef R_RO_SINGLE_H
+#define R_RO_SINGLE_H
 
 #include <stdbool.h>
 #include "core.h"
@@ -22,4 +22,4 @@ void r_ro_single_render(rRoSingle *self);
 
 void r_ro_single_set_texture(rRoSingle *self, GLuint tex);
 
-#endif //R_SINGLE_H
+#endif //R_RO_SINGLE_H
