@@ -59,12 +59,8 @@ static void setup_ro() {
 
 
 void palette_init() {
-    color *buf = New(color, 64);
-    for(int i=0;i<64;i++) 
-        buf[i] = COLOR_WHITE;
-    GLuint tex = r_texture_init(8, 8, buf);
+    GLuint tex = r_texture_init_file("res/palette_color_drop.png", NULL, NULL);
     r_texture_filter_nearest(tex);
-    free(buf);
     
     r_ro_batch_init(&L.palette_ro, PALETTE_MAX, &hud_camera_p.m00, tex);
 
