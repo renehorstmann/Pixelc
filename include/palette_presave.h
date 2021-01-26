@@ -3,6 +3,32 @@
 
 #include "palette.h"
 
+
+static void palette_presave_grayscale() {
+    color palette[10];
+    int size = 10;
+    palette[0] = COLOR_TRANSPARENT;
+    for (int i = 1; i <= 9; i++) {
+        uint8_t val = (i - 1) * 255 / 9;
+        palette[i] = (color) {val, val, val, 255};
+    }
+    palette_set_colors(palette, size);
+}
+
+static void palette_presave_grayscale_alpha() {
+    color palette[40];
+    int size = 40;
+    for(int r=0; r<4; r++) {
+        palette[0 + r*10] =  COLOR_TRANSPARENT;
+        for (int i = 1; i <= 9; i++) {
+            uint8_t val = (i - 1) * 255 / 9;
+            uint8_t alpha = (r+1) * 255 / 4;
+            palette[i+r*10] = (color) {val, val, val, alpha};
+        }
+    }
+    palette_set_colors(palette, size);
+}
+
 static void palette_presave_pixilmatt() {
     color palette[38];
     int size = 38;

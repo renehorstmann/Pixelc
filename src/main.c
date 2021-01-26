@@ -36,10 +36,11 @@ int main() {
     canvas_init();
     brush_init();
     palette_init();
-    palette_presave_pixilmatt();
     input_init();
 
-
+//    palette_presave_grayscale();
+    palette_presave_grayscale_alpha();
+//    palette_presave_pixilmatt();
 
     e_window_main_loop(main_loop);
 
