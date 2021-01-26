@@ -9,7 +9,7 @@ static void palette_presave_grayscale() {
     int size = 10;
     palette[0] = COLOR_TRANSPARENT;
     for (int i = 1; i <= 9; i++) {
-        uint8_t val = (i - 1) * 255 / 9;
+        uint8_t val = (i - 1) * 255 / 8;
         palette[i] = (color) {val, val, val, 255};
     }
     palette_set_colors(palette, size);
@@ -21,7 +21,7 @@ static void palette_presave_grayscale_alpha() {
     for(int r=0; r<4; r++) {
         palette[0 + r*10] =  COLOR_TRANSPARENT;
         for (int i = 1; i <= 9; i++) {
-            uint8_t val = (i - 1) * 255 / 9;
+            uint8_t val = (i - 1) * 255 / 8;
             uint8_t alpha = (r+1) * 255 / 4;
             palette[i+r*10] = (color) {val, val, val, alpha};
         }
