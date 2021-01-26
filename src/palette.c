@@ -13,11 +13,13 @@ static struct {
     color palette[PALETTE_MAX];
     int palette_size;
     rRoBatch ro;
+    float last_screen_ratio_for_updates;
 } L;
 
 static bool is_portrait_mode() {
     return hud_camera_height() > hud_camera_width();
 }
+
 
 
 static bool in_rect(ePointer_s pointer, mat4 pose) {
@@ -96,10 +98,19 @@ bool palette_pointer_event(ePointer_s pointer) {
 void palette_set_colors(const color *palette, int size) {
     memcpy(L.palette, palette, sizeof(color) * size);
     L.palette_size = size;
+    L.last_screen_ratio_for_updates = 0;
 }
 
+
 void palette_update(float dtime) {
-    setup_ro();
+    // check update
+    float ratio = hud_camera_width() / hud_camera_height();
+    bool update = fabsf(ratio - L.last_screen_ratio_for_updates) > 0.01f;
+    L.last_screen_ratio_for_updates = ratio;
+
+    if(update) {
+        setup_ro();
+    }
 }
 
 void palette_render() {
