@@ -43,11 +43,11 @@ Layer *canvas_current_layer() {
 }
 
 void canvas_init() {
-    L.cols = 32;
-    L.rows = 32;
+    L.cols = 16;
+    L.rows = 16;
 
     L.pose = mat4_eye();
-    u_pose_set(&L.pose, 0, 0, 80, 80, 0);
+    u_pose_set(&L.pose, -20, 20, 80, 80, 0);
 
     L.layers = New0(RoLayer, 1);
     L.layers_size = 1;

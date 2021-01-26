@@ -9,6 +9,7 @@
 #include "input.h"
 #include "hud_camera.h"
 #include "palette.h"
+#include "palette_presave.h"
 
 
 static void main_loop(float delta_time);
@@ -34,6 +35,7 @@ int main() {
     input_init();
     hud_camera_init();
     palette_init();
+    palette_presave_pixilmatt();
 
 
     e_window_main_loop(main_loop);

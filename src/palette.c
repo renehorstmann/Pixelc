@@ -4,17 +4,20 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "utilc/alloc.h"
-#include "color.h"
 #include "hud_camera.h"
 #include "brush.h"
 #include "palette.h"
 
 
 static struct {
-    int rows, cols;
-    color *palette;
+    color palette[PALETTE_MAX];
+    int palette_size;
     rRoBatch ro;
 } L;
+
+static bool is_portrait_mode() {
+    return hud_camera_height() > hud_camera_width();
+}
 
 
 static bool in_rect(ePointer_s pointer, mat4 pose) {
@@ -31,19 +34,31 @@ static bool in_rect(ePointer_s pointer, mat4 pose) {
     return x>=-1 && x<=1 && y>=-1 && y<=1;
 }
 
+static mat4 setup_palette_color_pose(int i) {
+    mat4 pose = mat4_eye();
+    int cols = 10;
+    int r = i / cols;
+    int c = i % cols;
+    u_pose_set_size(&pose, 8, 8);
+    if(is_portrait_mode()) {
+        u_pose_set_xy(&pose, -90 + c * 20, hud_camera_bottom() + 10 + r * 20);
+    } else {
+        u_pose_set_xy(&pose, hud_camera_right() - 10 - r * 20, -90 + c * 20);
+    }
+    return pose;
+}
+
+static void setup_ro() {
+    for(int i=0; i<L.palette_size; i++) {
+        L.ro.rects[i].pose = setup_palette_color_pose(i);
+        L.ro.rects[i].color = color_to_vec4(L.palette[i]);
+    }
+
+    r_ro_batch_update(&L.ro, 0, L.ro.num);
+}
+
 
 void palette_init() {
-    L.rows = 2;
-    L.cols = 8;
-    L.palette = New(color, L.rows * L.cols);
-    
-    for(int r=0; r<L.rows; r++) {
-    	for(int c=0; c<L.cols; c++) {
-    	   	int index = c + r * L.cols;
-           	L.palette[index] = (color) {r * 255 / (L.rows- 1), (L.rows-r) * 255 / L.rows, c * 255 / (L.cols - 1), 255};
-        }
-    }
-    
     color *buf = New(color, 64);
     for(int i=0;i<64;i++) 
         buf[i] = COLOR_WHITE;
@@ -51,26 +66,23 @@ void palette_init() {
     r_texture_filter_nearest(tex);
     free(buf);
     
-    r_ro_batch_init(&L.ro, L.rows * L.cols, &hud_camera_p.m00, tex);
-    
-    for(int r=0; r<L.rows; r++) {
-    	for(int c=0; c<L.cols; c++) {
-    	    int index = c + r * L.cols;
-    	   
-    	    mat4 pose = mat4_eye();
-    	    u_pose_set_size(&pose, 8, 8);
-    	    u_pose_set_xy(&pose, -80 + c * 20, -110 - r * 20);    	    
-    	    
-    	    L.ro.rects[index].pose = pose;
-    	    L.ro.rects[index].color = color_to_float(L.palette[index]);
-    	}
+    r_ro_batch_init(&L.ro, PALETTE_MAX, &hud_camera_p.m00, tex);
+
+    for(int i=0; i<PALETTE_MAX; i++) {
+        u_pose_set(&L.ro.rects[i].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+        L.ro.rects[i].color = color_to_vec4(COLOR_TRANSPARENT);
     }
     
-    r_ro_batch_update(&L.ro, 0, L.rows * L.cols);
+    r_ro_batch_update(&L.ro, 0, L.ro.num);
+
+
 }
 
 bool palette_pointer_event(ePointer_s pointer) {
-    for(int i = 0; i<L.rows  * L.cols; i++) {
+    if(pointer.action != E_POINTER_DOWN)
+        return false;
+
+    for(int i = 0; i<L.palette_size; i++) {
     	if(in_rect(pointer, L.ro.rects[i].pose)) {
     		brush_set_color(L.palette[i]);
     		return true;
@@ -80,8 +92,14 @@ bool palette_pointer_event(ePointer_s pointer) {
     return false;
 }
 
-void palette_update(float dtime) {
 
+void palette_set_colors(const color *palette, int size) {
+    memcpy(L.palette, palette, sizeof(color) * size);
+    L.palette_size = size;
+}
+
+void palette_update(float dtime) {
+    setup_ro();
 }
 
 void palette_render() {

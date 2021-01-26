@@ -12,6 +12,24 @@ void hud_camera_init();
 void hud_camera_update();
 
 float hud_camera_width();
+
 float hud_camera_height();
+
+static float hud_camera_top() {
+    return +hud_camera_height() / 2;
+}
+
+static float hud_camera_bottom() {
+    return -hud_camera_height() / 2;
+}
+
+static float hud_camera_left() {
+    return -hud_camera_width() / 2;
+}
+
+static float hud_camera_right() {
+    return +hud_camera_width() / 2;
+}
+
 
 #endif //PIXELC_HUD_CAMERA_H

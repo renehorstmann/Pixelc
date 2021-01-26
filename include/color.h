@@ -5,18 +5,62 @@
 #include "e/core.h"
 #include "mathc/types/float.h"
 
-typedef struct {
-    uint8_t r, g, b, a;
+typedef union {
+    uint8_t data[4];
+    struct {
+        uint8_t r, g, b, a;
+    };
 } color;
 _Static_assert(sizeof(color) == 4, "color not packed?");
 
-static vec4 color_to_float(color c) {
+static vec4 color_to_vec4(color c) {
 	return (vec4) {{
 		c.r / 255.0f,
 		c.g / 255.0f,
 		c.b / 255.0f,
 		c.a / 255.0f
 	}};
+}
+
+static color color_from_vec4(vec4 v) {
+    return (color) {
+        v.x * 255,
+        v.y * 255,
+        v.z * 255,
+        v.w * 255
+    };
+}
+
+static color color_from_hex(const char *hex_string) {
+    color c = {0};
+    char buf[8];
+    if(*hex_string == '#')
+        hex_string++;
+
+    // rgb
+    if(strlen(hex_string) == 6) {
+        for(int i=0; i<3; i++) {
+            strncpy(buf, hex_string, 2);
+            hex_string+=2;
+            c.data[i] = strtol(buf, NULL, 16);
+        }
+        c.a = 255;
+        return c;
+    }
+
+    // rgba
+    if(strlen(hex_string) == 8) {
+        for(int i=0; i<4; i++) {
+            strncpy(buf, hex_string, 2);
+            hex_string+=2;
+            c.data[i] = strtol(buf, NULL, 16);
+        }
+        return c;
+    }
+
+    // error
+    SDL_Log("color_from_hex failed for: %s", hex_string);
+    return c;
 }
 
 static void color_print(color c) {
