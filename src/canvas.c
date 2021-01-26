@@ -62,16 +62,17 @@ void canvas_init() {
         r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
     }
 
-//    for(int i=0; i<L.rows*L.cols; i++) {
-//        *layer_pixel_index(canvas_current_layer(), i) = COLOR_TRANSPARENT;
-//    }
-//    *layer_pixel(canvas_current_layer(), 0, 0) = COLOR_WHITE;
-//    *layer_pixel(canvas_current_layer(), L.rows-1, 0) = COLOR_WHITE;
-//    *layer_pixel(canvas_current_layer(), 0, L.cols-1) = COLOR_WHITE;
-//    *layer_pixel(canvas_current_layer(), L.rows-1, L.cols-1) = COLOR_WHITE;
 
 
-    io_load_layer(canvas_current_layer(), "sprite.png");
+    if(!io_load_layer(canvas_current_layer(), "sprite.png")) {
+        for(int i=0; i<L.rows*L.cols; i++) {
+            *layer_pixel_index(canvas_current_layer(), i) = COLOR_TRANSPARENT;
+        }
+        *layer_pixel(canvas_current_layer(), 0, 0) = COLOR_WHITE;
+        *layer_pixel(canvas_current_layer(), L.rows-1, 0) = COLOR_WHITE;
+        *layer_pixel(canvas_current_layer(), 0, L.cols-1) = COLOR_WHITE;
+        *layer_pixel(canvas_current_layer(), L.rows-1, L.cols-1) = COLOR_WHITE;
+    }
 }
 
 void canvas_update(float dtime) {

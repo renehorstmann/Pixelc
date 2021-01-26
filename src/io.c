@@ -25,29 +25,33 @@ static SDL_Surface *load_buffer(void *data, int width, int height) {
 }
 
 
-void io_load_layer(Layer *out_layer, const char *file) {
+bool io_load_layer(Layer *out_layer, const char *file) {
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
         SDL_Log("io_load_layer (%s) failed: %s", file, IMG_GetError());
-        return;
+        return false;
     }
     SDL_PixelFormat *f = img->format;
     if (f->BitsPerPixel != 32 || f->Amask == 0) {
         SDL_Log("io_load_layer failed, 8bpp and alpha needed");
-        return;
+        return false;
     }
     if (img->w != canvas_cols() || img->h != canvas_rows()) {
         SDL_Log("io_load_layer failed, wrong size");
-        return;
+        return false;
     }
 
     memcpy(out_layer->data, img->pixels, img->w * img->h * 4);
     SDL_FreeSurface(img);
+    return true;
 }
 
-void io_save_layer(const Layer layer, const char *file) {
+bool io_save_layer(const Layer layer, const char *file) {
     SDL_Surface *img = load_buffer(layer.data, canvas_cols(), canvas_rows());
     int ret = IMG_SavePNG(img, file);
-    if(ret)
+    if(ret) {
         SDL_Log("io_save_layer (%s) failed: %s", file, IMG_GetError());
+        return false;
+    }
+    return true;
 }
