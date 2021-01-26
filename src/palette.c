@@ -36,7 +36,7 @@ static mat4 setup_palette_color_pose(int i) {
     int cols = 10;
     int r = i / cols;
     int c = i % cols;
-    u_pose_set_size(&pose, 8, 8);
+    u_pose_set_size(&pose, 16, 16);
     if(hud_camera_is_portrait_mode()) {
         u_pose_set_xy(&pose, -90 + c * 20, hud_camera_bottom() + 10 + r * 20);
     } else {

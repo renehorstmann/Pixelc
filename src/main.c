@@ -3,13 +3,14 @@
 #include "r/r.h"
 #include "u/u.h"
 
-#include "brush.h"
-#include "c_camera.h"
-#include "canvas.h"
-#include "input.h"
 #include "hud_camera.h"
+#include "c_camera.h"
+#include "background.h"
+#include "canvas.h"
 #include "palette.h"
 #include "palette_presave.h"
+#include "brush.h"
+#include "input.h"
 
 
 static void main_loop(float delta_time);
@@ -29,13 +30,15 @@ int main() {
 
 
     // init systems
-    brush_init();
-    c_camera_init();
-    canvas_init();
-    input_init();
     hud_camera_init();
+    c_camera_init();
+    background_init();
+    canvas_init();
     palette_init();
     palette_presave_pixilmatt();
+    brush_init();
+    input_init();
+
 
 
     e_window_main_loop(main_loop);
@@ -53,14 +56,16 @@ static void main_loop(float delta_time) {
     
 
     // simulate
-    c_camera_update();
-    canvas_update(delta_time);
     hud_camera_update();
+    c_camera_update();
+    background_update(delta_time);
+    canvas_update(delta_time);
     palette_update(delta_time);
 
     // render
     r_render_begin_frame(e_window_size[0], e_window_size[1]);
 
+    background_render();
     canvas_render();
     palette_render();
 

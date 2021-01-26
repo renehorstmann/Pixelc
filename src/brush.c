@@ -4,6 +4,7 @@
 
 #include "color.h"
 #include "c_camera.h"
+#include "io.h"
 #include "canvas.h"
 
 static struct {
@@ -63,6 +64,10 @@ void brush_pointer_event(ePointer_s pointer) {
         case BRUSH_MODE_FREE:
             free_mode(pointer);
             break;
+    }
+
+    if(pointer.action == E_POINTER_UP) {
+        io_save_layer(*canvas_current_layer(), "sprite.png");
     }
 }
 

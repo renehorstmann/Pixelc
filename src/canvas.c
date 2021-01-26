@@ -5,6 +5,7 @@
 #include "mathc/mat/float.h"
 
 #include "c_camera.h"
+#include "io.h"
 #include "canvas.h"
 
 
@@ -61,16 +62,23 @@ void canvas_init() {
         r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
     }
 
-    for(int i=0; i<L.rows*L.cols; i++) {
-        *layer_pixel_index(canvas_current_layer(), i) = (color) {32, 32, 32, 255};
-    }
+//    for(int i=0; i<L.rows*L.cols; i++) {
+//        *layer_pixel_index(canvas_current_layer(), i) = COLOR_TRANSPARENT;
+//    }
+//    *layer_pixel(canvas_current_layer(), 0, 0) = COLOR_WHITE;
+//    *layer_pixel(canvas_current_layer(), L.rows-1, 0) = COLOR_WHITE;
+//    *layer_pixel(canvas_current_layer(), 0, L.cols-1) = COLOR_WHITE;
+//    *layer_pixel(canvas_current_layer(), L.rows-1, L.cols-1) = COLOR_WHITE;
+
+
+    io_load_layer(canvas_current_layer(), "sprite.png");
 }
 
 void canvas_update(float dtime) {
     if(c_camera_is_portrait_mode())
-        u_pose_set(&L.pose, 0, c_camera_top() - 85, 80, 80, 0);
+        u_pose_set(&L.pose, 0, c_camera_top() - 85, 160, 160, 0);
     else
-        u_pose_set(&L.pose, c_camera_left() + 85, 0, 80, 80, 0);
+        u_pose_set(&L.pose, c_camera_left() + 85, 0, 160, 160, 0);
 
     for(int i=0; i<L.layers_size; i++) {
         r_texture_update(L.layers[i].tex, L.cols, L.rows, L.layers[i].layer.data);

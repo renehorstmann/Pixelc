@@ -14,15 +14,15 @@ static float u_pose_get_y(mat4 p) {
 }
 
 static float u_pose_get_w(mat4 p) {
-	return sqrtf(powf(p.m00, 2) + powf(p.m01, 2));
+	return sqrtf(powf(p.m00, 2) + powf(p.m01, 2)) * 2;
 }
 
 static float u_pose_get_h(mat4 p) {
-	return sqrtf(powf(p.m10, 2) + powf(p.m11, 2));
+	return sqrtf(powf(p.m10, 2) + powf(p.m11, 2)) * 2;
 }
 
 static float u_pose_get_angle(mat4 p) {
-	return atan2(p.m01, p.m00);
+	return atan2f(p.m01, p.m00);
 }
 
 static void u_pose_set_x(mat4 *p, float x) {
@@ -39,10 +39,10 @@ static void u_pose_set_xy(mat4 *p, float x, float y) {
 }
 
 static void u_pose_set_size_angle(mat4 *p, float w, float h, float angle_rad) {
-	p->m00 = cos(angle_rad) * w;
-    p->m01 = sin(angle_rad) * w;
-    p->m10 = -sin(angle_rad) * h;
-    p->m11 = cos(angle_rad) * h;
+	p->m00 = cosf(angle_rad) * w / 2;
+    p->m01 = sinf(angle_rad) * w / 2;
+    p->m10 = -sinf(angle_rad) * h / 2;
+    p->m11 = cosf(angle_rad) * h / 2;
 }
 
 static void u_pose_set_w(mat4 *p, float w) {
