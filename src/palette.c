@@ -40,9 +40,9 @@ static mat4 setup_palette_color_pose(int i) {
     int c = i % cols;
     u_pose_set_size(&pose, 16, 16);
     if(hud_camera_is_portrait_mode()) {
-        u_pose_set_xy(&pose, -90 + c * 20, hud_camera_bottom() + 10 + r * 20);
+        u_pose_set_xy(&pose, -81 + c * 18, hud_camera_bottom() + 9 + r * 18);
     } else {
-        u_pose_set_xy(&pose, hud_camera_right() - 10 - r * 20, -90 + c * 20);
+        u_pose_set_xy(&pose, hud_camera_right() - 9 - r * 18, -81 + c * 18);
     }
     return pose;
 }
