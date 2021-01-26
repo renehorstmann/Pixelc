@@ -12,7 +12,9 @@
 static struct {
     color palette[PALETTE_MAX];
     int palette_size;
-    rRoBatch ro;
+    rRoBatch palette_ro;
+    rRoSingle select_ro;
+    int last_selected;
     float last_screen_ratio_for_updates;
 } L;
 
@@ -47,11 +49,12 @@ static mat4 setup_palette_color_pose(int i) {
 
 static void setup_ro() {
     for(int i=0; i<L.palette_size; i++) {
-        L.ro.rects[i].pose = setup_palette_color_pose(i);
-        L.ro.rects[i].color = color_to_vec4(L.palette[i]);
+        L.palette_ro.rects[i].pose = setup_palette_color_pose(i);
+        L.palette_ro.rects[i].color = color_to_vec4(L.palette[i]);
     }
+    L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
 
-    r_ro_batch_update(&L.ro, 0, L.ro.num);
+    r_ro_batch_update(&L.palette_ro, 0, L.palette_ro.num);
 }
 
 
@@ -63,16 +66,18 @@ void palette_init() {
     r_texture_filter_nearest(tex);
     free(buf);
     
-    r_ro_batch_init(&L.ro, PALETTE_MAX, &hud_camera_p.m00, tex);
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, &hud_camera_p.m00, tex);
 
     for(int i=0; i<PALETTE_MAX; i++) {
-        u_pose_set(&L.ro.rects[i].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-        L.ro.rects[i].color = color_to_vec4(COLOR_TRANSPARENT);
+        u_pose_set(&L.palette_ro.rects[i].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+        L.palette_ro.rects[i].color = color_to_vec4(COLOR_TRANSPARENT);
     }
     
-    r_ro_batch_update(&L.ro, 0, L.ro.num);
+    r_ro_batch_update(&L.palette_ro, 0, L.palette_ro.num);
 
-
+    GLuint select_tex = r_texture_init_file("res/palette_select.png", NULL, NULL);
+    r_texture_filter_nearest(select_tex);
+    r_ro_single_init(&L.select_ro, &hud_camera_p.m00, select_tex);
 }
 
 bool palette_pointer_event(ePointer_s pointer) {
@@ -80,8 +85,8 @@ bool palette_pointer_event(ePointer_s pointer) {
         return false;
 
     for(int i = 0; i<L.palette_size; i++) {
-    	if(in_rect(pointer, L.ro.rects[i].pose)) {
-    		brush_set_color(L.palette[i]);
+    	if(in_rect(pointer, L.palette_ro.rects[i].pose)) {
+    	    palette_select_color(i);
     		return true;
     	}
    }  
@@ -93,9 +98,14 @@ bool palette_pointer_event(ePointer_s pointer) {
 void palette_set_colors(const color *palette, int size) {
     memcpy(L.palette, palette, sizeof(color) * size);
     L.palette_size = size;
-    L.last_screen_ratio_for_updates = 0;
+    palette_select_color(0);
 }
 
+void palette_select_color(int index) {
+    brush_set_color(L.palette[index]);
+    L.select_ro.rect.pose = L.palette_ro.rects[index].pose;
+    L.last_selected = index;
+}
 
 void palette_update(float dtime) {
     // check update
@@ -109,5 +119,6 @@ void palette_update(float dtime) {
 }
 
 void palette_render() {
-    r_ro_batch_render(&L.ro);
+    r_ro_batch_render(&L.palette_ro);
+    r_ro_single_render(&L.select_ro);
 }

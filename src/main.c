@@ -7,9 +7,9 @@
 #include "c_camera.h"
 #include "background.h"
 #include "canvas.h"
+#include "brush.h"
 #include "palette.h"
 #include "palette_presave.h"
-#include "brush.h"
 #include "input.h"
 
 
@@ -34,9 +34,9 @@ int main() {
     c_camera_init();
     background_init();
     canvas_init();
+    brush_init();
     palette_init();
     palette_presave_pixilmatt();
-    brush_init();
     input_init();
 
 

@@ -73,7 +73,7 @@ void brush_pointer_event(ePointer_s pointer) {
 
 
 void brush_init() {
-    L.current_color = COLOR_RED;
+    L.current_color = COLOR_TRANSPARENT;
     L.mode = BRUSH_MODE_FREE;
 }
 
