@@ -1,15 +1,15 @@
 # Pixelc
 An opensource tile/sprite editor in C, using SDL2 and OpenGL, also running on Android
 
-## WARNING:
-In active devolpment
+## Status:
+Ready to draw.
+Saves after each tip on the screen to sprite.png
+Loads sprite.png at start, if available
+Palette, brush, size can be configured in code
 
 ## Todo
-- Color Palette
-- Selected Color overlay
 - Grid Overlay
-- Save Btn
-- Fill Btn
+- Brush Mode Buttons
 - Zoom n Pinch 
 - ...
 
