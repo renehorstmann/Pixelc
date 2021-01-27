@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <float.h>  // FLT_MAX
 #include "e/e_input.h"
 #include "r/r.h"
 #include "u/pose.h"

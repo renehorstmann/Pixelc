@@ -1,3 +1,4 @@
+#include <float.h> // FLT_MAX
 #include "mathc/float.h"
 #include "utilc/alloc.h"
 #include "utilc/assume.h"
