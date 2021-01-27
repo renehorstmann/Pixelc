@@ -11,11 +11,11 @@ static struct {
 
 void background_init() {
     Color_s buf[4];
-    buf[0] = buf[3] = color_from_hex("#999999");
-    buf[1] = buf[2] = color_from_hex("#777777");
+    buf[0] = buf[3] = color_from_hex("#000000");
+    buf[1] = buf[2] = color_from_hex("#111111");
 
     GLuint tex = r_texture_init(2, 2, buf);
-    r_texture_filter_nearest(tex);
+    r_texture_filter_linear(tex);
 
     r_ro_single_init(&L.ro, &hud_camera_p.m00, tex);
 }

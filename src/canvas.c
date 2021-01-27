@@ -24,7 +24,8 @@ static struct {
     int layers_size;
     int current_layer;
 
-
+    rRoSingle bg;
+    rRoSingle grid;
 } L;
 
 
@@ -61,7 +62,20 @@ void canvas_init(int rows, int cols) {
 
         r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
     }
+    
+    GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL, NULL);
+    r_texture_filter_nearest(grid_tex);
+    r_ro_single_init(&L.grid, &c_camera_p.m00, grid_tex);
+    u_pose_set_size(&L.grid.rect.uv, 2*cols, 2*rows);
 
+
+    Color_s buf[4];
+    buf[0] = buf[3] = color_from_hex("#999999");
+    buf[1] = buf[2] = color_from_hex("#777777");
+    GLuint bg_tex = r_texture_init(2, 2, buf);
+    r_texture_filter_nearest(bg_tex);
+    r_ro_single_init(&L.bg, &c_camera_p.m00, bg_tex);
+    u_pose_set_size(&L.bg.rect.uv, 4*cols, 4*rows);
 
 
     if(!io_load_layer(canvas_current_layer(), "sprite.png")) {
@@ -88,10 +102,17 @@ void canvas_update(float dtime) {
         L.layers[i].ro.rect.color.w = L.layers[i].layer.alpha * (1.0f/255.0f);
         L.layers[i].ro.rect.pose = L.pose;
     }
+    
+    L.grid.rect.pose = L.pose;
+    L.bg.rect.pose = L.pose;
 }
 
 void canvas_render() {
+    r_ro_single_render(&L.bg);
+    
     for(int i=0; i<L.layers_size; i++) {
         r_ro_single_render(&L.layers[i].ro);
     }
+    
+    r_ro_single_render(&L.grid);
 }

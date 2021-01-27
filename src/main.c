@@ -33,14 +33,14 @@ int main(int argc, char **argv) {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init(18, 18);
+    canvas_init(8, 8);
     brush_init();
     palette_init();
     input_init();
 
 //    palette_presave_grayscale();
-//    palette_presave_grayscale_alpha();
-    palette_presave_pixilmatt();
+    palette_presave_grayscale_alpha();
+//    palette_presave_pixilmatt();
 
     e_window_main_loop(main_loop);
 
