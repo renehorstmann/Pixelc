@@ -41,6 +41,7 @@ static mat4 setup_palette_color_pose(int r, int c) {
         u_pose_set_xy(&pose, -81 + c * 18, hud_camera_bottom() + 9 + r * 18);
     } else {
         u_pose_set_xy(&pose, hud_camera_right() - 9 - r * 18, -81 + c * 18);
+        u_pose_set_angle(&pose, M_PI_2);
     }
     return pose;
 }
