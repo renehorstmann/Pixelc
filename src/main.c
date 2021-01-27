@@ -16,7 +16,7 @@
 static void main_loop(float delta_time);
 
 
-int main() {
+int main(int argc, char **argv) {
     SDL_Log("Pixelc");
 
     // init e (environment)
