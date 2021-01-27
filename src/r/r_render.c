@@ -1,4 +1,4 @@
-#include "r/r_render.h"
+#include "r/render.h"
 
 SDL_Window *r_render_window;
 

@@ -2,8 +2,8 @@
 #define E_E_H
 
 #include "core.h"
-#include "e_window.h"
-#include "e_input.h"
-#include "e_gui.h"
+#include "window.h"
+#include "input.h"
+#include "gui.h"
 
 #endif //E_E_H

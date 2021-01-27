@@ -1,5 +1,5 @@
 #include <SDL_image.h>
-#include "r/r_texture.h"
+#include "r/texture.h"
 
 GLuint r_texture_init(int width, int height, const void *buffer) {
     GLuint tex;

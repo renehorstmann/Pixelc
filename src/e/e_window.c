@@ -2,7 +2,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-#include "e/e_window.h"
+#include "e/window.h"
 #include "e/definitions.h"
 
 

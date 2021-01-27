@@ -2,8 +2,8 @@
 #define NK_SDL_GLES2_IMPLEMENTATION
 #define NK_SDL_GL3_IMPLEMENTATION
 
-#include "e/e_window.h"
-#include "e/e_gui.h"
+#include "e/window.h"
+#include "e/gui.h"
 
 #define MAX_VERTEX_MEMORY 512 * 1024
 #define MAX_ELEMENT_MEMORY 128 * 1024

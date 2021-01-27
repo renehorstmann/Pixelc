@@ -1,4 +1,4 @@
-#include "u/u_prandom.h"
+#include "u/prandom.h"
 
 static _Thread_local uint32_t x;
 static const uint32_t a = 1103515245;

@@ -1,8 +1,8 @@
 #include "mathc/float.h"
 #include "utilc/assume.h"
-#include "e/e_window.h"
-#include "e/e_gui.h"
-#include "e/e_input.h"
+#include "e/window.h"
+#include "e/gui.h"
+#include "e/input.h"
 
 bool e_input_up;
 bool e_input_left;

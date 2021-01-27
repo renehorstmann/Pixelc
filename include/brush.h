@@ -1,7 +1,7 @@
 #ifndef PIXELC_BRUSH_H
 #define PIXELC_BRUSH_H
 
-#include "e/e_input.h"
+#include "e/input.h"
 #include "color.h"
 
 enum brushmodes {BRUSH_MODE_DOT, BRUSH_MODE_FREE};

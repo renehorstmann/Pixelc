@@ -1,4 +1,4 @@
-#include "e/e_input.h"
+#include "e/input.h"
 #include "brush.h"
 #include "mathc/float.h"
 

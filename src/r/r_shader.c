@@ -1,6 +1,6 @@
 #include "utilc/strviu.h"
 #include "r/definitions.h"
-#include "r/r_shader.h"
+#include "r/shader.h"
 
 
 static char *file_read(const char *filename) {
