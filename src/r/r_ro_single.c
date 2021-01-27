@@ -31,11 +31,6 @@ void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink) {
     }
 }
 
-void r_rect_update(rRoSingle *self);
-
-void r_ro_single_render(rRoSingle *self);
-
-
 void r_ro_single_kill(rRoSingle *self) {
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
