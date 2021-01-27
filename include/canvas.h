@@ -5,7 +5,7 @@
 #include "mathc/types/float.h"
 #include "layer.h"
 
-void canvas_init();
+void canvas_init(int rows, int cols);
 
 mat4 canvas_pose();
 

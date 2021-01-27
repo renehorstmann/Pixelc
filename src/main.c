@@ -33,7 +33,7 @@ int main() {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init();
+    canvas_init(18, 18);
     brush_init();
     palette_init();
     input_init();

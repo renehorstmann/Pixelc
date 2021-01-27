@@ -3,7 +3,8 @@
 
 #include "color.h"
 
-#define PALETTE_MAX 64
+#define PALETTE_MAX 60
+#define PALETTE_COLS 10
 
 void palette_init();
 

@@ -43,9 +43,9 @@ Layer *canvas_current_layer() {
     return &L.layers[L.current_layer].layer;
 }
 
-void canvas_init() {
-    L.cols = 16;
-    L.rows = 16;
+void canvas_init(int rows, int cols) {
+    L.rows = rows;
+    L.cols = cols;
 
     L.pose = mat4_eye();
 
