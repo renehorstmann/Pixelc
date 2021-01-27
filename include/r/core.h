@@ -25,13 +25,14 @@
 }
 
 
-static const vec4 rWHITE = {{1, 1, 1, 1}};
-static const vec4 rBLACK = {{0, 0, 0, 1}};
-static const vec4 rRED = {{1, 0, 0, 1}};
-static const vec4 rGREEN= {{0, 1, 0, 1}};
-static const vec4 rBLUE = {{0, 0, 1, 1}};
-static const vec4 rYELLOW = {{1, 1, 0, 1}};
-static const vec4 rCYAN = {{0, 1, 1, 1}};
-static const vec4 rMAGENTA = {{1, 0, 1, 1}};
+static const vec4 R_COLOR_TRANSPARENT = {{0, 0, 0, 0}};
+static const vec4 R_COLOR_BLACK = {{0, 0, 0, 1}};
+static const vec4 R_COLOR_WHITE = {{1, 1, 1, 1}};
+static const vec4 R_COLOR_RED = {{1, 0, 0, 1}};
+static const vec4 R_COLOR_GREEN= {{0, 1, 0, 1}};
+static const vec4 R_COLOR_BLUE = {{0, 0, 1, 1}};
+static const vec4 R_COLOR_YELLOW = {{1, 1, 0, 1}};
+static const vec4 R_COLOR_CYAN = {{0, 1, 1, 1}};
+static const vec4 R_COLOR_MAGENTA = {{1, 0, 1, 1}};
 
 #endif //R_CORE_H

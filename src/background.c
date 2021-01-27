@@ -10,7 +10,7 @@ static struct {
 } L;
 
 void background_init() {
-    color buf[4];
+    Color_s buf[4];
     buf[0] = buf[3] = color_from_hex("#999999");
     buf[1] = buf[2] = color_from_hex("#777777");
 

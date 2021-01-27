@@ -8,9 +8,9 @@
 #include "canvas.h"
 
 static struct {
-   color current_color;
-   enum brushmodes mode;
-   bool drawing;
+    Color_s current_color;
+    enum brushmodes mode;
+    bool drawing;
 } L;
 
 static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
@@ -27,37 +27,37 @@ static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
 }
 
 static void dot_mode(ePointer_s pointer) {
-    if(pointer.action != E_POINTER_DOWN)
+    if (pointer.action != E_POINTER_DOWN)
         return;
 
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if(c>=0 && c<canvas_cols() && r>=0 && r < canvas_rows()) {
+    if (c >= 0 && c < canvas_cols() && r >= 0 && r < canvas_rows()) {
         *layer_pixel(canvas_current_layer(), r, c) = L.current_color;
     }
 }
 
 static void free_mode(ePointer_s pointer) {
-    if(pointer.action == E_POINTER_DOWN) {
+    if (pointer.action == E_POINTER_DOWN) {
         L.drawing = true;
-    } else if(pointer.action != E_POINTER_MOVE) {
+    } else if (pointer.action != E_POINTER_MOVE) {
         L.drawing = false;
         return;
     }
-    if(!L.drawing)
+    if (!L.drawing)
         return;
 
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if(c>=0 && c<canvas_cols() && r>=0 && r < canvas_rows()) {
+    if (c >= 0 && c < canvas_cols() && r >= 0 && r < canvas_rows()) {
         *layer_pixel(canvas_current_layer(), r, c) = L.current_color;
     }
 }
 
 void brush_pointer_event(ePointer_s pointer) {
-    switch(L.mode) {
+    switch (L.mode) {
         case BRUSH_MODE_DOT:
             dot_mode(pointer);
             break;
@@ -66,7 +66,7 @@ void brush_pointer_event(ePointer_s pointer) {
             break;
     }
 
-    if(pointer.action == E_POINTER_UP) {
+    if (pointer.action == E_POINTER_UP) {
         io_save_layer(*canvas_current_layer(), "sprite.png");
     }
 }
@@ -77,7 +77,7 @@ void brush_init() {
     L.mode = BRUSH_MODE_FREE;
 }
 
-void brush_set_color(color col) {
+void brush_set_color(Color_s col) {
     L.current_color = col;
 }
 

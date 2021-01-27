@@ -10,10 +10,10 @@ typedef union {
     struct {
         uint8_t r, g, b, a;
     };
-} color;
-_Static_assert(sizeof(color) == 4, "color not packed?");
+} Color_s;
+_Static_assert(sizeof(Color_s) == 4, "color not packed?");
 
-static vec4 color_to_vec4(color c) {
+static vec4 color_to_vec4(Color_s c) {
 	return (vec4) {{
 		c.r / 255.0f,
 		c.g / 255.0f,
@@ -22,8 +22,8 @@ static vec4 color_to_vec4(color c) {
 	}};
 }
 
-static color color_from_vec4(vec4 v) {
-    return (color) {
+static Color_s color_from_vec4(vec4 v) {
+    return (Color_s) {
         v.x * 255,
         v.y * 255,
         v.z * 255,
@@ -31,8 +31,8 @@ static color color_from_vec4(vec4 v) {
     };
 }
 
-static color color_from_hex(const char *hex_string) {
-    color c = {0};
+static Color_s color_from_hex(const char *hex_string) {
+    Color_s c = {0};
     char buf[8];
     if(*hex_string == '#')
         hex_string++;
@@ -63,16 +63,16 @@ static color color_from_hex(const char *hex_string) {
     return c;
 }
 
-static void color_print(color c) {
+static void color_print(Color_s c) {
     SDL_Log("(color) {%d, %d, %d, %d}", c.r, c.g, c.b, c.a);
 }
 
-static const color COLOR_TRANSPARENT = {0, 0, 0, 0};
-static const color COLOR_BLACK = {0, 0, 0, 255};
-static const color COLOR_WHITE = {255, 255, 255, 255};
-static const color COLOR_RED = {255, 0, 0, 255};
-static const color COLOR_GREEN = {255, 0, 0, 255};
-static const color COLOR_BLUE = {255, 0, 0, 255};
+static const Color_s COLOR_TRANSPARENT = {0, 0, 0, 0};
+static const Color_s COLOR_BLACK = {0, 0, 0, 255};
+static const Color_s COLOR_WHITE = {255, 255, 255, 255};
+static const Color_s COLOR_RED = {255, 0, 0, 255};
+static const Color_s COLOR_GREEN = {255, 0, 0, 255};
+static const Color_s COLOR_BLUE = {255, 0, 0, 255};
 
 
 #endif //PIXELC_COLOR_H

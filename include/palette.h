@@ -11,7 +11,7 @@ void palette_init();
 // return true if the pointer was used (indicate event done)
 bool palette_pointer_event(ePointer_s pointer);
 
-void palette_set_colors(const color *palette, int size);
+void palette_set_colors(const Color_s *palette, int size);
 
 void palette_select_color(int index);
 

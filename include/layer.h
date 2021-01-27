@@ -4,7 +4,7 @@
 #include "color.h"
 
 typedef struct {
-    color *data;
+    Color_s *data;
     uint8_t alpha;
 } Layer;
 
@@ -12,9 +12,9 @@ void layer_init(Layer *self);
 
 void layer_kill(Layer *self);
 
-color *layer_pixel(Layer *self, int row, int col);
+Color_s *layer_pixel(Layer *self, int row, int col);
 
-color *layer_pixel_index(Layer *self, int index);
+Color_s *layer_pixel_index(Layer *self, int index);
 
 
 #endif //PIXELC_LAYER_H

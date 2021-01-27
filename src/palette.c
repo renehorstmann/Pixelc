@@ -10,7 +10,7 @@
 
 
 static struct {
-    color palette[PALETTE_MAX];
+    Color_s palette[PALETTE_MAX];
     int palette_size;
     rRoBatch palette_ro;
     rRoSingle select_ro;
@@ -65,7 +65,7 @@ static void setup_ro() {
         if(i<L.palette_size)
         	col = color_to_vec4(L.palette[i]);
         else
-            col = color_to_vec4(COLOR_TRANSPARENT);
+            col = R_COLOR_TRANSPARENT;
         
         L.palette_ro.rects[i].color = col;
         
@@ -106,7 +106,7 @@ void palette_init() {
     
     // default palette:
     {
-        color palette[4] = {
+        Color_s palette[4] = {
         	{0, 0, 0, 0},
         	{0, 0, 0, 255},
         	{128, 128, 128, 255},
@@ -131,8 +131,8 @@ bool palette_pointer_event(ePointer_s pointer) {
 }
 
 
-void palette_set_colors(const color *palette, int size) {
-    memcpy(L.palette, palette, sizeof(color) * size);
+void palette_set_colors(const Color_s *palette, int size) {
+    memcpy(L.palette, palette, sizeof(Color_s) * size);
     L.palette_size = size;
     palette_select_color(0);
 }

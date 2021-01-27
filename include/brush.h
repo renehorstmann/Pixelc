@@ -11,7 +11,7 @@ void brush_init();
 
 void brush_pointer_event(ePointer_s pointer);
 
-void brush_set_color(color col);
+void brush_set_color(Color_s col);
 
 void brush_set_mode(enum brushmodes mode);
 
