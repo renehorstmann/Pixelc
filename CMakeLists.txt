@@ -52,6 +52,10 @@ target_link_libraries(pixelc m
         ${SDL2_TTF_LIBRARIES}
         )
 
+# GLEW
+find_library(GLEW_LIB GLEW)
+target_link_libraries(pixelc ${GLEW_LIB})
+
 # res
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

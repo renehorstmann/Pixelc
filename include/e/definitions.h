@@ -2,8 +2,9 @@
 #define E_DEFINITIONS_H
 
 #define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
 #include <SDL.h>
-#include <SDL_opengl.h>
+//#include <SDL_opengl.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

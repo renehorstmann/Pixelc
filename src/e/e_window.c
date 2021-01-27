@@ -74,7 +74,15 @@ void e_window_init(const char *name) {
     // Not necessary, but recommended to create a gl context:
     SDL_GL_CreateContext(e_window);
     SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
-    
+
+    // glew
+    GLenum err = glewInit();
+    if (GLEW_OK != err){
+        /* Problem: glewInit failed, something is seriously wrong. */
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "glewInit faled: %s\n", glewGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
+    SDL_Log("Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
     e_window_update();
 }
