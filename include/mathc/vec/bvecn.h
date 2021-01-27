@@ -1,7 +1,7 @@
 #ifndef MATHC_VEC_BVECN_H
 #define MATHC_VEC_BVECN_H
 
-#include "stdbool.h"
+#include <stdbool.h>
 
 /** dst = vec */
 static void bvecN_copy(bool *dst_vec, const bool *vec, int n) {

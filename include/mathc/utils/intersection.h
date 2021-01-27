@@ -1,7 +1,7 @@
 #ifndef MATHC_UTILS_INTERSECTION_H
 #define MATHC_UTILS_INTERSECTION_H
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include "../vec/vec3.h"
 #include "../mat/mat3.h"
 

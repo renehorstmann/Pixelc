@@ -5,7 +5,7 @@
 #define static_assert _Static_assert
 #endif
 
-#include "stdbool.h"
+#include <stdbool.h>
 
 
 typedef union bvec2 {

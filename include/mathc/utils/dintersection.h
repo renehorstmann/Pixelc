@@ -1,7 +1,7 @@
 #ifndef MATHC_UTILS_DINTERSECTION_H
 #define MATHC_UTILS_DINTERSECTION_H
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include "../vec/dvec3.h"
 #include "../mat/dmat3.h"
 

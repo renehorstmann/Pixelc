@@ -1,7 +1,7 @@
 #ifndef MATHC_QUAT_QUAT_H
 #define MATHC_QUAT_QUAT_H
 
-#include "math.h"
+#include <math.h>
 #include "../initializer.h"
 #include "../types/float.h"
 #include "../vec/vec3.h"

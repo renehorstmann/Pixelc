@@ -2,6 +2,7 @@
 #define MATHC_IO_INT_H
 
 #include <stdio.h>
+#include <locale.h>
 #include "../types/int.h"
 
 //
@@ -26,6 +27,7 @@
 
 
 static void ivec2_print_f(ivec2 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(ivec2) " MATHC_PRINT_COLOR "{{");
     for (int v = 0; v < 2; v++) {
         if(v>0)
@@ -33,6 +35,7 @@ static void ivec2_print_f(ivec2 vec, FILE *ostream) {
         fprintf(ostream, " %d", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void ivec2_println_f(ivec2 vec, FILE *ostream) {
@@ -50,6 +53,7 @@ static void ivec2_println(ivec2 vec) {
 
 
 static void imat2_println_f(imat2 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "imat2: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 2; r++) {
         fprintf(ostream, "  |");
@@ -59,6 +63,7 @@ static void imat2_println_f(imat2 mat, FILE *ostream) {
         fprintf(ostream, " |\n");
     }
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void imat2_println(imat2 imat) {
@@ -66,6 +71,7 @@ static void imat2_println(imat2 imat) {
 }
 
 static void imat2_print_repr_f(imat2 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(imat2)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 4; v++) {
         if(v>0)
@@ -73,6 +79,7 @@ static void imat2_print_repr_f(imat2 mat, FILE *ostream) {
         fprintf(ostream, " %d", mat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void imat2_println_repr_f(imat2 mat, FILE *ostream) {
@@ -90,6 +97,7 @@ static void imat2_println_repr(imat2 mat) {
 
 
 static void ivec3_print_f(ivec3 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(ivec3) " MATHC_PRINT_COLOR "{{");
     for (int v = 0; v < 3; v++) {
         if(v>0)
@@ -97,6 +105,7 @@ static void ivec3_print_f(ivec3 vec, FILE *ostream) {
         fprintf(ostream, " %d", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void ivec3_println_f(ivec3 vec, FILE *ostream) {
@@ -113,6 +122,7 @@ static void ivec3_println(ivec3 vec) {
 }
 
 static void imat3_println_f(imat3 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "imat3: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 3; r++) {
         fprintf(ostream, "  |");
@@ -122,6 +132,7 @@ static void imat3_println_f(imat3 mat, FILE *ostream) {
         fprintf(ostream, " |\n");
     }
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void imat3_println(imat3 imat) {
@@ -129,6 +140,7 @@ static void imat3_println(imat3 imat) {
 }
 
 static void imat3_print_repr_f(imat3 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(imat3)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 9; v++) {
         if(v>0)
@@ -136,6 +148,7 @@ static void imat3_print_repr_f(imat3 mat, FILE *ostream) {
         fprintf(ostream, " %d", mat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void imat3_println_repr_f(imat3 mat, FILE *ostream) {
@@ -152,6 +165,7 @@ static void imat3_println_repr(imat3 mat) {
 }
 
 static void ivec4_print_f(ivec4 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(ivec4) " MATHC_PRINT_COLOR "{{");
     for (int v = 0; v < 4; v++) {
         if(v>0)
@@ -159,6 +173,7 @@ static void ivec4_print_f(ivec4 vec, FILE *ostream) {
         fprintf(ostream, " %d", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void ivec4_println_f(ivec4 vec, FILE *ostream) {
@@ -175,6 +190,7 @@ static void ivec4_println(ivec4 vec) {
 }
 
 static void imat4_println_f(imat4 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "imat4: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 4; r++) {
         fprintf(ostream, "  |");
@@ -184,6 +200,7 @@ static void imat4_println_f(imat4 mat, FILE *ostream) {
         fprintf(ostream, " |\n");
     }
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void imat4_println(imat4 imat) {
@@ -191,6 +208,7 @@ static void imat4_println(imat4 imat) {
 }
 
 static void imat4_print_repr_f(imat4 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(imat4)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 16; v++) {
         if(v>0)
@@ -198,6 +216,7 @@ static void imat4_print_repr_f(imat4 mat, FILE *ostream) {
         fprintf(ostream, " %d", mat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void imat4_println_repr_f(imat4 mat, FILE *ostream) {

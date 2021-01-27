@@ -12,8 +12,8 @@
 #endif
 #endif
 
-#include "math.h"
-#include "assert.h"
+#include <math.h>
+#include <assert.h>
 
 
 /** dst = r==c ? 1 : 0 (identity) */

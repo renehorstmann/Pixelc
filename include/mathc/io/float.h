@@ -2,6 +2,7 @@
 #define MATHC_IO_FLOAT_H
 
 #include <stdio.h>
+#include <locale.h>
 #include "../types/float.h"
 
 //
@@ -26,6 +27,7 @@
 
 
 static void vec2_print_f(vec2 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(vec2)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 2; v++) {
         if(v>0)
@@ -36,6 +38,7 @@ static void vec2_print_f(vec2 vec, FILE *ostream) {
             fprintf(ostream, " %g", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void vec2_println_f(vec2 vec, FILE *ostream) {
@@ -52,6 +55,7 @@ static void vec2_println(vec2 vec) {
 }
 
 static void mat2_println_f(mat2 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "mat2: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 2; r++) {
         fprintf(ostream, "  |");
@@ -64,6 +68,7 @@ static void mat2_println_f(mat2 mat, FILE *ostream) {
         fprintf(ostream, " |\n");
     }
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void mat2_println(mat2 mat) {
@@ -71,6 +76,7 @@ static void mat2_println(mat2 mat) {
 }
 
 static void mat2_print_repr_f(mat2 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(mat2)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 4; v++) {
         if(v>0)
@@ -81,6 +87,7 @@ static void mat2_print_repr_f(mat2 mat, FILE *ostream) {
             fprintf(ostream, " %g", mat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void mat2_println_repr_f(mat2 mat, FILE *ostream) {
@@ -98,6 +105,7 @@ static void mat2_println_repr(mat2 mat) {
 
 
 static void vec3_print_f(vec3 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(vec3) " MATHC_PRINT_COLOR "{{");
     for (int v = 0; v < 3; v++) {
         if(v>0)
@@ -108,6 +116,7 @@ static void vec3_print_f(vec3 vec, FILE *ostream) {
             fprintf(ostream, " %g", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void vec3_println_f(vec3 vec, FILE *ostream) {
@@ -125,6 +134,7 @@ static void vec3_println(vec3 vec) {
 
 
 static void mat3_println_f(mat3 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "mat3: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 3; r++) {
         fprintf(ostream, "  |");
@@ -137,6 +147,7 @@ static void mat3_println_f(mat3 mat, FILE *ostream) {
         fprintf(ostream, " |\n");
     }
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void mat3_println(mat3 mat) {
@@ -144,6 +155,7 @@ static void mat3_println(mat3 mat) {
 }
 
 static void mat3_print_repr_f(mat3 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(mat3)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 9; v++) {
         if(v>0)
@@ -154,6 +166,7 @@ static void mat3_print_repr_f(mat3 mat, FILE *ostream) {
             fprintf(ostream, " %g", mat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void mat3_println_repr_f(mat3 mat, FILE *ostream) {
@@ -170,6 +183,7 @@ static void mat3_println_repr(mat3 mat) {
 }
 
 static void vec4_print_f(vec4 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(vec4) " MATHC_PRINT_COLOR "{{");
     for (int v = 0; v < 4; v++) {
         if(v>0)
@@ -180,6 +194,7 @@ static void vec4_print_f(vec4 vec, FILE *ostream) {
             fprintf(ostream, " %g", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void vec4_println_f(vec4 vec, FILE *ostream) {
@@ -197,6 +212,7 @@ static void vec4_println(vec4 vec) {
 
 
 static void mat4_println_f(mat4 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "mat4: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 4; r++) {
         fprintf(ostream, "  |");
@@ -209,6 +225,7 @@ static void mat4_println_f(mat4 mat, FILE *ostream) {
         fprintf(ostream, " |\n");
     }
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void mat4_println(mat4 mat) {
@@ -216,6 +233,7 @@ static void mat4_println(mat4 mat) {
 }
 
 static void mat4_print_repr_f(mat4 mat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(mat4)" MATHC_PRINT_COLOR " {{");
     for (int v = 0; v < 16; v++) {
         if(v>0)
@@ -226,6 +244,7 @@ static void mat4_print_repr_f(mat4 mat, FILE *ostream) {
             fprintf(ostream, " %g", mat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void mat4_println_repr_f(mat4 mat, FILE *ostream) {
@@ -247,6 +266,7 @@ static void mat4_println_repr(mat4 mat) {
 //
 
 static void quat_print_f(quat quat, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(quat) " MATHC_PRINT_COLOR "{{");
     for (int v = 0; v < 4; v++) {
         if(v>0)
@@ -257,6 +277,7 @@ static void quat_print_f(quat quat, FILE *ostream) {
             fprintf(ostream, " %g", quat.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void quat_println_f(quat quat, FILE *ostream) {

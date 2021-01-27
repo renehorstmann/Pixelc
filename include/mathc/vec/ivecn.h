@@ -7,10 +7,10 @@
 #endif
 #endif
 
-#include "stdlib.h"     // abs
-#include "stdbool.h"
-#include "math.h"
-#include "assert.h"
+#include <stdlib.h>     // abs
+#include <stdbool.h>
+#include <math.h>
+#include <assert.h>
 
 
 /** macro to cast a vector into a int vector */

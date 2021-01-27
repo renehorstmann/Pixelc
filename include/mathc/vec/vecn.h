@@ -7,9 +7,9 @@
 #endif
 #endif
 
-#include "stdbool.h"
-#include "math.h"
-#include "assert.h"
+#include <stdbool.h>
+#include <math.h>
+#include <assert.h>
 
 
 /** macro to cast a vector into a float vector */
@@ -509,13 +509,13 @@ static void vecN_not_equal_eps_vec(bool *dst_vec, const float *vec_a, const floa
 /** dst = isnan(vec) */
 static void vecN_isnan(bool *dst_vec, const float *vec, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = isnanf(vec[i]);
+        dst_vec[i] = isnan(vec[i]);
 }
 
 /** dst = isnan(vec) */
 static void vecN_not_isnan(bool *dst_vec, const float *vec, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = !isnanf(vec[i]);
+        dst_vec[i] = !isnan(vec[i]);
 }
 
 #endif //MATHC_VEC_VECN_H

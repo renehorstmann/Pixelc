@@ -1,7 +1,7 @@
 #ifndef MATHC_QUAT_DQUAT_H
 #define MATHC_QUAT_DQUAT_H
 
-#include "math.h"
+#include <math.h>
 #include "../initializer.h"
 #include "../types/double.h"
 #include "../vec/dvec3.h"

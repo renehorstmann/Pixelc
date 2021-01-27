@@ -2,6 +2,7 @@
 #define MATHC_IO_BOOL_H
 
 #include <stdio.h>
+#include <locale.h>
 #include "../types/bool.h"
 
 //
@@ -25,6 +26,7 @@
 #endif
 
 static void bvec2_print_f(bvec2 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(bvec2) " MATHC_PRINT_COLOR "{{");
     for(int v=0; v<2; v++) {
         if(v>0)
@@ -32,6 +34,7 @@ static void bvec2_print_f(bvec2 vec, FILE *ostream) {
         fprintf(ostream, " %i", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void bvec2_println_f(bvec2 vec, FILE *ostream) {
@@ -48,6 +51,7 @@ static void bvec2_println(bvec2 vec) {
 }
 
 static void bvec3_print_f(bvec3 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(bvec3) " MATHC_PRINT_COLOR "{{");
     for(int v=0; v<3; v++) {
         if(v>0)
@@ -55,6 +59,7 @@ static void bvec3_print_f(bvec3 vec, FILE *ostream) {
         fprintf(ostream, " %i", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void bvec3_println_f(bvec3 vec, FILE *ostream) {
@@ -71,6 +76,7 @@ static void bvec3_println(bvec3 vec) {
 }
 
 static void bvec4_print_f(bvec4 vec, FILE *ostream) {
+    char *local_save = setlocale(LC_ALL, "C");
     fprintf(ostream, "(bvec4) " MATHC_PRINT_COLOR "{{");
     for(int v=0; v<4; v++) {
         if(v>0)
@@ -78,6 +84,7 @@ static void bvec4_print_f(bvec4 vec, FILE *ostream) {
         fprintf(ostream, " %i", vec.v[v]);
     }
     fprintf(ostream, " }}" MATHC_PRINT_COLOR_RESET);
+    setlocale(LC_ALL, local_save);
 }
 
 static void bvec4_println_f(bvec4 vec, FILE *ostream) {
