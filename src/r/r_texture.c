@@ -25,7 +25,7 @@ GLuint r_texture_init_img(SDL_Surface *img) {
     return r_texture_init(img->w, img->h, img->pixels);
 }
 
-GLuint r_texture_init_file(const char *file, int *opt_out_w, int *opt_out_h) {
+GLuint r_texture_init_file(const char *file, ivec2 *opt_out_size) {
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
         SDL_Log("Load image (%s) failed: %s", file, IMG_GetError());
@@ -33,10 +33,8 @@ GLuint r_texture_init_file(const char *file, int *opt_out_w, int *opt_out_h) {
     }
 
     GLuint tex = r_texture_init_img(img);
-    if(opt_out_w)
-        *opt_out_w = img->w;
-    if(opt_out_h)
-        *opt_out_h = img->h;
+    if(opt_out_size)
+        *opt_out_size = (ivec2) {{img->w, img->h}};
 
     SDL_FreeSurface(img);
     return tex;

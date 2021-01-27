@@ -63,7 +63,7 @@ void canvas_init(int rows, int cols) {
         r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
     }
     
-    GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL, NULL);
+    GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL);
     r_texture_filter_nearest(grid_tex);
     r_ro_single_init(&L.grid, &c_camera_p.m00, grid_tex);
     u_pose_set_size(&L.grid.rect.uv, 2*cols, 2*rows);

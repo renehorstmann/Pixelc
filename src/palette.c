@@ -89,19 +89,19 @@ static void setup_ro() {
 
 
 void palette_init() {
-    GLuint drop_tex = r_texture_init_file("res/palette_color_drop.png", NULL, NULL);
+    GLuint drop_tex = r_texture_init_file("res/palette_color_drop.png", NULL);
     r_texture_filter_nearest(drop_tex);
     
     r_ro_batch_init(&L.palette_ro, PALETTE_MAX, &hud_camera_p.m00, drop_tex);
     
     
-    GLuint bg_tex = r_texture_init_file("res/palette_background.png", NULL, NULL);
+    GLuint bg_tex = r_texture_init_file("res/palette_background.png", NULL);
     r_texture_filter_nearest(bg_tex);
     
     r_ro_batch_init(&L.background_ro, PALETTE_MAX, &hud_camera_p.m00, bg_tex);
     
 
-    GLuint select_tex = r_texture_init_file("res/palette_select.png", NULL, NULL);
+    GLuint select_tex = r_texture_init_file("res/palette_select.png", NULL);
     r_texture_filter_nearest(select_tex);
     r_ro_single_init(&L.select_ro, &hud_camera_p.m00, select_tex);
     
