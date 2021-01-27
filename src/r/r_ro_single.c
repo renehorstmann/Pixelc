@@ -1,6 +1,6 @@
 #include "mathc/float.h"
-#include "r/shader.h"
-#include "r/ro_single.h"
+#include "r/r_shader.h"
+#include "r/r_ro_single.h"
 
 
 void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink) {

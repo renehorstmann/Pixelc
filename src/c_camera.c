@@ -2,7 +2,7 @@
 #include "mathc/utils/camera.h"
 #include "r/rect.h"
 #include "u/pose.h"
-#include "e/window.h"
+#include "e/e_window.h"
 #include "c_camera.h"
 
 

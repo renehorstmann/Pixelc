@@ -2,8 +2,8 @@
 #define NK_SDL_GLES2_IMPLEMENTATION
 #define NK_SDL_GL3_IMPLEMENTATION
 
-#include "e/window.h"
-#include "e/gui.h"
+#include "e/e_window.h"
+#include "e/e_gui.h"
 
 #define MAX_VERTEX_MEMORY 512 * 1024
 #define MAX_ELEMENT_MEMORY 128 * 1024
@@ -11,7 +11,7 @@
 struct nk_context *e_gui_ctx;
 
 static struct {
-    int auto_offset
+    int auto_offset;
 } L;
 
 static struct nk_rect window_rect(float w, float h) {

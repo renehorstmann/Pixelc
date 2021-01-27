@@ -1,5 +1,5 @@
-#include "r/texture.h"
-#include "r/text.h"
+#include "r/r_texture.h"
+#include "r/r_text.h"
 
 TTF_Font *r_text_default_font;
 

@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "e/input.h"
+#include "e/e_input.h"
 #include "r/r.h"
 #include "u/pose.h"
 #include "mathc/float.h"
