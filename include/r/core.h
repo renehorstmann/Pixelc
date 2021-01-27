@@ -2,9 +2,16 @@
 #define R_CORE_H
 
 #define GL_GLEXT_PROTOTYPES
+
+#ifdef USING_GLEW
 #include <GL/glew.h>
+#endif
+
 #include <SDL.h>
-//#include <SDL_opengl.h>
+
+#ifndef USING_GLEW
+#include <SDL_opengl.h>
+#endif
 
 #include "mathc/types/float.h"
 

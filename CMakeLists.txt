@@ -35,6 +35,13 @@ else ()
     message(FATAL_ERROR "Neither GL nor GLESv3 found, exiting CMake")
 endif ()
 
+# GLEW
+find_library(GLEW_LIB GLEW)
+if(GLEW_LIB)
+    add_compile_definitions(USING_GLEW)
+    target_link_libraries(pixelc ${GLEW_LIB})
+endif()
+
 # SDL
 find_package(SDL2 REQUIRED)
 if (GL_LIB)
@@ -51,10 +58,6 @@ target_link_libraries(pixelc m
         ${SDL2_IMAGE_LIBRARIES}
         ${SDL2_TTF_LIBRARIES}
         )
-
-# GLEW
-find_library(GLEW_LIB GLEW)
-target_link_libraries(pixelc ${GLEW_LIB})
 
 # res
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res

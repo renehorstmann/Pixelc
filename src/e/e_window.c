@@ -75,7 +75,7 @@ void e_window_init(const char *name) {
     SDL_GL_CreateContext(e_window);
     SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
 
-    // glew
+#ifdef USING_GLEW
     GLenum err = glewInit();
     if (GLEW_OK != err){
         /* Problem: glewInit failed, something is seriously wrong. */
@@ -83,6 +83,7 @@ void e_window_init(const char *name) {
         exit(EXIT_FAILURE);
     }
     SDL_Log("Using GLEW %s\n", glewGetString(GLEW_VERSION));
+#endif
 
     e_window_update();
 }
