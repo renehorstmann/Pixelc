@@ -8,9 +8,21 @@ Loads sprite.png at start, if available
 Palette, brush, size can be configured in code
 
 ## Todo
-- Grid Overlay
-- Brush Mode Buttons
+- Toolbar
+  - Brush mode
+    - dot
+    - free
+    - line
+    - circle
+    - fill
+    - shade (from color to color)
+  - clear
+  - replace (from color to color)
+  - move mode
+  - undo and redo
 - Zoom n Pinch 
+- Layer Selection
+- Frame Selection
 - ...
 
 ## Compiling on Windows
