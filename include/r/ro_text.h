@@ -1,5 +1,5 @@
-#ifndef R_TEXT_H
-#define R_TEXT_H
+#ifndef R_RO_TEXT_H
+#define R_RO_TEXT_H
 
 #include "SDL_ttf.h"
 #include "mathc/types/float.h"
@@ -11,7 +11,7 @@ extern TTF_Font *r_text_default_font;
 GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h);
 
 typedef struct {
-	rRoSingle r;
+	rRoSingle ro;
 	TTF_Font *font;
 	float ratio;    // width / height
 } rRoText;
@@ -26,4 +26,4 @@ void r_ro_text_set_size(rRoText *self, float h);
 
 void r_ro_text_set_text(rRoText *self, vec4 color, const char *text);
 
-#endif //R_TEXT_H
+#endif //R_RO_TEXT_H

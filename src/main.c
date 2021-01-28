@@ -10,6 +10,7 @@
 #include "brush.h"
 #include "palette.h"
 #include "palette_presave.h"
+#include "toolbar.h"
 #include "input.h"
 
 
@@ -33,9 +34,10 @@ int main(int argc, char **argv) {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init(16, 16);
+    canvas_init(16, 32);
     brush_init();
     palette_init();
+    toolbar_init();
     input_init();
 
 //    palette_presave_grayscale();
@@ -62,6 +64,7 @@ static void main_loop(float delta_time) {
     background_update(delta_time);
     canvas_update(delta_time);
     palette_update(delta_time);
+    toolbar_update(delta_time);
 
     // render
     r_render_begin_frame(e_window_size[0], e_window_size[1]);
@@ -69,6 +72,7 @@ static void main_loop(float delta_time) {
     background_render();
     canvas_render();
     palette_render();
+    toolbar_render();
 
     e_gui_render();
 

@@ -15,13 +15,15 @@ bool e_input_space;
 bool e_input_accel_active;
 float e_input_accel[3];
 
-static struct {
+typedef struct {
     void (*cb)(ePointer_s, void *);
 
     void *ud;
-} reg_pointer_e[E_MAX_POINTER_EVENTS];
+} RegPointer;
+
 
 static struct {
+    RegPointer reg_pointer_e[E_MAX_POINTER_EVENTS];
     int reg_pointer_e_size;
 } L;
 
@@ -58,40 +60,40 @@ static void input_handle_pointer(SDL_Event *event) {
             ePointer_s action = pointer_finger(E_POINTER_DOWN,
                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
-                reg_pointer_e[i].cb(action, reg_pointer_e[i].ud);
+                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_FINGERMOTION: {
             ePointer_s action = pointer_finger(E_POINTER_MOVE,
                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
-                reg_pointer_e[i].cb(action, reg_pointer_e[i].ud);
+                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_FINGERUP: {
             ePointer_s action = pointer_finger(E_POINTER_UP,
                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
-                reg_pointer_e[i].cb(action, reg_pointer_e[i].ud);
+                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
 #else
         case SDL_MOUSEBUTTONDOWN: {
             ePointer_s action = pointer_mouse(E_POINTER_DOWN);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
-                reg_pointer_e[i].cb(action, reg_pointer_e[i].ud);
+                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_MOUSEMOTION: {
             ePointer_s action = pointer_mouse(E_POINTER_MOVE);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
-                reg_pointer_e[i].cb(action, reg_pointer_e[i].ud);
+                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_MOUSEBUTTONUP: {
             ePointer_s action = pointer_mouse(E_POINTER_UP);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
-                reg_pointer_e[i].cb(action, reg_pointer_e[i].ud);
+                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
 #endif
@@ -198,6 +200,6 @@ void e_input_update() {
 
 void e_input_register_pointer_event(ePointerEventFn event, void *user_data) {
     assume(L.reg_pointer_e_size < E_MAX_POINTER_EVENTS, "too many registered pointer events");
-    reg_pointer_e[L.reg_pointer_e_size].cb = event;
-    reg_pointer_e[L.reg_pointer_e_size++].ud = user_data;
+    L.reg_pointer_e[L.reg_pointer_e_size].cb = event;
+    L.reg_pointer_e[L.reg_pointer_e_size++].ud = user_data;
 }

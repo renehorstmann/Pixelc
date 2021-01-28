@@ -1,6 +1,7 @@
 #ifndef U_POSE_H
 #define U_POSE_H
 
+#include <stdbool.h>
 #include <math.h>
 #include "mathc/types/float.h"
 
@@ -24,6 +25,7 @@ static float u_pose_get_h(mat4 p) {
 static float u_pose_get_angle(mat4 p) {
 	return atan2f(p.m01, p.m00);
 }
+
 
 static void u_pose_set_x(mat4 *p, float x) {
     p->m30 = x;
@@ -111,5 +113,7 @@ static void u_pose_set_top(mat4 *p, float t) {
 static void u_pose_set_bottom(mat4 *p, float b) {
 	p->m31 = b + u_pose_get_h(*p) /2;
 }
+
+
 
 #endif //U_POSE_H
