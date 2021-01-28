@@ -8,6 +8,11 @@ Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
 ## Todo
+- PixelPerfect hud_camera
+- undo and redo
+  - draw step capture
+- Zoom n Pinch 
+  - undos/aborts accidently draw capture
 - Toolbar
   - Brush mode
     - dot
@@ -20,7 +25,6 @@ Palette, brush, size can be configured in code
   - replace (from color to color)
   - move mode
   - undo and redo
-- Zoom n Pinch 
 - Layer Selection
 - Frame Selection
 - ...
