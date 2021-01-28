@@ -8,6 +8,9 @@ Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
 ## Todo
+- Code Style
+  - Button not in r/
+  - hud base (rect contains, pointer adapter, ...)
 - PixelPerfect hud_camera
 - undo and redo
   - draw step capture
