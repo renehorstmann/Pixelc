@@ -32,7 +32,7 @@ static bool in_rect(ePointer_s pointer, mat4 pose) {
     float x = rect_pos.x;
     float y = rect_pos.y;
     
-    return x>=-1 && x<=1 && y>=-1 && y<=1;
+    return x>=-0.5 && x<=0.5 && y>=-0.5 && y<=0.5;
 }
 
 static mat4 setup_palette_color_pose(int r, int c) {

@@ -75,7 +75,11 @@ void canvas_init(int rows, int cols) {
     GLuint bg_tex = r_texture_init(2, 2, buf);
     r_texture_filter_nearest(bg_tex);
     r_ro_single_init(&L.bg, &c_camera_p.m00, bg_tex);
-    u_pose_set_size(&L.bg.rect.uv, 2*cols, 2*rows);
+    {    
+        float w = cols <= 8 ? 1 : cols/16.0f;
+        float h = rows <= 8 ? 1 : rows/16.0f;
+        u_pose_set_size(&L.bg.rect.uv, w, h);
+    }
 
 
     if(!io_load_layer(canvas_current_layer(), "sprite.png")) {
