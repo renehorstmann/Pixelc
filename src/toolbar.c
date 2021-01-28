@@ -75,10 +75,10 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 void toolbar_update(float dtime) {
 	//u_pose_set(L.undo.pose, hud_camera_left() + 8, hud_camera_top() - 8, 16, 16, 0);
 	
-	u_pose_set(&L.undo.rect.pose, 0, -30, 16, 16, 0);
+	u_pose_set(&L.undo.rect.pose, 0, -20, 16, 16, 0);
 	
 	for(int i=0; i<4; i++) {
-		u_pose_set(&L.mode[i].rect.pose, -24+16*i, -60, 16, 16, 0);
+		u_pose_set(&L.mode[i].rect.pose, -24+16*i, -40, 16, 16, 0);
 	}
 }
 
