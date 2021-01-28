@@ -8,6 +8,8 @@
 
 static struct {
 	rRoSingle undo;
+	
+	rRoSingle mode[4];
 } L;
 
 
@@ -25,11 +27,22 @@ static bool in_rect(ePointer_s pointer, mat4 pose) {
     return x>=-0.5 && x<=0.5 && y>=-0.5 && y<=0.5;
 }
 
+static void unpress_modes(int ignore) {
+	for(int i=0; i<4; i++) {
+		if(i==ignore)
+		    continue;
+		r_ro_button_set_pressed(&L.mode[i], false);
+	}
+}
 
 void toolbar_init() {
 	GLuint undo_tex = r_texture_init_file("res/button_undo.png", NULL);
 	r_texture_filter_nearest(undo_tex);
 	r_ro_button_init(&L.undo, &hud_camera_p.m00, undo_tex);
+
+    for(int i=0; i<4; i++) {
+    	r_ro_button_init(&L.mode[i], &hud_camera_p.m00, undo_tex);
+    }
 	
 }
 
@@ -41,6 +54,19 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 	    pointer.action == E_POINTER_UP)) {
 	    	
 	    puts("click");
+	    
+	    unpress_modes(-1);
+	}
+	
+	for(int i=0; i<4; i++) {
+		if(r_ro_button_pressed(
+		    &L.mode[i],
+		    in_rect(pointer, L.mode[i].rect.pose),
+		    pointer.action == E_POINTER_UP)) {
+			
+			printf("mode %d\n", i);
+			unpress_modes(i);
+		}
 	}
 	
 	return false;
@@ -49,9 +75,16 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 void toolbar_update(float dtime) {
 	//u_pose_set(L.undo.pose, hud_camera_left() + 8, hud_camera_top() - 8, 16, 16, 0);
 	
-	u_pose_set(&L.undo.rect.pose, 0, -30 - 8, 16, 16, 0);
+	u_pose_set(&L.undo.rect.pose, 0, -30, 16, 16, 0);
+	
+	for(int i=0; i<4; i++) {
+		u_pose_set(&L.mode[i].rect.pose, -24+16*i, -60, 16, 16, 0);
+	}
 }
 
 void toolbar_render() {
 	r_ro_single_render(&L.undo);
+	for(int i=0; i<4; i++) {
+		r_ro_single_render(&L.mode[i]);
+	}
 }
