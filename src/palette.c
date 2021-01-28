@@ -79,7 +79,7 @@ static void setup_ro() {
             } else if(i >= L.palette_size) {
         	    u = 0.5;
             }
-            u_pose_set(&L.background_ro.rects[i].uv, u, v, 1, 1, 0);
+            u_pose_set(&L.background_ro.rects[i].uv, u, v, 0.5, 0.5, 0);
         }
     }
     L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
