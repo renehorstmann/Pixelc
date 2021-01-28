@@ -17,6 +17,8 @@ Palette, brush, size can be configured in code
   - Brush mode
     - dot
     - free
+    - shape (block, plus, cross)
+    - size (1, 3, 5)
     - line
     - circle
     - fill
