@@ -1,6 +1,8 @@
 #ifndef PIXELC_PALETTE_H
 #define PIXELC_PALETTE_H
 
+#include <stdbool.h>
+#include "e/input.h"
 #include "color.h"
 
 #define PALETTE_MAX 60

@@ -72,9 +72,11 @@ static void palette_presave_pixilmatt() {
             "#b3785d",
             "#9c4f41"
     };
-
-    for (int i = 0; i < size; i++)
+    
+    for (int i = 0; i < size; i++) {
         palette[i] = color_from_hex(hex[i]);
+    }
+    
     palette_set_colors(palette, size);
 }
 

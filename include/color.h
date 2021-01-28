@@ -6,7 +6,7 @@
 #include "mathc/types/float.h"
 
 typedef union {
-    uint8_t data[4];
+    uint8_t v[4];
     struct {
         uint8_t r, g, b, a;
     };
@@ -33,16 +33,15 @@ static Color_s color_from_vec4(vec4 v) {
 
 static Color_s color_from_hex(const char *hex_string) {
     Color_s c = {0};
-    char buf[8];
     if(*hex_string == '#')
         hex_string++;
 
     // rgb
     if(strlen(hex_string) == 6) {
         for(int i=0; i<3; i++) {
-            strncpy(buf, hex_string, 2);
+            char buf[3] = {hex_string[0], hex_string[1], 0};
             hex_string+=2;
-            c.data[i] = strtol(buf, NULL, 16);
+            c.v[i] = strtol(buf, NULL, 16);
         }
         c.a = 255;
         return c;
@@ -51,9 +50,9 @@ static Color_s color_from_hex(const char *hex_string) {
     // rgba
     if(strlen(hex_string) == 8) {
         for(int i=0; i<4; i++) {
-            strncpy(buf, hex_string, 2);
+            char buf[3] = {hex_string[0], hex_string[1], 0};
             hex_string+=2;
-            c.data[i] = strtol(buf, NULL, 16);
+            c.v[i] = strtol(buf, NULL, 16);
         }
         return c;
     }
