@@ -66,7 +66,7 @@ void canvas_init(int rows, int cols) {
     GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL);
     r_texture_filter_nearest(grid_tex);
     r_ro_single_init(&L.grid, &c_camera_p.m00, grid_tex);
-    u_pose_set_size(&L.grid.rect.uv, 2*cols, 2*rows);
+    u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
     Color_s buf[4];
@@ -75,7 +75,7 @@ void canvas_init(int rows, int cols) {
     GLuint bg_tex = r_texture_init(2, 2, buf);
     r_texture_filter_nearest(bg_tex);
     r_ro_single_init(&L.bg, &c_camera_p.m00, bg_tex);
-    u_pose_set_size(&L.bg.rect.uv, 4*cols, 4*rows);
+    u_pose_set_size(&L.bg.rect.uv, 2*cols, 2*rows);
 
 
     if(!io_load_layer(canvas_current_layer(), "sprite.png")) {

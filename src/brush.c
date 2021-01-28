@@ -22,8 +22,8 @@ static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
 
     vec4 rect_pos = mat4_mul_vec(screen_to_rect, screen_pos);
 
-    *row = (1 - rect_pos.y) / 2 * canvas_rows();
-    *col = (rect_pos.x + 1) / 2 * canvas_cols();
+    *row = (0.5 - rect_pos.y) * canvas_rows();
+    *col = (rect_pos.x + 0.5) * canvas_cols();
 }
 
 static void dot_mode(ePointer_s pointer) {
