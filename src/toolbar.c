@@ -1,5 +1,5 @@
 #include "mathc/float.h"
-#include "r/ro_button.h"
+#include "button.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "hud_camera.h"
@@ -32,14 +32,14 @@ static void unpress_modes(int ignore) {
 	for(int i=0; i<4; i++) {
 		if(i==ignore)
 		    continue;
-		r_ro_button_set_pressed(&L.mode[i], false);
+        button_set_pressed(&L.mode[i], false);
 	}
 }
 
 void toolbar_init() {
 	GLuint undo_tex = r_texture_init_file("res/button_undo.png", NULL);
 	r_texture_filter_nearest(undo_tex);
-	r_ro_button_init(&L.undo, &hud_camera_p.m00, undo_tex);
+    button_init(&L.undo, undo_tex);
 
     const char *mode_files[4] = {
     	"res/button_dot.png",
@@ -52,17 +52,14 @@ void toolbar_init() {
     	GLuint tex = r_texture_init_file(mode_files[i], NULL);
     r_texture_filter_nearest(tex);
 
-    	r_ro_button_init(&L.mode[i], &hud_camera_p.m00, tex);
+        button_init(&L.mode[i], tex);
     }
 	
 }
 
 // return true if the pointer was used (indicate event done)
 bool toolbar_pointer_event(ePointer_s pointer) {
-	if(r_ro_button_clicked(
-	    &L.undo, 
-	    in_rect(pointer, L.undo.rect.pose),
-	    pointer.action == E_POINTER_UP)) {
+	if(button_clicked(&L.undo, pointer)) {
 	    	
 	    puts("click");
 	    
@@ -70,10 +67,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 	}
 	
 	for(int i=0; i<4; i++) {
-		if(r_ro_button_pressed(
-		    &L.mode[i],
-		    in_rect(pointer, L.mode[i].rect.pose),
-		    pointer.action == E_POINTER_UP)) {
+		if(button_pressed(&L.mode[i], pointer)) {
 			
 			printf("mode %d\n", i);
 			unpress_modes(i);
