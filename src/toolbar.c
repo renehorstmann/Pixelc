@@ -5,6 +5,7 @@
 #include "hud_camera.h"
 #include "brush.h"
 #include "toolbar.h"
+#include "savestate.h"
 
 
 static struct {
@@ -64,6 +65,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 	    puts("click");
 	    
 	    unpress_modes(-1);
+	    savestate_undo();
 	}
 	
 	for(int i=0; i<4; i++) {
@@ -76,6 +78,8 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 				brush_set_mode(BRUSH_MODE_DOT);
 			} else if(i==1) {
 				brush_set_mode(BRUSH_MODE_FREE);
+			} else if(i==3) {
+			    savestate_save();
 			}
 		}
 	}

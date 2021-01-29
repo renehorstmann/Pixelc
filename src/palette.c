@@ -123,7 +123,7 @@ bool palette_pointer_event(ePointer_s pointer) {
 
     for(int i = 0; i<L.palette_size; i++) {
     	if(in_rect(pointer, L.palette_ro.rects[i].pose)) {
-    	    palette_select_color(i);
+            palette_set_color(i);
     		return true;
     	}
    }  
@@ -135,10 +135,15 @@ bool palette_pointer_event(ePointer_s pointer) {
 void palette_set_colors(const Color_s *palette, int size) {
     memcpy(L.palette, palette, sizeof(Color_s) * size);
     L.palette_size = size;
-    palette_select_color(0);
+    palette_set_color(0);
 }
 
-void palette_select_color(int index) {
+
+int palette_get_color() {
+    return L.last_selected;
+}
+
+void palette_set_color(int index) {
     brush_set_color(L.palette[index]);
     L.select_ro.rect.pose = L.palette_ro.rects[index].pose;
     L.last_selected = index;

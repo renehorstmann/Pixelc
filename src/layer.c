@@ -15,6 +15,11 @@ void layer_kill(Layer *self) {
     *self = (Layer) {0};
 }
 
+void layer_copy(Layer *self, Layer from) {
+    memcpy(self->data, from.data, sizeof(Color_s) * canvas_rows() * canvas_cols());
+    self->alpha = from.alpha;
+}
+
 Color_s *layer_pixel(Layer *self, int row, int col) {
     return &self->data[col + row * canvas_cols()];
 }

@@ -15,7 +15,9 @@ bool palette_pointer_event(ePointer_s pointer);
 
 void palette_set_colors(const Color_s *palette, int size);
 
-void palette_select_color(int index);
+int palette_get_color();
+
+void palette_set_color(int index);
 
 void palette_update(float dtime);
 

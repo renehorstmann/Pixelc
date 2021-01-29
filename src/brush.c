@@ -81,6 +81,11 @@ void brush_set_color(Color_s col) {
     L.current_color = col;
 }
 
+
+enum brushmodes brush_get_mode() {
+    return L.mode;
+}
+
 void brush_set_mode(enum brushmodes mode) {
     L.mode = mode;
     L.drawing = false;

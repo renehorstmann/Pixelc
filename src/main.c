@@ -12,6 +12,7 @@
 #include "palette_presave.h"
 #include "toolbar.h"
 #include "input.h"
+#include "savestate.h"
 
 
 static void main_loop(float delta_time);
@@ -39,6 +40,8 @@ int main(int argc, char **argv) {
     palette_init();
     toolbar_init();
     input_init();
+    savestate_init();
+
 
 //    palette_presave_grayscale();
 //    palette_presave_grayscale_alpha();

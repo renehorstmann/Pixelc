@@ -13,6 +13,8 @@ void brush_pointer_event(ePointer_s pointer);
 
 void brush_set_color(Color_s col);
 
+enum brushmodes brush_get_mode();
+
 void brush_set_mode(enum brushmodes mode);
 
 #endif //PIXELC_BRUSH_H

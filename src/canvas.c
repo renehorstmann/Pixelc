@@ -8,41 +8,33 @@
 #include "io.h"
 #include "canvas.h"
 
-
-typedef struct {
-    Layer layer;
-    rRoSingle ro;
-    GLuint tex;
-} RoLayer;
-
 static struct {
     int rows, cols;
 
     mat4 pose;
 
-    RoLayer *layers;
-    int layers_size;
-    int current_layer;
+    Layer *layers;
+    rRoSingle *ros;
+    GLuint *texs;
+    int size;
+    int current;
 
     rRoSingle bg;
     rRoSingle grid;
 } L;
 
 
-mat4 canvas_pose() {
-    return L.pose;
+static void init_layer_n_ros() {
+    for(int i=0; i<L.size; i++) {
+        layer_init(&L.layers[i]);
+
+        GLuint tex = r_texture_init(L.cols, L.rows, L.layers[i].data);
+        r_texture_filter_nearest(tex);
+
+        r_ro_single_init(&L.ros[i], &c_camera_vp.m00, tex);
+    }
 }
 
-int canvas_cols() {
-    return L.cols;
-}
-int canvas_rows() {
-    return L.rows;
-}
-
-Layer *canvas_current_layer() {
-    return &L.layers[L.current_layer].layer;
-}
 
 void canvas_init(int rows, int cols) {
     L.rows = rows;
@@ -50,18 +42,12 @@ void canvas_init(int rows, int cols) {
 
     L.pose = mat4_eye();
 
-    L.layers = New0(RoLayer, 1);
-    L.layers_size = 1;
-    L.current_layer = 0;
+    L.layers = New0(Layer, 1);
+    L.ros = New0(rRoSingle , 1);
+    L.size = 1;
+    L.current = 0;
 
-    for(int i=0; i<L.layers_size; i++) {
-        layer_init(&L.layers[i].layer);
-
-        L.layers[i].tex = r_texture_init(L.cols, L.rows, L.layers[i].layer.data);
-        r_texture_filter_nearest(L.layers[i].tex);
-
-        r_ro_single_init(&L.layers[i].ro, &c_camera_vp.m00, L.layers[i].tex);
-    }
+    init_layer_n_ros();
     
     GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL);
     r_texture_filter_nearest(grid_tex);
@@ -93,6 +79,56 @@ void canvas_init(int rows, int cols) {
     }
 }
 
+
+
+mat4 canvas_pose() {
+    return L.pose;
+}
+
+int canvas_cols() {
+    return L.cols;
+}
+int canvas_rows() {
+    return L.rows;
+}
+
+
+Layer *canvas_layers() {
+    return L.layers;
+}
+int canvas_size() {
+    return L.size;
+}
+int canvas_current() {
+    return L.current;
+}
+Layer *canvas_current_layer() {
+    return &L.layers[L.current];
+}
+
+void canvas_set_layer(Layer layer, int index) {
+    layer_copy(&L.layers[index], layer);
+}
+void canvas_set_layers(const Layer *layer, int size) {
+    if(size != L.size) {
+        for(int i=0; i<L.size; i++) {
+            layer_kill(&L.layers[i]);
+            r_ro_single_kill(&L.ros[i]);
+        }
+        L.layers = ReNew(Layer, L.layers, size);
+        L.ros = ReNew(rRoSingle, L.ros, size);
+        L.size = size;
+        init_layer_n_ros();
+    }
+
+    for(int i=0; i<size; i++) {
+        layer_copy(&L.layers[i], layer[i]);
+    }
+}
+void canvas_set_current(int current) {
+    L.current = current;
+}
+
 void canvas_update(float dtime) {
     float w = 160;
     float h = 160.0f * L.rows / L.cols;
@@ -101,12 +137,12 @@ void canvas_update(float dtime) {
     else
         u_pose_set(&L.pose, c_camera_left() + 85, 0, w, h, 0);
 
-    for(int i=0; i<L.layers_size; i++) {
-        r_texture_update(L.layers[i].tex, L.cols, L.rows, L.layers[i].layer.data);
+    for(int i=0; i<L.size; i++) {
+        r_texture_update(L.ros[i].tex, L.cols, L.rows, L.layers[i].data);
 
         // set alpha and pose
-        L.layers[i].ro.rect.color.w = L.layers[i].layer.alpha * (1.0f/255.0f);
-        L.layers[i].ro.rect.pose = L.pose;
+        L.ros[i].rect.color.w = L.layers[i].alpha * (1.0f / 255.0f);
+        L.ros[i].rect.pose = L.pose;
     }
     
     L.grid.rect.pose = L.pose;
@@ -116,8 +152,8 @@ void canvas_update(float dtime) {
 void canvas_render() {
     r_ro_single_render(&L.bg);
     
-    for(int i=0; i<L.layers_size; i++) {
-        r_ro_single_render(&L.layers[i].ro);
+    for(int i=0; i<=L.current; i++) {
+        r_ro_single_render(&L.ros[i]);
     }
     
     r_ro_single_render(&L.grid);
