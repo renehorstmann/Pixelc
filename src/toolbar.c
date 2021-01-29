@@ -3,6 +3,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "hud_camera.h"
+#include "brush.h"
 #include "toolbar.h"
 
 
@@ -40,8 +41,18 @@ void toolbar_init() {
 	r_texture_filter_nearest(undo_tex);
 	r_ro_button_init(&L.undo, &hud_camera_p.m00, undo_tex);
 
+    const char *mode_files[4] = {
+    	"res/button_dot.png",
+    	"res/button_free.png",
+    	"res/button_fill.png",
+    	"res/button_fill.png"
+    };
+    
     for(int i=0; i<4; i++) {
-    	r_ro_button_init(&L.mode[i], &hud_camera_p.m00, undo_tex);
+    	GLuint tex = r_texture_init_file(mode_files[i], NULL);
+    r_texture_filter_nearest(tex);
+
+    	r_ro_button_init(&L.mode[i], &hud_camera_p.m00, tex);
     }
 	
 }
@@ -66,6 +77,12 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 			
 			printf("mode %d\n", i);
 			unpress_modes(i);
+			
+			if(i==0) {
+				brush_set_mode(BRUSH_MODE_DOT);
+			} else if(i==1) {
+				brush_set_mode(BRUSH_MODE_FREE);
+			}
 		}
 	}
 	
