@@ -26,8 +26,8 @@ void hud_camera_update() {
     int wnd_height = e_window_size[1];
 
 
-    int smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    float real_pixel_per_pixel = floorf((float) smaller_size / HUD_CAMERA_SIZE);
+    float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
+    float real_pixel_per_pixel = floorf(smaller_size / HUD_CAMERA_SIZE);
 
     float width_2 = wnd_width / (2 * real_pixel_per_pixel);
     float height_2 = wnd_height / (2 * real_pixel_per_pixel);
