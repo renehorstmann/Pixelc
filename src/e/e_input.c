@@ -35,8 +35,9 @@ static ePointer_s pointer_mouse(enum ePointerAction action) {
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    res.x = (2.0f * x) / e_window_size[0] - 1.0f;
-    res.y = 1.0f - (2.0f * y) / e_window_size[1];
+    res.pos.x = (2.0f * x) / e_window_size[0] - 1.0f;
+    res.pos.y = 1.0f - (2.0f * y) / e_window_size[1];    res.pos.z = 0;
+    res.pos.w = 1;
 
     return res;
 }
@@ -46,8 +47,10 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, i
     res.action = action;
     res.id = finger_id;
 
-    res.x = 2.0f * x - 1.0f;
-    res.y = 1.0f - 2.0f * y;
+    res.pos.x = 2.0f * x - 1.0f;
+    res.pos.y = 1.0f - 2.0f * y;
+    res.pos.z = 0;
+    res.pos.w = 1;
 
     return res;
 }

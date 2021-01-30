@@ -17,7 +17,7 @@ void background_init() {
     GLuint tex = r_texture_init(2, 2, buf);
     r_texture_filter_linear(tex);
 
-    r_ro_single_init(&L.ro, &hud_camera_p.m00, tex);
+    r_ro_single_init(&L.ro, hud_camera_gl, tex);
 }
 
 void background_update(float dtime) {

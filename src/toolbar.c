@@ -1,4 +1,4 @@
-#include "mathc/float.h"
+
 #include "button.h"
 #include "r/texture.h"
 #include "u/pose.h"
@@ -14,20 +14,6 @@ static struct {
 	rRoSingle mode[4];
 } L;
 
-
-static bool in_rect(ePointer_s pointer, mat4 pose) {
-    vec4 screen_pos = {{pointer.x, pointer.y, 0, 1}};
-
-    mat4 pose_inv = mat4_inv(pose);
-    mat4 screen_to_rect = mat4_mul_mat(pose_inv, hud_camera_p_inv);
-
-    vec4 rect_pos = mat4_mul_vec(screen_to_rect, screen_pos);
-
-    float x = rect_pos.x;
-    float y = rect_pos.y;
-    
-    return x>=-0.5 && x<=0.5 && y>=-0.5 && y<=0.5;
-}
 
 static void unpress_modes(int ignore) {
 	for(int i=0; i<4; i++) {

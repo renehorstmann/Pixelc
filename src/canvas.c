@@ -31,7 +31,7 @@ static void init_layer_n_ros() {
         GLuint tex = r_texture_init(L.cols, L.rows, L.layers[i].data);
         r_texture_filter_nearest(tex);
 
-        r_ro_single_init(&L.ros[i], &c_camera_vp.m00, tex);
+        r_ro_single_init(&L.ros[i], c_camera_gl, tex);
     }
 }
 
@@ -51,7 +51,7 @@ void canvas_init(int rows, int cols) {
     
     GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL);
     r_texture_filter_nearest(grid_tex);
-    r_ro_single_init(&L.grid, &c_camera_p.m00, grid_tex);
+    r_ro_single_init(&L.grid, c_camera_gl, grid_tex);
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
@@ -60,7 +60,7 @@ void canvas_init(int rows, int cols) {
     buf[1] = buf[2] = color_from_hex("#777777");
     GLuint bg_tex = r_texture_init(2, 2, buf);
     r_texture_filter_nearest(bg_tex);
-    r_ro_single_init(&L.bg, &c_camera_p.m00, bg_tex);
+    r_ro_single_init(&L.bg, c_camera_gl, bg_tex);
     {    
         float w = cols <= 8 ? 1 : cols/16.0f;
         float h = rows <= 8 ? 1 : rows/16.0f;

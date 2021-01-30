@@ -6,11 +6,13 @@
 #include "c_camera.h"
 
 
+const float *c_camera_gl;
 mat4 c_camera_v;
 mat4 c_camera_v_inv;
 mat4 c_camera_p;
 mat4 c_camera_p_inv;
 mat4 c_camera_vp;
+mat4 c_camera_v_p_inv;  // v @ p_inv
 //mat4 c_camera_vp_inv;
 
 static struct {
@@ -19,11 +21,13 @@ static struct {
 
 
 void c_camera_init() {
+    c_camera_gl = &c_camera_vp.m00;
     c_camera_v = mat4_eye();
     c_camera_v_inv = mat4_eye();
     c_camera_p = mat4_eye();
     c_camera_p_inv = mat4_eye();
     c_camera_vp = mat4_eye();
+    c_camera_v_p_inv = mat4_eye();
 //    c_camera_vp_inv = mat4_eye();
 }
 
@@ -45,6 +49,9 @@ void c_camera_update() {
     c_camera_p_inv = mat4_inv(c_camera_p);
 
     c_camera_vp = mat4_mul_mat(c_camera_p, c_camera_v_inv);
+    
+    c_camera_v_p_inv = mat4_mul_mat(c_camera_v, c_camera_p_inv);
+    
 //    c_camera_vp_inv = mat4_inv(c_camera_vp);
 }
 

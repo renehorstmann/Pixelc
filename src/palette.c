@@ -3,7 +3,6 @@
 #include "e/input.h"
 #include "r/r.h"
 #include "u/pose.h"
-#include "mathc/float.h"
 #include "utilc/alloc.h"
 #include "hud_camera.h"
 #include "brush.h"
@@ -20,20 +19,6 @@ static struct {
     float last_screen_ratio_for_updates;
 } L;
 
-
-static bool in_rect(ePointer_s pointer, mat4 pose) {
-    vec4 screen_pos = {{pointer.x, pointer.y, 0, 1}};
-
-    mat4 pose_inv = mat4_inv(pose);
-    mat4 screen_to_rect = mat4_mul_mat(pose_inv, hud_camera_p_inv);
-
-    vec4 rect_pos = mat4_mul_vec(screen_to_rect, screen_pos);
-
-    float x = rect_pos.x;
-    float y = rect_pos.y;
-    
-    return x>=-0.5 && x<=0.5 && y>=-0.5 && y<=0.5;
-}
 
 static mat4 setup_palette_color_pose(int r, int c) {
     mat4 pose = mat4_eye();
@@ -92,18 +77,18 @@ void palette_init() {
     GLuint drop_tex = r_texture_init_file("res/palette_color_drop.png", NULL);
     r_texture_filter_nearest(drop_tex);
     
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, &hud_camera_p.m00, drop_tex);
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, drop_tex);
     
     
     GLuint bg_tex = r_texture_init_file("res/palette_background.png", NULL);
     r_texture_filter_nearest(bg_tex);
     
-    r_ro_batch_init(&L.background_ro, PALETTE_MAX, &hud_camera_p.m00, bg_tex);
+    r_ro_batch_init(&L.background_ro, PALETTE_MAX, hud_camera_gl, bg_tex);
     
 
     GLuint select_tex = r_texture_init_file("res/palette_select.png", NULL);
     r_texture_filter_nearest(select_tex);
-    r_ro_single_init(&L.select_ro, &hud_camera_p.m00, select_tex);
+    r_ro_single_init(&L.select_ro, hud_camera_gl, select_tex);
     
     // default palette:
     {
@@ -122,7 +107,7 @@ bool palette_pointer_event(ePointer_s pointer) {
         return false;
 
     for(int i = 0; i<L.palette_size; i++) {
-    	if(in_rect(pointer, L.palette_ro.rects[i].pose)) {
+    	if(u_pose_aa_contains(L.palette_ro.rects[i].pose, pointer.pos.xy)) {
             palette_set_color(i);
     		return true;
     	}

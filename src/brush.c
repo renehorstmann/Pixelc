@@ -14,16 +14,11 @@ static struct {
 } L;
 
 static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
-    vec4 screen_pos = {{pointer.x, pointer.y, 0, 1}};
-
     mat4 pose_inv = mat4_inv(canvas_pose());
-    mat4 pose_inv_v = mat4_mul_mat(pose_inv, c_camera_v);
-    mat4 screen_to_rect = mat4_mul_mat(pose_inv_v, c_camera_p_inv);
+    vec4 pose_pos = mat4_mul_vec(pose_inv, pointer.pos);
 
-    vec4 rect_pos = mat4_mul_vec(screen_to_rect, screen_pos);
-
-    *row = (0.5 - rect_pos.y) * canvas_rows();
-    *col = (rect_pos.x + 0.5) * canvas_cols();
+    *row = (0.5 - pose_pos.y) * canvas_rows();
+    *col = (pose_pos.x + 0.5) * canvas_cols();
 }
 
 static void dot_mode(ePointer_s pointer) {

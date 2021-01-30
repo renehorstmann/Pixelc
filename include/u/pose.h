@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <math.h>
-#include "mathc/types/float.h"
+#include "mathc/mat/mat4.h"
 
 
 static float u_pose_get_x(mat4 p) {
@@ -24,6 +24,22 @@ static float u_pose_get_h(mat4 p) {
 
 static float u_pose_get_angle(mat4 p) {
 	return atan2f(p.m01, p.m00);
+}
+
+static float u_pose_aa_get_left(mat4 p) {
+    return p.m30 - u_pose_get_w(p) /2;
+}
+
+static float u_pose_aa_get_right(mat4 p) {
+    return p.m30 + u_pose_get_w(p) /2;
+}
+
+static float u_pose_aa_get_top(mat4 p) {
+    return p.m31 + u_pose_get_h(p) /2;
+}
+
+static float u_pose_aa_get_bottom(mat4 p) {
+    return p.m31 - u_pose_get_h(p) /2;
 }
 
 
@@ -98,21 +114,43 @@ static void u_pose_shift(mat4 *p, float x, float y, float angle_rad) {
 	u_pose_shift_angle(p, angle_rad);
 }
 
-static void u_pose_set_left(mat4 *p, float l) {
+
+static void u_pose_aa_set_left(mat4 *p, float l) {
 	p->m30 = l + u_pose_get_w(*p) /2;
 }
 
-static void u_pose_set_right(mat4 *p, float r) {
+static void u_pose_aa_set_right(mat4 *p, float r) {
 	p->m30 = r - u_pose_get_w(*p) /2;
 }
 
-static void u_pose_set_top(mat4 *p, float t) {
+static void u_pose_aa_set_top(mat4 *p, float t) {
     p->m31 = t - u_pose_get_h(*p) /2;
 }
 
-static void u_pose_set_bottom(mat4 *p, float b) {
+static void u_pose_aa_set_bottom(mat4 *p, float b) {
 	p->m31 = b + u_pose_get_h(*p) /2;
 }
+
+
+static bool u_pose_contains(mat4 p, vec4 pos) {
+	
+    mat4 p_inv = mat4_inv(p);
+    vec4 p_pos = mat4_mul_vec(p_inv, pos);
+
+    return p_pos.x>=-0.5 && p_pos.x<=0.5
+           && p_pos.y>=-0.5 && p_pos.y<=0.5;
+}
+
+
+static bool u_pose_aa_contains(mat4 p, vec2 pos) {
+	float l = u_pose_aa_get_left(p);
+	float r = u_pose_aa_get_right(p);
+	float t = u_pose_aa_get_top(p);
+	float b = u_pose_aa_get_bottom(p);
+	
+	return pos.x>=l && pos.x<=r && pos.y<=t && pos.y>=b;
+}
+
 
 
 

@@ -12,7 +12,7 @@
 enum ePointerAction {E_POINTER_DOWN, E_POINTER_MOVE, E_POINTER_UP, E_POINTER_NUM_ACTIONS};
 
 typedef struct {
-    float x, y;
+    vec4 pos; // x, y, 0, 1
     enum ePointerAction action;
     int id;
 } ePointer_s;
