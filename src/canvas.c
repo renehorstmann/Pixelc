@@ -79,6 +79,36 @@ void canvas_init(int rows, int cols) {
     }
 }
 
+void canvas_update(float dtime) {
+    float w = 160;
+    float h = 160.0f * L.rows / L.cols;
+    if(c_camera_is_portrait_mode())
+        u_pose_set(&L.pose, 0, c_camera_top() - 85, w, h, 0);
+    else
+        u_pose_set(&L.pose, c_camera_left() + 85, 0, w, h, 0);
+
+    for(int i=0; i<L.size; i++) {
+        r_texture_update(L.ros[i].tex, L.cols, L.rows, L.layers[i].data);
+
+        // set alpha and pose
+        L.ros[i].rect.color.w = L.layers[i].alpha * (1.0f / 255.0f);
+        L.ros[i].rect.pose = L.pose;
+    }
+
+    L.grid.rect.pose = L.pose;
+    L.bg.rect.pose = L.pose;
+}
+
+void canvas_render() {
+    r_ro_single_render(&L.bg);
+
+    for(int i=0; i<=L.current; i++) {
+        r_ro_single_render(&L.ros[i]);
+    }
+
+    r_ro_single_render(&L.grid);
+}
+
 
 
 mat4 canvas_pose() {
@@ -127,34 +157,4 @@ void canvas_set_layers(const Layer *layer, int size) {
 }
 void canvas_set_current(int current) {
     L.current = current;
-}
-
-void canvas_update(float dtime) {
-    float w = 160;
-    float h = 160.0f * L.rows / L.cols;
-    if(c_camera_is_portrait_mode())
-        u_pose_set(&L.pose, 0, c_camera_top() - 85, w, h, 0);
-    else
-        u_pose_set(&L.pose, c_camera_left() + 85, 0, w, h, 0);
-
-    for(int i=0; i<L.size; i++) {
-        r_texture_update(L.ros[i].tex, L.cols, L.rows, L.layers[i].data);
-
-        // set alpha and pose
-        L.ros[i].rect.color.w = L.layers[i].alpha * (1.0f / 255.0f);
-        L.ros[i].rect.pose = L.pose;
-    }
-    
-    L.grid.rect.pose = L.pose;
-    L.bg.rect.pose = L.pose;
-}
-
-void canvas_render() {
-    r_ro_single_render(&L.bg);
-    
-    for(int i=0; i<=L.current; i++) {
-        r_ro_single_render(&L.ros[i]);
-    }
-    
-    r_ro_single_render(&L.grid);
 }

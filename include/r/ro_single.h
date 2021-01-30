@@ -20,6 +20,7 @@ void r_ro_single_kill(rRoSingle *self);
 
 void r_ro_single_render(rRoSingle *self);
 
-void r_ro_single_set_texture(rRoSingle *self, GLuint tex);
+void r_ro_single_set_texture(rRoSingle *self, GLuint tex_sink);
+
 
 #endif //R_RO_SINGLE_H

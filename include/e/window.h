@@ -18,5 +18,4 @@ void e_window_update();
 
 void e_window_main_loop(eWindowMainLoopFn main_loop);
 
-
 #endif //E_WINDOW

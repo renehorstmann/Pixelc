@@ -19,13 +19,12 @@ typedef struct {
 
 typedef void (*ePointerEventFn)(ePointer_s, void *user_data);
 
+typedef struct {
+    bool up, left, right, down;
+    bool enter, space;
+} eInputKeys;
 
-extern bool e_input_up;
-extern bool e_input_left;
-extern bool e_input_right;
-extern bool e_input_down;
-extern bool e_input_enter;
-extern bool e_input_space;
+extern eInputKeys e_input_keys;
 
 extern bool e_input_accel_active;
 extern float e_input_accel[3];

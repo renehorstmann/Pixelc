@@ -6,10 +6,9 @@
 #include "hud_camera.h"
 
 
-const float *hud_camera_gl;
-mat4 hud_camera_p;
-mat4 hud_camera_p_inv;
 
+HudCameraMatrices_s hud_camera_matrices;
+const float *hud_camera_gl;
 
 static struct {
     float width, height;
@@ -17,9 +16,9 @@ static struct {
 
 
 void hud_camera_init() {
-    hud_camera_gl = &hud_camera_p.m00;
-    hud_camera_p = mat4_eye();
-    hud_camera_p_inv = mat4_eye();
+    hud_camera_gl = &hud_camera_matrices.p.m00;
+    hud_camera_matrices.p = mat4_eye();
+    hud_camera_matrices.p_inv = mat4_eye();
 }
 
 void hud_camera_update() {
@@ -35,8 +34,11 @@ void hud_camera_update() {
         L.height = 180 * wnd_height / wnd_width;
     }
 
-    hud_camera_p = mat4_camera_ortho(-L.width / 2, L.width / 2, -L.height / 2, L.height / 2, -1, 1);
-    hud_camera_p_inv = mat4_inv(hud_camera_p);
+    hud_camera_matrices.p = mat4_camera_ortho(
+            -L.width / 2, L.width / 2,      // left, right
+            -L.height / 2, L.height / 2,  // bottom, top
+            -1, 1);                         // near, far
+    hud_camera_matrices.p_inv = mat4_inv(hud_camera_matrices.p);
 }
 
 float hud_camera_width() {

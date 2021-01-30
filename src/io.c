@@ -46,7 +46,7 @@ bool io_load_layer(Layer *out_layer, const char *file) {
     return true;
 }
 
-bool io_save_layer(const Layer layer, const char *file) {
+bool io_save_layer(Layer layer, const char *file) {
     SDL_Surface *img = load_buffer(layer.data, canvas_cols(), canvas_rows());
     int ret = IMG_SavePNG(img, file);
     if(ret) {

@@ -6,6 +6,6 @@
 
 bool io_load_layer(Layer *out_layer, const char *file);
 
-bool io_save_layer(const Layer layer, const char *file);
+bool io_save_layer(Layer layer, const char *file);
 
 #endif //PIXELC_IO_H

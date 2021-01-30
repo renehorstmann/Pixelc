@@ -6,7 +6,6 @@
 #include "e/definitions.h"
 
 
-
 SDL_Window *e_window;
 int e_window_size[2];
 
@@ -18,34 +17,34 @@ static struct {
 } L;
 
 static void loop() {
-	Uint32 time = SDL_GetTicks();
+    Uint32 time = SDL_GetTicks();
     float dtime = (time - L.last_time) / 1000.0f;
     L.last_time = time;
-    
+
     L.main_loop_fn(dtime);
 }
 
 
 void e_window_init(const char *name) {
 
-    if(SDL_Init(E_SDL_INIT_FLAGS) != 0) {
+    if (SDL_Init(E_SDL_INIT_FLAGS) != 0) {
         SDL_Log("SDL_Init failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
-    
+
     // initialize IMG
     int imgFlags = IMG_INIT_PNG;
-    if( !( IMG_Init( imgFlags ) & imgFlags ) ) {
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
         SDL_Log("IMG_Init failed: %s", IMG_GetError());
         exit(EXIT_FAILURE);
     }
-    
+
     // initialize TTF
     if (TTF_Init() == -1) {
-		SDL_Log("TTF_Init failed: %s", TTF_GetError());
+        SDL_Log("TTF_Init failed: %s", TTF_GetError());
         exit(EXIT_FAILURE);
-	}
+    }
 
     // setup OpenGL usage
     SDL_Log("OpenGL minimal version: %d.%d", E_GL_MAJOR_VERSION, E_GL_MINOR_VERSION);
@@ -63,9 +62,9 @@ void e_window_init(const char *name) {
 
     // create window
     e_window = SDL_CreateWindow(name,
-            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            640, 480,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                640, 480,
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!e_window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
@@ -77,7 +76,7 @@ void e_window_init(const char *name) {
 
 #ifdef USING_GLEW
     GLenum err = glewInit();
-    if (GLEW_OK != err){
+    if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "glewInit faled: %s\n", glewGetErrorString(err));
         exit(EXIT_FAILURE);
@@ -89,12 +88,12 @@ void e_window_init(const char *name) {
 }
 
 void e_window_kill() {
-	SDL_Log("Window killed");
-	L.running = false;
+    SDL_Log("Window killed");
+    L.running = false;
 }
 
 void e_window_update() {
-	SDL_GetWindowSize(e_window, &e_window_size[0], &e_window_size[1]);
+    SDL_GetWindowSize(e_window, &e_window_size[0], &e_window_size[1]);
 }
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {
@@ -116,5 +115,4 @@ void e_window_main_loop(eWindowMainLoopFn main_loop) {
     SDL_Quit();
 #endif
 }
-
 

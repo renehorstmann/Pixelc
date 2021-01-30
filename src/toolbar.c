@@ -44,35 +44,6 @@ void toolbar_init() {
 	
 }
 
-// return true if the pointer was used (indicate event done)
-bool toolbar_pointer_event(ePointer_s pointer) {
-	if(button_clicked(&L.undo, pointer)) {
-	    	
-	    puts("click");
-	    
-	    unpress_modes(-1);
-	    savestate_undo();
-	}
-	
-	for(int i=0; i<4; i++) {
-		if(button_pressed(&L.mode[i], pointer)) {
-			
-			printf("mode %d\n", i);
-			unpress_modes(i);
-			
-			if(i==0) {
-				brush_set_mode(BRUSH_MODE_DOT);
-			} else if(i==1) {
-				brush_set_mode(BRUSH_MODE_FREE);
-			} else if(i==3) {
-			    savestate_save();
-			}
-		}
-	}
-	
-	return false;
-}
-
 void toolbar_update(float dtime) {
 	//u_pose_set(L.undo.pose, hud_camera_left() + 8, hud_camera_top() - 8, 16, 16, 0);
 	
@@ -88,4 +59,33 @@ void toolbar_render() {
 	for(int i=0; i<4; i++) {
 		r_ro_single_render(&L.mode[i]);
 	}
+}
+
+// return true if the pointer was used (indicate event done)
+bool toolbar_pointer_event(ePointer_s pointer) {
+    if(button_clicked(&L.undo, pointer)) {
+
+        puts("click");
+
+        unpress_modes(-1);
+        savestate_undo();
+    }
+
+    for(int i=0; i<4; i++) {
+        if(button_pressed(&L.mode[i], pointer)) {
+
+            printf("mode %d\n", i);
+            unpress_modes(i);
+
+            if(i==0) {
+                brush_set_mode(BRUSH_MODE_DOT);
+            } else if(i==1) {
+                brush_set_mode(BRUSH_MODE_FREE);
+            } else if(i==3) {
+                savestate_save();
+            }
+        }
+    }
+
+    return false;
 }

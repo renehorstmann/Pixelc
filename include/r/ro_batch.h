@@ -25,6 +25,6 @@ void r_ro_batch_update(rRoBatch *self, int offset, int size);
 
 void r_ro_batch_render(rRoBatch *self);
 
-void r_ro_batch_set_texture(rRoBatch *self, GLuint tex);
+void r_ro_batch_set_texture(rRoBatch *self, GLuint tex_sink);
 
 #endif //R_RO_BATCH_H

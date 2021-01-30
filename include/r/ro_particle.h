@@ -37,6 +37,6 @@ void r_ro_particle_update(rRoParticle *self, int offset, int size);
 
 void r_ro_particle_render(rRoParticle *self, float time);
 
-void r_ro_particle_set_texture(rRoParticle *self, GLuint tex);
+void r_ro_particle_set_texture(rRoParticle *self, GLuint tex_sink);
 
 #endif //R_RO_PARTICLE_H

@@ -4,13 +4,7 @@
 #include "e/gui.h"
 #include "e/input.h"
 
-bool e_input_up;
-bool e_input_left;
-bool e_input_right;
-bool e_input_down;
-bool e_input_enter;
-bool e_input_space;
-
+eInputKeys e_input_keys;
 
 bool e_input_accel_active;
 float e_input_accel[3];
@@ -107,22 +101,22 @@ static void input_handle_keys(SDL_Event *event) {
     bool down = event->type == SDL_KEYDOWN;
     switch (event->key.keysym.sym) {
         case SDLK_UP:
-            e_input_up = down;
+            e_input_keys.up = down;
             break;
         case SDLK_LEFT:
-            e_input_left = down;
+            e_input_keys.left = down;
             break;
         case SDLK_RIGHT:
-            e_input_right = down;
+            e_input_keys.right = down;
             break;
         case SDLK_DOWN:
-            e_input_down = down;
+            e_input_keys.down = down;
             break;
         case SDLK_RETURN:
-            e_input_enter = down;
+            e_input_keys.enter = down;
             break;
         case SDLK_SPACE:
-            e_input_space = down;
+            e_input_keys.space = down;
             break;
     }
 }

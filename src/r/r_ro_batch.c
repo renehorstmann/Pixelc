@@ -13,6 +13,14 @@ static void init_rects(rRect_s *instances, int num) {
     }
 }
 
+static int clamp_range(int i, int begin, int end) {
+    if (i < begin)
+        i = begin;
+    if (i >= end)
+        i = end - 1;
+    return i;
+}
+
 void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink) {
     self->rects = New(rRect_s, num);
     init_rects(self->rects, num);
@@ -87,48 +95,39 @@ void r_ro_batch_kill(rRoBatch *self) {
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     glDeleteBuffers(1, &self->vbo);
-    if(self->owns_tex)
+    if (self->owns_tex)
         glDeleteTextures(1, &self->tex);
     *self = (rRoBatch) {0};
 }
 
-static int clamp_range(int i, int begin, int end) {
-	if(i < begin)
-	    i = begin;
-	if(i >= end)
-	    i = end - 1;
-	return i;
-}
-
 void r_ro_batch_update(rRoBatch *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
-    
+
     offset = clamp_range(offset, 0, self->num);
-    size = clamp_range(size, 1, self->num+1);
-    
-    if(offset + size > self->num) {
+    size = clamp_range(size, 1, self->num + 1);
+
+    if (offset + size > self->num) {
         int to_end = self->num - offset;
         int from_start = size - to_end;
-    	glBufferSubData(GL_ARRAY_BUFFER, 
+        glBufferSubData(GL_ARRAY_BUFFER,
                         offset * sizeof(rRect_s),
-                        to_end * sizeof(rRect_s), 
+                        to_end * sizeof(rRect_s),
                         self->rects + offset);
-         
-    	glBufferSubData(GL_ARRAY_BUFFER, 
+
+        glBufferSubData(GL_ARRAY_BUFFER,
                         0,
-                        from_start * sizeof(rRect_s), 
+                        from_start * sizeof(rRect_s),
                         self->rects);
     } else {
-        glBufferSubData(GL_ARRAY_BUFFER, 
+        glBufferSubData(GL_ARRAY_BUFFER,
                         offset * sizeof(rRect_s),
-                        size * sizeof(rRect_s), 
+                        size * sizeof(rRect_s),
                         self->rects + offset);
-                    
+
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
 
 
 void r_ro_batch_render(rRoBatch *self) {
@@ -149,9 +148,9 @@ void r_ro_batch_render(rRoBatch *self) {
     glUseProgram(0);
 }
 
-void r_ro_batch_set_texture(rRoBatch *self, GLuint tex) {
-    if(self->owns_tex)
+void r_ro_batch_set_texture(rRoBatch *self, GLuint tex_sink) {
+    if (self->owns_tex)
         glDeleteTextures(1, &self->tex);
-    self->tex = tex;
+    self->tex = tex_sink;
 }
 

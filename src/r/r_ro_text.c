@@ -67,3 +67,4 @@ void r_ro_text_set_text(rRoText *self, vec4 color, const char *text) {
     r_ro_text_set_size(self, u_pose_get_h(self->ro.rect.pose));
 }
 
+

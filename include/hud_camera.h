@@ -5,9 +5,15 @@
 #include "mathc/types/float.h"
 
 
+typedef struct {
+    mat4 p;
+    mat4 p_inv;
+} HudCameraMatrices_s;
+
+extern HudCameraMatrices_s hud_camera_matrices;
 extern const float *hud_camera_gl;
-extern mat4 hud_camera_p;
-extern mat4 hud_camera_p_inv;
+
+
 
 void hud_camera_init();
 

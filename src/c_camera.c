@@ -6,14 +6,8 @@
 #include "c_camera.h"
 
 
+CanvasCameraMatrices_s c_camera_matrices;
 const float *c_camera_gl;
-mat4 c_camera_v;
-mat4 c_camera_v_inv;
-mat4 c_camera_p;
-mat4 c_camera_p_inv;
-mat4 c_camera_vp;
-mat4 c_camera_v_p_inv;  // v @ p_inv
-//mat4 c_camera_vp_inv;
 
 static struct {
     float width, height;
@@ -21,14 +15,13 @@ static struct {
 
 
 void c_camera_init() {
-    c_camera_gl = &c_camera_vp.m00;
-    c_camera_v = mat4_eye();
-    c_camera_v_inv = mat4_eye();
-    c_camera_p = mat4_eye();
-    c_camera_p_inv = mat4_eye();
-    c_camera_vp = mat4_eye();
-    c_camera_v_p_inv = mat4_eye();
-//    c_camera_vp_inv = mat4_eye();
+    c_camera_gl = &c_camera_matrices.vp.m00;
+    c_camera_matrices.v = mat4_eye();
+    c_camera_matrices.v_inv = mat4_eye();
+    c_camera_matrices.p = mat4_eye();
+    c_camera_matrices.p_inv = mat4_eye();
+    c_camera_matrices.vp = mat4_eye();
+    c_camera_matrices.v_p_inv = mat4_eye();
 }
 
 void c_camera_update() {
@@ -43,16 +36,14 @@ void c_camera_update() {
         L.height = 200 * wnd_height / wnd_width;
     }
 
-    c_camera_v_inv = mat4_inv(c_camera_v);
+    c_camera_matrices.v_inv = mat4_inv(c_camera_matrices.v);
 
-    c_camera_p = mat4_camera_ortho(-L.width / 2, L.width / 2, -L.height / 2, L.height / 2, -1, 1);
-    c_camera_p_inv = mat4_inv(c_camera_p);
+    c_camera_matrices.p = mat4_camera_ortho(-L.width / 2, L.width / 2, -L.height / 2, L.height / 2, -1, 1);
+    c_camera_matrices.p_inv = mat4_inv(c_camera_matrices.p);
 
-    c_camera_vp = mat4_mul_mat(c_camera_p, c_camera_v_inv);
+    c_camera_matrices.vp = mat4_mul_mat(c_camera_matrices.p, c_camera_matrices.v_inv);
     
-    c_camera_v_p_inv = mat4_mul_mat(c_camera_v, c_camera_p_inv);
-    
-//    c_camera_vp_inv = mat4_inv(c_camera_vp);
+    c_camera_matrices.v_p_inv = mat4_mul_mat(c_camera_matrices.v, c_camera_matrices.p_inv);
 }
 
 
@@ -64,9 +55,9 @@ float c_camera_height() {
 }
 
 void c_camera_set_pos(float x, float y) {
-    u_pose_set_xy(&c_camera_v, x, y);
+    u_pose_set_xy(&c_camera_matrices.v, x, y);
 }
 
 void c_camera_set_angle(float alpha) {
-    u_pose_set_angle(&c_camera_v, alpha);
+    u_pose_set_angle(&c_camera_matrices.v, alpha);
 }

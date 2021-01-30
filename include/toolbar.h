@@ -7,11 +7,11 @@
 
 void toolbar_init();
 
-// return true if the pointer was used (indicate event done)
-bool toolbar_pointer_event(ePointer_s pointer);
-
 void toolbar_update(float dtime);
 
 void toolbar_render();
+
+// return true if the pointer was used (indicate event done)
+bool toolbar_pointer_event(ePointer_s pointer);
 
 #endif //PIXELC_TOOLBAR_H

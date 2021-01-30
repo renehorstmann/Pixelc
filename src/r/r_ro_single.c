@@ -66,8 +66,8 @@ void r_ro_single_render(rRoSingle *self) {
     glUseProgram(0);
 }
 
-void r_ro_single_set_texture(rRoSingle *self, GLuint tex) {
+void r_ro_single_set_texture(rRoSingle *self, GLuint tex_sink) {
     if(self->owns_tex)
         glDeleteTextures(1, &self->tex);
-    self->tex = tex;
+    self->tex = tex_sink;
 }
