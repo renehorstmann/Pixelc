@@ -1,11 +1,11 @@
 #include "e/input.h"
-#include "brush.h"
 #include "mathc/float.h"
 
 #include "color.h"
 #include "c_camera.h"
 #include "io.h"
 #include "canvas.h"
+#include "brush.h"
 
 static struct {
     Color_s current_color;
@@ -25,11 +25,14 @@ static void dot_mode(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return;
 
+    Image *img = canvas_image();
+    int layer = canvas_current_layer;
+
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if (c >= 0 && c < canvas_image()->cols && r >= 0 && r < canvas_image()->rows) {
-        *image_pixel(canvas_image(), canvas_current_layer, r, c) = L.current_color;
+    if (c >= 0 && c < img->cols && r >= 0 && r < img->rows) {
+        *image_pixel(img, layer, r, c) = L.current_color;
     }
 }
 
@@ -43,11 +46,14 @@ static void free_mode(ePointer_s pointer) {
     if (!L.drawing)
         return;
 
+    Image *img = canvas_image();
+    int layer = canvas_current_layer;
+
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if (c >= 0 && c < canvas_image()->cols && r >= 0 && r < canvas_image()->rows) {
-        *image_pixel(canvas_image(), canvas_current_layer, r, c) = L.current_color;
+    if (c >= 0 && c < img->cols && r >= 0 && r < img->rows) {
+        *image_pixel(img, layer, r, c) = L.current_color;
     }
 }
 
