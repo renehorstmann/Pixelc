@@ -17,8 +17,8 @@ static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
     mat4 pose_inv = mat4_inv(canvas_pose());
     vec4 pose_pos = mat4_mul_vec(pose_inv, pointer.pos);
 
-    *row = (0.5 - pose_pos.y) * canvas_rows();
-    *col = (pose_pos.x + 0.5) * canvas_cols();
+    *row = (0.5 - pose_pos.y) * canvas_image()->rows;
+    *col = (pose_pos.x + 0.5) * canvas_image()->cols;
 }
 
 static void dot_mode(ePointer_s pointer) {
@@ -28,8 +28,8 @@ static void dot_mode(ePointer_s pointer) {
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if (c >= 0 && c < canvas_cols() && r >= 0 && r < canvas_rows()) {
-        *layer_pixel(canvas_current_layer(), r, c) = L.current_color;
+    if (c >= 0 && c < canvas_image()->cols && r >= 0 && r < canvas_image()->rows) {
+        *image_pixel(canvas_image(), canvas_current_layer, r, c) = L.current_color;
     }
 }
 
@@ -46,8 +46,8 @@ static void free_mode(ePointer_s pointer) {
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if (c >= 0 && c < canvas_cols() && r >= 0 && r < canvas_rows()) {
-        *layer_pixel(canvas_current_layer(), r, c) = L.current_color;
+    if (c >= 0 && c < canvas_image()->cols && r >= 0 && r < canvas_image()->rows) {
+        *image_pixel(canvas_image(), canvas_current_layer, r, c) = L.current_color;
     }
 }
 
@@ -62,7 +62,7 @@ void brush_pointer_event(ePointer_s pointer) {
     }
 
     if (pointer.action == E_POINTER_UP) {
-        io_save_layer(*canvas_current_layer(), "sprite.png");
+        io_save_image(canvas_image(), "sprite.png");
     }
 }
 

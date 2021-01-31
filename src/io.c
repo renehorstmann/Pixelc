@@ -25,30 +25,30 @@ static SDL_Surface *load_buffer(void *data, int width, int height) {
 }
 
 
-bool io_load_layer(Layer *out_layer, const char *file) {
+Image *io_load_image(const char *file) {
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
         SDL_Log("io_load_layer (%s) failed: %s", file, IMG_GetError());
-        return false;
+        return NULL;
     }
     SDL_PixelFormat *f = img->format;
     if (f->BitsPerPixel != 32 || f->Amask == 0) {
         SDL_Log("io_load_layer failed, 8bpp and alpha needed");
-        return false;
-    }
-    if (img->w != canvas_cols() || img->h != canvas_rows()) {
-        SDL_Log("io_load_layer failed, wrong size");
-        return false;
+        SDL_FreeSurface(img);
+        return NULL;
     }
 
-    memcpy(out_layer->data, img->pixels, img->w * img->h * 4);
+    Image *image = image_new_empty(1, img->h, img->w);
+    memcpy(image->data, img->pixels, sizeof(Color_s) * img->w * img->h);
     SDL_FreeSurface(img);
-    return true;
+    return image;
 }
 
-bool io_save_layer(Layer layer, const char *file) {
-    SDL_Surface *img = load_buffer(layer.data, canvas_cols(), canvas_rows());
+
+bool io_save_image(const Image *image, const char *file) {
+    SDL_Surface *img = load_buffer((void *)image->data, image->cols, image->rows);
     int ret = IMG_SavePNG(img, file);
+    SDL_FreeSurface(img);
     if(ret) {
         SDL_Log("io_save_layer (%s) failed: %s", file, IMG_GetError());
         return false;

@@ -2,10 +2,10 @@
 #define PIXELC_IO_H
 
 #include <stdbool.h>
-#include "layer.h"
+#include "image.h"
 
-bool io_load_layer(Layer *out_layer, const char *file);
+Image *io_load_image(const char *file);
 
-bool io_save_layer(Layer layer, const char *file);
+bool io_save_image(const Image *image, const char *file);
 
 #endif //PIXELC_IO_H
