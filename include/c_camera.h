@@ -49,6 +49,8 @@ static bool c_camera_is_portrait_mode() {
 
 void c_camera_set_pos(float x, float y);
 
+void c_camera_set_size(float size);
+
 void c_camera_set_angle(float alpha);
 
 #endif //PIXELC_C_CAMERA_H

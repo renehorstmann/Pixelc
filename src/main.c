@@ -8,6 +8,7 @@
 #include "background.h"
 #include "canvas.h"
 #include "brush.h"
+#include "camera_control.h"
 #include "palette.h"
 #include "palette_presave.h"
 #include "toolbar.h"
@@ -37,6 +38,7 @@ int main(int argc, char **argv) {
     background_init();
     canvas_init(16, 16);
     brush_init();
+    camera_control_init();
     palette_init();
     toolbar_init();
     input_init();

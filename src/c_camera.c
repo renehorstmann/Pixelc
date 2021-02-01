@@ -70,6 +70,10 @@ void c_camera_set_pos(float x, float y) {
     u_pose_set_xy(&c_camera_matrices.v, x, y);
 }
 
+void c_camera_set_size(float size) {
+	u_pose_set_size(&c_camera_matrices.v, size, size);
+}
+
 void c_camera_set_angle(float alpha) {
     u_pose_set_angle(&c_camera_matrices.v, alpha);
 }

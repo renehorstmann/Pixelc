@@ -4,6 +4,7 @@
 #include "c_camera.h"
 
 #include "brush.h"
+#include "camera_control.h"
 #include "palette.h"
 #include "toolbar.h"
 #include "input.h"
@@ -28,6 +29,8 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     c_pointer.pos = mat4_mul_vec(c_camera_matrices.v_p_inv, pointer.pos);
 
     brush_pointer_event(c_pointer);
+    camera_control_pointer_event(c_pointer);
+    
     
 }
 
