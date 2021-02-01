@@ -18,6 +18,7 @@ static struct {
     mat4 pose;
 
     Image *image;
+    Image *last_image;
     rRoSingle *render_objects;
     int layers;
     
@@ -86,6 +87,8 @@ void canvas_init(int rows, int cols) {
         *image_pixel(L.image, canvas_current_layer, 0, L.image->cols-1) = COLOR_WHITE;
         *image_pixel(L.image, canvas_current_layer, L.image->rows-1, L.image->cols-1) = COLOR_WHITE;
     }
+    
+    L.last_image = image_new_clone(L.image);
 }
 
 void canvas_update(float dtime) {
@@ -128,6 +131,14 @@ Image *canvas_image() {
 
 int canvas_layers() {
     return L.layers;
+}
+
+void canvas_save() {
+	if(!image_equals(L.image, L.last_image)) {
+	    image_copy(L.last_image, L.image);
+	    savestate_save();
+        io_save_image(canvas_image(), "sprite.png");
+	}
 }
 
 void canvas_redo_image() {

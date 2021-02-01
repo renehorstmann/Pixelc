@@ -78,8 +78,7 @@ void brush_pointer_event(ePointer_s pointer) {
         L.change = true;
 
     if (L.change && pointer.action == E_POINTER_UP) {
-        savestate_save();
-        io_save_image(canvas_image(), "sprite.png");
+        canvas_save();
     }
     
     if(pointer.action != E_POINTER_MOVE)

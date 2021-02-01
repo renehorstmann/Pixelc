@@ -1,3 +1,4 @@
+#include <string.h>  // memcmp
 #include "utilc/alloc.h"
 #include "image.h"
 
@@ -40,5 +41,12 @@ bool image_copy(Image *self, const Image *from) {
     }
     SDL_Log("image_copy failed: wrong size (self/from): %zu / %zu", self_size, from_size);
     return false;
+}
+
+bool image_equals(const Image *self, const Image *from) {
+	if(image_data_size(self) != image_data_size(from))
+	    return false;
+	    
+	return memcmp(self, from, image_full_size(self)) == 0;
 }
 
