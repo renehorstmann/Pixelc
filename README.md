@@ -8,25 +8,33 @@ Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
 ## Todo
-- Zoom n Pinch 
+- Zoom n move
   - undos/aborts accidently draw capture
 - Toolbar
+  - undo
   - Brush mode
     - dot
     - free
-    - shape (block, plus, cross)
-    - size (1, 3, 5)
+    - shape
+      - dot, plus, cross, dither
+    - size
+      - 1, 3, 5
     - line
     - circle
     - fill
     - shade (from color to color)
+  - second color 
+    - for dither, shade, replace
   - clear
   - replace (from color to color)
   - move mode
-  - undo and redo
+  - selection
+    - copy
+    - move
+- Tile repeat
 - Layer Selection
 - Frame Selection
-- ...
+- Animation view
 
 ## Compiling on Windows
 Compiling with Mingw (msys2).
