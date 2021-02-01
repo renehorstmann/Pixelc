@@ -104,5 +104,24 @@ static void palette_presave_slso8() {
 }
 
 
+static void palette_presave_gameboy() {
+    Color_s palette[5];
+    int size = 5;
+    const char *hex[5] = {
+            "#00000000",
+            "#00131a",
+            "#3d8026",
+            "#abcc47",
+            "#f9ffb3"
+    };
+    
+    for (int i = 0; i < size; i++) {
+        palette[i] = color_from_hex(hex[i]);
+    }
+    
+    palette_set_colors(palette, size);
+}
+
+
 
 #endif //PIXELC_PALETTE_PRESAVE_H

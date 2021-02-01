@@ -46,8 +46,9 @@ int main(int argc, char **argv) {
 
 //    palette_presave_grayscale();
 //    palette_presave_grayscale_alpha();
-    palette_presave_pixilmatt();
+//    palette_presave_pixilmatt();
 //    palette_presave_slso8();
+    palette_presave_gameboy();
 
     // save start frame
     savestate_save();
