@@ -8,8 +8,6 @@ Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
 ## Todo
-- undo and redo
-  - draw step capture
 - Zoom n Pinch 
   - undos/aborts accidently draw capture
 - Toolbar
