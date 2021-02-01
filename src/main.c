@@ -42,10 +42,12 @@ int main(int argc, char **argv) {
     input_init();
     savestate_init();
 
-
 //    palette_presave_grayscale();
 //    palette_presave_grayscale_alpha();
     palette_presave_pixilmatt();
+
+    // save start frame
+    savestate_save();
 
     e_window_main_loop(main_loop);
 

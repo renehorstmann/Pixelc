@@ -55,12 +55,14 @@ void savestate_save() {
 void savestate_undo() {
     SDL_Log("savestate_undo state: %d", L.state_size);
     
-    if(L.state_size<=0) {
+    if(L.state_size<=1) {
 		SDL_Log("savestate_undo failed");
 		return;
 	}
-
-    State *state = &L.states[--L.state_size];
+ 
+    // the last savestate should be the actual state
+    // so reduce it and take the second last
+    State *state = &L.states[--L.state_size-1];
     
     for(int i=0; i<state->id_size; i++) {
     	L.load_fns[i](state->data[i], state->size[i]);

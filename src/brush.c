@@ -5,12 +5,14 @@
 #include "c_camera.h"
 #include "io.h"
 #include "canvas.h"
+#include "savestate.h"
 #include "brush.h"
 
 static struct {
     Color_s current_color;
     enum brushmodes mode;
     bool drawing;
+    bool change;
 } L;
 
 static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
@@ -21,9 +23,9 @@ static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
     *col = (pose_pos.x + 0.5) * canvas_image()->cols;
 }
 
-static void dot_mode(ePointer_s pointer) {
+static bool dot_mode(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
-        return;
+        return false;
 
     Image *img = canvas_image();
     int layer = canvas_current_layer;
@@ -31,20 +33,22 @@ static void dot_mode(ePointer_s pointer) {
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if (c >= 0 && c < img->cols && r >= 0 && r < img->rows) {
+    bool in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows;
+    if(in_image) {
         *image_pixel(img, layer, r, c) = L.current_color;
     }
+    return in_image;
 }
 
-static void free_mode(ePointer_s pointer) {
+static bool free_mode(ePointer_s pointer) {
     if (pointer.action == E_POINTER_DOWN) {
         L.drawing = true;
     } else if (pointer.action != E_POINTER_MOVE) {
         L.drawing = false;
-        return;
+        return false;
     }
     if (!L.drawing)
-        return;
+        return false;
 
     Image *img = canvas_image();
     int layer = canvas_current_layer;
@@ -52,24 +56,34 @@ static void free_mode(ePointer_s pointer) {
     int r, c;
     get_tex_coords(pointer, &r, &c);
 
-    if (c >= 0 && c < img->cols && r >= 0 && r < img->rows) {
+    bool in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows; 
+    if(in_image) {
         *image_pixel(img, layer, r, c) = L.current_color;
     }
+    return in_image;
 }
 
 void brush_pointer_event(ePointer_s pointer) {
+    bool change;
     switch (L.mode) {
         case BRUSH_MODE_DOT:
-            dot_mode(pointer);
+            change = dot_mode(pointer);
             break;
         case BRUSH_MODE_FREE:
-            free_mode(pointer);
+            change = free_mode(pointer);
             break;
     }
+    
+    if(change)
+        L.change = true;
 
-    if (pointer.action == E_POINTER_UP) {
+    if (L.change && pointer.action == E_POINTER_UP) {
+        savestate_save();
         io_save_image(canvas_image(), "sprite.png");
     }
+    
+    if(pointer.action != E_POINTER_MOVE)
+        L.change = false;
 }
 
 

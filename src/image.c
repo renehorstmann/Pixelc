@@ -18,22 +18,21 @@ Image *image_new_zeros(int layers, int rows, int cols) {
     return self;
 }
 
+Image *image_new_clone(const Image *from) {
+    Image *self = image_new_empty(from->layers, from->rows, from->cols);
+    memcpy(self->data, from->data, image_data_size(from));
+    return self;
+}
+
 void image_delete(Image *self) {
     free(self);
 }
 
-Image *image_clone(const Image *from) {
-    size_t size = from->layers * from->rows * from->cols;
-    Image *self = image_new_empty(from->layers, from->rows, from->cols);
-    memcpy(self->data, from->data, sizeof(Color_s) * size);
-    return self;
-}
-
 bool image_copy(Image *self, const Image *from) {
-    size_t self_size = self->layers * self->rows * self->cols;
-    size_t from_size = from->layers * from->rows * from->cols;
+    size_t self_size = image_data_size(self);
+    size_t from_size = image_data_size(from);
     if(self_size == from_size) {
-        memcpy(self->data, from->data, sizeof(Color_s) * self_size);
+        memcpy(self->data, from->data, self_size);
         self->layers = from->layers;
         self->rows = from->rows;
         self->cols = from->cols;

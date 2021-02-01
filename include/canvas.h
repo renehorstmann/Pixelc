@@ -17,4 +17,6 @@ mat4 canvas_pose();
 Image *canvas_image();
 int canvas_layers();
 
+void canvas_redo_image();
+
 #endif //PIXELC_CANVAS_H

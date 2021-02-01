@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
@@ -7,6 +8,7 @@
 #include "image.h"
 #include "c_camera.h"
 #include "io.h"
+#include "savestate.h"
 #include "canvas.h"
 
 
@@ -21,6 +23,8 @@ static struct {
     
     rRoSingle bg;
     rRoSingle grid;
+    
+    int save_id;
 } L;
 
 
@@ -33,9 +37,15 @@ static void init_render_objects() {
     }
 }
 
+static void save_state(void **data, size_t *size);
+static void load_state(const void *data, size_t size);
+
 
 void canvas_init(int rows, int cols) {
     int layers = 1;
+    
+    L.save_id = savestate_register(save_state, load_state);
+     
     L.pose = mat4_eye();
 
     L.image = image_new_zeros(layers, rows, cols);
@@ -119,3 +129,22 @@ Image *canvas_image() {
 int canvas_layers() {
     return L.layers;
 }
+
+void canvas_redo_image() {
+	savestate_redo_id(L.save_id);
+}
+
+
+static void save_state(void **data, size_t *size) {
+	puts("save");
+	*data = L.image;
+	*size = image_full_size(L.image);
+}
+static void load_state(const void *data, size_t size) {
+	// todo: check new layers, rows, cols
+	puts("load");
+	image_delete(L.image);
+	L.image = image_new_clone(data);
+	assert(image_full_size(L.image) == size);
+}
+
