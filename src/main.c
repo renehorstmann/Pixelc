@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init(16, 32);
+    canvas_init(16, 16);
     brush_init();
     palette_init();
     toolbar_init();
@@ -45,6 +45,7 @@ int main(int argc, char **argv) {
 //    palette_presave_grayscale();
 //    palette_presave_grayscale_alpha();
     palette_presave_pixilmatt();
+//    palette_presave_slso8();
 
     // save start frame
     savestate_save();

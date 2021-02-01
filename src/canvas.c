@@ -78,14 +78,6 @@ void canvas_init(int rows, int cols) {
     if(img) {
         image_copy(L.image, img);
         image_delete(img);
-    } else {
-        for(int i=0; i<L.image->rows*L.image->cols; i++) {
-            *image_pixel_index(L.image, canvas_current_layer, i) = COLOR_TRANSPARENT;
-        }
-        *image_pixel(L.image, canvas_current_layer, 0, 0) = COLOR_WHITE;
-        *image_pixel(L.image, canvas_current_layer, L.image->rows-1, 0) = COLOR_WHITE;
-        *image_pixel(L.image, canvas_current_layer, 0, L.image->cols-1) = COLOR_WHITE;
-        *image_pixel(L.image, canvas_current_layer, L.image->rows-1, L.image->cols-1) = COLOR_WHITE;
     }
     
     L.last_image = image_new_clone(L.image);
@@ -95,7 +87,7 @@ void canvas_update(float dtime) {
     float w = 160;
     float h = 160.0f * L.image->rows / L.image->cols;
     if(c_camera_is_portrait_mode())
-        u_pose_set(&L.pose, 0, c_camera_top() - 85, w, h, 0);
+        u_pose_set(&L.pose, 0, c_camera_top() - 110, w, h, 0);
     else
         u_pose_set(&L.pose, c_camera_left() + 85, 0, w, h, 0);
 
@@ -147,13 +139,11 @@ void canvas_redo_image() {
 
 
 static void save_state(void **data, size_t *size) {
-	puts("save");
 	*data = L.image;
 	*size = image_full_size(L.image);
 }
 static void load_state(const void *data, size_t size) {
 	// todo: check new layers, rows, cols
-	puts("load");
 	image_delete(L.image);
 	L.image = image_new_clone(data);
 	assert(image_full_size(L.image) == size);

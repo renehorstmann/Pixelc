@@ -80,4 +80,29 @@ static void palette_presave_pixilmatt() {
     palette_set_colors(palette, size);
 }
 
+static void palette_presave_slso8() {
+    Color_s palette[10];
+    int size = 10;
+    const char *hex[10] = {
+            "#00000000",
+            "#000000",
+            "#0d2b45",
+            "#203c56",
+            "#544e68",
+            "#8d697a",
+            "#d08159",
+            "#ffaa5e",
+            "#ffd4a3",
+            "#ffecd6"
+    };
+    
+    for (int i = 0; i < size; i++) {
+        palette[i] = color_from_hex(hex[i]);
+    }
+    
+    palette_set_colors(palette, size);
+}
+
+
+
 #endif //PIXELC_PALETTE_PRESAVE_H
