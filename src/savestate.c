@@ -40,15 +40,20 @@ void savestate_save() {
     L.states = ReNew(State, L.states, ++L.state_size);
     
     State *state = &L.states[L.state_size-1];
+    memset(state, 0, sizeof(State));
+
     state->id_size = L.id_size;
     
     for(int i=0; i<L.id_size; i++) {
     	void *data;
     	size_t size;
     	L.save_fns[i](&data, &size);
-    	state->data[i] = raising_malloc(size, 1, SIGABRT);
-    	memcpy(state->data[i], data, size);
-    	state->size[i] = size;
+    	if(size > 0) {
+            state->data[i] = raising_malloc(size, 1, SIGABRT);
+            memcpy(state->data[i], data, size);
+            state->size[i] = size;
+        } else
+            state->size[i] = 0;
     }
 }
 
@@ -59,15 +64,21 @@ void savestate_undo() {
 		SDL_Log("savestate_undo failed");
 		return;
 	}
- 
-    // the last savestate should be the actual state
-    // so reduce it and take the second last
-    State *state = &L.states[--L.state_size-1];
+
+    // reduce states by one
+    L.state_size--;
+
+    // use last one
+    State *state = &L.states[L.state_size-1];
     
     for(int i=0; i<state->id_size; i++) {
     	L.load_fns[i](state->data[i], state->size[i]);
-    	free(state->data[i]);
-    	state->size[i] = 0;
+
+    	// dont pop first one (start of app)
+    	if(L.state_size>1) {
+            free(state->data[i]);
+            state->size[i] = 0;
+        }
     }
 }
 
