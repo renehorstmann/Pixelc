@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "utilc/alloc.h"
 #include "canvas.h"
 #include "palette.h"
@@ -5,60 +6,76 @@
 #include "savestate.h"
 
 typedef struct {
-    int palette_color;
-    enum brushmodes brush_mode;
+    void *data[SAVESTATE_MAX_IDS];
+    size_t size[SAVESTATE_MAX_IDS];
+    int id_size;
 } State;
 
 
 static struct {
     State *states;
-    int size;
+    int state_size;
+    savestate_save_fn save_fns[SAVESTATE_MAX_IDS];
+    savestate_load_fn load_fns[SAVESTATE_MAX_IDS];
+    int id_size;
 } L;
 
-static void state_init(State *self,
-                       int palette_color,
-                       enum brushmodes brush_mode) {
-    self->palette_color = palette_color;
-    self->brush_mode = brush_mode;
-}
-
-static void state_kill(State *self) {
-    *self = (State){0};
-}
 
 void savestate_init() {
 
 }
 
+int savestate_register(savestate_save_fn save_fn, savestate_load_fn load_fn) {
+	int id = L.id_size++;
+	assert(L.id_size <= SAVESTATE_MAX_IDS);
+	
+	L.save_fns[id] = save_fn;
+	L.load_fns[id] = load_fn;
+	
+	return id;
+}
+
 void savestate_save() {
-    SDL_Log("savestate_save state: %d", L.size);
-
-    L.states = ReNew(State, L.states, ++L.size);
-    State *s = &L.states[L.size - 1];
-
-    state_init(s,
-               palette_get_color(),
-               brush_get_mode()
-    );
+    SDL_Log("savestate_save state: %d", L.state_size);
+    L.states = ReNew(State, L.states, ++L.state_size);
+    
+    State *state = &L.states[L.state_size-1];
+    state->id_size = L.id_size;
+    
+    for(int i=0; i<L.id_size; i++) {
+    	void *data;
+    	size_t size;
+    	L.save_fns[i](&data, &size);
+    	state->data[i] = raising_malloc(size, 1, SIGABRT);
+    	memcpy(state->data[i], data, size);
+    	state->size[i] = size;
+    }
 }
 
 void savestate_undo() {
-    SDL_Log("savestate_undo state: %d", L.size);
+    SDL_Log("savestate_undo state: %d", L.state_size);
+    
+    if(L.state_size<=0) {
+		SDL_Log("savestate_undo failed");
+		return;
+	}
 
-    if(L.size<0) {
-        SDL_Log("savestate_undo failed hard: size=%d", L.size);
-        L.size = 0;
+    State *state = &L.states[--L.state_size];
+    
+    for(int i=0; i<state->id_size; i++) {
+    	L.load_fns[i](state->data[i], state->size[i]);
+    	free(state->data[i]);
+    	state->size[i] = 0;
     }
-    if(L.size == 0)
-        return;
-
-    State *s = &L.states[--L.size];
-    palette_set_color(s->palette_color);
-    brush_set_mode(s->brush_mode);
-
-    state_kill(s);
 }
 
-void savestate_copy_last_layer() {
-    State *s = &L.states[L.size - 1];
+void savestate_redo_id(int savestate_id) {
+	if(L.state_size<=0 
+	    || savestate_id >= L.id_size 
+	    || savestate_id >= L.states[L.state_size-1].id_size) {
+		SDL_Log("savestate_redo failed");
+		return;
+	}
+	State *state = &L.states[L.state_size-1];
+    L.load_fns[savestate_id](state->data[savestate_id], state->size[savestate_id]);
 }
