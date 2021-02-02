@@ -1,3 +1,4 @@
+#include "mathc/bool.h"
 #include "mathc/float.h"
 #include "c_camera.h"
 #include "camera_control.h"
@@ -7,7 +8,8 @@ static struct {
     vec2 pos;
     float size;
 
-    ePointer_s touch0;
+    vec2 touch[2];
+    bvec2 touching;
 
     vec2 move0;
     bool moving;
@@ -35,12 +37,28 @@ void camera_control_init() {
 
 void camera_control_pointer_event(ePointer_s pointer) {
 #ifdef GLES
-    if(pointer.id == 0) {
-        L.touch0 = pointer;
-        return;
+    if(pointer.action == E_POINTER_DOWN) {
+        if(pointer.id >= 0 && pointer.id <= 1) {
+            L.touch[pointer.id] = pointer.pos.xy;
+            L.touching.v[pointer.id] = true;
+        }
+    }
+
+    if(pointer.action == E_POINTER_UP) {
+        if(pointer.id >= 0 && pointer.id <= 1)
+            L.touching.v[pointer.id] = false;
+    }
+
+    if(bvec2_all(L.touching)) {
+        vec2 mean = vec2_div(vec2_add_vec(L.touch[0], L.touch[1]), 2);
+
+        if(pointer.action == E_POINTER_DOWN) {
+            L.move0 = mean;
+        } else {
+            move_camera(mean);
+        }
     }
 #else
-
     if(L.moving) {
         move_camera(pointer.pos.xy);
         if(pointer.action == E_POINTER_DOWN) {
@@ -50,7 +68,6 @@ void camera_control_pointer_event(ePointer_s pointer) {
         L.move0 = pointer.pos.xy;
         L.moving = true;
     }
-
 #endif
 }
 
