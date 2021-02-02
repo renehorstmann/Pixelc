@@ -33,7 +33,7 @@ static void move_camera(vec2 current_pos) {
 
 #if GLES
 static void zoom_camera(float new_distance) {
-    float factor = 2 * new_distance / L.distance0;
+    float factor = new_distance / L.distance0;
     L.size = L.size0 / factor;
     c_camera_set_size(L.size);
 }
