@@ -10,27 +10,33 @@ bool e_input_accel_active;
 float e_input_accel[3];
 
 typedef struct {
-    void (*cb)(ePointer_s, void *);
-
+    ePointerEventFn cb;
     void *ud;
 } RegPointer;
 
+typedef struct {
+    eWheelEventFn cb;
+    void *ud;
+} RegWheel;
 
 static struct {
     RegPointer reg_pointer_e[E_MAX_POINTER_EVENTS];
     int reg_pointer_e_size;
+
+    RegWheel reg_wheel_e[E_MAX_WHEEL_EVENTS];
+    int reg_wheel_e_size;
 } L;
 
 static ePointer_s pointer_mouse(enum ePointerAction action) {
     ePointer_s res;
     res.action = action;
     res.id = 0;
-
     int x, y;
     SDL_GetMouseState(&x, &y);
 
     res.pos.x = (2.0f * x) / e_window_size[0] - 1.0f;
-    res.pos.y = 1.0f - (2.0f * y) / e_window_size[1];    res.pos.z = 0;
+    res.pos.y = 1.0f - (2.0f * y) / e_window_size[1];
+    res.pos.z = 0;
     res.pos.w = 1;
 
     return res;
@@ -48,7 +54,6 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, i
 
     return res;
 }
-
 
 static void input_handle_pointer(SDL_Event *event) {
     switch (event->type) {
@@ -76,7 +81,10 @@ static void input_handle_pointer(SDL_Event *event) {
             break;
 #else
         case SDL_MOUSEBUTTONDOWN: {
-            ePointer_s action = pointer_mouse(E_POINTER_DOWN);
+            if(event->button.button<=0 || event->button.button>3)
+                break;
+            ePointer_s action = pointer_mouse(
+            (int[]) {E_POINTER_DOWN, E_POINTER_MIDDLE_DOWN, E_POINTER_RIGHT_DOWN}[event->button.button-1]);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
@@ -88,13 +96,28 @@ static void input_handle_pointer(SDL_Event *event) {
         }
             break;
         case SDL_MOUSEBUTTONUP: {
-            ePointer_s action = pointer_mouse(E_POINTER_UP);
+            if(event->button.button<=0 || event->button.button>3)
+                break;
+            ePointer_s action = pointer_mouse(
+            (int[]) {E_POINTER_UP, E_POINTER_MIDDLE_UP, E_POINTER_RIGHT_UP}[event->button.button-1]);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
 #endif
     }
+}
+
+static void input_handle_wheel(SDL_Event *event) {
+    if (event->wheel.y > 0) {
+        for (int i = 0; i < L.reg_wheel_e_size; i++)
+            L.reg_wheel_e[i].cb(true, L.reg_pointer_e[i].ud);
+    } else if (event->wheel.y < 0) {
+        for (int i = 0; i < L.reg_wheel_e_size; i++)
+            L.reg_wheel_e[i].cb(false, L.reg_pointer_e[i].ud);
+    }
+
+    // it could be possible that y==0, (e. g. x!=0)
 }
 
 static void input_handle_keys(SDL_Event *event) {
@@ -124,7 +147,7 @@ static void input_handle_keys(SDL_Event *event) {
 
 #ifdef GLES
 static void input_handle_sensors(SDL_Event *event) {
-	SDL_Sensor *sensor = SDL_SensorFromInstanceID(event->sensor.which);
+    SDL_Sensor *sensor = SDL_SensorFromInstanceID(event->sensor.which);
     if (!sensor
         || SDL_SensorGetType(sensor) != SDL_SENSOR_ACCEL) {
         SDL_Log("Couldn't get sensor for sensor event\n");
@@ -142,32 +165,32 @@ static void input_handle_sensors(SDL_Event *event) {
 void e_input_init() {
 
 #ifdef GLES
-	int num_sensors = SDL_NumSensors();
-	bool accel_opened = false;
-	for(int i=0; i<num_sensors; i++) {
-		if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_ACCEL) {
+    int num_sensors = SDL_NumSensors();
+    bool accel_opened = false;
+    for(int i=0; i<num_sensors; i++) {
+        if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_ACCEL) {
             SDL_Sensor *sensor = SDL_SensorOpen(i);
             if (sensor) {
                 accel_opened = true;
                 break;
             }
-		}
-	}
-	
-	e_input_accel_active = accel_opened;
-	if(accel_opened)
-	    SDL_Log("Opened acceleration sensor");
+        }
+    }
+
+    e_input_accel_active = accel_opened;
+    if(accel_opened)
+        SDL_Log("Opened acceleration sensor");
 #endif
 }
 
 void e_input_update() {
-    if(e_gui_ctx) nk_input_begin(e_gui_ctx);
+    if (e_gui_ctx) nk_input_begin(e_gui_ctx);
 
-	SDL_Event event;
+    SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if(e_gui_ctx) nk_sdl_handle_event(&event);
+        if (e_gui_ctx) nk_sdl_handle_event(&event);
 
-        switch(event.type) {
+        switch (event.type) {
             case SDL_QUIT:
                 e_window_kill();
                 return;
@@ -179,24 +202,32 @@ void e_input_update() {
             case SDL_FINGERUP:
                 input_handle_pointer(&event);
                 break;
+            case SDL_MOUSEWHEEL:
+                input_handle_wheel(&event);
+                break;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
                 input_handle_keys(&event);
                 break;
 #ifdef GLES
-            case SDL_SENSORUPDATE:
-                input_handle_sensors(&event);
-                break;
+                case SDL_SENSORUPDATE:
+                    input_handle_sensors(&event);
+                    break;
 #endif
         }
     }
 
-    if(e_gui_ctx) nk_input_end(e_gui_ctx);
+    if (e_gui_ctx) nk_input_end(e_gui_ctx);
 }
 
 
 void e_input_register_pointer_event(ePointerEventFn event, void *user_data) {
     assume(L.reg_pointer_e_size < E_MAX_POINTER_EVENTS, "too many registered pointer events");
-    L.reg_pointer_e[L.reg_pointer_e_size].cb = event;
-    L.reg_pointer_e[L.reg_pointer_e_size++].ud = user_data;
+    L.reg_pointer_e[L.reg_pointer_e_size++] = (RegPointer) {event, user_data};
+}
+
+
+void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
+    assume(L.reg_wheel_e_size < E_MAX_WHEEL_EVENTS, "too many registered wheel events");
+    L.reg_wheel_e[L.reg_wheel_e_size++] = (RegWheel) {event, user_data};
 }
