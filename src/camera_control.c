@@ -12,6 +12,7 @@ static struct {
     bvec2 touching;
 
     float distance0;
+    float size0;
     vec2 move0;
     bool moving;
 } L;
@@ -24,8 +25,8 @@ static void move_camera(vec2 current_pos) {
 }
 
 static void zoom_camera(float new_distance) {
-    L.size *= new_distance / L.distance0;
-    L.distance0 = new_distance;
+    float factor = new_distance / L.distance0;
+    L.size = L.size0 * factor;
     c_camera_set_size(L.size);
 }
 
@@ -64,6 +65,7 @@ void camera_control_pointer_event(ePointer_s pointer) {
         if (pointer.action == E_POINTER_DOWN) {
             L.move0 = mean;
             L.distance0 = distance;
+            L.size0 = L.size;
         } else {
             move_camera(mean);
             zoom_camera(distance);
