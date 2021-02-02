@@ -36,17 +36,18 @@ void camera_control_init() {
 }
 
 void camera_control_pointer_event(ePointer_s pointer) {
-#ifdef GLES
+#ifndef GLES
+    if(pointer.id <0 || pointer.id > 1)
+        return;
+
+    L.touch[pointer.id] = pointer.pos.xy;
+
     if(pointer.action == E_POINTER_DOWN) {
-        if(pointer.id >= 0 && pointer.id <= 1) {
-            L.touch[pointer.id] = pointer.pos.xy;
-            L.touching.v[pointer.id] = true;
-        }
+        L.touching.v[pointer.id] = true;
     }
 
     if(pointer.action == E_POINTER_UP) {
-        if(pointer.id >= 0 && pointer.id <= 1)
-            L.touching.v[pointer.id] = false;
+        L.touching.v[pointer.id] = false;
     }
 
     if(bvec2_all(L.touching)) {
