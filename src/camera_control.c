@@ -70,7 +70,7 @@ void camera_control_pointer_event(ePointer_s pointer) {
 
     if (bvec2_all(L.touching)) {
         vec2 mean = vec2_div(vec2_add_vec(L.touch[0], L.touch[1]), 2);
-        float distance = vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
+        float distance = 2* vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
 
         if (pointer.action == E_POINTER_DOWN) {
             L.size0 = L.size;
