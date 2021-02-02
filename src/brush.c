@@ -63,6 +63,45 @@ static bool free_mode(ePointer_s pointer) {
     return in_image;
 }
 
+static void fill_r(int r, int c, Color_s replace) {
+	Image *img = canvas_image();
+    int layer = canvas_current_layer;
+    
+    bool in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows;
+    if(in_image) {
+    	Color_s *p = image_pixel(img, layer, r, c);
+    	if(color_equals(*p, replace)) {
+    		*p = L.current_color;
+    		fill_r(r-1, c, replace);
+    		fill_r(r, c-1, replace);
+    		fill_r(r+1, c, replace);
+    		fill_r(r, c+1, replace);
+    	}
+    }
+}
+
+static bool fill_mode(ePointer_s pointer) {
+    if (pointer.action != E_POINTER_DOWN)
+        return false;
+
+    Image *img = canvas_image();
+    int layer = canvas_current_layer;
+
+    int r, c;
+    get_tex_coords(pointer, &r, &c);
+
+    bool in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows;
+    if(in_image) {
+        Color_s replace = *image_pixel(img, layer, r, c);
+        if(color_equals(L.current_color, replace))
+            return false;
+        
+        fill_r(r, c, replace);
+    }
+    return in_image;
+}
+
+
 void brush_pointer_event(ePointer_s pointer) {
     bool change;
     switch (L.mode) {
@@ -71,6 +110,9 @@ void brush_pointer_event(ePointer_s pointer) {
             break;
         case BRUSH_MODE_FREE:
             change = free_mode(pointer);
+            break;
+        case BRUSH_MODE_FILL:
+            change = fill_mode(pointer);
             break;
     }
     

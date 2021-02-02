@@ -2,6 +2,7 @@
 #define PIXELC_COLOR_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "e/core.h"
 #include "mathc/types/float.h"
 
@@ -12,6 +13,10 @@ typedef union {
     };
 } Color_s;
 _Static_assert(sizeof(Color_s) == 4, "color not packed?");
+
+static bool color_equals(Color_s a, Color_s b) {
+	return *(uint32_t *) &a == *(uint32_t *) &b;
+}
 
 static vec4 color_to_vec4(Color_s c) {
 	return (vec4) {{

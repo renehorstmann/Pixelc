@@ -83,7 +83,9 @@ bool toolbar_pointer_event(ePointer_s pointer) {
                 brush_set_mode(BRUSH_MODE_DOT);
             } else if(i==1) {
                 brush_set_mode(BRUSH_MODE_FREE);
-            } 
+            } else if(i==2) {
+            	brush_set_mode(BRUSH_MODE_FILL);
+            }
         }
     }
 

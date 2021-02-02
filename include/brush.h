@@ -4,7 +4,7 @@
 #include "e/input.h"
 #include "color.h"
 
-enum brushmodes {BRUSH_MODE_DOT, BRUSH_MODE_FREE};
+enum brushmodes {BRUSH_MODE_DOT, BRUSH_MODE_FREE, BRUSH_MODE_FILL, BRUSH_NUM_MODES};
 
 
 void brush_init();
