@@ -4,6 +4,7 @@
 #include "e/input.h"
 
 #define CAMERA_CONTROL_WHEEL_ZOOM_FACTOR 1.1
+#define CAMERA_CONTROL_SMOOTH_ALPHA 0.5
 
 void camera_control_init();
 

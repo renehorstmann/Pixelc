@@ -26,14 +26,14 @@ static struct {
 
 
 static void move_camera(vec2 current_pos) {
-    vec2 diff = vec2_sub_vec(current_pos, L.move0);
+    vec2 diff = vec2_scale(vec2_sub_vec(current_pos, L.move0), 2);
     L.pos = vec2_sub_vec(L.pos0, diff);
     c_camera_set_pos(L.pos.x, L.pos.y);
 }
 
 #if GLES
 static void zoom_camera(float new_distance) {
-    float factor = new_distance / L.distance0;
+    float factor = 2 * new_distance / L.distance0;
     L.size = L.size0 / factor;
     c_camera_set_size(L.size);
 }
@@ -57,8 +57,7 @@ void camera_control_pointer_event(ePointer_s pointer) {
     if (pointer.id < 0 || pointer.id > 1)
         return;
 
-    float alpha = 0.5;
-    L.touch[pointer.id] = vec2_mix(L.touch[pointer.id], pointer.pos.xy, alpha);
+    L.touch[pointer.id] = vec2_mix(L.touch[pointer.id], pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
 
     if (pointer.action == E_POINTER_DOWN) {
         L.touching.v[pointer.id] = true;
@@ -84,8 +83,7 @@ void camera_control_pointer_event(ePointer_s pointer) {
         }
     }
 #else
-    float alpha = 0.5;
-    L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, alpha);
+    L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
     if(L.moving) {
         move_camera(L.pointer_pos);
         if(pointer.action == E_POINTER_DOWN) {
