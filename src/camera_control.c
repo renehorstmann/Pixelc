@@ -11,6 +11,7 @@ static struct {
     vec2 touch[2];
     bvec2 touching;
 
+    float distance0;
     vec2 move0;
     bool moving;
 } L;
@@ -22,8 +23,14 @@ static void move_camera(vec2 current_pos) {
     c_camera_set_pos(L.pos.x, L.pos.y);
 }
 
+static void zoom_camera(float new_distance) {
+    L.size *= new_distance / L.distance0;
+    L.distance0 = new_distance;
+    c_camera_set_size(L.size);
+}
+
 static void wheel_event(bool up, void *user_data) {
-    if(up)
+    if (up)
         L.size /= CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
     else
         L.size *= CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
@@ -36,27 +43,30 @@ void camera_control_init() {
 }
 
 void camera_control_pointer_event(ePointer_s pointer) {
-#ifndef GLES
-    if(pointer.id <0 || pointer.id > 1)
+#ifdef GLES
+    if (pointer.id < 0 || pointer.id > 1)
         return;
 
     L.touch[pointer.id] = pointer.pos.xy;
 
-    if(pointer.action == E_POINTER_DOWN) {
+    if (pointer.action == E_POINTER_DOWN) {
         L.touching.v[pointer.id] = true;
     }
 
-    if(pointer.action == E_POINTER_UP) {
+    if (pointer.action == E_POINTER_UP) {
         L.touching.v[pointer.id] = false;
     }
 
-    if(bvec2_all(L.touching)) {
+    if (bvec2_all(L.touching)) {
         vec2 mean = vec2_div(vec2_add_vec(L.touch[0], L.touch[1]), 2);
+        float distance = vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
 
-        if(pointer.action == E_POINTER_DOWN) {
+        if (pointer.action == E_POINTER_DOWN) {
             L.move0 = mean;
+            L.distance0 = distance;
         } else {
             move_camera(mean);
+            zoom_camera(distance);
         }
     }
 #else
