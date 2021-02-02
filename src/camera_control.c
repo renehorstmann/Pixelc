@@ -36,7 +36,7 @@ void camera_control_init() {
 }
 
 void camera_control_pointer_event(ePointer_s pointer) {
-#ifdef GLES
+#ifndef GLES
     if(pointer.action == E_POINTER_DOWN) {
         if(pointer.id >= 0 && pointer.id <= 1) {
             L.touch[pointer.id] = pointer.pos.xy;

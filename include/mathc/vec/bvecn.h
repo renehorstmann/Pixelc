@@ -72,7 +72,7 @@ static bool bvecN_any(const bool *vec, int n) {
 
 /** returns sum(vec) == n */
 static bool bvecN_all(const bool *vec, int n) {
-    return bvecN_sum(vec, n) == 3;
+    return bvecN_sum(vec, n) == n;
 }
 
 #endif //MATHC_VEC_BVECN_H
