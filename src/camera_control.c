@@ -48,10 +48,13 @@ void camera_control_pointer_event(ePointer_s pointer) {
     if (pointer.id < 0 || pointer.id > 1)
         return;
 
-    L.touch[pointer.id] = pointer.pos.xy;
+    float alpha = 0.5;
+    L.touch[pointer.id].x = L.touch[pointer.id].x *(1-alpha) + pointer.pos.x * alpha;
+    L.touch[pointer.id].y = L.touch[pointer.id].y *(1-alpha) + pointer.pos.y * alpha;
 
     if (pointer.action == E_POINTER_DOWN) {
         L.touching.v[pointer.id] = true;
+        L.touch[pointer.id] = pointer.pos.xy;
     }
 
     if (pointer.action == E_POINTER_UP) {
@@ -67,7 +70,7 @@ void camera_control_pointer_event(ePointer_s pointer) {
             L.distance0 = distance;
             L.size0 = L.size;
         } else {
-            move_camera(mean);
+            //move_camera(mean);
             zoom_camera(distance);
         }
     }
