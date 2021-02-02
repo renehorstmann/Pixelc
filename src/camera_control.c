@@ -26,7 +26,7 @@ static void move_camera(vec2 current_pos) {
 
 static void zoom_camera(float new_distance) {
     float factor = new_distance / L.distance0;
-    L.size = L.size0 * factor;
+    L.size = L.size0 / factor;
     c_camera_set_size(L.size);
 }
 
