@@ -15,4 +15,6 @@ bool button_clicked(rRoSingle *self, ePointer_s pointer);
 
 bool button_pressed(rRoSingle *self, ePointer_s pointer);
 
+bool button_toggled(rRoSingle *self, ePointer_s pointer);
+
 #endif //BUTTON_H

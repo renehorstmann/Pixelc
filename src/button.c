@@ -42,3 +42,12 @@ bool button_pressed(rRoSingle *self, ePointer_s pointer) {
     }
     return press;
 }
+
+bool button_toggled(rRoSingle *self, ePointer_s pointer) {
+	bool toggle = pointer.action == E_POINTER_UP && u_pose_aa_contains(self->rect.pose, pointer.pos.xy);
+	
+	if(toggle) {
+		button_set_pressed(self, !button_is_pressed(self));	
+	}
+	return toggle;
+}

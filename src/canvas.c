@@ -13,6 +13,7 @@
 
 
 int canvas_current_layer;
+bool canvas_show_grid;
 
 static struct {
     mat4 pose;
@@ -115,7 +116,8 @@ void canvas_render() {
         r_ro_single_render(&L.render_objects[i]);
     }
 
-    r_ro_single_render(&L.grid);
+    if(canvas_show_grid)
+        r_ro_single_render(&L.grid);
 }
 
 

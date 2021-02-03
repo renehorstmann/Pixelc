@@ -17,6 +17,7 @@ static struct {
 	
 	rRoSingle mode[MODES];
 	
+	rRoSingle grid;
 	rRoSingle camera;
 	rRoSingle clear;
 	
@@ -57,6 +58,10 @@ void toolbar_init() {
 	button_set_pressed(&L.mode[1], true);
 	
 	
+	GLuint grid_tex = r_texture_init_file("res/button_grid.png", NULL);
+	r_texture_filter_nearest(grid_tex);
+    button_init(&L.grid, grid_tex);
+	
 	GLuint camera_tex = r_texture_init_file("res/button_camera.png", NULL);
 	r_texture_filter_nearest(camera_tex);
     button_init(&L.camera, camera_tex);
@@ -78,13 +83,17 @@ void toolbar_update(float dtime) {
 	
 	for(int i=0; i<MODES; i++) {
 		u_pose_set(&L.mode[i].rect.pose, 
-		-24+16*i, top, 
+		hud_camera_left()+30+16*i, top, 
 		16, 16, 0);
 	}
-    
+	
+	
+    u_pose_set(&L.grid.rect.pose,
+        hud_camera_right()-42, top,
+        16, 16, 0);
     
     u_pose_set(&L.camera.rect.pose,
-        hud_camera_right()-30, top,
+        hud_camera_right()-26, top,
         16, 16, 0);
         
     u_pose_set(&L.clear.rect.pose,
@@ -97,6 +106,7 @@ void toolbar_render() {
 	for(int i=0; i<MODES; i++) {
 		r_ro_single_render(&L.mode[i]);
 	}
+	r_ro_single_render(&L.grid);
 	r_ro_single_render(&L.camera);
 	r_ro_single_render(&L.clear);
 }
@@ -127,7 +137,12 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             }
         }
     }
+
     
+    if(button_toggled(&L.grid, pointer)) {
+    	canvas_show_grid = button_is_pressed(&L.grid);
+    }    
+            
     if(button_clicked(&L.camera, pointer)) {
     	camera_control_set_home();
     }

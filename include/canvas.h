@@ -7,6 +7,7 @@
 #include "image.h"
 
 extern int canvas_current_layer;
+extern bool canvas_show_grid;
 
 void canvas_init(int rows, int cols);
 
