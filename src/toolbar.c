@@ -9,12 +9,13 @@
 #include "savestate.h"
 #include "toolbar.h"
 
+#define MODES 4
 
 
 static struct {
 	rRoSingle undo;
 	
-	rRoSingle mode[3];
+	rRoSingle mode[MODES];
 	
 	rRoSingle camera;
 	rRoSingle clear;
@@ -27,7 +28,7 @@ static bool pos_in_toolbar(vec2 pos) {
 }
 
 static void unpress_modes(int ignore) {
-	for(int i=0; i<3; i++) {
+	for(int i=0; i<MODES; i++) {
 		if(i==ignore)
 		    continue;
         button_set_pressed(&L.mode[i], false);
@@ -39,13 +40,14 @@ void toolbar_init() {
 	r_texture_filter_nearest(undo_tex);
     button_init(&L.undo, undo_tex);
 
-    const char *mode_files[3] = {
+    const char *mode_files[MODES] = {
     	"res/button_dot.png",
     	"res/button_free.png",
-    	"res/button_fill.png"
+    	"res/button_fill.png",
+    	"res/button_fill8.png"
     };
     
-    for(int i=0; i<3; i++) {
+    for(int i=0; i<MODES; i++) {
     	GLuint tex = r_texture_init_file(mode_files[i], NULL);
     r_texture_filter_nearest(tex);
 
@@ -74,7 +76,7 @@ void toolbar_update(float dtime) {
         hud_camera_left()+10, top,
 	    16, 16, 0);
 	
-	for(int i=0; i<3; i++) {
+	for(int i=0; i<MODES; i++) {
 		u_pose_set(&L.mode[i].rect.pose, 
 		-24+16*i, top, 
 		16, 16, 0);
@@ -92,7 +94,7 @@ void toolbar_update(float dtime) {
 
 void toolbar_render() {
 	r_ro_single_render(&L.undo);
-	for(int i=0; i<3; i++) {
+	for(int i=0; i<MODES; i++) {
 		r_ro_single_render(&L.mode[i]);
 	}
 	r_ro_single_render(&L.camera);
@@ -108,7 +110,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         savestate_undo();
     }
 
-    for(int i=0; i<3; i++) {
+    for(int i=0; i<MODES; i++) {
         if(button_pressed(&L.mode[i], pointer)) {
 
             printf("mode %d\n", i);
@@ -120,6 +122,8 @@ bool toolbar_pointer_event(ePointer_s pointer) {
                 brush_set_mode(BRUSH_MODE_FREE);
             } else if(i==2) {
             	brush_set_mode(BRUSH_MODE_FILL);
+            } else if(i==3) {
+            	brush_set_mode(BRUSH_MODE_FILL8);
             }
         }
     }

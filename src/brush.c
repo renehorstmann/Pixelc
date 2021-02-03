@@ -68,7 +68,7 @@ static bool free_mode(ePointer_s pointer) {
 }
 
 
-static bool fill_mode(ePointer_s pointer) {
+static bool fill_mode(ePointer_s pointer, bool mode8) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
@@ -109,11 +109,20 @@ static bool fill_mode(ePointer_s pointer) {
     	pos_stack_push(&stack, (ivec2) {{c+1, r}});
     	pos_stack_push(&stack, (ivec2) {{c, r-1}});
     	pos_stack_push(&stack, (ivec2) {{c, r+1}});
+    	
+    	// mode8 edges
+    	if(!mode8)
+    	    continue;
+    	pos_stack_push(&stack, (ivec2) {{c-1, r-1}});
+    	pos_stack_push(&stack, (ivec2) {{c+1, r-1}});
+    	pos_stack_push(&stack, (ivec2) {{c-1, r+1}});
+    	pos_stack_push(&stack, (ivec2) {{c+1, r+1}});
     }
     
     pos_stack_kill(&stack);
     return true;
 }
+
 
 
 void brush_pointer_event(ePointer_s pointer) {
@@ -129,7 +138,10 @@ void brush_pointer_event(ePointer_s pointer) {
             change = free_mode(pointer);
             break;
         case BRUSH_MODE_FILL:
-            change = fill_mode(pointer);
+            change = fill_mode(pointer, false);
+            break;
+        case BRUSH_MODE_FILL8:
+            change = fill_mode(pointer, true);
             break;
             
         default:
