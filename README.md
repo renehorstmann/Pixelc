@@ -7,6 +7,8 @@ Saves after each tip on the screen to sprite.png.
 Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
+![example_image](example.jpg)
+
 ## Todo
 - Toolbar
   - Brush mode
