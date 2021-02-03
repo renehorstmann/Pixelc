@@ -8,8 +8,7 @@ Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
 ## Todo
-- Zoom n move
-  - undos/aborts accidently draw capture
+- brush.c code style
 - Toolbar
   - undo
   - Brush mode
