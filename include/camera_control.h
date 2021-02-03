@@ -9,6 +9,8 @@
 
 void camera_control_init();
 
+void camera_control_set_home();
+
 bool camera_control_pointer_event(ePointer_s pointer);
 
 #endif //PIXELC_CAMERA_CONTROL_H

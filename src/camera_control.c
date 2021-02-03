@@ -54,6 +54,13 @@ void camera_control_init() {
     e_input_register_wheel_event(wheel_event, NULL);
 }
 
+void camera_control_set_home() {
+	memset(&L, 0, sizeof(L));
+	L.size = 1;
+	c_camera_set_pos(L.pos.x, L.pos.y);
+	c_camera_set_size(L.size);
+}
+
 bool camera_control_pointer_event(ePointer_s pointer) {
 #ifdef GLES
     if (pointer.id < 0 || pointer.id > 1)
@@ -114,5 +121,4 @@ bool camera_control_pointer_event(ePointer_s pointer) {
     return L.moving;
 #endif
 }
-
 
