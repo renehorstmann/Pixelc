@@ -36,13 +36,13 @@ int savestate_register(savestate_save_fn save_fn, savestate_load_fn load_fn) {
 }
 
 void savestate_save() {
-    L.state_size++;
+    SDL_Log("savestate_save: %d", L.state_size);
     
-    SDL_Log("savestate_save state: %d", L.state_size-1);
+    L.state_size++;
     L.states = ReNew(State, L.states, L.state_size);
     
     State *state = &L.states[L.state_size-1];
-    memset(state, 0, sizeof(State));
+    *state = (State) {0};
 
     state->id_size = L.id_size;
     
@@ -60,27 +60,27 @@ void savestate_save() {
 }
 
 void savestate_undo() {
-    SDL_Log("savestate_undo state: %d", L.state_size-2);
+    SDL_Log("savestate_undo: %d", L.state_size-1);
     
     if(L.state_size<=1) {
 		SDL_Log("savestate_undo failed");
 		return;
 	}
+	
+	// kill last state
+	State *state = &L.states[L.state_size-1];
+	for(int i=0; i<state->id_size; i++) {
+		free(state->data[i]);
+	}
+	*state = (State) {0};
 
     // reduce states by one
     L.state_size--;
 
-    // use last one
-    State *state = &L.states[L.state_size-1];
-    
+    // undo new last state
+    state = &L.states[L.state_size-1];   
     for(int i=0; i<state->id_size; i++) {
     	L.load_fns[i](state->data[i], state->size[i]);
-
-    	// dont pop first one (start of app)
-    	if(L.state_size>1) {
-            free(state->data[i]);
-            state->size[i] = 0;
-        }
     }
 }
 
