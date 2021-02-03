@@ -1,5 +1,7 @@
 #include "e/input.h"
+#include "mathc/types/int.h"
 #include "mathc/float.h"
+#include "utilc/dynarray.h"
 
 #include "color.h"
 #include "c_camera.h"
@@ -14,6 +16,8 @@ static struct {
     bool drawing;
     bool change;
 } L;
+
+DynArray(ivec2, PosStack, pos_stack)
 
 static void get_tex_coords(ePointer_s pointer, int *row, int *col) {
     mat4 pose_inv = mat4_inv(canvas_pose());
@@ -63,22 +67,6 @@ static bool free_mode(ePointer_s pointer) {
     return in_image;
 }
 
-static void fill_r(int r, int c, Color_s replace) {
-	Image *img = canvas_image();
-    int layer = canvas_current_layer;
-    
-    bool in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows;
-    if(in_image) {
-    	Color_s *p = image_pixel(img, layer, r, c);
-    	if(color_equals(*p, replace)) {
-    		*p = L.current_color;
-    		fill_r(r, c-1, replace);
-    		fill_r(r, c+1, replace);
-    		fill_r(r-1, c, replace);
-    		fill_r(r+1, c, replace);
-    	}
-    }
-}
 
 static bool fill_mode(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
@@ -89,16 +77,42 @@ static bool fill_mode(ePointer_s pointer) {
 
     int r, c;
     get_tex_coords(pointer, &r, &c);
-
+    
     bool in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows;
-    if(in_image) {
-        Color_s replace = *image_pixel(img, layer, r, c);
-        if(color_equals(L.current_color, replace))
-            return false;
-        
-        fill_r(r, c, replace);
+    
+    if(!in_image)
+        return false;
+    
+    Color_s replace = *image_pixel(img, layer, r, c);
+    if(color_equals(L.current_color, replace))
+        return false;
+    
+    // PosStack needs to be killed
+    PosStack stack = {0};
+    pos_stack_push(&stack, (ivec2) {{c, r}});
+    
+    while(stack.size>0) {
+    	ivec2 p = pos_stack_pop(&stack);
+    	r = p.y;
+    	c = p.x;
+    	in_image = c >= 0 && c < img->cols && r >= 0 && r < img->rows;
+    	
+    	if(!in_image)
+    	    continue;
+    	    
+    	Color_s *pixel = image_pixel(img, layer, r, c);
+    	if(!color_equals(*pixel, replace))
+    	    continue;
+    	    
+    	*pixel = L.current_color;
+    	pos_stack_push(&stack, (ivec2) {{c-1, r}});
+    	pos_stack_push(&stack, (ivec2) {{c+1, r}});
+    	pos_stack_push(&stack, (ivec2) {{c, r-1}});
+    	pos_stack_push(&stack, (ivec2) {{c, r+1}});
     }
-    return in_image;
+    
+    pos_stack_kill(&stack);
+    return true;
 }
 
 
