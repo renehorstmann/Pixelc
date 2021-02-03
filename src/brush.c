@@ -103,6 +103,9 @@ static bool fill_mode(ePointer_s pointer) {
 
 
 void brush_pointer_event(ePointer_s pointer) {
+    if(pointer.id!=0)
+        return;
+        
     bool change = false;
     switch (L.mode) {
         case BRUSH_MODE_DOT:
@@ -147,4 +150,13 @@ enum brushmodes brush_get_mode() {
 void brush_set_mode(enum brushmodes mode) {
     L.mode = mode;
     L.drawing = false;
+}
+
+void brush_abort_current_draw() {
+	if(L.change) {
+		ePointer_s up = {0};
+		up.action = E_POINTER_UP;
+		brush_pointer_event(up);
+		savestate_undo();
+	}
 }

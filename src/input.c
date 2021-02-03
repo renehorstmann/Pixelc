@@ -28,10 +28,10 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     ePointer_s c_pointer = pointer;
     c_pointer.pos = mat4_mul_vec(c_camera_matrices.v_p_inv, pointer.pos);
 
+    if(camera_control_pointer_event(c_pointer))
+        return;
+        
     brush_pointer_event(c_pointer);
-    camera_control_pointer_event(c_pointer);
-    
-    
 }
 
 void input_init() {

@@ -1,6 +1,7 @@
 #include "mathc/bool.h"
 #include "mathc/float.h"
 #include "c_camera.h"
+#include "brush.h"
 #include "camera_control.h"
 
 
@@ -17,6 +18,7 @@ static struct {
     vec2 touch[2];
     bvec2 touching;
     float distance0;
+    bool touched;
 #else
     vec2 pointer_pos;
     bool moving;
@@ -52,10 +54,10 @@ void camera_control_init() {
     e_input_register_wheel_event(wheel_event, NULL);
 }
 
-void camera_control_pointer_event(ePointer_s pointer) {
+bool camera_control_pointer_event(ePointer_s pointer) {
 #ifdef GLES
     if (pointer.id < 0 || pointer.id > 1)
-        return;
+        return false;
 
     L.touch[pointer.id] = vec2_mix(L.touch[pointer.id], pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
 
@@ -69,6 +71,11 @@ void camera_control_pointer_event(ePointer_s pointer) {
     }
 
     if (bvec2_all(L.touching)) {
+        if(!L.touched) {
+            L.touched = true;
+            brush_abort_current_draw();
+        }
+        
         vec2 mean = vec2_div(vec2_add_vec(L.touch[0], L.touch[1]), 2);
         float distance = 2* vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
 
@@ -82,19 +89,29 @@ void camera_control_pointer_event(ePointer_s pointer) {
             zoom_camera(distance);
         }
     }
+    
+    if (L.touched && !bvec2_any(L.touching))
+        L.touched = false;
+    
+    return L.touched;
 #else
     L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
     if(L.moving) {
         move_camera(L.pointer_pos);
         if(pointer.action == E_POINTER_DOWN) {
             L.moving = false;
+            return true;
         }
     } else if(pointer.action == E_POINTER_MIDDLE_DOWN || pointer.action == E_POINTER_RIGHT_DOWN) {
         L.pointer_pos = pointer.pos.xy;
         L.pos0 = L.pos;
         L.move0 = pointer.pos.xy;
         L.moving = true;
+        
+        brush_abort_current_draw();
     }
+    
+    return L.moving;
 #endif
 }
 

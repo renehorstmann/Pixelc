@@ -17,4 +17,6 @@ enum brushmodes brush_get_mode();
 
 void brush_set_mode(enum brushmodes mode);
 
+void brush_abort_current_draw();
+
 #endif //PIXELC_BRUSH_H
