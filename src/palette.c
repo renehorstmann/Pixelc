@@ -19,6 +19,14 @@ static struct {
     float last_screen_ratio_for_updates;
 } L;
 
+static bool pos_in_palette(vec2 pos) {
+	int rows = 1 + L.palette_size / PALETTE_COLS;
+	if(hud_camera_is_portrait_mode()) {
+        return pos.y <= hud_camera_bottom() + rows * 18;		
+	}
+	return pos.x >= hud_camera_right() - rows * 18;
+}
+
 
 static mat4 setup_palette_color_pose(int r, int c) {
     mat4 pose = mat4_eye();
@@ -123,8 +131,11 @@ void palette_render() {
 
 
 bool palette_pointer_event(ePointer_s pointer) {
-    if (pointer.action != E_POINTER_DOWN)
+    if(!pos_in_palette(pointer.pos.xy))
         return false;
+    
+    if (pointer.action != E_POINTER_DOWN)
+        return true;
 
     for (int i = 0; i < L.palette_size; i++) {
         if (u_pose_aa_contains(L.palette_ro.rects[i].pose, pointer.pos.xy)) {
@@ -133,7 +144,7 @@ bool palette_pointer_event(ePointer_s pointer) {
         }
     }
 
-    return false;
+    return true;
 }
 
 

@@ -9,18 +9,18 @@
 #define E_MAX_POINTER_EVENTS 32
 #define E_MAX_WHEEL_EVENTS 32
 
+#define E_POINTER_BUTTON_MIDDLE -1
+#define E_POINTER_BUTTON_RIGHT -2
 
 enum ePointerAction {
     E_POINTER_DOWN, E_POINTER_MOVE, E_POINTER_UP,
-    E_POINTER_MIDDLE_DOWN, E_POINTER_MIDDLE_UP,
-    E_POINTER_RIGHT_DOWN, E_POINTER_RIGHT_UP,
     E_POINTER_NUM_ACTIONS
 };
 
 typedef struct {
     vec4 pos; // x, y, 0, 1
     enum ePointerAction action;
-    int id;
+    int id;   // 0 = default; >0 multitouch; <0 m+r click
 } ePointer_s;
 
 typedef void (*ePointerEventFn)(ePointer_s, void *user_data);

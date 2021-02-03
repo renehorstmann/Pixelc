@@ -18,8 +18,13 @@ static struct {
 	
 	rRoSingle camera;
 	rRoSingle clear;
+	
+	float bottom;
 } L;
 
+static bool pos_in_toolbar(vec2 pos) {
+    return pos.y >= hud_camera_top() - 20;
+}
 
 static void unpress_modes(int ignore) {
 	for(int i=0; i<3; i++) {
@@ -96,6 +101,9 @@ void toolbar_render() {
 
 // return true if the pointer was used (indicate event done)
 bool toolbar_pointer_event(ePointer_s pointer) {
+    if(!pos_in_toolbar(pointer.pos.xy))
+        return false;
+        
     if(button_clicked(&L.undo, pointer)) {
         savestate_undo();
     }
@@ -124,5 +132,5 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         canvas_clear();
     }
     
-    return false;
+    return true;
 }

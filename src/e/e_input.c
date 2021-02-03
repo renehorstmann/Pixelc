@@ -27,10 +27,10 @@ static struct {
     int reg_wheel_e_size;
 } L;
 
-static ePointer_s pointer_mouse(enum ePointerAction action) {
+static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
     ePointer_s res;
     res.action = action;
-    res.id = 0;
+    res.id = btn_id;
     int x, y;
     SDL_GetMouseState(&x, &y);
 
@@ -84,13 +84,14 @@ static void input_handle_pointer(SDL_Event *event) {
             if(event->button.button<=0 || event->button.button>3)
                 break;
             ePointer_s action = pointer_mouse(
-            (int[]) {E_POINTER_DOWN, E_POINTER_MIDDLE_DOWN, E_POINTER_RIGHT_DOWN}[event->button.button-1]);
+                E_POINTER_DOWN, 
+                1-event->button.button);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_MOUSEMOTION: {
-            ePointer_s action = pointer_mouse(E_POINTER_MOVE);
+            ePointer_s action = pointer_mouse(E_POINTER_MOVE, 0);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
@@ -99,7 +100,8 @@ static void input_handle_pointer(SDL_Event *event) {
             if(event->button.button<=0 || event->button.button>3)
                 break;
             ePointer_s action = pointer_mouse(
-            (int[]) {E_POINTER_UP, E_POINTER_MIDDLE_UP, E_POINTER_RIGHT_UP}[event->button.button-1]);
+                E_POINTER_UP, 
+                1-event->button.button);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }

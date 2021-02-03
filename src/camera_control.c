@@ -33,9 +33,14 @@ static void move_camera(vec2 current_pos) {
     c_camera_set_pos(L.pos.x, L.pos.y);
 }
 
+static float clampf(float f, float min, float max) {
+	return f < min ? min : f > max ? max : f;
+}
+
 #if GLES
 static void zoom_camera(float new_distance) {
     float factor = new_distance / L.distance0;
+    factor = clampf(factor, 0.3, 3);
     L.size = L.size0 / factor;
     c_camera_set_size(L.size);
 }
@@ -75,6 +80,7 @@ bool camera_control_pointer_event(ePointer_s pointer) {
 
     if (pointer.action == E_POINTER_UP) {
         L.touching.v[pointer.id] = false;
+        bvec2_println(L.touching);
     }
 
     if (bvec2_all(L.touching)) {
@@ -84,7 +90,7 @@ bool camera_control_pointer_event(ePointer_s pointer) {
         }
         
         vec2 mean = vec2_div(vec2_add_vec(L.touch[0], L.touch[1]), 2);
-        float distance = 2* vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
+        float distance = vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
 
         if (pointer.action == E_POINTER_DOWN) {
             L.size0 = L.size;
@@ -109,7 +115,8 @@ bool camera_control_pointer_event(ePointer_s pointer) {
             L.moving = false;
             return true;
         }
-    } else if(pointer.action == E_POINTER_MIDDLE_DOWN || pointer.action == E_POINTER_RIGHT_DOWN) {
+    } else if(pointer.action == E_POINTER_DOWN
+        && pointer.id <0) { // middle + right
         L.pointer_pos = pointer.pos.xy;
         L.pos0 = L.pos;
         L.move0 = pointer.pos.xy;
