@@ -131,6 +131,13 @@ int canvas_layers() {
     return L.layers;
 }
 
+void canvas_clear() {
+    for(int i=0; i<L.image->rows*L.image->cols; i++) {
+        *image_pixel_index(L.image, canvas_current_layer, i) = COLOR_TRANSPARENT;
+    }
+    canvas_save();
+}
+
 void canvas_save() {
 	if(!image_equals(L.image, L.last_image)) {
 	    image_copy(L.last_image, L.image);

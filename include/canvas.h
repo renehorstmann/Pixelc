@@ -17,6 +17,8 @@ mat4 canvas_pose();
 Image *canvas_image();
 int canvas_layers();
 
+void canvas_clear();
+
 void canvas_save();
 
 void canvas_redo_image();

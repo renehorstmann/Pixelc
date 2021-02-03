@@ -104,12 +104,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
     
     if(button_clicked(&L.clear, pointer)) {
-        Image *img = canvas_image();
-        int layer = canvas_current_layer;
-        for(int i=0; i<img->rows*img->cols; i++) {
-        	*image_pixel_index(img, layer, i) = COLOR_TRANSPARENT;
-        }
-        canvas_save();
+        canvas_clear();
     }
     
     return false;
