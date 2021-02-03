@@ -8,23 +8,17 @@ Loads sprite.png at start, if available.
 Palette, brush, size can be configured in code
 
 ## Todo
-- brush.c code style
 - Toolbar
-  - undo
   - Brush mode
-    - dot
-    - free
     - shape
       - dot, plus, cross, dither
     - size
       - 1, 3, 5
     - line
     - circle
-    - fill
     - shade (from color to color)
   - second color 
     - for dither, shade, replace
-  - clear
   - replace (from color to color)
   - move mode
   - selection
@@ -36,7 +30,7 @@ Palette, brush, size can be configured in code
 - Animation view
 - VertexColors?
   - white to color like the palette
-- background image option!
+- background image option?
 
 
 ## Compiling on Windows
