@@ -84,8 +84,14 @@ void canvas_init(int rows, int cols) {
 }
 
 void canvas_update(float dtime) {
-    float w = 160;
-    float h = 160.0f * L.image->rows / L.image->cols;
+    float w, h;
+    if(L.image->rows < L.image->cols) {
+        w = 160;
+        h = 160.0f * L.image->rows / L.image->cols;      } else {
+        h = 160;
+        w = 160.0f * L.image->cols / L.image->rows;
+    }
+    
     if(c_camera_is_portrait_mode())
         u_pose_set(&L.pose, 0, c_camera_top() - 110, w, h, 0);
     else

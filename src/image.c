@@ -30,16 +30,14 @@ void image_delete(Image *self) {
 }
 
 bool image_copy(Image *self, const Image *from) {
-    size_t self_size = image_data_size(self);
-    size_t from_size = image_data_size(from);
-    if(self_size == from_size) {
-        memcpy(self->data, from->data, self_size);
-        self->layers = from->layers;
-        self->rows = from->rows;
-        self->cols = from->cols;
+    if(self->layers == from->layers
+       && self->rows == from->rows 
+       && self->cols == from->cols) {
+        size_t size = image_data_size(self);
+        memcpy(self->data, from->data, size);
         return true;
     }
-    SDL_Log("image_copy failed: wrong size (self/from): %zu / %zu", self_size, from_size);
+    SDL_Log("image_copy failed");
     return false;
 }
 
