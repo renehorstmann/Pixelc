@@ -4,14 +4,18 @@
 #include "u/pose.h"
 #include "hud_camera.h"
 #include "brush.h"
-#include "toolbar.h"
+#include "canvas.h"
 #include "savestate.h"
+#include "toolbar.h"
+
 
 
 static struct {
 	rRoSingle undo;
 	
 	rRoSingle mode[3];
+	
+	rRoSingle clear;
 } L;
 
 
@@ -42,6 +46,11 @@ void toolbar_init() {
     }
 	
 	button_set_pressed(&L.mode[1], true);
+	
+	GLuint clear_tex = r_texture_init_file("res/button_clear.png", NULL);
+	r_texture_filter_nearest(clear_tex);
+    button_init(&L.clear, clear_tex);
+
 }
 
 void toolbar_update(float dtime) {
@@ -50,14 +59,18 @@ void toolbar_update(float dtime) {
 	float top = hud_camera_top() - 10;
 	
 	u_pose_set(&L.undo.rect.pose, 
-	hud_camera_left()+10, top,
-	16, 16, 0);
+        hud_camera_left()+10, top,
+	    16, 16, 0);
 	
 	for(int i=0; i<3; i++) {
 		u_pose_set(&L.mode[i].rect.pose, 
 		-24+16*i, top, 
 		16, 16, 0);
 	}
+    
+    u_pose_set(&L.clear.rect.pose,
+        hud_camera_right()-10, top,
+        16, 16, 0);
 }
 
 void toolbar_render() {
@@ -65,6 +78,7 @@ void toolbar_render() {
 	for(int i=0; i<3; i++) {
 		r_ro_single_render(&L.mode[i]);
 	}
+	r_ro_single_render(&L.clear);
 }
 
 // return true if the pointer was used (indicate event done)
@@ -88,6 +102,15 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             }
         }
     }
-
+    
+    if(button_clicked(&L.clear, pointer)) {
+        Image *img = canvas_image();
+        int layer = canvas_current_layer;
+        for(int i=0; i<img->rows*img->cols; i++) {
+        	*image_pixel_index(img, layer, i) = COLOR_TRANSPARENT;
+        }
+        canvas_save();
+    }
+    
     return false;
 }
