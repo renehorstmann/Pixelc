@@ -72,10 +72,10 @@ static void fill_r(int r, int c, Color_s replace) {
     	Color_s *p = image_pixel(img, layer, r, c);
     	if(color_equals(*p, replace)) {
     		*p = L.current_color;
-    		fill_r(r-1, c, replace);
     		fill_r(r, c-1, replace);
-    		fill_r(r+1, c, replace);
     		fill_r(r, c+1, replace);
+    		fill_r(r-1, c, replace);
+    		fill_r(r+1, c, replace);
     	}
     }
 }
@@ -103,7 +103,7 @@ static bool fill_mode(ePointer_s pointer) {
 
 
 void brush_pointer_event(ePointer_s pointer) {
-    bool change;
+    bool change = false;
     switch (L.mode) {
         case BRUSH_MODE_DOT:
             change = dot_mode(pointer);
@@ -114,17 +114,19 @@ void brush_pointer_event(ePointer_s pointer) {
         case BRUSH_MODE_FILL:
             change = fill_mode(pointer);
             break;
+            
+        default:
+            SDL_Log("brush unknown mode");
     }
     
     if(change)
         L.change = true;
 
     if (L.change && pointer.action == E_POINTER_UP) {
+        L.change = false;
         canvas_save();
     }
     
-    if(pointer.action != E_POINTER_MOVE)
-        L.change = false;
 }
 
 

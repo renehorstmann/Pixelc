@@ -36,8 +36,10 @@ int savestate_register(savestate_save_fn save_fn, savestate_load_fn load_fn) {
 }
 
 void savestate_save() {
-    SDL_Log("savestate_save state: %d", L.state_size);
-    L.states = ReNew(State, L.states, ++L.state_size);
+    L.state_size++;
+    
+    SDL_Log("savestate_save state: %d", L.state_size-1);
+    L.states = ReNew(State, L.states, L.state_size);
     
     State *state = &L.states[L.state_size-1];
     memset(state, 0, sizeof(State));
@@ -58,7 +60,7 @@ void savestate_save() {
 }
 
 void savestate_undo() {
-    SDL_Log("savestate_undo state: %d", L.state_size);
+    SDL_Log("savestate_undo state: %d", L.state_size-2);
     
     if(L.state_size<=1) {
 		SDL_Log("savestate_undo failed");
