@@ -153,4 +153,5 @@ cmake.check_cache
 C.includecache
 
 ## Pixelc specific
+pixelc
 sprite.png
