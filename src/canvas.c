@@ -131,6 +131,16 @@ int canvas_layers() {
     return L.layers;
 }
 
+ivec2 canvas_get_uv(vec4 pointer_pos) {
+    mat4 pose_inv = mat4_inv(L.pose);
+    vec4 pose_pos = mat4_mul_vec(pose_inv, pointer_pos);
+
+    ivec2 uv;
+    uv.x = (pose_pos.x + 0.5) * canvas_image()->cols;    
+    uv.y = (0.5 - pose_pos.y) * canvas_image()->rows;
+    return uv;
+}
+
 void canvas_clear() {
     for(int i=0; i<L.image->rows*L.image->cols; i++) {
         *image_pixel_index(L.image, canvas_current_layer, i) = COLOR_TRANSPARENT;

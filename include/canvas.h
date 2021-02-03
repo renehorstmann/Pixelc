@@ -2,6 +2,7 @@
 #define PIXELC_CANVAS_H
 
 #include <stdint.h>
+#include "mathc/types/int.h"
 #include "mathc/types/float.h"
 #include "image.h"
 
@@ -16,6 +17,8 @@ void canvas_render();
 mat4 canvas_pose();
 Image *canvas_image();
 int canvas_layers();
+
+ivec2 canvas_get_uv(vec4 pointer_pos);
 
 void canvas_clear();
 

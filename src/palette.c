@@ -160,7 +160,7 @@ int palette_get_color() {
 }
 
 void palette_set_color(int index) {
-    brush_set_color(L.palette[index]);
+    brush_current_color = L.palette[index];
     L.select_ro.rect.pose = L.palette_ro.rects[index].pose;
     L.last_selected = index;
 }

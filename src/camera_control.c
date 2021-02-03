@@ -80,7 +80,6 @@ bool camera_control_pointer_event(ePointer_s pointer) {
 
     if (pointer.action == E_POINTER_UP) {
         L.touching.v[pointer.id] = false;
-        bvec2_println(L.touching);
     }
 
     if (bvec2_all(L.touching)) {

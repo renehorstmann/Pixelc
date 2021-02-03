@@ -2,6 +2,7 @@
 #define PIXELC_IMAGE_H
 
 #include <stdbool.h>
+#include <mathc/types/int.h>
 #include "color.h"
 
 typedef struct {
@@ -37,12 +38,21 @@ static Color_s *image_pixel(Image *self, int layer, int row, int col) {
 	    + col];
 }
 
+static Color_s *image_pixel_uv(Image *self, int layer, ivec2 uv) {
+	return image_pixel(self, layer, uv.y, uv.x);
+}
+
 static Color_s *image_pixel_index(Image *self, int layer, int index) {
     return image_pixel(self, layer, 0, index);
 }
 
 static Color_s *image_layer(Image *self, int layer) {
     return image_pixel(self, layer, 0, 0);
+}
+
+static bool image_contains_uv(const Image *img, ivec2 uv) {
+	return uv.x >= 0 && uv.x < img->cols 
+	    && uv.y >= 0 && uv.y < img->rows;
 }
 
 #endif //PIXELC_IMAGE_H
