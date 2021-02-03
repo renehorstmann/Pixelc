@@ -64,9 +64,8 @@ void brush_set_mode(enum brushmodes mode) {
 
 void brush_abort_current_draw() {
 	if(L.change) {
-		ePointer_s up = {0};
-		up.action = E_POINTER_UP;
-		brush_pointer_event(up);
-		savestate_undo();
+		canvas_redo_image();
+		L.change = false;
+		L.drawing = false;
 	}
 }

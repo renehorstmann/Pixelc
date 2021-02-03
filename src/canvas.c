@@ -157,7 +157,7 @@ void canvas_save() {
 }
 
 void canvas_redo_image() {
-	savestate_redo_id(L.save_id);
+	image_copy(L.image, L.last_image);
 }
 
 
@@ -169,6 +169,7 @@ static void load_state(const void *data, size_t size) {
 	// todo: check new layers, rows, cols
 	image_delete(L.image);
 	L.image = image_new_clone(data);
+	image_copy(L.last_image, L.image);
 	assert(image_full_size(L.image) == size);
 }
 
