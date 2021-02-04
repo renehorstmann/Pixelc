@@ -28,7 +28,7 @@ static struct {
 
 
 static void move_camera(vec2 current_pos) {
-    vec2 diff = vec2_scale(vec2_sub_vec(current_pos, L.move0), 2);
+    vec2 diff = vec2_sub_vec(current_pos, L.move0);
     L.pos = vec2_sub_vec(L.pos0, diff);
     c_camera_set_pos(L.pos.x, L.pos.y);
 }
