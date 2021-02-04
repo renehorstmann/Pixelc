@@ -25,7 +25,9 @@ static struct {
 } L;
 
 static bool pos_in_toolbar(vec2 pos) {
-    return pos.y >= hud_camera_top() - 20;
+    if(hud_camera_is_portrait_mode())
+        return pos.y >= hud_camera_top() - 20;
+    return pos.x <= hud_camera_left() + 20;
 }
 
 static void unpress_modes(int ignore) {
@@ -34,6 +36,16 @@ static void unpress_modes(int ignore) {
 		    continue;
         button_set_pressed(&L.mode[i], false);
 	}
+}
+
+static mat4 pose16(float col, float row) {
+    mat4 pose = mat4_eye();
+    if(hud_camera_is_portrait_mode()) {
+        u_pose_set(&pose, col, hud_camera_top() - row, 16, 16, 0);
+    } else {
+        u_pose_set(&pose, hud_camera_left() + row, col, 16, 16, 0);
+    }
+    return pose;
 }
 
 void toolbar_init() {
@@ -73,32 +85,15 @@ void toolbar_init() {
 }
 
 void toolbar_update(float dtime) {
-	//u_pose_set(L.undo.pose, hud_camera_left() + 8, hud_camera_top() - 8, 16, 16, 0);
-	
-	float top = hud_camera_top() - 10;
-	
-	u_pose_set(&L.undo.rect.pose, 
-        hud_camera_left()+10, top,
-	    16, 16, 0);
-	
-	for(int i=0; i<MODES; i++) {
-		u_pose_set(&L.mode[i].rect.pose, 
-		hud_camera_left()+30+16*i, top, 
-		16, 16, 0);
-	}
-	
-	
-    u_pose_set(&L.grid.rect.pose,
-        hud_camera_right()-42, top,
-        16, 16, 0);
+    L.undo.rect.pose = pose16(-90, 10);
+
+    for(int i=0; i<MODES; i++) {
+        L.mode[i].rect.pose = pose16(-60+16*i, 10);
+    }
     
-    u_pose_set(&L.camera.rect.pose,
-        hud_camera_right()-26, top,
-        16, 16, 0);
-        
-    u_pose_set(&L.clear.rect.pose,
-        hud_camera_right()-10, top,
-        16, 16, 0);
+    L.grid.rect.pose = pose16(40, 10);
+    L.camera.rect.pose = pose16(60, 10);
+    L.clear.rect.pose = pose16(80, 10);
 }
 
 void toolbar_render() {
