@@ -85,10 +85,10 @@ void toolbar_init() {
 }
 
 void toolbar_update(float dtime) {
-    L.undo.rect.pose = pose16(-90, 10);
+    L.undo.rect.pose = pose16(-80, 10);
 
     for(int i=0; i<MODES; i++) {
-        L.mode[i].rect.pose = pose16(-60+16*i, 10);
+        L.mode[i].rect.pose = pose16(-50+16*i, 10);
     }
     
     L.grid.rect.pose = pose16(40, 10);
