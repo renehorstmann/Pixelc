@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init(32, 32);
+    canvas_init(16, 16);
     brush_init();
     camera_control_init();
     palette_init();
@@ -44,9 +44,9 @@ int main(int argc, char **argv) {
     input_init();
     savestate_init();
 
-//    palette_presave_grayscale();
+    palette_presave_grayscale();
 //    palette_presave_grayscale_alpha();
-    palette_presave_pixilmatt();
+//    palette_presave_pixilmatt();
 //    palette_presave_slso8();
 //    palette_presave_gameboy();
 //    palette_presave_endesga();
