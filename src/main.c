@@ -7,6 +7,7 @@
 #include "c_camera.h"
 #include "background.h"
 #include "canvas.h"
+#include "animation.h"
 #include "brush.h"
 #include "camera_control.h"
 #include "palette.h"
@@ -36,7 +37,8 @@ int main(int argc, char **argv) {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init(16, 16);
+    canvas_init(16, 32);
+    animation_init(2);
     brush_init();
     camera_control_init();
     palette_init();
@@ -76,6 +78,7 @@ static void main_loop(float delta_time) {
     c_camera_update();
     background_update(delta_time);
     canvas_update(delta_time);
+    animation_update(delta_time);
     palette_update(delta_time);
     toolbar_update(delta_time);
 
@@ -84,6 +87,7 @@ static void main_loop(float delta_time) {
 
     background_render();
     canvas_render();
+    animation_render();
     palette_render();
     toolbar_render();
 
