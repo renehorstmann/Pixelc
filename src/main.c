@@ -37,8 +37,8 @@ int main(int argc, char **argv) {
     hud_camera_init();
     c_camera_init();
     background_init();
-    canvas_init(16, 32);
-    animation_init(2);
+    canvas_init(8, 32);
+    animation_init(4, 8);
     brush_init();
     camera_control_init();
     palette_init();
@@ -53,8 +53,8 @@ int main(int argc, char **argv) {
 //    palette_presave_gameboy();
 //    palette_presave_endesga32();
 //    palette_presave_endesga64();
-    palette_presave_nes();
-//    palette_presave_aap64();
+//    palette_presave_nes();
+    palette_presave_aap64();
 
     // save start frame
     savestate_save();

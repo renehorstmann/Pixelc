@@ -2,7 +2,7 @@
 #define PIXELC_ANIMATION_H
 
 
-void animation_init(int frames);
+void animation_init(int frames, float fps);
 
 void animation_update(float dtime);
 

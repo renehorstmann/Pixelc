@@ -15,9 +15,9 @@ static struct {
     float fps;
 } L;
 
-void animation_init(int frames) {
+void animation_init(int frames, float fps) {
 	L.frames = frames;
-	L.fps = 2;
+	L.fps = fps;
 	
 	Image *img = canvas_image();
 	L.tex = r_texture_init(img->cols, img->rows, image_layer(img, canvas_current_layer));
