@@ -29,7 +29,6 @@ Palette, brush, size can be configured in code
 - Tile repeat
 - Layer Selection
 - Frame Selection
-- Animation view
 - VertexColors?
   - white to color like the palette
 - background image option?
