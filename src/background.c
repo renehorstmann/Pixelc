@@ -23,6 +23,11 @@ void background_init() {
 void background_update(float dtime) {
     u_pose_set_size(&L.ro.rect.pose, hud_camera_width(), hud_camera_height());
     u_pose_set_size(&L.ro.rect.uv, hud_camera_width()/2, hud_camera_height()/2);
+    
+    float ux = -(hud_camera_right()+hud_camera_left())/4;
+    float uy = (hud_camera_bottom()+hud_camera_top())/4;
+    
+    u_pose_set_xy(&L.ro.rect.uv, ux, uy);
 }
 
 void background_render() {
