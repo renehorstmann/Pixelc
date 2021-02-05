@@ -44,12 +44,12 @@ int main(int argc, char **argv) {
     input_init();
     savestate_init();
 
-    palette_presave_grayscale();
+//    palette_presave_grayscale();
 //    palette_presave_grayscale_alpha();
 //    palette_presave_pixilmatt();
 //    palette_presave_slso8();
 //    palette_presave_gameboy();
-//    palette_presave_endesga();
+    palette_presave_endesga();
 
     // save start frame
     savestate_save();

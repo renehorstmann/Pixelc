@@ -19,6 +19,8 @@ void hud_camera_init() {
     hud_camera_gl = &hud_camera_matrices.p.m00;
     hud_camera_matrices.p = mat4_eye();
     hud_camera_matrices.p_inv = mat4_eye();
+
+    hud_camera_update();
 }
 
 void hud_camera_update() {

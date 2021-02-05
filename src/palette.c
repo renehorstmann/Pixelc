@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <float.h>  // FLT_MAX
+#include <assert.h>
 #include "e/input.h"
 #include "r/r.h"
 #include "u/pose.h"
@@ -16,80 +17,47 @@ static struct {
     rRoSingle select_ro;
     rRoBatch background_ro;
     int last_selected;
-    float last_screen_ratio_for_updates;
+    float last_camera_width, last_camera_height;
 } L;
 
+static int palette_cols() {
+    assert(hud_camera_width() > 0 && hud_camera_height() > 0 && "startup bug?");
+    if (hud_camera_is_portrait_mode())
+        return (int) floorf(hud_camera_width() / 8);
+    return (int) floorf(hud_camera_height() / 8);
+}
+
 static bool pos_in_palette(vec2 pos) {
-	int rows = 1 + L.palette_size / PALETTE_COLS;
-	if(hud_camera_is_portrait_mode()) {
-        return pos.y <= hud_camera_bottom() + rows * 18;		
-	}
-	return pos.x >= hud_camera_right() - rows * 18;
+    int cols = palette_cols();
+    if (hud_camera_is_portrait_mode()) {
+        int rows = 1 + L.palette_size / cols;
+        return pos.y <= hud_camera_bottom() + rows * 8;
+    } else {
+        int rows = 1 + L.palette_size / cols;
+        return pos.x >= hud_camera_right() - rows * 8;
+    }
 }
 
 
 static mat4 setup_palette_color_pose(int r, int c) {
     mat4 pose = mat4_eye();
-    u_pose_set_size(&pose, 18, 18);
+    u_pose_set_size(&pose, 8, 8);
     if (hud_camera_is_portrait_mode()) {
-        u_pose_set_xy(&pose, -81 + c * 18, hud_camera_bottom() + 9 + r * 18);
+        u_pose_set_xy(&pose, hud_camera_left() + 4 + c * 8, hud_camera_bottom() + 4 + r * 8);
     } else {
-        u_pose_set_xy(&pose, hud_camera_right() - 9 - r * 18, -81 + c * 18);
-        u_pose_set_angle(&pose, M_PI_2);
+        u_pose_set_xy(&pose, hud_camera_right() - 4 - r * 8, hud_camera_bottom() + 4 + c * 8);
     }
     return pose;
 }
 
-static void setup_ro() {
-    int last_row = (L.palette_size - 1) / PALETTE_COLS;
-    for (int i = 0; i < PALETTE_MAX; i++) {
-        int r = i / PALETTE_COLS;
-        int c = i % PALETTE_COLS;
-
-
-        mat4 pose = mat4_eye();
-        if (r <= last_row)
-            pose = setup_palette_color_pose(r, c);
-        else
-            u_pose_set(&pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-        L.palette_ro.rects[i].pose = pose;
-        L.background_ro.rects[i].pose = pose;
-
-        vec4 col;
-        if (i < L.palette_size)
-            col = color_to_vec4(L.palette[i]);
-        else
-            col = R_COLOR_TRANSPARENT;
-
-        L.palette_ro.rects[i].color = col;
-
-
-        // background uv
-        {
-            float u = 0, v = 0;
-            if (r < last_row) {
-                v = 0.5;
-            } else if (i >= L.palette_size) {
-                u = 0.5;
-            }
-            u_pose_set(&L.background_ro.rects[i].uv, u, v, 0.5, 0.5, 0);
-        }
-    }
-    L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
-
-    r_ro_batch_update(&L.palette_ro, 0, PALETTE_MAX);
-    r_ro_batch_update(&L.background_ro, 0, PALETTE_MAX);
-}
-
-
 void palette_init() {
-    GLuint drop_tex = r_texture_init_file("res/palette_color_drop.png", NULL);
+    GLuint drop_tex = r_texture_init_file("res/palette_color.png", NULL);
     r_texture_filter_nearest(drop_tex);
 
     r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, drop_tex);
 
 
-    GLuint bg_tex = r_texture_init_file("res/palette_background.png", NULL);
+    GLuint bg_tex = r_texture_init_file("res/palette_alpha_bg.png", NULL);
     r_texture_filter_nearest(bg_tex);
 
     r_ro_batch_init(&L.background_ro, PALETTE_MAX, hud_camera_gl, bg_tex);
@@ -113,14 +81,41 @@ void palette_init() {
 
 
 void palette_update(float dtime) {
-    // check update
-    float ratio = hud_camera_width() / hud_camera_height();
-    bool update = fabsf(ratio - L.last_screen_ratio_for_updates) > 0.01f;
-    L.last_screen_ratio_for_updates = ratio;
+    int cols = palette_cols();
+    int last_row = (L.palette_size - 1) / cols;
+    for (int i = 0; i < PALETTE_MAX; i++) {
+        int r = i / cols;
+        int c = i % cols;
 
-    if (update) {
-        setup_ro();
+        // pose
+        mat4 pose = mat4_eye();
+        if (r <= last_row)
+            pose = setup_palette_color_pose(r, c);
+        else
+            u_pose_set(&pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+        L.palette_ro.rects[i].pose = pose;
+        L.background_ro.rects[i].pose = pose;
+
+        // color
+        vec4 col;
+        if (i < L.palette_size)
+            col = color_to_vec4(L.palette[i]);
+        else
+            col = R_COLOR_TRANSPARENT;
+
+        L.palette_ro.rects[i].color = col;
+
+
+        // background uv
+        {
+            float u = i < L.palette_size ? 0 : 0.5;
+            u_pose_set(&L.background_ro.rects[i].uv, u, 0, 0.5, 1, 0);
+        }
     }
+    L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
+
+    r_ro_batch_update(&L.palette_ro, 0, PALETTE_MAX);
+    r_ro_batch_update(&L.background_ro, 0, PALETTE_MAX);
 }
 
 void palette_render() {
@@ -131,9 +126,9 @@ void palette_render() {
 
 
 bool palette_pointer_event(ePointer_s pointer) {
-    if(!pos_in_palette(pointer.pos.xy))
+    if (!pos_in_palette(pointer.pos.xy))
         return false;
-    
+
     if (pointer.action != E_POINTER_DOWN)
         return true;
 
