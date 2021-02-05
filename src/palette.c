@@ -9,6 +9,7 @@
 #include "brush.h"
 #include "palette.h"
 
+#define COLOR_DROP_SIZE 16.0f
 
 static struct {
     Color_s palette[PALETTE_MAX];
@@ -23,29 +24,31 @@ static struct {
 static int palette_cols() {
     assert(hud_camera_width() > 0 && hud_camera_height() > 0 && "startup bug?");
     if (hud_camera_is_portrait_mode())
-        return (int) floorf(hud_camera_width() / 8);
-    return (int) floorf(hud_camera_height() / 8);
+        return (int) floorf(hud_camera_width() / COLOR_DROP_SIZE);
+    return (int) floorf(hud_camera_height() / COLOR_DROP_SIZE);
 }
 
 static bool pos_in_palette(vec2 pos) {
     int cols = palette_cols();
     if (hud_camera_is_portrait_mode()) {
         int rows = 1 + L.palette_size / cols;
-        return pos.y <= hud_camera_bottom() + rows * 8;
+        return pos.y <= hud_camera_bottom() + rows * COLOR_DROP_SIZE;
     } else {
         int rows = 1 + L.palette_size / cols;
-        return pos.x >= hud_camera_right() - rows * 8;
+        return pos.x >= hud_camera_right() - rows * COLOR_DROP_SIZE;
     }
 }
 
 
 static mat4 setup_palette_color_pose(int r, int c) {
     mat4 pose = mat4_eye();
-    u_pose_set_size(&pose, 8, 8);
+    u_pose_set_size(&pose, COLOR_DROP_SIZE, COLOR_DROP_SIZE);
     if (hud_camera_is_portrait_mode()) {
-        u_pose_set_xy(&pose, hud_camera_left() + 4 + c * 8, hud_camera_bottom() + 4 + r * 8);
+        u_pose_set_xy(&pose, hud_camera_left() + COLOR_DROP_SIZE/2 + c * COLOR_DROP_SIZE,
+                      hud_camera_bottom() + COLOR_DROP_SIZE/2 + r * COLOR_DROP_SIZE);
     } else {
-        u_pose_set_xy(&pose, hud_camera_right() - 4 - r * 8, hud_camera_bottom() + 4 + c * 8);
+        u_pose_set_xy(&pose, hud_camera_right() - COLOR_DROP_SIZE/2 - r * COLOR_DROP_SIZE,
+                      hud_camera_bottom() + COLOR_DROP_SIZE/2 + c * COLOR_DROP_SIZE);
     }
     return pose;
 }
