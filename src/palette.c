@@ -167,6 +167,11 @@ bool palette_pointer_event(ePointer_s pointer) {
     return true;
 }
 
+float palette_get_hud_size() {
+	int cols = palette_cols();
+	int rows = 1 + L.palette_size / cols;
+    return rows * COLOR_DROP_SIZE;
+}
 
 void palette_set_colors(const Color_s *palette, int size) {
     assert(size < PALETTE_MAX);
