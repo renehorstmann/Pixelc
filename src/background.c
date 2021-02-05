@@ -15,7 +15,7 @@ void background_init() {
     buf[1] = buf[2] = color_from_hex("#222222");
 
     GLuint tex = r_texture_init(2, 2, buf);
-    r_texture_filter_linear(tex);
+    r_texture_filter_nearest(tex);
 
     r_ro_single_init(&L.ro, hud_camera_gl, tex);
 }
