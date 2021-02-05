@@ -50,7 +50,9 @@ int main(int argc, char **argv) {
 //    palette_presave_slso8();
 //    palette_presave_gameboy();
 //    palette_presave_endesga32();
-    palette_presave_endesga64();
+//    palette_presave_endesga64();
+//    palette_presave_nes();
+    palette_presave_aap64();
 
     // save start frame
     savestate_save();

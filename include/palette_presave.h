@@ -249,4 +249,153 @@ static void palette_presave_endesga64() {
 }
 
 
+
+static void palette_presave_nes() {
+    Color_s palette[56];
+    int size = 56;
+    const char *hex[56] = {
+            "#00000000",
+            "#000000",
+            "#fcfcfc",
+            "#f8f8f8",
+            "#bcbcbc",
+            "#7c7c7c",
+            "#a4e4fc",
+            "#3cbcfc",
+            "#0078f8",
+            "#0000fc",
+            "#b8b8f8",
+            "#6888fc",
+            "#0058f8",
+            "#0000bc",
+            "#d8b8f8",
+            "#9878f8",
+            "#6844fc",
+            "#4428bc",
+            "#f8b8f8",
+            "#f878f8",
+            "#d800cc",
+            "#940084",
+            "#f8a4c0",
+            "#f85898",
+            "#e40058",
+            "#a80020",
+            "#f0d0b0",
+            "#f87858",
+            "#f83800",
+            "#a81000",
+            "#fce0a8",
+            "#fca044",
+            "#e45c10",
+            "#881400",
+            "#f8d878",
+            "#f8b800",
+            "#ac7c00",
+            "#503000",
+            "#d8f878",
+            "#b8f818",
+            "#00b800",
+            "#007800",
+            "#b8f8b8",
+            "#58d854",
+            "#00a800",
+            "#006800",
+            "#b8f8d8",
+            "#58f898",
+            "#00a844",
+            "#005800",
+            "#00fcfc",
+            "#00e8d8",
+            "#008888",
+            "#004058",
+            "#f8d8f8",
+            "#787878"
+    };
+
+    for (int i = 0; i < size; i++) {
+        palette[i] = color_from_hex(hex[i]);
+    }
+
+    palette_set_colors(palette, size);
+}
+
+
+static void palette_presave_aap64() {
+    Color_s palette[65];
+    int size = 65;
+    const char *hex[65] = {
+            "#00000000",
+            "#060608",
+            "#141013",
+            "#3b1725",
+            "#73172d",
+            "#b4202a",
+            "#df3e23",
+            "#fa6a0a",
+            "#f9a31b",
+            "#ffd541",
+            "#fffc40",
+            "#d6f264",
+            "#9cdb43",
+            "#59c135",
+            "#14a02e",
+            "#1a7a3e",
+            "#24523b",
+            "#122020",
+            "#143464",
+            "#285cc4",
+            "#249fde",
+            "#20d6c7",
+            "#a6fcdb",
+            "#ffffff",
+            "#fef3c0",
+            "#fad6b8",
+            "#f5a097",
+            "#e86a73",
+            "#bc4a9b",
+            "#793a80",
+            "#403353",
+            "#242234",
+            "#221c1a",
+            "#322b28",
+            "#71413b",
+            "#bb7547",
+            "#dba463",
+            "#f4d29c",
+            "#dae0ea",
+            "#b3b9d1",
+            "#8b93af",
+            "#6d758d",
+            "#4a5462",
+            "#333941",
+            "#422433",
+            "#5b3138",
+            "#8e5252",
+            "#ba756a",
+            "#e9b5a3",
+            "#e3e6ff",
+            "#b9bffb",
+            "#849be4",
+            "#588dbe",
+            "#477d85",
+            "#23674e",
+            "#328464",
+            "#5daf8d",
+            "#92dcba",
+            "#cdf7e2",
+            "#e4d2aa",
+            "#c7b08b",
+            "#a08662",
+            "#796755",
+            "#5a4e44",
+            "#423934"
+    };
+
+    for (int i = 0; i < size; i++) {
+        palette[i] = color_from_hex(hex[i]);
+    }
+
+    palette_set_colors(palette, size);
+}
+
 #endif //PIXELC_PALETTE_PRESAVE_H
