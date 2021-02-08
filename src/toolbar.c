@@ -10,12 +10,14 @@
 #include "toolbar.h"
 
 #define MODES 4
+#define SHAPES 3
 
 
 static struct {
 	rRoSingle undo;
 	
 	rRoSingle mode[MODES];
+	rRoSingle shape[SHAPES];
 	
 	rRoSingle grid;
 	rRoSingle camera;
@@ -26,8 +28,9 @@ static struct {
 
 static bool pos_in_toolbar(vec2 pos) {
     if(hud_camera_is_portrait_mode())
-        return pos.y >= hud_camera_top() - 20;
-    return pos.x <= hud_camera_left() + 20;
+        return pos.y >= hud_camera_top() - 34;
+    return pos.x <= hud_camera_left() + 34
+    ;
 }
 
 static void unpress_modes(int ignore) {
@@ -37,6 +40,15 @@ static void unpress_modes(int ignore) {
         button_set_pressed(&L.mode[i], false);
 	}
 }
+
+static void unpress_shapes(int ignore) {
+	for(int i=0; i<SHAPES; i++) {
+		if(i==ignore)
+		    continue;
+        button_set_pressed(&L.shape[i], false);
+	}
+}
+
 
 static mat4 pose16(float col, float row) {
     mat4 pose = mat4_eye();
@@ -66,8 +78,23 @@ void toolbar_init() {
 
         button_init(&L.mode[i], tex);
     }
+    
+    button_set_pressed(&L.mode[0], true);
+    
+    const char *shape_files[SHAPES] = {
+    	"res/button_dot.png",
+    	"res/button_dither.png",
+    	"res/button_dither2.png"
+    };
+    
+    for(int i=0; i<SHAPES; i++) {
+    	GLuint tex = r_texture_init_file(shape_files[i], NULL);
+    r_texture_filter_nearest(tex);
+
+        button_init(&L.shape[i], tex);
+    }
 	
-	button_set_pressed(&L.mode[0], true);
+	button_set_pressed(&L.shape[0], true);
 	
 	
 	GLuint grid_tex = r_texture_init_file("res/button_grid.png", NULL);
@@ -88,7 +115,11 @@ void toolbar_update(float dtime) {
     L.undo.rect.pose = pose16(-80, 10);
 
     for(int i=0; i<MODES; i++) {
-        L.mode[i].rect.pose = pose16(-50+16*i, 10);
+        L.mode[i].rect.pose = pose16(-50+16*i, 26);
+    }
+    
+    for(int i=0; i<SHAPES; i++) {
+    	L.shape[i].rect.pose = pose16(-50 +16*i, 10);
     }
     
     L.grid.rect.pose = pose16(40, 10);
@@ -100,6 +131,9 @@ void toolbar_render() {
 	r_ro_single_render(&L.undo);
 	for(int i=0; i<MODES; i++) {
 		r_ro_single_render(&L.mode[i]);
+	}
+	for(int i=0; i<SHAPES; i++) {
+		r_ro_single_render(&L.shape[i]);
 	}
 	r_ro_single_render(&L.grid);
 	r_ro_single_render(&L.camera);
@@ -129,6 +163,22 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             	brush_mode = BRUSH_MODE_FILL;
             } else if(i==3) {
             	brush_mode = BRUSH_MODE_FILL8;
+            }
+        }
+    }
+    
+    for(int i=0; i<SHAPES; i++) {
+        if(button_pressed(&L.shape[i], pointer)) {
+
+            printf("shape %d\n", i);
+            unpress_shapes(i);
+
+            if(i==0) {
+            	brush_shape = BRUSH_SHAPE_DOT;
+            } else if(i==1) {
+            	brush_shape = BRUSH_SHAPE_DITHER;
+            } else if(i==2) {
+            	brush_shape = BRUSH_SHAPE_DITHER2;
             }
         }
     }
