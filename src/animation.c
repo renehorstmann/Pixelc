@@ -7,6 +7,9 @@
 #include "animation.h"
 
 
+#define SIZE 1
+
+
 static struct {
 	rRoSingle ro;
 	GLuint tex;
@@ -35,8 +38,8 @@ void animation_update(float dtime) {
 	Image *img = canvas_image();
 	r_texture_update(L.tex, img->cols, img->rows, image_layer(img, canvas_current_layer));
 
-    float w = img->cols / L.frames;
-    float h = img->rows;
+    float w = SIZE * img->cols / L.frames;
+    float h = SIZE * img->rows;
     
     float x, y;
     if(hud_camera_is_portrait_mode()) {
@@ -46,7 +49,9 @@ void animation_update(float dtime) {
     	x = hud_camera_right() - palette_get_hud_size() - w/2 - 2;
     	y = hud_camera_top() - h/2 - 2;
     }
-    u_pose_set(&L.ro.rect.pose, floorf(x), floorf(y), w, h, 0);
+    
+    u_pose_set(&L.ro.rect.pose, 
+        floorf(x), floorf(y), w, h, 0);
 }
 
 void animation_render() {
