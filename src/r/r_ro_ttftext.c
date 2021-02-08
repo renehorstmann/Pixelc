@@ -1,9 +1,9 @@
 #include "r/texture.h"
-#include "r/ro_text.h"
+#include "r/ro_ttftext.h"
 
-TTF_Font *r_text_default_font;
+TTF_Font *r_ttftext_default_font;
 
-GLuint r_text_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h) {
+GLuint r_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h) {
 
     // SDL_ttf seems to render in BGRA format, so we just swap r and b
     SDL_Surface *img = TTF_RenderText_Blended(font, text,
@@ -41,30 +41,30 @@ static void u_pose_set_size(mat4 *p, float w, float h) {
 }
 
 
-void r_ro_text_init(rRoText *self, const float *vp, vec4 color, const char *text) {
-    self->font = r_text_default_font;
+void r_ro_ttftext_init(rRoTtfText *self, const float *vp, vec4 color, const char *text) {
+    self->font = r_ttftext_default_font;
     int w, h;
-    r_ro_single_init(&self->ro, vp, r_text_create_texture(self->font, color, text, &w, &h));
+    r_ro_single_init(&self->ro, vp, r_ttftext_create_texture(self->font, color, text, &w, &h));
     self->ratio = (float) w / h;
 }
 
-void r_ro_text_kill(rRoText *self) {
+void r_ro_ttftext_kill(rRoTtfText *self) {
     r_ro_single_kill(&self->ro);
 }
 
-void r_ro_text_render(rRoText *self) {
+void r_ro_ttftext_render(rRoTtfText *self) {
     r_ro_single_render(&self->ro);
 }
 
-void r_ro_text_set_size(rRoText *self, float h) {
+void r_ro_ttftext_set_size(rRoTtfText *self, float h) {
 	u_pose_set_size(&self->ro.rect.pose, h*self->ratio, h);
 }
 
-void r_ro_text_set_text(rRoText *self, vec4 color, const char *text) {
+void r_ro_ttftext_set_text(rRoTtfText *self, vec4 color, const char *text) {
     int w, h;
-    r_ro_single_set_texture(&self->ro, r_text_create_texture(self->font, color, text, &w, &h));
+    r_ro_single_set_texture(&self->ro, r_ttftext_create_texture(self->font, color, text, &w, &h));
     self->ratio = (float) w / h;
-    r_ro_text_set_size(self, u_pose_get_h(self->ro.rect.pose));
+    r_ro_ttftext_set_size(self, u_pose_get_h(self->ro.rect.pose));
 }
 
 

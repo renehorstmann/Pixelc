@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 
     // init r (render)
     r_render_init(e_window);
-    r_text_default_font = TTF_OpenFont("res/fnf.ttf", 64);
 
 
     // init systems

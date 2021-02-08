@@ -9,6 +9,6 @@
 #include "ro_single.h"
 #include "ro_batch.h"
 #include "ro_particle.h"
-#include "ro_text.h"
+#include "ro_ttftext.h"
 
 #endif //R_R_H
