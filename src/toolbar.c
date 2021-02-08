@@ -17,6 +17,7 @@
 
 static struct {
 	rRoSingle undo;
+	rRoSingle clear;
 	
 	rRoSingle modes[MODES];
 	rRoSingle shapes[SHAPES];
@@ -25,7 +26,11 @@ static struct {
 	rRoSingle grid;
 	rRoSingle camera;
 	rRoSingle animation;
-	rRoSingle clear;
+	
+	
+	rRoSingle color_bg, color_drop;
+	
+	rRoSingle shade;
 	
 	float bottom;
 } L;
@@ -57,6 +62,8 @@ static mat4 pose16(float col, float row) {
 
 void toolbar_init() {
     button_init(&L.undo, r_texture_init_file("res/button_undo.png", NULL));
+    
+    button_init(&L.clear, r_texture_init_file("res/button_clear.png", NULL));
 
     for(int i=0; i<MODES; i++) {
         button_init(&L.modes[i], r_texture_init_file((const char *[]) {
@@ -87,40 +94,51 @@ void toolbar_init() {
 	button_set_pressed(&L.sizes[0], true);
 	
 	
-	
     button_init(&L.grid, r_texture_init_file("res/button_grid.png", NULL));
 	
     button_init(&L.camera, r_texture_init_file("res/button_camera.png", NULL));
     
     button_init(&L.animation, r_texture_init_file("res/button_play.png", NULL));
-	
-    button_init(&L.clear, r_texture_init_file("res/button_clear.png", NULL));
+    
 
+    r_ro_single_init(&L.color_bg, hud_camera_gl, r_texture_init_file("res/toolbar_color_bg.png", NULL));
+    
+    r_ro_single_init(&L.color_drop, hud_camera_gl, r_texture_init_file("res/color_drop.png", NULL));
+    
+    button_init(&L.shade, r_texture_init_file("res/button_shade.png", NULL));
+    
 }
 
 void toolbar_update(float dtime) {
     L.undo.rect.pose = pose16(-80, 26);
+    L.clear.rect.pose = pose16(-80, 9);
 
     for(int i=0; i<MODES; i++) {
-        L.modes[i].rect.pose = pose16(-50+16*i, 26);
+        L.modes[i].rect.pose = pose16(-60+16*i, 26);
     }
     
     for(int i=0; i<SHAPES; i++) {
-    	L.shapes[i].rect.pose = pose16(-50 +16*i, 9);
+    	L.shapes[i].rect.pose = pose16(-60 +16*i, 9);
     }
     
     for(int i=0; i<SIZES; i++) {
-    	L.sizes[i].rect.pose = pose16(2 +16*i, 9);
+    	L.sizes[i].rect.pose = pose16(-8 +16*i, 9);
     }
     
     L.grid.rect.pose = pose16(80, 26);
     L.camera.rect.pose = pose16(80, 9);
     L.animation.rect.pose = pose16(64, 26);
-    L.clear.rect.pose = pose16(-80, 9);
+    
+    L.color_bg.rect.pose = L.color_drop.rect.pose = pose16(64, 10);
+    L.color_drop.rect.color = color_to_vec4(brush_secondary_color);
+    
+    L.shade.rect.pose = pose16(48, 10);
 }
 
 void toolbar_render() {
 	r_ro_single_render(&L.undo);
+	r_ro_single_render(&L.clear);
+	
 	for(int i=0; i<MODES; i++) {
 		r_ro_single_render(&L.modes[i]);
 	}
@@ -130,10 +148,16 @@ void toolbar_render() {
 	for(int i=0; i<SIZES; i++) {
 		r_ro_single_render(&L.sizes[i]);
 	}
+	
 	r_ro_single_render(&L.grid);
 	r_ro_single_render(&L.camera);
 	r_ro_single_render(&L.animation);
-	r_ro_single_render(&L.clear);
+	
+	
+	r_ro_single_render(&L.color_bg);
+	r_ro_single_render(&L.color_drop);
+	
+	r_ro_single_render(&L.shade);
 }
 
 // return true if the pointer was used (indicate event done)
@@ -204,6 +228,14 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     
     if(button_clicked(&L.clear, pointer)) {
         canvas_clear();
+    }
+    
+    if(u_pose_aa_contains(L.color_drop.rect.pose, pointer.pos.xy)) {
+    	brush_secondary_color = brush_current_color;
+    }
+    
+    if(button_toggled(&L.shade, pointer)) {
+    	brush_shading_active = button_is_pressed(&L.shade);
     }
     
     return true;

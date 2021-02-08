@@ -56,7 +56,7 @@ static mat4 setup_palette_color_pose(int r, int c) {
 }
 
 void palette_init() {
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, r_texture_init_file("res/palette_color_drop.png", NULL));
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, r_texture_init_file("res/color_drop.png", NULL));
 
     r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, hud_camera_gl, r_texture_init_file("res/palette_background.png", NULL));
 

@@ -8,6 +8,8 @@
 #include "image.h"
 #include "c_camera.h"
 #include "io.h"
+#include "palette.h"
+#include "toolbar.h"
 #include "savestate.h"
 #include "canvas.h"
 
@@ -91,10 +93,12 @@ void canvas_update(float dtime) {
         w = 160.0f * L.image->cols / L.image->rows;
     }
     
-    if(c_camera_is_portrait_mode())
-        u_pose_set(&L.pose, 0, 40, w, h, 0);
-    else
-        u_pose_set(&L.pose, 0, 0, w, h, 0);
+    float x = 0, y = 0;
+    if(c_camera_is_portrait_mode()) {
+        y = 20;
+    }
+    
+    u_pose_set(&L.pose, x, y, w, h, 0);
 
     for(int i=0; i<L.layers; i++) {
         r_texture_update(L.render_objects[i].tex, L.image->cols, L.image->rows, image_layer(L.image, i));
