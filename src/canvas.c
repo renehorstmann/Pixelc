@@ -33,8 +33,6 @@ static struct {
 static void init_render_objects() {
     for(int i=0; i<L.layers; i++) {
         GLuint tex = r_texture_init(L.image->cols, L.image->rows, image_layer(L.image, i));
-        r_texture_filter_nearest(tex);
-
         r_ro_single_init(&L.render_objects[i], c_camera_gl, tex);
     }
 }

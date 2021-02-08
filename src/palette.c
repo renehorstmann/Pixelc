@@ -56,21 +56,11 @@ static mat4 setup_palette_color_pose(int r, int c) {
 }
 
 void palette_init() {
-    GLuint drop_tex = r_texture_init_file("res/palette_color_drop.png", NULL);
-    r_texture_filter_nearest(drop_tex);
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, r_texture_init_file("res/palette_color_drop.png", NULL));
 
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, drop_tex);
+    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, hud_camera_gl, r_texture_init_file("res/palette_background.png", NULL));
 
-
-    GLuint bg_tex = r_texture_init_file("res/palette_background.png", NULL);
-    r_texture_filter_nearest(bg_tex);
-
-    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, hud_camera_gl, bg_tex);
-
-
-    GLuint select_tex = r_texture_init_file("res/palette_select.png", NULL);
-    r_texture_filter_nearest(select_tex);
-    r_ro_single_init(&L.select_ro, hud_camera_gl, select_tex);
+    r_ro_single_init(&L.select_ro, hud_camera_gl, r_texture_init_file("res/palette_select.png", NULL));
 
     // default palette:
     {

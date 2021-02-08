@@ -14,10 +14,7 @@ void background_init() {
     buf[0] = buf[3] = color_from_hex("#000000");
     buf[1] = buf[2] = color_from_hex("#222222");
 
-    GLuint tex = r_texture_init(2, 2, buf);
-    r_texture_filter_nearest(tex);
-
-    r_ro_single_init(&L.ro, hud_camera_gl, tex);
+    r_ro_single_init(&L.ro, hud_camera_gl, r_texture_init(2, 2, buf));
 }
 
 void background_update(float dtime) {
