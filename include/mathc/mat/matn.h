@@ -78,7 +78,7 @@ static float matN_trace(const float *mat, int n) {
 static void matN_transpose_no_alias(float *restrict dst_mat, const float *restrict mat, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
-            dst_mat[c * n + r] = mat[c * n + r];
+            dst_mat[c * n + r] = mat[r * n + c];
         }
     }
 }

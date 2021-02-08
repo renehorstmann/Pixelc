@@ -78,7 +78,7 @@ static int imatN_trace(const int *mat, int n) {
 static void imatN_transpose_no_alias(int *restrict dst_mat, const int *restrict mat, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
-            dst_mat[c * n + r] = mat[c * n + r];
+            dst_mat[c * n + r] = mat[r * n + c];
         }
     }
 }

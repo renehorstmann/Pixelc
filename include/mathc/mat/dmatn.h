@@ -78,7 +78,7 @@ static double dmatN_trace(const double *mat, int n) {
 static void dmatN_transpose_no_alias(double *restrict dst_mat, const double *restrict mat, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
-            dst_mat[c * n + r] = mat[c * n + r];
+            dst_mat[c * n + r] = mat[r * n + c];
         }
     }
 }
