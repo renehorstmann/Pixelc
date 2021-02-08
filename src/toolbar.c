@@ -6,6 +6,7 @@
 #include "brush.h"
 #include "canvas.h"
 #include "camera_control.h"
+#include "animation.h"
 #include "savestate.h"
 #include "toolbar.h"
 
@@ -23,6 +24,7 @@ static struct {
 	
 	rRoSingle grid;
 	rRoSingle camera;
+	rRoSingle animation;
 	rRoSingle clear;
 	
 	float bottom;
@@ -89,6 +91,8 @@ void toolbar_init() {
     button_init(&L.grid, r_texture_init_file("res/button_grid.png", NULL));
 	
     button_init(&L.camera, r_texture_init_file("res/button_camera.png", NULL));
+    
+    button_init(&L.animation, r_texture_init_file("res/button_play.png", NULL));
 	
     button_init(&L.clear, r_texture_init_file("res/button_clear.png", NULL));
 
@@ -111,6 +115,7 @@ void toolbar_update(float dtime) {
     
     L.grid.rect.pose = pose16(80, 26);
     L.camera.rect.pose = pose16(80, 9);
+    L.animation.rect.pose = pose16(64, 26);
     L.clear.rect.pose = pose16(-80, 9);
 }
 
@@ -127,6 +132,7 @@ void toolbar_render() {
 	}
 	r_ro_single_render(&L.grid);
 	r_ro_single_render(&L.camera);
+	r_ro_single_render(&L.animation);
 	r_ro_single_render(&L.clear);
 }
 
@@ -191,6 +197,10 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if(button_clicked(&L.camera, pointer)) {
     	camera_control_set_home();
     }
+    
+    if(button_toggled(&L.animation, pointer)) {
+    	animation_show = button_is_pressed(&L.animation);
+    }   
     
     if(button_clicked(&L.clear, pointer)) {
         canvas_clear();

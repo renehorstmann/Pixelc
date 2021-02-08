@@ -9,6 +9,7 @@
 
 #define SIZE 1
 
+bool animation_show;
 
 static struct {
 	rRoSingle ro;
@@ -31,6 +32,9 @@ void animation_init(int frames, float fps) {
 }
 
 void animation_update(float dtime) {
+	if(!animation_show)
+	    return;
+	    
 	L.time = fmodf(L.time + dtime, L.frames / L.fps);
 	float u = floorf(L.time * L.fps) / L.frames;
 	u_pose_set_x(&L.ro.rect.uv, u);
@@ -55,6 +59,8 @@ void animation_update(float dtime) {
 }
 
 void animation_render() {
+	if(!animation_show)
+	    return;
 	r_ro_single_render(&L.ro);
 }
 
