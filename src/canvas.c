@@ -92,9 +92,9 @@ void canvas_update(float dtime) {
     }
     
     if(c_camera_is_portrait_mode())
-        u_pose_set(&L.pose, 0, c_camera_top() - 110, w, h, 0);
+        u_pose_set(&L.pose, 0, 40, w, h, 0);
     else
-        u_pose_set(&L.pose, c_camera_left() + 110, 0, w, h, 0);
+        u_pose_set(&L.pose, 0, 0, w, h, 0);
 
     for(int i=0; i<L.layers; i++) {
         r_texture_update(L.render_objects[i].tex, L.image->cols, L.image->rows, image_layer(L.image, i));
