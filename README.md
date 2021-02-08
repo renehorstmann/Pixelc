@@ -12,15 +12,8 @@ Palette, brush, size can be configured in code
 ## Todo
 - Toolbar
   - Brush mode
-    - shape
-      - dot, plus, cross, dither
-    - size
-      - 1, 3, 5
     - line
     - circle
-    - shade (from color to color)
-  - second color 
-    - for dither, shade, replace
   - replace (from color to color)
   - move mode
   - selection
