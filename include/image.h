@@ -50,9 +50,13 @@ static Color_s *image_layer(Image *self, int layer) {
     return image_pixel(self, layer, 0, 0);
 }
 
+static bool image_contains(const Image *img, int x, int y) {
+	return x >= 0 && x < img->cols 
+	    && y >= 0 && y < img->rows;
+}
+
 static bool image_contains_uv(const Image *img, ivec2 uv) {
-	return uv.x >= 0 && uv.x < img->cols 
-	    && uv.y >= 0 && uv.y < img->rows;
+	return image_contains(img, uv.x, uv.y);
 }
 
 #endif //PIXELC_IMAGE_H

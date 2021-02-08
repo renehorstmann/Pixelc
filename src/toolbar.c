@@ -54,8 +54,8 @@ void toolbar_init() {
     button_init(&L.undo, undo_tex);
 
     const char *mode_files[MODES] = {
-    	"res/button_dot.png",
     	"res/button_free.png",
+    	"res/button_dot.png",
     	"res/button_fill.png",
     	"res/button_fill8.png"
     };
@@ -67,7 +67,7 @@ void toolbar_init() {
         button_init(&L.mode[i], tex);
     }
 	
-	button_set_pressed(&L.mode[1], true);
+	button_set_pressed(&L.mode[0], true);
 	
 	
 	GLuint grid_tex = r_texture_init_file("res/button_grid.png", NULL);
@@ -122,13 +122,13 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             unpress_modes(i);
 
             if(i==0) {
-                brush_set_mode(BRUSH_MODE_DOT);
+                brush_mode = BRUSH_MODE_FREE;
             } else if(i==1) {
-                brush_set_mode(BRUSH_MODE_FREE);
+                brush_mode = BRUSH_MODE_DOT;
             } else if(i==2) {
-            	brush_set_mode(BRUSH_MODE_FILL);
+            	brush_mode = BRUSH_MODE_FILL;
             } else if(i==3) {
-            	brush_set_mode(BRUSH_MODE_FILL8);
+            	brush_mode = BRUSH_MODE_FILL8;
             }
         }
     }

@@ -1,13 +1,13 @@
 #include "utilc/dynarray.h"
 #include "brush.h"
 #include "canvas.h"
-#include "brush_fill.h"
+#include "brush_mode_fill.h"
 
 
 DynArray(ivec2, PosStack, pos_stack)
 
 
-bool brush_fill(ePointer_s pointer, bool mode8) {
+bool brush_mode_fill(ePointer_s pointer, bool mode8) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
