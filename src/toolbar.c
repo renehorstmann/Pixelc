@@ -230,7 +230,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         canvas_clear();
     }
     
-    if(u_pose_aa_contains(L.color_drop.rect.pose, pointer.pos.xy)) {
+    if(pointer.action == E_POINTER_DOWN && u_pose_aa_contains(L.color_drop.rect.pose, pointer.pos.xy)) {
     	brush_secondary_color = brush_current_color;
     }
     
