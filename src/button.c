@@ -1,11 +1,11 @@
 
 #include "u/pose.h"
-#include "hud_camera.h"
+#include "camera.h"
 #include "button.h"
 
 
 void button_init(rRoSingle *self, GLuint tex_sink) {
-	r_ro_single_init(self, hud_camera_gl, tex_sink);
+	r_ro_single_init(self, camera_gl, tex_sink);
 	
 	u_pose_set_size(&self->rect.uv, 0.5, 1);
 }

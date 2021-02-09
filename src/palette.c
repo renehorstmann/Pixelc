@@ -5,7 +5,7 @@
 #include "r/r.h"
 #include "u/pose.h"
 #include "utilc/alloc.h"
-#include "hud_camera.h"
+#include "camera.h"
 #include "brush.h"
 #include "palette.h"
 
@@ -23,20 +23,20 @@ static struct {
 } L;
 
 static int palette_cols() {
-    assert(hud_camera_width() > 0 && hud_camera_height() > 0 && "startup bug?");
-    if (hud_camera_is_portrait_mode())
-        return (int) floorf(hud_camera_width() / COLOR_DROP_SIZE);
-    return (int) floorf(hud_camera_height() / COLOR_DROP_SIZE);
+    assert(camera_width() > 0 && camera_height() > 0 && "startup bug?");
+    if (camera_is_portrait_mode())
+        return (int) floorf(camera_width() / COLOR_DROP_SIZE);
+    return (int) floorf(camera_height() / COLOR_DROP_SIZE);
 }
 
 static bool pos_in_palette(vec2 pos) {
     int cols = palette_cols();
-    if (hud_camera_is_portrait_mode()) {
+    if (camera_is_portrait_mode()) {
         int rows = 1 + L.palette_size / cols;
-        return pos.y <= hud_camera_bottom() + rows * COLOR_DROP_SIZE;
+        return pos.y <= camera_bottom() + rows * COLOR_DROP_SIZE;
     } else {
         int rows = 1 + L.palette_size / cols;
-        return pos.x >= hud_camera_right() - rows * COLOR_DROP_SIZE;
+        return pos.x >= camera_right() - rows * COLOR_DROP_SIZE;
     }
 }
 
@@ -44,23 +44,23 @@ static bool pos_in_palette(vec2 pos) {
 static mat4 setup_palette_color_pose(int r, int c) {
     mat4 pose = mat4_eye();
     u_pose_set_size(&pose, COLOR_DROP_SIZE, COLOR_DROP_SIZE);
-    if (hud_camera_is_portrait_mode()) {
-        u_pose_set_xy(&pose, hud_camera_left() + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE,
-                      hud_camera_bottom() + COLOR_DROP_SIZE / 2 + r * COLOR_DROP_SIZE);
+    if (camera_is_portrait_mode()) {
+        u_pose_set_xy(&pose, camera_left() + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE,
+                      camera_bottom() + COLOR_DROP_SIZE / 2 + r * COLOR_DROP_SIZE);
     } else {
-        u_pose_set_xy(&pose, hud_camera_right() - COLOR_DROP_SIZE / 2 - r * COLOR_DROP_SIZE,
-                      hud_camera_bottom() + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE);
+        u_pose_set_xy(&pose, camera_right() - COLOR_DROP_SIZE / 2 - r * COLOR_DROP_SIZE,
+                      camera_bottom() + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE);
         u_pose_set_angle(&pose, M_PI_2);
     }
     return pose;
 }
 
 void palette_init() {
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, hud_camera_gl, r_texture_init_file("res/color_drop.png", NULL));
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera_gl, r_texture_init_file("res/color_drop.png", NULL));
 
-    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, hud_camera_gl, r_texture_init_file("res/palette_background.png", NULL));
+    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera_gl, r_texture_init_file("res/palette_background.png", NULL));
 
-    r_ro_single_init(&L.select_ro, hud_camera_gl, r_texture_init_file("res/palette_select.png", NULL));
+    r_ro_single_init(&L.select_ro, camera_gl, r_texture_init_file("res/palette_select.png", NULL));
 
     // default palette:
     {

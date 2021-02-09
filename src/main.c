@@ -3,13 +3,13 @@
 #include "r/r.h"
 #include "u/u.h"
 
-#include "hud_camera.h"
-#include "c_camera.h"
+#include "camera.h"
+#include "canvas_camera.h"
 #include "background.h"
 #include "canvas.h"
 #include "animation.h"
 #include "brush.h"
-#include "camera_control.h"
+#include "canvas_camera_control.h"
 #include "palette.h"
 #include "palette_presave.h"
 #include "toolbar.h"
@@ -33,13 +33,13 @@ int main(int argc, char **argv) {
 
 
     // init systems
-    hud_camera_init();
-    c_camera_init();
+    camera_init();
+    canvas_camera_init();
     background_init();
     canvas_init(16, 16);
     animation_init(2, 2);
     brush_init();
-    camera_control_init();
+    canvas_camera_control_init();
     palette_init();
     toolbar_init();
     input_init();
@@ -73,8 +73,8 @@ static void main_loop(float delta_time) {
     
 
     // simulate
-    hud_camera_update();
-    c_camera_update();
+    camera_update();
+    canvas_camera_update();
     background_update(delta_time);
     canvas_update(delta_time);
     animation_update(delta_time);

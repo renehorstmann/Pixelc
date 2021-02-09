@@ -1,7 +1,7 @@
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "hud_camera.h"
+#include "camera.h"
 #include "canvas.h"
 #include "palette.h"
 #include "animation.h"
@@ -27,7 +27,7 @@ void animation_init(int frames, float fps) {
 	L.tex = r_texture_init(img->cols, img->rows, image_layer(img, canvas_current_layer));
 	r_texture_filter_nearest(L.tex);
 	
-	r_ro_single_init(&L.ro, hud_camera_gl, L.tex);
+	r_ro_single_init(&L.ro, camera_gl, L.tex);
 	u_pose_set_w(&L.ro.rect.uv, 1.0/frames);
 }
 
@@ -46,12 +46,12 @@ void animation_update(float dtime) {
     float h = SIZE * img->rows;
     
     float x, y;
-    if(hud_camera_is_portrait_mode()) {
-    	x = hud_camera_right() - w/2 - 2; 
-        y = hud_camera_bottom() + palette_get_hud_size() + h/2 + 2;	
+    if(camera_is_portrait_mode()) {
+    	x = camera_right() - w / 2 - 2;
+        y = camera_bottom() + palette_get_hud_size() + h / 2 + 2;
     } else {
-    	x = hud_camera_right() - palette_get_hud_size() - w/2 - 2;
-    	y = hud_camera_top() - h/2 - 2;
+    	x = camera_right() - palette_get_hud_size() - w / 2 - 2;
+    	y = camera_top() - h / 2 - 2;
     }
     
     u_pose_set(&L.ro.rect.pose, 

@@ -6,7 +6,7 @@
 #include "mathc/mat/float.h"
 
 #include "image.h"
-#include "c_camera.h"
+#include "canvas_camera.h"
 #include "io.h"
 #include "palette.h"
 #include "toolbar.h"
@@ -35,7 +35,7 @@ static struct {
 static void init_render_objects() {
     for(int i=0; i<L.layers; i++) {
         GLuint tex = r_texture_init(L.image->cols, L.image->rows, image_layer(L.image, i));
-        r_ro_single_init(&L.render_objects[i], c_camera_gl, tex);
+        r_ro_single_init(&L.render_objects[i], canvas_camera_gl, tex);
     }
 }
 
@@ -59,7 +59,7 @@ void canvas_init(int rows, int cols) {
     
     GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL);
     r_texture_filter_nearest(grid_tex);
-    r_ro_single_init(&L.grid, c_camera_gl, grid_tex);
+    r_ro_single_init(&L.grid, canvas_camera_gl, grid_tex);
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
@@ -68,7 +68,7 @@ void canvas_init(int rows, int cols) {
     buf[1] = buf[2] = color_from_hex("#777777");
     GLuint bg_tex = r_texture_init(2, 2, buf);
     r_texture_filter_nearest(bg_tex);
-    r_ro_single_init(&L.bg, c_camera_gl, bg_tex);
+    r_ro_single_init(&L.bg, canvas_camera_gl, bg_tex);
     {    
         float w = cols <= 8 ? 1 : cols/16.0f;
         float h = rows <= 8 ? 1 : rows/16.0f;
@@ -94,7 +94,7 @@ void canvas_update(float dtime) {
     }
     
     float x = 0, y = 0;
-    if(c_camera_is_portrait_mode()) {
+    if(canvas_camera_is_portrait_mode()) {
         y = 20;
     }
     

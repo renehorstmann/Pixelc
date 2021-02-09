@@ -2,11 +2,11 @@
 #include "button.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "hud_camera.h"
+#include "camera.h"
 #include "brush.h"
 #include "brush_shape.h"
 #include "canvas.h"
-#include "camera_control.h"
+#include "canvas_camera_control.h"
 #include "animation.h"
 #include "savestate.h"
 #include "toolbar.h"
@@ -40,9 +40,9 @@ static struct {
 } L;
 
 static bool pos_in_toolbar(vec2 pos) {
-    if(hud_camera_is_portrait_mode())
-        return pos.y >= hud_camera_top() - 34;
-    return pos.x <= hud_camera_left() + 34
+    if(camera_is_portrait_mode())
+        return pos.y >= camera_top() - 34;
+    return pos.x <= camera_left() + 34
     ;
 }
 
@@ -57,10 +57,10 @@ static void unpress(rRoSingle *btns, int n, int ignore) {
 
 static mat4 pose_wh(float col, float row, float w, float h) {
     mat4 pose = mat4_eye();
-    if(hud_camera_is_portrait_mode()) {
-        u_pose_set(&pose, col, hud_camera_top() - row, w, h, 0);
+    if(camera_is_portrait_mode()) {
+        u_pose_set(&pose, col, camera_top() - row, w, h, 0);
     } else {
-        u_pose_set(&pose, hud_camera_left() + row, col, w, h, 0);
+        u_pose_set(&pose, camera_left() + row, col, w, h, 0);
     }
     return pose;
 }
@@ -95,7 +95,7 @@ void toolbar_init() {
             BRUSH_KERNEL_SIZE,
             img);
     free(img);
-    r_ro_single_init(&L.shape, hud_camera_gl, kernel_tex);
+    r_ro_single_init(&L.shape, camera_gl, kernel_tex);
     u_pose_set_w(&L.shape.rect.uv, 1.0f/BRUSH_NUM_SHAPES);
     
     button_init(&L.shape_minus, r_texture_init_file("res/button_minus.png", NULL));
@@ -114,9 +114,9 @@ void toolbar_init() {
     button_init(&L.animation, r_texture_init_file("res/button_play.png", NULL));
     
 
-    r_ro_single_init(&L.color_bg, hud_camera_gl, r_texture_init_file("res/toolbar_color_bg.png", NULL));
+    r_ro_single_init(&L.color_bg, camera_gl, r_texture_init_file("res/toolbar_color_bg.png", NULL));
     
-    r_ro_single_init(&L.color_drop, hud_camera_gl, r_texture_init_file("res/color_drop.png", NULL));
+    r_ro_single_init(&L.color_drop, camera_gl, r_texture_init_file("res/color_drop.png", NULL));
     
     button_init(&L.shade, r_texture_init_file("res/button_shade.png", NULL));
     
@@ -243,7 +243,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }    
             
     if(button_clicked(&L.camera, pointer)) {
-    	camera_control_set_home();
+        canvas_camera_control_set_home();
     }
     
     if(button_toggled(&L.animation, pointer)) {

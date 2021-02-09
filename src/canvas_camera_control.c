@@ -1,8 +1,8 @@
 #include "mathc/bool.h"
 #include "mathc/float.h"
-#include "c_camera.h"
+#include "canvas_camera.h"
 #include "brush.h"
-#include "camera_control.h"
+#include "canvas_camera_control.h"
 
 
 static struct {
@@ -30,7 +30,7 @@ static struct {
 static void move_camera(vec2 current_pos) {
     vec2 diff = vec2_sub_vec(current_pos, L.move0);
     L.pos = vec2_sub_vec(L.pos0, diff);
-    c_camera_set_pos(L.pos.x, L.pos.y);
+    canvas_camera_set_pos(L.pos.x, L.pos.y);
 }
 
 static float clampf(float f, float min, float max) {
@@ -48,30 +48,30 @@ static void zoom_camera(float new_distance) {
 
 static void wheel_event(bool up, void *user_data) {
     if (up)
-        L.size /= CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
+        L.size /= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
     else
-        L.size *= CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
-    c_camera_set_size(L.size);
+        L.size *= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
+    canvas_camera_set_size(L.size);
 }
 
-void camera_control_init() {
+void canvas_camera_control_init() {
     L.size = 1;
     e_input_register_wheel_event(wheel_event, NULL);
 }
 
-void camera_control_set_home() {
+void canvas_camera_control_set_home() {
 	memset(&L, 0, sizeof(L));
 	L.size = 1;
-	c_camera_set_pos(L.pos.x, L.pos.y);
-	c_camera_set_size(L.size);
+    canvas_camera_set_pos(L.pos.x, L.pos.y);
+    canvas_camera_set_size(L.size);
 }
 
-bool camera_control_pointer_event(ePointer_s pointer) {
+bool canvas_camera_control_pointer_event(ePointer_s pointer) {
 #ifdef GLES
     if (pointer.id < 0 || pointer.id > 1)
         return false;
 
-    L.touch[pointer.id] = vec2_mix(L.touch[pointer.id], pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
+    L.touch[pointer.id] = vec2_mix(L.touch[pointer.id], pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
 
     if (pointer.action == E_POINTER_DOWN) {
         L.touching.v[pointer.id] = true;
@@ -107,7 +107,7 @@ bool camera_control_pointer_event(ePointer_s pointer) {
     
     return L.touched;
 #else
-    L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
+    L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
     if(L.moving) {
         move_camera(L.pointer_pos);
         if(pointer.action == E_POINTER_DOWN) {
