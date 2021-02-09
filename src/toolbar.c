@@ -87,15 +87,7 @@ void toolbar_init() {
     button_set_pressed(&L.modes[0], true);
 
 
-    // shape
-    Color_s *img = brush_shape_kernel_image_on_heap(COLOR_TRANSPARENT, COLOR_WHITE);
-    GLuint kernel_tex = r_texture_init(
-            BRUSH_NUM_SHAPES * BRUSH_KERNEL_SIZE,
-            BRUSH_KERNEL_SIZE,
-            img);
-    free(img);
-    r_ro_single_init(&L.shape, camera_gl, kernel_tex);
-    u_pose_set_w(&L.shape.rect.uv, 1.0 / BRUSH_NUM_SHAPES);
+    r_ro_single_init(&L.shape, camera_gl, brush_shape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
 
     button_init(&L.shape_minus, r_texture_init_file("res/button_minus.png", NULL));
 
@@ -139,9 +131,8 @@ void toolbar_update(float dtime) {
     }
     
     L.shape.rect.pose = pose_wh(-60, 26,
-                                BRUSH_KERNEL_SIZE*2, BRUSH_KERNEL_SIZE*2);  // should be 14x14
-    u_pose_set_x(&L.shape.rect.uv,
-                 (float) brush_shape / BRUSH_NUM_SHAPES);
+                                BRUSH_KERNEL_TEXTURE_SIZE*2, BRUSH_KERNEL_TEXTURE_SIZE*2);  // should be 16x16
+    L.shape.rect.uv = brush_shape_kernel_texture_uv(brush_shape);
 
     L.shape_minus.rect.pose = pose16(20, 26);
     L.shape_plus.rect.pose = pose16(36, 26);
