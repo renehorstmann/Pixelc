@@ -4,6 +4,7 @@
 #include "u/pose.h"
 #include "hud_camera.h"
 #include "brush.h"
+#include "brush_shape.h"
 #include "canvas.h"
 #include "camera_control.h"
 #include "animation.h"
@@ -31,6 +32,8 @@ static struct {
 	rRoSingle color_bg, color_drop;
 	
 	rRoSingle shade;
+	
+	rRoSingle shape;
 	
 	float bottom;
 } L;
@@ -107,6 +110,14 @@ void toolbar_init() {
     
     button_init(&L.shade, r_texture_init_file("res/button_shade.png", NULL));
     
+    
+    Color_s *img = brush_shape_kernel_image_on_heap(COLOR_TRANSPARENT, COLOR_BLUE);
+    r_ro_single_init(&L.shape, hud_camera_gl,
+            r_texture_init(
+            BRUSH_NUM_SHAPES * BRUSH_KERNEL_SIZE,
+            BRUSH_KERNEL_SIZE,
+            img));
+    free(img);
 }
 
 void toolbar_update(float dtime) {
@@ -133,6 +144,8 @@ void toolbar_update(float dtime) {
     L.color_drop.rect.color = color_to_vec4(brush_secondary_color);
     
     L.shade.rect.pose = pose16(48, 10);
+    
+    u_pose_set(&L.shape.rect.pose, 0, 0, 22*7, 7, 0);
 }
 
 void toolbar_render() {
@@ -158,6 +171,8 @@ void toolbar_render() {
 	r_ro_single_render(&L.color_drop);
 	
 	r_ro_single_render(&L.shade);
+	
+	r_ro_single_render(&L.shape);
 }
 
 // return true if the pointer was used (indicate event done)

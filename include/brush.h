@@ -15,7 +15,7 @@ enum brushshapes {
 	BRUSH_SHAPE_DOT,
 	BRUSH_SHAPE_DITHER,
 	BRUSH_SHAPE_DITHER2,
-	BRUSH_NUM_SHAPES};
+	BRUSH_NUM_SHAPES2};
 	
 enum brushsizes {
 	BRUSH_SIZE_1 = 0,
