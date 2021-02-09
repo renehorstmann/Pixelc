@@ -134,7 +134,7 @@ void toolbar_update(float dtime) {
     }
     
     L.shape.rect.pose = pose_wh(-60, 26, 
-            BRUSH_KERNEL_SIZE, BRUSH_KERNEL_SIZE);
+            BRUSH_KERNEL_SIZE*2, BRUSH_KERNEL_SIZE*2);  // should be 14x14
     u_pose_set_x(&L.shape.rect.uv, 
             (float) brush_shape / BRUSH_NUM_SHAPES);
     
