@@ -11,9 +11,8 @@
 #include "savestate.h"
 #include "toolbar.h"
 
-#define MODES 4
-#define SHAPES 3
-#define SIZES 3
+#define MODES 6
+#define LONG_PRESS_TIME 1.0
 
 
 static struct {
@@ -21,8 +20,11 @@ static struct {
 	rRoSingle clear;
 	
 	rRoSingle modes[MODES];
-	rRoSingle shapes[SHAPES];
-	rRoSingle sizes[SIZES];
+	
+	rRoSingle shape;
+	rRoSingle shape_minus, shape_plus;
+	float shape_minus_time, shape_plus_time;
+	
 	
 	rRoSingle grid;
 	rRoSingle camera;
@@ -33,7 +35,6 @@ static struct {
 	
 	rRoSingle shade;
 	
-	rRoSingle shape;
 	
 	float bottom;
 } L;
@@ -53,50 +54,59 @@ static void unpress(rRoSingle *btns, int n, int ignore) {
 	}
 }
 
-static mat4 pose16(float col, float row) {
+
+static mat4 pose_wh(float col, float row, float w, float h) {
     mat4 pose = mat4_eye();
     if(hud_camera_is_portrait_mode()) {
-        u_pose_set(&pose, col, hud_camera_top() - row, 16, 16, 0);
+        u_pose_set(&pose, col, hud_camera_top() - row, w, h, 0);
     } else {
-        u_pose_set(&pose, hud_camera_left() + row, col, 16, 16, 0);
+        u_pose_set(&pose, hud_camera_left() + row, col, w, h, 0);
     }
     return pose;
+}
+
+static mat4 pose16(float col, float row) {
+	return pose_wh(col, row, 16, 16);
 }
 
 void toolbar_init() {
     button_init(&L.undo, r_texture_init_file("res/button_undo.png", NULL));
     
     button_init(&L.clear, r_texture_init_file("res/button_clear.png", NULL));
-
+    
+    // modes
     for(int i=0; i<MODES; i++) {
         button_init(&L.modes[i], r_texture_init_file((const char *[]) {
     	        "res/button_free.png",
     	        "res/button_dot.png",
+    	        "res/button_dither.png",
+    	        "res/button_dither2.png",
             	"res/button_fill.png",
     	        "res/button_fill8.png"
     	        }[i], NULL));
     }
     button_set_pressed(&L.modes[0], true);
     
-    for(int i=0; i<SHAPES; i++) {
-    	button_init(&L.shapes[i], r_texture_init_file((const char *[]) {
-    	        "res/button_dot.png",
-    	        "res/button_dither.png",
-    	        "res/button_dither2.png"
-    	        }[i], NULL));
-    }
-	button_set_pressed(&L.shapes[0], true);
+    
+    // shape
+    Color_s *img = brush_shape_kernel_image_on_heap(COLOR_TRANSPARENT, COLOR_WHITE);
+    GLuint kernel_tex = r_texture_init(
+            BRUSH_NUM_SHAPES * BRUSH_KERNEL_SIZE,
+            BRUSH_KERNEL_SIZE,
+            img);
+    free(img);
+    r_ro_single_init(&L.shape, hud_camera_gl, kernel_tex);
+    u_pose_set_w(&L.shape.rect.uv, 1.0f/BRUSH_NUM_SHAPES);
+    
+    button_init(&L.shape_minus, r_texture_init_file("res/button_minus.png", NULL));
+    
+    button_init(&L.shape_plus, r_texture_init_file("res/button_plus.png", NULL));
+
+
+    
+    
 	
-	for(int i=0; i<SIZES; i++) {
-    	button_init(&L.sizes[i], r_texture_init_file((const char *[]) {
-    	        "res/button_dot.png",
-            	"res/button_large.png",
-            	"res/button_xlarge.png"
-    	        }[i], NULL));
-    }
-	button_set_pressed(&L.sizes[0], true);
-	
-	
+	// helper
     button_init(&L.grid, r_texture_init_file("res/button_grid.png", NULL));
 	
     button_init(&L.camera, r_texture_init_file("res/button_camera.png", NULL));
@@ -111,30 +121,40 @@ void toolbar_init() {
     button_init(&L.shade, r_texture_init_file("res/button_shade.png", NULL));
     
     
-    Color_s *img = brush_shape_kernel_image_on_heap(COLOR_TRANSPARENT, COLOR_BLUE);
-    r_ro_single_init(&L.shape, hud_camera_gl,
-            r_texture_init(
-            BRUSH_NUM_SHAPES * BRUSH_KERNEL_SIZE,
-            BRUSH_KERNEL_SIZE,
-            img));
-    free(img);
+   
 }
+
 
 void toolbar_update(float dtime) {
     L.undo.rect.pose = pose16(-80, 26);
     L.clear.rect.pose = pose16(-80, 9);
-
+    
     for(int i=0; i<MODES; i++) {
-        L.modes[i].rect.pose = pose16(-60+16*i, 26);
+        L.modes[i].rect.pose = pose16(-60+16*i, 9);
     }
     
-    for(int i=0; i<SHAPES; i++) {
-    	L.shapes[i].rect.pose = pose16(-60 +16*i, 9);
-    }
+    L.shape.rect.pose = pose_wh(-60, 26, 
+            BRUSH_KERNEL_SIZE, BRUSH_KERNEL_SIZE);
+    u_pose_set_x(&L.shape.rect.uv, 
+            (float) brush_shape / BRUSH_NUM_SHAPES);
     
-    for(int i=0; i<SIZES; i++) {
-    	L.sizes[i].rect.pose = pose16(-8 +16*i, 9);
-    }
+    L.shape_minus.rect.pose = pose16(20, 26);
+    L.shape_plus.rect.pose = pose16(36, 26);
+    
+    if(button_is_pressed(&L.shape_minus)) {
+    	L.shape_minus_time += dtime;
+    	if(L.shape_minus_time > LONG_PRESS_TIME)
+    	    brush_shape = 0;
+    } else
+        L.shape_minus_time = 0;
+        
+    if(button_is_pressed(&L.shape_plus)) {
+    	L.shape_plus_time += dtime;
+    	if(L.shape_plus_time > LONG_PRESS_TIME)
+    	    brush_shape = BRUSH_NUM_SHAPES-1;
+    } else
+        L.shape_plus_time = 0;
+    
     
     L.grid.rect.pose = pose16(80, 26);
     L.camera.rect.pose = pose16(80, 9);
@@ -145,7 +165,6 @@ void toolbar_update(float dtime) {
     
     L.shade.rect.pose = pose16(48, 10);
     
-    u_pose_set(&L.shape.rect.pose, 0, 0, 22*7, 7, 0);
 }
 
 void toolbar_render() {
@@ -155,12 +174,12 @@ void toolbar_render() {
 	for(int i=0; i<MODES; i++) {
 		r_ro_single_render(&L.modes[i]);
 	}
-	for(int i=0; i<SHAPES; i++) {
-		r_ro_single_render(&L.shapes[i]);
-	}
-	for(int i=0; i<SIZES; i++) {
-		r_ro_single_render(&L.sizes[i]);
-	}
+	
+	r_ro_single_render(&L.shape);
+	r_ro_single_render(&L.shape_minus);
+	r_ro_single_render(&L.shape_plus);
+	
+	
 	
 	r_ro_single_render(&L.grid);
 	r_ro_single_render(&L.camera);
@@ -172,7 +191,6 @@ void toolbar_render() {
 	
 	r_ro_single_render(&L.shade);
 	
-	r_ro_single_render(&L.shape);
 }
 
 // return true if the pointer was used (indicate event done)
@@ -183,50 +201,41 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if(button_clicked(&L.undo, pointer)) {
         savestate_undo();
     }
-
+    
     for(int i=0; i<MODES; i++) {
         if(button_pressed(&L.modes[i], pointer)) {
             unpress(L.modes, MODES, i);
 
-            if(i==0) {
+            if(i==0)
                 brush_mode = BRUSH_MODE_FREE;
-            } else if(i==1) {
+            else if(i==1)
                 brush_mode = BRUSH_MODE_DOT;
-            } else if(i==2) {
+            else if(i==2)
+                brush_mode = BRUSH_MODE_DITHER;
+            else if(i==3)
+                brush_mode = BRUSH_MODE_DITHER2;
+            else if(i==4)
             	brush_mode = BRUSH_MODE_FILL;
-            } else if(i==3) {
+            else if(i==5)
             	brush_mode = BRUSH_MODE_FILL8;
-            }
         }
     }
     
-    for(int i=0; i<SHAPES; i++) {
-        if(button_pressed(&L.shapes[i], pointer)) {
-            unpress(L.shapes, SHAPES, i);
-
-            if(i==0) {
-            	brush_shape = BRUSH_SHAPE_DOT;
-            } else if(i==1) {
-            	brush_shape = BRUSH_SHAPE_DITHER;
-            } else if(i==2) {
-            	brush_shape = BRUSH_SHAPE_DITHER2;
-            }
-        }
+    if(button_clicked(&L.shape_minus, pointer)) {
+    	brush_shape--;
+        if(brush_shape<0)
+            brush_shape = 0;
     }
     
-    for(int i=0; i<SIZES; i++) {
-        if(button_pressed(&L.sizes[i], pointer)) {
-            unpress(L.sizes, SIZES, i);
-
-            if(i==0) {
-            	brush_size = BRUSH_SIZE_1;
-            } else if(i==1) {
-            	brush_size = BRUSH_SIZE_3;
-            } else if(i==2) {
-            	brush_size = BRUSH_SIZE_5;
-            }
-        }
+    if(button_clicked(&L.shape_plus, pointer)) {
+    	brush_shape++;
+    	if(brush_shape >= BRUSH_NUM_SHAPES)
+    	    brush_shape = BRUSH_NUM_SHAPES-1;
     }
+
+    
+    
+    
 
     
     if(button_toggled(&L.grid, pointer)) {

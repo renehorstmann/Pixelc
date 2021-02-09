@@ -1,15 +1,13 @@
 #include "canvas.h"
 #include "savestate.h"
-#include "brush_mode_dot_free.h"
-#include "brush_mode_fill.h"
+#include "brush_mode.h"
 #include "brush_shape.h"
 #include "brush.h"
 
 Color_s brush_current_color;
 Color_s brush_secondary_color;
 enum brushmodes brush_mode;
-enum brushshapes brush_shape;
-enum brushsizes brush_size;
+int brush_shape;
 bool brush_shading_active;
 
 static struct {
@@ -22,8 +20,7 @@ void brush_init() {
     brush_current_color = COLOR_TRANSPARENT;
     brush_secondary_color = COLOR_TRANSPARENT;
     brush_mode = BRUSH_MODE_FREE;
-    brush_shape = BRUSH_SHAPE_DOT;
-    brush_size = BRUSH_SIZE_1;
+    brush_shape = 0;
     brush_shading_active = false;
 }
 
@@ -34,6 +31,8 @@ void brush_pointer_event(ePointer_s pointer) {
     bool change = false;
     switch (brush_mode) {
         case BRUSH_MODE_FREE:
+        case BRUSH_MODE_DITHER:
+        case BRUSH_MODE_DITHER2:
             change = brush_mode_free(pointer, &L.drawing);
             break;
         case BRUSH_MODE_DOT:
@@ -78,18 +77,11 @@ bool brush_draw_pixel(float x, float y) {
 
 
 bool brush_draw(float x, float y) {
-	switch(brush_shape) {
-		case BRUSH_SHAPE_DOT:
-		    return brush_shape_dot(x, y);
-		case BRUSH_SHAPE_DITHER:
-		    return brush_shape_dither(x, y, true);
-		case BRUSH_SHAPE_DITHER2:
-		    return brush_shape_dither(x, y, false);
-		
-		default:
-            SDL_Log("brush unknown shape");
-	}
-	return false;
+	if(brush_mode == BRUSH_MODE_DITHER)
+	    return brush_shape_dither(x, y, true);
+	if(brush_mode == BRUSH_MODE_DITHER2)
+	    return brush_shape_dither(x, y, false);
+	return brush_shape_dot(x, y);
 }
 
 void brush_abort_current_draw() {

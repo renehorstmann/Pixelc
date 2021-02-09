@@ -1,6 +1,6 @@
 #include "brush.h"
 #include "canvas.h"
-#include "brush_mode_dot_free.h"
+#include "brush_mode.h"
 
 bool brush_mode_dot(ePointer_s pointer) {	
     if (pointer.action != E_POINTER_DOWN)

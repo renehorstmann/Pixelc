@@ -31,9 +31,17 @@ Color_s *brush_shape_kernel_image_on_heap(Color_s bg, Color_s fg) {
 
 bool brush_shape_dot(float x, float y) {
 	bool changed = false;
-	for(int dy=y-brush_size; dy<=y+brush_size; dy++) {
-		for(int dx=x-brush_size; dx<=x+brush_size; dx++) {
-			changed |= brush_draw_pixel(dx, dy);
+	for(int ky=0; ky<BRUSH_KERNEL_SIZE; ky++) {
+		int dy = y + ky - BRUSH_KERNEL_SIZE/2;
+		
+		for(int kx=0; kx<BRUSH_KERNEL_SIZE; kx++) {
+			int dx = x + kx - BRUSH_KERNEL_SIZE/2;
+			
+			if(brush_shape_kernels[brush_shape]
+			        [ky][kx]) {
+				
+				changed |= brush_draw_pixel(dx, dy);
+			}
 		}
 	}
 	return changed;
@@ -41,10 +49,18 @@ bool brush_shape_dot(float x, float y) {
 
 bool brush_shape_dither(float x, float y, bool a) {
 	bool changed = false;
-	for(int dy=y-brush_size; dy<=y+brush_size; dy++) {
-		for(int dx=x-brush_size; dx<=x+brush_size; dx++) {
-			if((dx%2 + dy%2)%2 == a? 0 : 1)
-			    changed |= brush_draw_pixel(dx, dy);
+	for(int ky=0; ky<BRUSH_KERNEL_SIZE; ky++) {
+		int dy = y + ky - BRUSH_KERNEL_SIZE/2;
+		
+		for(int kx=0; kx<BRUSH_KERNEL_SIZE; kx++) {
+			int dx = x + kx - BRUSH_KERNEL_SIZE/2;
+			
+			if(brush_shape_kernels[brush_shape]
+			        [ky][kx]) {
+				
+				if((dx%2 + dy%2)%2 == a? 0 : 1)
+				    changed |= brush_draw_pixel(dx, dy);
+			}
 		}
 	}
 	return changed;

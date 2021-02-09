@@ -1,7 +1,7 @@
 #include "utilc/dynarray.h"
 #include "brush.h"
 #include "canvas.h"
-#include "brush_mode_fill.h"
+#include "brush_mode.h"
 
 
 DynArray(ivec2, PosStack, pos_stack)

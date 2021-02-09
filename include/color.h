@@ -75,8 +75,8 @@ static const Color_s COLOR_TRANSPARENT = {0, 0, 0, 0};
 static const Color_s COLOR_BLACK = {0, 0, 0, 255};
 static const Color_s COLOR_WHITE = {255, 255, 255, 255};
 static const Color_s COLOR_RED = {255, 0, 0, 255};
-static const Color_s COLOR_GREEN = {255, 0, 0, 255};
-static const Color_s COLOR_BLUE = {255, 0, 0, 255};
+static const Color_s COLOR_GREEN = {0, 255, 0, 255};
+static const Color_s COLOR_BLUE = {0, 0, 255, 255};
 
 
 #endif //PIXELC_COLOR_H
