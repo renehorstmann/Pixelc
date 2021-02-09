@@ -42,7 +42,7 @@ static void zoom_camera(float new_distance) {
     float factor = new_distance / L.distance0;
     factor = clampf(factor, 0.3, 3);
     L.size = L.size0 / factor;
-    c_camera_set_size(L.size);
+    canvas_camera_set_size(L.size);
 }
 #endif
 
