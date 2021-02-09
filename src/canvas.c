@@ -175,5 +175,6 @@ static void load_state(const void *data, size_t size) {
 	L.image = image_new_clone(data);
 	image_copy(L.last_image, L.image);
 	assert(image_full_size(L.image) == size);
+	io_save_image(canvas_image(), "sprite.png");
 }
 
