@@ -7,7 +7,7 @@
 
 
 SDL_Window *e_window;
-int e_window_size[2];
+ivec2 e_window_size;
 
 static struct {
     bool running;
@@ -94,7 +94,7 @@ void e_window_kill() {
 }
 
 void e_window_update() {
-    SDL_GetWindowSize(e_window, &e_window_size[0], &e_window_size[1]);
+    SDL_GetWindowSize(e_window, &e_window_size.x, &e_window_size.y);
 }
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {

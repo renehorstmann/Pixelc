@@ -26,8 +26,8 @@ void canvas_camera_init() {
 }
 
 void canvas_camera_update() {
-    int wnd_width = e_window_size[0];
-    int wnd_height = e_window_size[1];
+    int wnd_width = e_window_size.x;
+    int wnd_height = e_window_size.y;
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     L.real_pixel_per_pixel = floorf(smaller_size / CANVAS_CAMERA_SIZE);

@@ -82,7 +82,7 @@ static void main_loop(float delta_time) {
     toolbar_update(delta_time);
 
     // render
-    r_render_begin_frame(e_window_size[0], e_window_size[1]);
+    r_render_begin_frame(e_window_size.x, e_window_size.y);
 
     background_render();
     canvas_render();

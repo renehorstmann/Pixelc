@@ -34,8 +34,8 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    res.pos.x = (2.0f * x) / e_window_size[0] - 1.0f;
-    res.pos.y = 1.0f - (2.0f * y) / e_window_size[1];
+    res.pos.x = (2.0f * x) / e_window_size.x - 1.0f;
+    res.pos.y = 1.0f - (2.0f * y) / e_window_size.y;
     res.pos.z = 0;
     res.pos.w = 1;
 
