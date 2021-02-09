@@ -31,7 +31,7 @@ Palette, brush, size can be configured in code
   - camera, grid, animation
   - replace (from color to color)?
   - selection
-    - new appearing copy, cut 
+    - new appearing copy, cut, load.png
       - move until ok
 - Tile repeat
 - Layer Selection
