@@ -11,17 +11,29 @@ Palette, brush, size can be configured in code
 
 ## Todo
 - Toolbar
+  - undo, clear
   - Brush mode
-    - line
-    - circle
-  - replace (from color to color)
-  - move mode
+    - free
+    - dot
+    - dither
+    - dither2
+    - fill
+    - fill8
+    - line?
+    - circle?
+  - Brush size/shape
+    - Left, Right buttons
+    - dot, cross, 9, ball, ...
+  - shade
+    - color drop
+  - camera, grid, animation
+  - replace (from color to color)?
   - selection
-    - copy
-    - move
+    - new appearing copy, cut 
+      - move until ok
 - Tile repeat
 - Layer Selection
-- Frame Selection
+- Frame Selection (or grid shows frames?)
 - VertexColors?
   - white to color like the palette
 - background image option?
