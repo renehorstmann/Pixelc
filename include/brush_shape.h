@@ -13,8 +13,8 @@ extern const char brush_shape_kernels
         
 Color_s *brush_shape_kernel_image_on_heap(Color_s bg, Color_s fg);
 
-bool brush_shape_dot(float x, float y);
+bool brush_shape_draw(int x, int y);
 
-bool brush_shape_dither(float x, float y, bool a);
+bool brush_shape_draw_dither(int x, int y, bool a);
 
 #endif //PIXELC_BRUSH_SHAPE_H

@@ -29,6 +29,7 @@ void canvas_camera_init();
 
 void canvas_camera_update();
 
+float canvas_camera_real_pixel_per_pixel();
 
 float canvas_camera_left();
 float canvas_camera_right();

@@ -96,7 +96,7 @@ void toolbar_init() {
             img);
     free(img);
     r_ro_single_init(&L.shape, camera_gl, kernel_tex);
-    u_pose_set_w(&L.shape.rect.uv, 1.0f/BRUSH_NUM_SHAPES);
+    u_pose_set_w(&L.shape.rect.uv, 1.0/BRUSH_NUM_SHAPES);
     
     button_init(&L.shape_minus, r_texture_init_file("res/button_minus.png", NULL));
     
@@ -135,7 +135,7 @@ void toolbar_update(float dtime) {
     
     L.shape.rect.pose = pose_wh(-60, 26, 
             BRUSH_KERNEL_SIZE*2, BRUSH_KERNEL_SIZE*2);  // should be 14x14
-    u_pose_set_x(&L.shape.rect.uv, 
+    u_pose_set_x(&L.shape.rect.uv,
             (float) brush_shape / BRUSH_NUM_SHAPES);
     
     L.shape_minus.rect.pose = pose16(20, 26);

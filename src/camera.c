@@ -10,6 +10,7 @@ CameraMatrices_s camera_matrices;
 const float *camera_gl;
 
 static struct {
+    float real_pixel_per_pixel;
     float left, right, bottom, top;
 } L;
 
@@ -29,10 +30,10 @@ void camera_update() {
 
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    float real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
+    L.real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
 
-    float width_2 = wnd_width / (2 * real_pixel_per_pixel);
-    float height_2 = wnd_height / (2 * real_pixel_per_pixel);
+    float width_2 = wnd_width / (2 * L.real_pixel_per_pixel);
+    float height_2 = wnd_height / (2 * L.real_pixel_per_pixel);
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
@@ -45,6 +46,9 @@ void camera_update() {
     camera_matrices.p_inv = mat4_inv(camera_matrices.p);
 }
 
+float camera_real_pixel_per_pixel() {
+    return L.real_pixel_per_pixel;
+}
 
 float camera_left() {
     return L.left;

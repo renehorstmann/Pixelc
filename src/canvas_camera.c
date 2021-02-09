@@ -10,6 +10,7 @@ CanvasCameraMatrices_s canvas_camera_matrices;
 const float *canvas_camera_gl;
 
 static struct {
+    float real_pixel_per_pixel;
     float left, right, bottom, top;
 } L;
 
@@ -29,10 +30,10 @@ void canvas_camera_update() {
     int wnd_height = e_window_size[1];
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    float real_pixel_per_pixel = floorf(smaller_size / CANVAS_CAMERA_SIZE);
+    L.real_pixel_per_pixel = floorf(smaller_size / CANVAS_CAMERA_SIZE);
 
-    float width_2 = wnd_width / (2 * real_pixel_per_pixel);
-    float height_2 = wnd_height / (2 * real_pixel_per_pixel);
+    float width_2 = wnd_width / (2 * L.real_pixel_per_pixel);
+    float height_2 = wnd_height / (2 * L.real_pixel_per_pixel);
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
@@ -51,7 +52,9 @@ void canvas_camera_update() {
     canvas_camera_matrices.v_p_inv = mat4_mul_mat(canvas_camera_matrices.v, canvas_camera_matrices.p_inv);
 }
 
-
+float canvas_camera_real_pixel_per_pixel() {
+    return L.real_pixel_per_pixel;
+}
 
 float canvas_camera_left() {
     return L.left;
