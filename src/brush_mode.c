@@ -1,3 +1,4 @@
+#include "mathc/int.h"
 #include "brush.h"
 #include "canvas.h"
 #include "brush_mode.h"
@@ -62,6 +63,10 @@ bool brush_mode_free(ePointer_s pointer) {
 
     if (!L.is_drawing)
         return false;
+
+    // just 1 pixel length
+    if(ivec2_norm_inf(ivec2_sub_vec(uv, L.last)) <= 1)
+        return brush_draw(uv.x, uv.y);
 
     bool changed = lineto(L.last, uv);
     L.last = uv;
