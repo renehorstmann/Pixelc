@@ -7,6 +7,7 @@
 #include "canvas.h"
 #include "canvas_camera_control.h"
 #include "animation.h"
+#include "selection.h"
 #include "savestate.h"
 #include "toolbar.h"
 
@@ -260,7 +261,11 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if(button_toggled(&L.selection, pointer)) {
-    	printf("selection: %d\n", button_is_pressed(&L.selection));
+    	if(button_is_pressed(&L.selection)) {
+    		selection_init(-5, 5, 10, 10);
+    	} else {
+    		selection_kill();
+    	}
     	
     }
 

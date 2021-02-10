@@ -12,6 +12,7 @@
 #include "io.h"
 #include "palette.h"
 #include "toolbar.h"
+#include "selection.h"
 #include "savestate.h"
 #include "canvas.h"
 
@@ -30,7 +31,6 @@ static struct {
     rRoSingle bg;
     rRoSingle grid;
     
-    bool show_selection;
     rRoBatch selection_border;
     
     int save_id;
@@ -58,27 +58,27 @@ static mat4 pixel_pose(int x, int y) {
 }
 
 static void setup_selection() {
-	int x = 2;
-	int y = -1;
-	int rows = 6;
-	int cols = 10;
+	int x = selection_pos().x;
+	int y = selection_pos().y;
+	int w = selection_size().x;
+	int h = selection_size().y;
 	
 	int idx = 0;
-	for(int i=0;i<rows;i++) {
+	for(int i=0;i<h;i++) {
 		L.selection_border.rects[idx].pose = pixel_pose(x-1, y+i);
 		u_pose_set(&L.selection_border.rects[idx].uv, 0, 0, 0.5, 0.5, 0);
 		idx++;
 		
-		L.selection_border.rects[idx].pose = pixel_pose(x+cols, y+i);
+		L.selection_border.rects[idx].pose = pixel_pose(x+w, y+i);
 		u_pose_set(&L.selection_border.rects[idx].uv, 0, 0.5, 0.5, 0.5, 0);
 		idx++;
 	}
-	for(int i=0;i<cols;i++) {
+	for(int i=0;i<w;i++) {
 		L.selection_border.rects[idx].pose = pixel_pose(x+i, y-1);
 		u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0, 0.5, 0.5, 0);
 		idx++;
 		
-		L.selection_border.rects[idx].pose = pixel_pose(x+i, y+rows);
+		L.selection_border.rects[idx].pose = pixel_pose(x+i, y+h);
 		u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0.5, 0.5, 0.5, 0);
 		idx++;
 	}
@@ -168,7 +168,6 @@ void canvas_update(float dtime) {
     L.bg.rect.pose = L.pose;
     
     setup_selection();
-    L.show_selection = true;
 }
 
 void canvas_render() {
@@ -181,7 +180,7 @@ void canvas_render() {
     if(canvas_show_grid)
         r_ro_single_render(&L.grid);
         
-    if(L.show_selection)
+    if(selection_active())
         r_ro_batch_render(&L.selection_border);
 }
 

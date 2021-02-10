@@ -4,13 +4,17 @@
 #include <stdbool.h>
 #include "image.h"
 
-void selection_init(int x, int y, int rows, int cols);
+
+void selection_init(int x, int y, int w, int h);
 
 void selection_kill();
 
-void selection_move(int x, int y);
-
 bool selection_active();
+
+ivec2 selection_pos();
+ivec2 selection_size();
+
+void selection_move(int x, int y);
 
 bool selection_contains(int x, int y);
 
