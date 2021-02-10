@@ -33,6 +33,8 @@ static struct {
     rRoSingle color_bg, color_drop;
 
     rRoSingle shade;
+    
+    rRoSingle selection;
 
 
     float bottom;
@@ -112,6 +114,7 @@ void toolbar_init() {
     button_init(&L.shade, r_texture_init_file("res/button_shade.png", NULL));
 
 
+    button_init(&L.selection, r_texture_init_file("res/button_selection.png", NULL));
 }
 const vec4 vertices[6] = {
         {-0.5, -0.5, 0, 1},
@@ -134,8 +137,8 @@ void toolbar_update(float dtime) {
                                 BRUSH_KERNEL_TEXTURE_SIZE*2, BRUSH_KERNEL_TEXTURE_SIZE*2);  // should be 16x16
     L.shape.rect.uv = brush_shape_kernel_texture_uv(brush_shape);
 
-    L.shape_minus.rect.pose = pose16(20, 26);
-    L.shape_plus.rect.pose = pose16(36, 26);
+    L.shape_minus.rect.pose = pose16(0, 26);
+    L.shape_plus.rect.pose = pose16(16, 26);
 
     if (button_is_pressed(&L.shape_minus)) {
         L.shape_minus_time += dtime;
@@ -160,6 +163,8 @@ void toolbar_update(float dtime) {
     L.color_drop.rect.color = color_to_vec4(brush_secondary_color);
 
     L.shade.rect.pose = pose16(48, 10);
+    
+    L.selection.rect.pose = pose16(48, 26);
 
 }
 
@@ -185,6 +190,7 @@ void toolbar_render() {
     r_ro_single_render(&L.color_drop);
 
     r_ro_single_render(&L.shade);
+    r_ro_single_render(&L.selection);
 
 }
 
@@ -251,6 +257,11 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     if (button_toggled(&L.shade, pointer)) {
         brush_shading_active = button_is_pressed(&L.shade);
+    }
+
+    if(button_toggled(&L.selection, pointer)) {
+    	printf("selection: %d\n", button_is_pressed(&L.selection));
+    	
     }
 
     return true;
