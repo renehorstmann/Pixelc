@@ -15,8 +15,8 @@ static bool lineto(ivec2 from, ivec2 to) {
     if (from.y > to.y)
         sign_y = -1;
 
-    int dy = to.y - from.y;
-    int dx = to.x - from.x;
+    int dy = abs(to.y - from.y);
+    int dx = abs(to.x - from.x);
 
     bool changed = false;
     if (dx == 0) {
@@ -28,12 +28,12 @@ static bool lineto(ivec2 from, ivec2 to) {
     float m = (float) dy / dx;
     if (m <= 1) {
         for (int i = 0; i <= dx; i++)
-            changed |= brush_draw(from.x + i * sign_x, ceilf(from.y + i * m * sign_y));
+            changed |= brush_draw(from.x + i * sign_x, (from.y + i * m * sign_y));
         return changed;
     }
 
     for (int i = 0; i <= dy; i++)
-        changed |= brush_draw(ceilf(from.x + i * m * sign_x), from.y + i * sign_y);
+        changed |= brush_draw((from.x + i * m * sign_x), from.y + i * sign_y);
     return changed;
 }
 
