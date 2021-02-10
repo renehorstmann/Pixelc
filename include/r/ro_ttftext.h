@@ -5,10 +5,12 @@
 #include "mathc/types/float.h"
 #include "ro_single.h"
 
+struct rRoTtfTextGlobals_s {
+    TTF_Font *default_font;
+};
+extern struct rRoTtfTextGlobals_s r_ro_ttftext;
 
-extern TTF_Font *r_ttftext_default_font;
-
-GLuint r_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h);
+GLuint r_ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h);
 
 typedef struct {
 	rRoSingle ro;

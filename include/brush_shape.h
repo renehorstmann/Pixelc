@@ -10,9 +10,12 @@
 
 #define BRUSH_KERNEL_TEXTURE_SIZE 8
 
-extern const char brush_shape_kernels
-        [BRUSH_NUM_SHAPES]
-        [BRUSH_KERNEL_SIZE][BRUSH_KERNEL_SIZE];
+struct BrushShapeGlobals_s {
+    const char kernels
+            [BRUSH_NUM_SHAPES]
+            [BRUSH_KERNEL_SIZE][BRUSH_KERNEL_SIZE];
+};
+extern struct BrushShapeGlobals_s brush_shape;
         
 GLuint brush_shape_create_kernel_texture(Color_s bg, Color_s fg);
 mat4 brush_shape_kernel_texture_uv(int kernel);

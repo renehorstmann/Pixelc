@@ -5,9 +5,7 @@
 #include "e/window.h"
 #include "e/definitions.h"
 
-
-SDL_Window *e_window;
-ivec2 e_window_size;
+struct eWindowGlobals_s e_window;
 
 static struct {
     bool running;
@@ -61,18 +59,18 @@ void e_window_init(const char *name) {
 
 
     // create window
-    e_window = SDL_CreateWindow(name,
+    e_window.window = SDL_CreateWindow(name,
                                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                 640, 480,
                                 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    SDL_SetWindowMinimumSize(e_window, 480, 320);
-    if (!e_window) {
+    SDL_SetWindowMinimumSize(e_window.window, 480, 320);
+    if (!e_window.window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }
 
     // Not necessary, but recommended to create a gl context:
-    SDL_GL_CreateContext(e_window);
+    SDL_GL_CreateContext(e_window.window);
     SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
 
 #ifdef USING_GLEW
@@ -94,7 +92,7 @@ void e_window_kill() {
 }
 
 void e_window_update() {
-    SDL_GetWindowSize(e_window, &e_window_size.x, &e_window_size.y);
+    SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
 }
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {
@@ -112,7 +110,7 @@ void e_window_main_loop(eWindowMainLoopFn main_loop) {
 
 // ?
 #ifndef __EMSCRIPTEN__
-    SDL_DestroyWindow(e_window);
+    SDL_DestroyWindow(e_window.window);
     SDL_Quit();
 #endif
 }

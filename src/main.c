@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     e_gui_init();
 
     // init r (render)
-    r_render_init(e_window);
+    r_render_init(e_window.window);
 
 
     // init systems
@@ -82,7 +82,7 @@ static void main_loop(float delta_time) {
     toolbar_update(delta_time);
 
     // render
-    r_render_begin_frame(e_window_size.x, e_window_size.y);
+    r_render_begin_frame(e_window.size.x, e_window.size.y);
 
     background_render();
     canvas_render();

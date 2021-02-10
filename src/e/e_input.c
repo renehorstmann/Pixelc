@@ -4,10 +4,8 @@
 #include "e/gui.h"
 #include "e/input.h"
 
-eInputKeys e_input_keys;
+struct eInputGloabals_s e_input;
 
-bool e_input_accel_active;
-float e_input_accel[3];
 
 typedef struct {
     ePointerEventFn cb;
@@ -34,8 +32,8 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    res.pos.x = (2.0f * x) / e_window_size.x - 1.0f;
-    res.pos.y = 1.0f - (2.0f * y) / e_window_size.y;
+    res.pos.x = (2.0f * x) / e_window.size.x - 1.0f;
+    res.pos.y = 1.0f - (2.0f * y) / e_window.size.y;
     res.pos.z = 0;
     res.pos.w = 1;
 
@@ -126,22 +124,22 @@ static void input_handle_keys(SDL_Event *event) {
     bool down = event->type == SDL_KEYDOWN;
     switch (event->key.keysym.sym) {
         case SDLK_UP:
-            e_input_keys.up = down;
+            e_input.keys.up = down;
             break;
         case SDLK_LEFT:
-            e_input_keys.left = down;
+            e_input.keys.left = down;
             break;
         case SDLK_RIGHT:
-            e_input_keys.right = down;
+            e_input.keys.right = down;
             break;
         case SDLK_DOWN:
-            e_input_keys.down = down;
+            e_input.keys.down = down;
             break;
         case SDLK_RETURN:
-            e_input_keys.enter = down;
+            e_input.keys.enter = down;
             break;
         case SDLK_SPACE:
-            e_input_keys.space = down;
+            e_input.keys.space = down;
             break;
     }
 }
@@ -157,7 +155,7 @@ static void input_handle_sensors(SDL_Event *event) {
     }
     
     const float *data = event->sensor.data;
-    memcpy(e_input_accel, data, sizeof(e_input_accel));
+    memcpy(e_input.accel, data, sizeof(e_input.accel));
     
     //SDL_Log("Gyro update: %.2f, %.2f, %.2f\n", data[0], data[1], data[2]);
       
@@ -179,18 +177,18 @@ void e_input_init() {
         }
     }
 
-    e_input_accel_active = accel_opened;
+    e_input.accel_active = accel_opened;
     if(accel_opened)
         SDL_Log("Opened acceleration sensor");
 #endif
 }
 
 void e_input_update() {
-    if (e_gui_ctx) nk_input_begin(e_gui_ctx);
+    if (e_gui.ctx) nk_input_begin(e_gui.ctx);
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (e_gui_ctx) nk_sdl_handle_event(&event);
+        if (e_gui.ctx) nk_sdl_handle_event(&event);
 
         switch (event.type) {
             case SDL_QUIT:
@@ -219,7 +217,7 @@ void e_input_update() {
         }
     }
 
-    if (e_gui_ctx) nk_input_end(e_gui_ctx);
+    if (e_gui.ctx) nk_input_end(e_gui.ctx);
 }
 
 

@@ -3,8 +3,10 @@
 
 #include "core.h"
 
-
-extern SDL_Window *r_render_window;
+struct rRenderGolabals_s {
+    SDL_Window *window;
+};
+extern struct rRenderGolabals_s r_render;
 
 
 void r_render_init(SDL_Window *window);

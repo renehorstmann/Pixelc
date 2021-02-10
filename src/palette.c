@@ -56,11 +56,11 @@ static mat4 setup_palette_color_pose(int r, int c) {
 }
 
 void palette_init() {
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera_gl, r_texture_init_file("res/color_drop.png", NULL));
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_init_file("res/color_drop.png", NULL));
 
-    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera_gl, r_texture_init_file("res/palette_background.png", NULL));
+    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl, r_texture_init_file("res/palette_background.png", NULL));
 
-    r_ro_single_init(&L.select_ro, camera_gl, r_texture_init_file("res/palette_select.png", NULL));
+    r_ro_single_init(&L.select_ro, camera.gl, r_texture_init_file("res/palette_select.png", NULL));
 
     // default palette:
     {
@@ -176,7 +176,7 @@ int palette_get_color() {
 }
 
 void palette_set_color(int index) {
-    brush_current_color = L.palette[index];
+    brush.current_color = L.palette[index];
     L.select_ro.rect.pose = L.palette_ro.rects[index].pose;
     L.last_selected = index;
 }

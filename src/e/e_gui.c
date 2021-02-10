@@ -8,7 +8,7 @@
 #define MAX_VERTEX_MEMORY 512 * 1024
 #define MAX_ELEMENT_MEMORY 128 * 1024
 
-struct nk_context *e_gui_ctx;
+struct eGuiGlobals_s e_gui;
 
 static struct {
     int auto_offset;
@@ -22,7 +22,7 @@ static struct nk_rect window_rect(float w, float h) {
 }
 
 void e_gui_init() {
-    e_gui_ctx = nk_sdl_init(e_window);
+    e_gui.ctx = nk_sdl_init(e_window.window);
 
     struct nk_font_atlas *atlas;
     nk_sdl_font_stash_begin(&atlas);
@@ -35,7 +35,7 @@ void e_gui_kill() {
 
 void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, float max, float step) {
 
-    struct nk_context *ctx = e_gui_ctx;
+    struct nk_context *ctx = e_gui.ctx;
     if (nk_begin(ctx, title, window_rect(300, 100),
                  NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
                  NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
@@ -50,7 +50,7 @@ void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, f
 void e_gui_test() {
 
     /* GUI */
-    struct nk_context *ctx = e_gui_ctx;
+    struct nk_context *ctx = e_gui.ctx;
     static struct nk_colorf bg;
     if (nk_begin(ctx, "Demo", window_rect(300, 600),
                  NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|

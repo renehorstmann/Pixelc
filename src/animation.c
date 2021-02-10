@@ -6,10 +6,10 @@
 #include "palette.h"
 #include "animation.h"
 
-
 #define SIZE 1
 
-bool animation_show;
+struct AnimationGlobals_s animation;
+
 
 static struct {
 	rRoSingle ro;
@@ -24,15 +24,15 @@ void animation_init(int frames, float fps) {
 	L.fps = fps;
 	
 	Image *img = canvas_image();
-	L.tex = r_texture_init(img->cols, img->rows, image_layer(img, canvas_current_layer));
+	L.tex = r_texture_init(img->cols, img->rows, image_layer(img, canvas.current_layer));
 	r_texture_filter_nearest(L.tex);
 	
-	r_ro_single_init(&L.ro, camera_gl, L.tex);
+	r_ro_single_init(&L.ro, camera.gl, L.tex);
 	u_pose_set_w(&L.ro.rect.uv, 1.0/frames);
 }
 
 void animation_update(float dtime) {
-	if(!animation_show)
+	if(!animation.show)
 	    return;
 	    
 	L.time = fmodf(L.time + dtime, L.frames / L.fps);
@@ -40,7 +40,7 @@ void animation_update(float dtime) {
 	u_pose_set_x(&L.ro.rect.uv, u);
 	
 	Image *img = canvas_image();
-	r_texture_update(L.tex, img->cols, img->rows, image_layer(img, canvas_current_layer));
+	r_texture_update(L.tex, img->cols, img->rows, image_layer(img, canvas.current_layer));
 
     float w = SIZE * img->cols / L.frames;
     float h = SIZE * img->rows;
@@ -59,7 +59,7 @@ void animation_update(float dtime) {
 }
 
 void animation_render() {
-	if(!animation_show)
+	if(!animation.show)
 	    return;
 	r_ro_single_render(&L.ro);
 }

@@ -4,11 +4,15 @@
 #include "mathc/types/int.h"
 #include "core.h"
 
+struct eWindowGlobals_s {
+	SDL_Window *window;
+    ivec2 size;
+};
+extern struct eWindowGlobals_s e_window; 
+
+
 typedef void (*eWindowMainLoopFn)(float delta_time);
 
-
-extern SDL_Window *e_window;
-extern ivec2 e_window_size;
 
 
 void e_window_init(const char *name);

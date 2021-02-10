@@ -12,18 +12,18 @@ bool brush_mode_fill(ePointer_s pointer, bool mode8) {
         return false;
 
     Image *img = canvas_image();
-    int layer = canvas_current_layer;
+    int layer = canvas.current_layer;
 
     ivec2 uv = canvas_get_uv(pointer.pos);
     if(!image_contains_uv(img, uv))
         return false;
     
-    brush_secondary_color = *image_pixel_uv(img, layer, uv);
-    if(color_equals(brush_current_color, brush_secondary_color))
+    brush.secondary_color = *image_pixel_uv(img, layer, uv);
+    if(color_equals(brush.current_color, brush.secondary_color))
         return false;
     
-    bool shading_was_active = brush_shading_active;
-    brush_shading_active = true;
+    bool shading_was_active = brush.shading_active;
+    brush.shading_active = true;
     
     // PosStack needs to be killed
     PosStack stack = {0};
@@ -59,7 +59,7 @@ bool brush_mode_fill(ePointer_s pointer, bool mode8) {
     
     pos_stack_kill(&stack);
     
-    brush_shading_active = shading_was_active;
+    brush.shading_active = shading_was_active;
     return true;
 }
 

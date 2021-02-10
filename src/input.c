@@ -14,10 +14,10 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     
     // hud pointer.pos in hud coords
     ePointer_s hud_pointer = pointer;
-    hud_pointer.pos = mat4_mul_vec(camera_matrices.p_inv, pointer.pos);
+    hud_pointer.pos = mat4_mul_vec(camera.matrices.p_inv, pointer.pos);
     // canvas pointer.pos in canvas coords
     ePointer_s c_pointer = pointer;
-    c_pointer.pos = mat4_mul_vec(canvas_camera_matrices.v_p_inv, pointer.pos);
+    c_pointer.pos = mat4_mul_vec(canvas_camera.matrices.v_p_inv, pointer.pos);
         
         
     // only UP in all cases

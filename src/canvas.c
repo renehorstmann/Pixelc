@@ -17,8 +17,7 @@
 #include "canvas.h"
 
 
-int canvas_current_layer;
-bool canvas_show_grid;
+struct CanvasGlobals_s canvas;
 
 static struct {
     mat4 pose;
@@ -40,7 +39,7 @@ static struct {
 static void init_render_objects() {
     for(int i=0; i<L.layers; i++) {
         GLuint tex = r_texture_init(L.image->cols, L.image->rows, image_layer(L.image, i));
-        r_ro_single_init(&L.render_objects[i], canvas_camera_gl, tex);
+        r_ro_single_init(&L.render_objects[i], canvas_camera.gl, tex);
     }
 }
 
@@ -104,16 +103,16 @@ void canvas_init(int rows, int cols) {
     L.image = image_new_zeros(layers, rows, cols);
     L.render_objects = New0(rRoSingle , layers);
     L.layers = layers;
-    canvas_current_layer = 0;
+    canvas.current_layer = 0;
 
     init_render_objects();
     
-    r_ro_single_init(&L.grid, canvas_camera_gl, 
+    r_ro_single_init(&L.grid, canvas_camera.gl, 
             r_texture_init_file("res/canvas_grid.png", NULL));
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
-    r_ro_batch_init(&L.selection_border, 2*(rows+cols), canvas_camera_gl,
+    r_ro_batch_init(&L.selection_border, 2*(rows+cols), canvas_camera.gl,
             r_texture_init_file("res/selection_border.png", NULL));
     for(int i=0; i<L.selection_border.num; i++) {
         L.selection_border.rects[i].color = (vec4) {{1, 0.25, 0.25, 0.75}};       
@@ -125,7 +124,7 @@ void canvas_init(int rows, int cols) {
     buf[1] = buf[2] = color_from_hex("#777777");
     GLuint bg_tex = r_texture_init(2, 2, buf);
     r_texture_filter_nearest(bg_tex);
-    r_ro_single_init(&L.bg, canvas_camera_gl, bg_tex);
+    r_ro_single_init(&L.bg, canvas_camera.gl, bg_tex);
     {    
         float w = cols <= 8 ? 1 : cols/16.0f;
         float h = rows <= 8 ? 1 : rows/16.0f;
@@ -173,11 +172,11 @@ void canvas_update(float dtime) {
 void canvas_render() {
     r_ro_single_render(&L.bg);
 
-    for(int i=0; i<=canvas_current_layer; i++) {
+    for(int i=0; i<=canvas.current_layer; i++) {
         r_ro_single_render(&L.render_objects[i]);
     }
 
-    if(canvas_show_grid)
+    if(canvas.show_grid)
         r_ro_single_render(&L.grid);
         
     if(selection_active())
@@ -213,7 +212,7 @@ void canvas_clear() {
         	if(!selection_contains(c, r))
         	    continue;
         	
-            *image_pixel(L.image, canvas_current_layer, r, c) = COLOR_TRANSPARENT;
+            *image_pixel(L.image, canvas.current_layer, r, c) = COLOR_TRANSPARENT;
         }
     }
     canvas_save();

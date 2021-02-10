@@ -16,7 +16,10 @@
 #endif
 #include "SDL.h"
 
-extern struct nk_context *e_gui_ctx;
+struct eGuiGlobals_s {
+    struct nk_context *ctx;
+};
+extern struct eGuiGlobals_s e_gui;
 
 void e_gui_init();
 

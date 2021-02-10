@@ -6,8 +6,7 @@
 #include "camera.h"
 
 
-CameraMatrices_s camera_matrices;
-const float *camera_gl;
+struct CameraGlobals_s camera;
 
 static struct {
     float real_pixel_per_pixel;
@@ -17,16 +16,16 @@ static struct {
 
 void camera_init() {
     assert(CAMERA_SIZE % 2 == 0 && "CAMERA_SIZE must be even");
-    camera_gl = &camera_matrices.p.m00;
-    camera_matrices.p = mat4_eye();
-    camera_matrices.p_inv = mat4_eye();
+    camera.gl = &camera.matrices.p.m00;
+    camera.matrices.p = mat4_eye();
+    camera.matrices.p_inv = mat4_eye();
 
     camera_update();
 }
 
 void camera_update() {
-    int wnd_width = e_window_size.x;
-    int wnd_height = e_window_size.y;
+    int wnd_width = e_window.size.x;
+    int wnd_height = e_window.size.y;
 
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
@@ -42,8 +41,8 @@ void camera_update() {
     L.right = width_2 + (width_2 - floorf(width_2));
     L.bottom = -height_2 - (height_2 - floorf(height_2));
 
-    camera_matrices.p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
-    camera_matrices.p_inv = mat4_inv(camera_matrices.p);
+    camera.matrices.p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
+    camera.matrices.p_inv = mat4_inv(camera.matrices.p);
 }
 
 float camera_real_pixel_per_pixel() {

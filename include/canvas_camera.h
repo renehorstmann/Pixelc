@@ -21,8 +21,11 @@ typedef struct {
     mat4 v_p_inv;   // v @ p_inv
 } CanvasCameraMatrices_s;
 
-extern CanvasCameraMatrices_s canvas_camera_matrices;
-extern const float *canvas_camera_gl;
+struct CanvasCameraGlobals_s {
+    CanvasCameraMatrices_s matrices;
+    const float *gl;
+};
+extern struct CanvasCameraGlobals_s canvas_camera;
 
 
 void canvas_camera_init();

@@ -90,7 +90,7 @@ void toolbar_init() {
     button_set_pressed(&L.modes[0], true);
 
 
-    r_ro_single_init(&L.shape, camera_gl, brush_shape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
+    r_ro_single_init(&L.shape, camera.gl, brush_shape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
 
     button_init(&L.shape_minus, r_texture_init_file("res/button_minus.png", NULL));
 
@@ -108,9 +108,9 @@ void toolbar_init() {
     button_init(&L.animation, r_texture_init_file("res/button_play.png", NULL));
 
 
-    r_ro_single_init(&L.color_bg, camera_gl, r_texture_init_file("res/toolbar_color_bg.png", NULL));
+    r_ro_single_init(&L.color_bg, camera.gl, r_texture_init_file("res/toolbar_color_bg.png", NULL));
 
-    r_ro_single_init(&L.color_drop, camera_gl, r_texture_init_file("res/color_drop.png", NULL));
+    r_ro_single_init(&L.color_drop, camera.gl, r_texture_init_file("res/color_drop.png", NULL));
 
     button_init(&L.shade, r_texture_init_file("res/button_shade.png", NULL));
 
@@ -136,7 +136,7 @@ void toolbar_update(float dtime) {
     
     L.shape.rect.pose = pose_wh(-60, 26,
                                 BRUSH_KERNEL_TEXTURE_SIZE*2, BRUSH_KERNEL_TEXTURE_SIZE*2);  // should be 16x16
-    L.shape.rect.uv = brush_shape_kernel_texture_uv(brush_shape);
+    L.shape.rect.uv = brush_shape_kernel_texture_uv(brush.shape);
 
     L.shape_minus.rect.pose = pose16(0, 26);
     L.shape_plus.rect.pose = pose16(16, 26);
@@ -144,14 +144,14 @@ void toolbar_update(float dtime) {
     if (button_is_pressed(&L.shape_minus)) {
         L.shape_minus_time += dtime;
         if (L.shape_minus_time > LONG_PRESS_TIME)
-            brush_shape = 0;
+            brush.shape = 0;
     } else
         L.shape_minus_time = 0;
 
     if (button_is_pressed(&L.shape_plus)) {
         L.shape_plus_time += dtime;
         if (L.shape_plus_time > LONG_PRESS_TIME)
-            brush_shape = BRUSH_NUM_SHAPES - 1;
+            brush.shape = BRUSH_NUM_SHAPES - 1;
     } else
         L.shape_plus_time = 0;
 
@@ -161,7 +161,7 @@ void toolbar_update(float dtime) {
     L.animation.rect.pose = pose16(64, 26);
 
     L.color_bg.rect.pose = L.color_drop.rect.pose = pose16(64, 10);
-    L.color_drop.rect.color = color_to_vec4(brush_secondary_color);
+    L.color_drop.rect.color = color_to_vec4(brush.secondary_color);
 
     L.shade.rect.pose = pose16(48, 10);
     
@@ -209,35 +209,35 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             unpress(L.modes, MODES, i);
 
             if (i == 0)
-                brush_mode = BRUSH_MODE_FREE;
+                brush.mode = BRUSH_MODE_FREE;
             else if (i == 1)
-                brush_mode = BRUSH_MODE_DOT;
+                brush.mode = BRUSH_MODE_DOT;
             else if (i == 2)
-                brush_mode = BRUSH_MODE_DITHER;
+                brush.mode = BRUSH_MODE_DITHER;
             else if (i == 3)
-                brush_mode = BRUSH_MODE_DITHER2;
+                brush.mode = BRUSH_MODE_DITHER2;
             else if (i == 4)
-                brush_mode = BRUSH_MODE_FILL;
+                brush.mode = BRUSH_MODE_FILL;
             else if (i == 5)
-                brush_mode = BRUSH_MODE_FILL8;
+                brush.mode = BRUSH_MODE_FILL8;
         }
     }
 
     if (button_clicked(&L.shape_minus, pointer)) {
-        brush_shape--;
-        if (brush_shape < 0)
-            brush_shape = 0;
+        brush.shape--;
+        if (brush.shape < 0)
+            brush.shape = 0;
     }
 
     if (button_clicked(&L.shape_plus, pointer)) {
-        brush_shape++;
-        if (brush_shape >= BRUSH_NUM_SHAPES)
-            brush_shape = BRUSH_NUM_SHAPES - 1;
+        brush.shape++;
+        if (brush.shape >= BRUSH_NUM_SHAPES)
+            brush.shape = BRUSH_NUM_SHAPES - 1;
     }
 
 
     if (button_toggled(&L.grid, pointer)) {
-        canvas_show_grid = button_is_pressed(&L.grid);
+        canvas.show_grid = button_is_pressed(&L.grid);
     }
 
     if (button_clicked(&L.camera, pointer)) {
@@ -245,7 +245,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (button_toggled(&L.animation, pointer)) {
-        animation_show = button_is_pressed(&L.animation);
+        animation.show = button_is_pressed(&L.animation);
     }
 
     if (button_clicked(&L.clear, pointer)) {
@@ -253,11 +253,11 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (pointer.action == E_POINTER_DOWN && u_pose_aa_contains(L.color_drop.rect.pose, pointer.pos.xy)) {
-        brush_secondary_color = brush_current_color;
+        brush.secondary_color = brush.current_color;
     }
 
     if (button_toggled(&L.shade, pointer)) {
-        brush_shading_active = button_is_pressed(&L.shade);
+        brush.shading_active = button_is_pressed(&L.shade);
     }
 
     if(button_toggled(&L.selection, pointer)) {

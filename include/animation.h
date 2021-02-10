@@ -3,7 +3,10 @@
 
 #include <stdbool.h>
 
-extern bool animation_show;
+struct AnimationGlobals_s {
+    bool show;
+};
+extern struct AnimationGlobals_s animation;
 
 
 void animation_init(int frames, float fps);

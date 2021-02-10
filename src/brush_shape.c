@@ -24,7 +24,7 @@ GLuint brush_shape_create_kernel_texture(Color_s bg, Color_s fg) {
     for (int k = 0; k < BRUSH_NUM_SHAPES; k++) {
         for (int x = 0; x < BRUSH_KERNEL_SIZE; x++) {
             for (int y = 0; y < BRUSH_KERNEL_SIZE; y++) {
-                if (brush_shape_kernels[k][y][x])
+                if (brush_shape.kernels[k][y][x])
                     img[pixel_idx(k, y, x)] = fg;
                 else
                     img[pixel_idx(k, y, x)] = bg;
@@ -53,7 +53,7 @@ bool brush_shape_draw(int x, int y) {
         for (int kx = 0; kx < BRUSH_KERNEL_SIZE; kx++) {
             int dx = x + kx - BRUSH_KERNEL_SIZE / 2;
 
-            if (brush_shape_kernels[brush_shape]
+            if (brush_shape.kernels[brush.shape]
             [ky][kx]) {
 
                 changed |= brush_draw_pixel(dx, dy);
@@ -71,7 +71,7 @@ bool brush_shape_draw_dither(int x, int y, bool a) {
         for (int kx = 0; kx < BRUSH_KERNEL_SIZE; kx++) {
             int dx = x + kx - BRUSH_KERNEL_SIZE / 2;
 
-            if (brush_shape_kernels[brush_shape]
+            if (brush_shape.kernels[brush.shape]
             [ky][kx]) {
 
                 if ((dx % 2 + dy % 2) % 2 == a ? 0 : 1)

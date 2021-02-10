@@ -14,7 +14,7 @@ void background_init() {
     buf[0] = buf[3] = color_from_hex("#000000");
     buf[1] = buf[2] = color_from_hex("#222222");
 
-    r_ro_single_init(&L.ro, camera_gl, r_texture_init(2, 2, buf));
+    r_ro_single_init(&L.ro, camera.gl, r_texture_init(2, 2, buf));
 }
 
 void background_update(float dtime) {

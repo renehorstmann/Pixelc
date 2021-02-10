@@ -1,8 +1,6 @@
 #include "brush_shape.h"
 
-const char brush_shape_kernels
-        [BRUSH_NUM_SHAPES]
-        [BRUSH_KERNEL_SIZE][BRUSH_KERNEL_SIZE] = {
+struct BrushShapeGlobals_s brush_shape = {{
 	{
 		{0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0},
@@ -148,4 +146,4 @@ const char brush_shape_kernels
 		{1, 1, 1, 1, 1, 1, 1}
 	}
 	
-};
+}};

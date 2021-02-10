@@ -6,8 +6,11 @@
 #include "mathc/types/float.h"
 #include "image.h"
 
-extern int canvas_current_layer;
-extern bool canvas_show_grid;
+struct CanvasGlobals_s {
+    int current_layer;
+    bool show_grid;
+};
+extern struct CanvasGlobals_s canvas;
 
 void canvas_init(int rows, int cols);
 

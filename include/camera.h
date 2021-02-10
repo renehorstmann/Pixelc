@@ -16,8 +16,11 @@ typedef struct {
     mat4 p_inv;
 } CameraMatrices_s;
 
-extern CameraMatrices_s camera_matrices;
-extern const float *camera_gl;
+struct CameraGlobals_s {
+    CameraMatrices_s matrices;
+    const float *gl;
+};
+extern struct CameraGlobals_s camera;
 
 
 

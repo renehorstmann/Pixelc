@@ -5,11 +5,7 @@
 #include "brush_shape.h"
 #include "brush.h"
 
-Color_s brush_current_color;
-Color_s brush_secondary_color;
-enum brushmodes brush_mode;
-int brush_shape;
-bool brush_shading_active;
+struct BrushGlobals_s brush;
 
 static struct {
     bool change;
@@ -17,11 +13,11 @@ static struct {
 
 
 void brush_init() {
-    brush_current_color = COLOR_TRANSPARENT;
-    brush_secondary_color = COLOR_TRANSPARENT;
-    brush_mode = BRUSH_MODE_FREE;
-    brush_shape = 0;
-    brush_shading_active = false;
+    brush.current_color = COLOR_TRANSPARENT;
+    brush.secondary_color = COLOR_TRANSPARENT;
+    brush.mode = BRUSH_MODE_FREE;
+    brush.shape = 0;
+    brush.shading_active = false;
 }
 
 void brush_pointer_event(ePointer_s pointer) {
@@ -29,7 +25,7 @@ void brush_pointer_event(ePointer_s pointer) {
         return;
         
     bool change = false;
-    switch (brush_mode) {
+    switch (brush.mode) {
         case BRUSH_MODE_FREE:
         case BRUSH_MODE_DITHER:
         case BRUSH_MODE_DITHER2:
@@ -61,7 +57,7 @@ void brush_pointer_event(ePointer_s pointer) {
 
 bool brush_draw_pixel(int x, int y) {
 	Image *img = canvas_image();
-	int layer = canvas_current_layer;
+	int layer = canvas.current_layer;
 	if (!image_contains(img, x, y))
         return false;
         
@@ -69,20 +65,20 @@ bool brush_draw_pixel(int x, int y) {
         return false;
         
     Color_s *pixel = image_pixel(img, layer, y, x);
-    if (brush_shading_active) {
-    	if(!color_equals(*pixel, brush_secondary_color))
+    if (brush.shading_active) {
+    	if(!color_equals(*pixel, brush.secondary_color))
     	    return false;
     }
     
-    *pixel = brush_current_color;
+    *pixel = brush.current_color;
     return true;
 }
 
 
 bool brush_draw(int x, int y) {
-	if(brush_mode == BRUSH_MODE_DITHER)
+	if(brush.mode == BRUSH_MODE_DITHER)
 	    return brush_shape_draw_dither(x, y, true);
-	if(brush_mode == BRUSH_MODE_DITHER2)
+	if(brush.mode == BRUSH_MODE_DITHER2)
 	    return brush_shape_draw_dither(x, y, false);
 	return brush_shape_draw(x, y);
 }
