@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
     camera_init();
     canvas_camera_init();
     background_init();
-    canvas_init(16, 16);
-    animation_init(2, 2);
+    canvas_init(16, 32);
+    animation_init(4, 2);
     brush_init();
     canvas_camera_control_init();
     palette_init();
@@ -46,8 +46,8 @@ int main(int argc, char **argv) {
     savestate_init();
 
 //    palette_presave_grayscale();
-    palette_presave_grayscale_alpha();
-//    palette_presave_pixilmatt();
+//    palette_presave_grayscale_alpha();
+    palette_presave_pixilmatt();
 //    palette_presave_slso8();
 //    palette_presave_gameboy();
 //    palette_presave_endesga32();
