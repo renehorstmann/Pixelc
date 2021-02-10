@@ -10,8 +10,6 @@ Palette, brush, size can be configured in code
 ![example_image](example.jpg)
 
 ## Todo
-- draw_line(int from_x, int from_y, int to_x, int to_y)
-  - free mode line between each move
 - Toolbar
   - undo, clear
   - Brush mode
