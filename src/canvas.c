@@ -208,8 +208,13 @@ ivec2 canvas_get_uv(vec4 pointer_pos) {
 }
 
 void canvas_clear() {
-    for(int i=0; i<L.image->rows*L.image->cols; i++) {
-        *image_pixel_index(L.image, canvas_current_layer, i) = COLOR_TRANSPARENT;
+    for(int r=0; r<L.image->rows; r++) {
+        for(int c=0; c<L.image->cols; c++) {
+        	if(!selection_contains(c, r))
+        	    continue;
+        	
+            *image_pixel(L.image, canvas_current_layer, r, c) = COLOR_TRANSPARENT;
+        }
     }
     canvas_save();
 }
