@@ -10,6 +10,8 @@ bool brush_mode_dot(ePointer_s pointer);
 
 bool brush_mode_free(ePointer_s pointer);
 
+bool brush_mode_free_line(ePointer_s pointer);
+
 bool brush_mode_fill(ePointer_s pointer, bool mode8);
 
 
