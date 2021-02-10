@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "image.h"
 
-void selection_init(int left, int top, int width, int height);
+void selection_init(int x, int y, int rows, int cols);
 
 void selection_kill();
 
