@@ -1,4 +1,5 @@
 #include "canvas.h"
+#include "selection.h"
 #include "savestate.h"
 #include "brush_mode.h"
 #include "brush_shape.h"
@@ -62,6 +63,9 @@ bool brush_draw_pixel(int x, int y) {
 	Image *img = canvas_image();
 	int layer = canvas_current_layer;
 	if (!image_contains(img, x, y))
+        return false;
+        
+    if(!selection_contains(x, y))
         return false;
         
     Color_s *pixel = image_pixel(img, layer, y, x);
