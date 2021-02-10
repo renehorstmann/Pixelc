@@ -1,5 +1,7 @@
 #include <assert.h>
+#include <float.h>
 #include "r/ro_single.h"
+#include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "utilc/alloc.h"
@@ -28,6 +30,9 @@ static struct {
     rRoSingle bg;
     rRoSingle grid;
     
+    bool show_selection;
+    rRoBatch selection_border;
+    
     int save_id;
 } L;
 
@@ -37,6 +42,52 @@ static void init_render_objects() {
         GLuint tex = r_texture_init(L.image->cols, L.image->rows, image_layer(L.image, i));
         r_ro_single_init(&L.render_objects[i], canvas_camera_gl, tex);
     }
+}
+
+static mat4 pixel_pose(int x, int y) {
+	float w = u_pose_get_w(L.pose);
+	float size = w/L.image->cols;
+	
+	
+	float pos_x = u_pose_aa_get_left(L.pose) + (x + 0.5) * size;    
+	float pos_y = u_pose_aa_get_top(L.pose) - (y + 0.5) * size;
+	
+	mat4 pose = mat4_eye();
+	u_pose_set(&pose, pos_x, pos_y, size, size, 0);
+	return pose;
+}
+
+static void setup_selection() {
+	int x = 2;
+	int y = -1;
+	int rows = 6;
+	int cols = 10;
+	
+	int idx = 0;
+	for(int i=0;i<rows;i++) {
+		L.selection_border.rects[idx].pose = pixel_pose(x-1, y+i);
+		u_pose_set(&L.selection_border.rects[idx].uv, 0, 0, 0.5, 0.5, 0);
+		idx++;
+		
+		L.selection_border.rects[idx].pose = pixel_pose(x+cols, y+i);
+		u_pose_set(&L.selection_border.rects[idx].uv, 0, 0.5, 0.5, 0.5, 0);
+		idx++;
+	}
+	for(int i=0;i<cols;i++) {
+		L.selection_border.rects[idx].pose = pixel_pose(x+i, y-1);
+		u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0, 0.5, 0.5, 0);
+		idx++;
+		
+		L.selection_border.rects[idx].pose = pixel_pose(x+i, y+rows);
+		u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0.5, 0.5, 0.5, 0);
+		idx++;
+	}
+	
+	for(;idx < L.selection_border.num; idx++) {
+		u_pose_set(&L.selection_border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+	}
+	
+	r_ro_batch_update(&L.selection_border, 0, L.selection_border.num);
 }
 
 static void save_state(void **data, size_t *size);
@@ -57,11 +108,17 @@ void canvas_init(int rows, int cols) {
 
     init_render_objects();
     
-    GLuint grid_tex = r_texture_init_file("res/canvas_grid.png", NULL);
-    r_texture_filter_nearest(grid_tex);
-    r_ro_single_init(&L.grid, canvas_camera_gl, grid_tex);
+    r_ro_single_init(&L.grid, canvas_camera_gl, 
+            r_texture_init_file("res/canvas_grid.png", NULL));
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
+
+    r_ro_batch_init(&L.selection_border, 2*(rows+cols), canvas_camera_gl,
+            r_texture_init_file("res/selection_border.png", NULL));
+    for(int i=0; i<L.selection_border.num; i++) {
+        L.selection_border.rects[i].color = (vec4) {{1, 0.25, 0.25, 0.75}};       
+    }
+            
 
     Color_s buf[4];
     buf[0] = buf[3] = color_from_hex("#999999");
@@ -109,6 +166,9 @@ void canvas_update(float dtime) {
 
     L.grid.rect.pose = L.pose;
     L.bg.rect.pose = L.pose;
+    
+    setup_selection();
+    L.show_selection = true;
 }
 
 void canvas_render() {
@@ -120,6 +180,9 @@ void canvas_render() {
 
     if(canvas_show_grid)
         r_ro_single_render(&L.grid);
+        
+    if(L.show_selection)
+        r_ro_batch_render(&L.selection_border);
 }
 
 
