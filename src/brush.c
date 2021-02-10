@@ -11,7 +11,6 @@ int brush_shape;
 bool brush_shading_active;
 
 static struct {
-    bool drawing;
     bool change;
 } L;
 
@@ -33,7 +32,7 @@ void brush_pointer_event(ePointer_s pointer) {
         case BRUSH_MODE_FREE:
         case BRUSH_MODE_DITHER:
         case BRUSH_MODE_DITHER2:
-            change = brush_mode_free(pointer, &L.drawing);
+            change = brush_mode_free(pointer);
             break;
         case BRUSH_MODE_DOT:
             change = brush_mode_dot(pointer);
@@ -87,7 +86,7 @@ bool brush_draw(int x, int y) {
 void brush_abort_current_draw() {
 	if(L.change) {
 		canvas_redo_image();
+		brush_mode_reset(); // sets drawing to false
 		L.change = false;
-		L.drawing = false;
 	}
 }
