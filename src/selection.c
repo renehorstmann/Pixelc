@@ -32,9 +32,14 @@ void selection_move(int x, int y) {
 	L.y = y;
 }
 
+bool selection_active() {
+	return L.cols > 0 && L.rows > 0;
+}
+
 bool selection_contains(int x, int y) {
-	return x>=L.x && x<L.x+L.cols
-	        && y>=L.y && y<L.y+L.rows;
+	return !selection_active() 
+	        || (x>=L.x && x<L.x+L.cols
+	        && y>=L.y && y<L.y+L.rows);
 }
 
 void selection_copy(const Image *from, int layer) {

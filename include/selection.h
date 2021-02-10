@@ -10,6 +10,8 @@ void selection_kill();
 
 void selection_move(int x, int y);
 
+bool selection_active();
+
 bool selection_contains(int x, int y);
 
 void selection_copy(const Image *from, int layer);
