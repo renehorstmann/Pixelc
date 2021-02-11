@@ -33,7 +33,7 @@ static bool pos_in_palette(vec2 pos) {
     int cols = palette_cols();
     if (camera_is_portrait_mode()) {
         int rows = 1 + L.palette_size / cols;
-        return pos.y <= camera_bottom() + rows * COLOR_DROP_SIZE;
+        return pos.y >= camera_bottom() - rows * COLOR_DROP_SIZE;
     } else {
         int rows = 1 + L.palette_size / cols;
         return pos.x >= camera_right() - rows * COLOR_DROP_SIZE;
@@ -46,10 +46,10 @@ static mat4 setup_palette_color_pose(int r, int c) {
     u_pose_set_size(&pose, COLOR_DROP_SIZE, COLOR_DROP_SIZE);
     if (camera_is_portrait_mode()) {
         u_pose_set_xy(&pose, camera_left() + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE,
-                      camera_bottom() + COLOR_DROP_SIZE / 2 + r * COLOR_DROP_SIZE);
+                      camera_bottom() - COLOR_DROP_SIZE / 2 - r * COLOR_DROP_SIZE);
     } else {
         u_pose_set_xy(&pose, camera_right() - COLOR_DROP_SIZE / 2 - r * COLOR_DROP_SIZE,
-                      camera_bottom() + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE);
+                      camera_bottom() - COLOR_DROP_SIZE / 2 - c * COLOR_DROP_SIZE);
         u_pose_set_angle(&pose, M_PI_2);
     }
     return pose;

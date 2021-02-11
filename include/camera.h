@@ -40,7 +40,7 @@ static float camera_width() {
 }
 
 static float camera_height() {
-    return -camera_bottom() + camera_top();
+    return -camera_top() + camera_bottom();
 }
 
 static bool camera_is_portrait_mode() {
