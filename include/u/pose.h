@@ -35,11 +35,11 @@ static float u_pose_aa_get_right(mat4 p) {
 }
 
 static float u_pose_aa_get_top(mat4 p) {
-    return p.m31 - u_pose_get_h(p) / 2;
+    return p.m31 + u_pose_get_h(p) / 2;
 }
 
 static float u_pose_aa_get_bottom(mat4 p) {
-    return p.m31 + u_pose_get_h(p) / 2;
+    return p.m31 - u_pose_get_h(p) / 2;
 }
 
 
@@ -124,11 +124,11 @@ static void u_pose_aa_set_right(mat4 *p, float r) {
 }
 
 static void u_pose_aa_set_top(mat4 *p, float t) {
-    p->m31 = t + u_pose_get_h(*p) / 2;
+    p->m31 = t - u_pose_get_h(*p) / 2;
 }
 
 static void u_pose_aa_set_bottom(mat4 *p, float b) {
-    p->m31 = b - u_pose_get_h(*p) / 2;
+    p->m31 = b + u_pose_get_h(*p) / 2;
 }
 
 static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
@@ -152,7 +152,7 @@ static bool u_pose_aa_contains(mat4 p, vec2 pos) {
     float t = u_pose_aa_get_top(p);
     float b = u_pose_aa_get_bottom(p);
 
-    return pos.x >= l && pos.x <= r && pos.y >= t && pos.y <= b;
+    return pos.x >= l && pos.x <= r && pos.y <= t && pos.y >= b;
 }
 
 

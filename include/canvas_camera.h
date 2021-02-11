@@ -44,7 +44,7 @@ static float canvas_camera_width() {
 }
 
 static float canvas_camera_height() {
-    return -canvas_camera_top() + canvas_camera_bottom();
+    return -canvas_camera_bottom() + canvas_camera_top();
 }
 
 static bool canvas_camera_is_portrait_mode() {

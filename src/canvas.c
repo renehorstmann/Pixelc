@@ -43,16 +43,16 @@ static void init_render_objects() {
     }
 }
 
-static mat4 pixel_pose(int c, int r) {
+static mat4 pixel_pose(int x, int y) {
 	float w = u_pose_get_w(L.pose);
 	float size = w/L.image->cols;
 	
 	
-	float x = u_pose_aa_get_left(L.pose) + (c + 0.5) * size;    
-	float y = u_pose_aa_get_top(L.pose) + (r + 0.5) * size;
+	float pos_x = u_pose_aa_get_left(L.pose) + (x + 0.5) * size;    
+	float pos_y = u_pose_aa_get_top(L.pose) - (y + 0.5) * size;
 	
 	mat4 pose = mat4_eye();
-	u_pose_set(&pose, x, y, size, size, 0);
+	u_pose_set(&pose, pos_x, pos_y, size, size, 0);
 	return pose;
 }
 
@@ -151,7 +151,7 @@ void canvas_update(float dtime) {
     
     float x = 0, y = 0;
     if(canvas_camera_is_portrait_mode()) {
-        y = -20;
+        y = 20;
     }
     
     u_pose_set(&L.pose, x, y, w, h, 0);
@@ -202,7 +202,7 @@ ivec2 canvas_get_cr(vec4 pointer_pos) {
 
     ivec2 cr;
     cr.x = (pose_pos.x + 0.5) * canvas_image()->cols;    
-    cr.y = (pose_pos.y + 0.5) * canvas_image()->rows;
+    cr.y = (0.5 - pose_pos.y) * canvas_image()->rows;
     return cr;
 }
 

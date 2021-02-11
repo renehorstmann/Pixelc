@@ -89,15 +89,6 @@ static void main_loop(float delta_time) {
     animation_render();
     palette_render();
     toolbar_render();
-    
-    static bool b=false;
-    static rRoSingle r;
-    if(!b) {
-    	b=true;
-    	r_ro_single_init(&r, camera.gl, r_texture_init_file("res/button_plus.png", NULL));
-    	u_pose_set(&r.rect.pose, 30, 50, 30, 50, 0);
-    }
-    r_ro_single_render(&r);
 
     e_gui_render();
 
