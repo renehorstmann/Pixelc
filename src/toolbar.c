@@ -225,14 +225,17 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     if (button_clicked(&L.shape_minus, pointer)) {
         brush.shape--;
-        if (brush.shape < 0)
+        if (brush.shape <= 0) {
             brush.shape = 0;
+            
+        }
     }
 
     if (button_clicked(&L.shape_plus, pointer)) {
         brush.shape++;
-        if (brush.shape >= BRUSH_NUM_SHAPES)
+        if (brush.shape >= BRUSH_NUM_SHAPES-1) {
             brush.shape = BRUSH_NUM_SHAPES - 1;
+        }
     }
 
 

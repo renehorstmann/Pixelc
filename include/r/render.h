@@ -11,7 +11,7 @@ extern struct rRenderGolabals_s r_render;
 
 void r_render_init(SDL_Window *window);
 
-void r_render_begin_frame(int width, int height);
+void r_render_begin_frame(int cols, int rows);
 
 void r_render_end_frame();
 
