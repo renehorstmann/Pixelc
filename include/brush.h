@@ -28,9 +28,9 @@ void brush_init();
 
 void brush_pointer_event(ePointer_s pointer);
 
-bool brush_draw_pixel(int x, int y);
+bool brush_draw_pixel(int c, int r);
 
-bool brush_draw(int x, int y);
+bool brush_draw(int c, int r);
 
 void brush_abort_current_draw();
 

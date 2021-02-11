@@ -3,7 +3,7 @@
 #include "image.h"
 
 
-Image *image_new_empty(int layers, int rows, int cols) {
+Image *image_new_empty(int layers, int cols, int rows) {
     Image *self = raising_malloc(1, sizeof(Image) + sizeof(Color_s) * layers * rows * cols, SIGABRT);
     self->layers = layers;
     self->rows = rows;
@@ -11,7 +11,7 @@ Image *image_new_empty(int layers, int rows, int cols) {
     return self;
 }
 
-Image *image_new_zeros(int layers, int rows, int cols) {
+Image *image_new_zeros(int layers, int cols, int rows) {
     Image *self = raising_calloc(1, sizeof(Image) + sizeof(Color_s) * layers * rows * cols, SIGABRT);
     self->layers = layers;
     self->rows = rows;
@@ -20,7 +20,7 @@ Image *image_new_zeros(int layers, int rows, int cols) {
 }
 
 Image *image_new_clone(const Image *from) {
-    Image *self = image_new_empty(from->layers, from->rows, from->cols);
+    Image *self = image_new_empty(from->layers, from->cols, from->rows);
     memcpy(self->data, from->data, image_data_size(from));
     return self;
 }

@@ -47,8 +47,8 @@ bool brush_mode_dot(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    ivec2 uv = canvas_get_uv(pointer.pos);
-    return brush_draw(uv.x, uv.y);
+    ivec2 cr = canvas_get_cr(pointer.pos);
+    return brush_draw(cr.x, cr.y);
 }
 
 bool brush_mode_free(ePointer_s pointer) {
@@ -61,16 +61,16 @@ bool brush_mode_free(ePointer_s pointer) {
     if (!L.is_drawing)
         return false;
 
-    ivec2 uv = canvas_get_uv(pointer.pos);
-    return brush_draw(uv.x, uv.y);
+    ivec2 cr = canvas_get_cr(pointer.pos);
+    return brush_draw(cr.x, cr.y);
 }
 
 bool brush_mode_free_line(ePointer_s pointer) {
-    ivec2 uv = canvas_get_uv(pointer.pos);
+    ivec2 cr = canvas_get_cr(pointer.pos);
 
     if (pointer.action == E_POINTER_DOWN) {
         L.is_drawing = true;
-        L.last = uv;
+        L.last = cr;
     } else if (pointer.action != E_POINTER_MOVE) {
         L.is_drawing = false;
     }
@@ -79,10 +79,10 @@ bool brush_mode_free_line(ePointer_s pointer) {
         return false;
 
     // just 1 pixel length
-    if(ivec2_norm_inf(ivec2_sub_vec(uv, L.last)) <= 1)
-        return brush_draw(uv.x, uv.y);
+    if(ivec2_norm_inf(ivec2_sub_vec(cr, L.last)) <= 1)
+        return brush_draw(cr.x, cr.y);
 
-    bool changed = lineto(L.last, uv);
-    L.last = uv;
+    bool changed = lineto(L.last, cr);
+    L.last = cr;
     return changed;
 }

@@ -93,14 +93,14 @@ static void save_state(void **data, size_t *size);
 static void load_state(const void *data, size_t size);
 
 
-void canvas_init(int rows, int cols) {
+void canvas_init(int cols, int rows) {
     int layers = 1;
     
     L.save_id = savestate_register(save_state, load_state);
      
     L.pose = mat4_eye();
 
-    L.image = image_new_zeros(layers, rows, cols);
+    L.image = image_new_zeros(layers, cols, rows);
     L.render_objects = New0(rRoSingle , layers);
     L.layers = layers;
     canvas.current_layer = 0;
@@ -196,14 +196,14 @@ int canvas_layers() {
     return L.layers;
 }
 
-ivec2 canvas_get_uv(vec4 pointer_pos) {
+ivec2 canvas_get_cr(vec4 pointer_pos) {
     mat4 pose_inv = mat4_inv(L.pose);
     vec4 pose_pos = mat4_mul_vec(pose_inv, pointer_pos);
 
-    ivec2 uv;
-    uv.x = (pose_pos.x + 0.5) * canvas_image()->cols;    
-    uv.y = (0.5 - pose_pos.y) * canvas_image()->rows;
-    return uv;
+    ivec2 cr;
+    cr.x = (pose_pos.x + 0.5) * canvas_image()->cols;    
+    cr.y = (0.5 - pose_pos.y) * canvas_image()->rows;
+    return cr;
 }
 
 void canvas_clear() {
@@ -212,7 +212,7 @@ void canvas_clear() {
         	if(!selection_contains(c, r))
         	    continue;
         	
-            *image_pixel(L.image, canvas.current_layer, r, c) = COLOR_TRANSPARENT;
+            *image_pixel(L.image, canvas.current_layer, c, r) = COLOR_TRANSPARENT;
         }
     }
     canvas_save();

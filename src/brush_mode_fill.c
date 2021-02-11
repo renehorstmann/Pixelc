@@ -14,11 +14,11 @@ bool brush_mode_fill(ePointer_s pointer, bool mode8) {
     Image *img = canvas_image();
     int layer = canvas.current_layer;
 
-    ivec2 uv = canvas_get_uv(pointer.pos);
-    if(!image_contains_uv(img, uv))
+    ivec2 cr = canvas_get_cr(pointer.pos);
+    if(!image_contains(img, cr.x, cr.y))
         return false;
     
-    brush.secondary_color = *image_pixel_uv(img, layer, uv);
+    brush.secondary_color = *image_pixel(img, layer, cr.x, cr.y);
     if(color_equals(brush.current_color, brush.secondary_color))
         return false;
     
@@ -27,7 +27,7 @@ bool brush_mode_fill(ePointer_s pointer, bool mode8) {
     
     // PosStack needs to be killed
     PosStack stack = {0};
-    pos_stack_push(&stack, uv);
+    pos_stack_push(&stack, cr);
     
     while(stack.size>0) 	{
     	ivec2 p = pos_stack_pop(&stack);

@@ -20,8 +20,8 @@ extern struct BrushShapeGlobals_s brush_shape;
 GLuint brush_shape_create_kernel_texture(Color_s bg, Color_s fg);
 mat4 brush_shape_kernel_texture_uv(int kernel);
 
-bool brush_shape_draw(int x, int y);
+bool brush_shape_draw(int r, int c);
 
-bool brush_shape_draw_dither(int x, int y, bool a);
+bool brush_shape_draw_dither(int r, int c, bool a);
 
 #endif //PIXELC_BRUSH_SHAPE_H

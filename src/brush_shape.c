@@ -9,9 +9,9 @@
 #define TEX_COLS (BRUSH_KERNEL_TEXTURE_SIZE * TEX_SIZE)
 _Static_assert(TEX_SIZE * TEX_SIZE >= BRUSH_NUM_SHAPES, "wrong texture size");
 
-static int pixel_idx(int k, int y, int x) {
-    int row = (k / TEX_SIZE) * BRUSH_KERNEL_TEXTURE_SIZE + y;
-    int col = (k % TEX_SIZE) * BRUSH_KERNEL_TEXTURE_SIZE + x;
+static int pixel_idx(int k, int c, int r) {
+    int row = (k / TEX_SIZE) * BRUSH_KERNEL_TEXTURE_SIZE + r;
+    int col = (k % TEX_SIZE) * BRUSH_KERNEL_TEXTURE_SIZE + c;
     return row * TEX_COLS + col;
 }
 
@@ -22,12 +22,12 @@ GLuint brush_shape_create_kernel_texture(Color_s bg, Color_s fg) {
         img[i] = bg;
 
     for (int k = 0; k < BRUSH_NUM_SHAPES; k++) {
-        for (int x = 0; x < BRUSH_KERNEL_SIZE; x++) {
-            for (int y = 0; y < BRUSH_KERNEL_SIZE; y++) {
-                if (brush_shape.kernels[k][y][x])
-                    img[pixel_idx(k, y, x)] = fg;
+        for (int r = 0; r < BRUSH_KERNEL_SIZE; r++) {
+            for (int c = 0; c < BRUSH_KERNEL_SIZE; c++) {
+                if (brush_shape.kernels[k][r][c])
+                    img[pixel_idx(k, c, r)] = fg;
                 else
-                    img[pixel_idx(k, y, x)] = bg;
+                    img[pixel_idx(k, c, r)] = bg;
             }
         }
     }
@@ -45,37 +45,37 @@ mat4 brush_shape_kernel_texture_uv(int kernel) {
     return uv;
 }
 
-bool brush_shape_draw(int x, int y) {
+bool brush_shape_draw(int c, int r) {
     bool changed = false;
-    for (int ky = 0; ky < BRUSH_KERNEL_SIZE; ky++) {
-        int dy = y + ky - BRUSH_KERNEL_SIZE / 2;
+    for (int kr = 0; kr < BRUSH_KERNEL_SIZE; kr++) {
+        int dr = r + kr - BRUSH_KERNEL_SIZE / 2;
 
-        for (int kx = 0; kx < BRUSH_KERNEL_SIZE; kx++) {
-            int dx = x + kx - BRUSH_KERNEL_SIZE / 2;
+        for (int kc = 0; kc < BRUSH_KERNEL_SIZE; kc++) {
+            int dc = c + kc - BRUSH_KERNEL_SIZE / 2;
 
             if (brush_shape.kernels[brush.shape]
-            [ky][kx]) {
+            [kr][kc]) {
 
-                changed |= brush_draw_pixel(dx, dy);
+                changed |= brush_draw_pixel(dc, dr);
             }
         }
     }
     return changed;
 }
 
-bool brush_shape_draw_dither(int x, int y, bool a) {
+bool brush_shape_draw_dither(int c, int r, bool a) {
     bool changed = false;
-    for (int ky = 0; ky < BRUSH_KERNEL_SIZE; ky++) {
-        int dy = y + ky - BRUSH_KERNEL_SIZE / 2;
+    for (int kr = 0; kr < BRUSH_KERNEL_SIZE; kr++) {
+        int dr = r + kr - BRUSH_KERNEL_SIZE / 2;
 
-        for (int kx = 0; kx < BRUSH_KERNEL_SIZE; kx++) {
-            int dx = x + kx - BRUSH_KERNEL_SIZE / 2;
+        for (int kc = 0; kc < BRUSH_KERNEL_SIZE; kc++) {
+            int dc = c + kc - BRUSH_KERNEL_SIZE / 2;
 
             if (brush_shape.kernels[brush.shape]
-            [ky][kx]) {
+            [kr][kc]) {
 
-                if ((dx % 2 + dy % 2) % 2 == a ? 0 : 1)
-                    changed |= brush_draw_pixel(dx, dy);
+                if ((dc % 2 + dr % 2) % 2 == a ? 0 : 1)
+                    changed |= brush_draw_pixel(dc, dr);
             }
         }
     }

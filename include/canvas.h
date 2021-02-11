@@ -12,7 +12,7 @@ struct CanvasGlobals_s {
 };
 extern struct CanvasGlobals_s canvas;
 
-void canvas_init(int rows, int cols);
+void canvas_init(int cols, int rows);
 
 void canvas_update(float dtime);
 
@@ -22,7 +22,7 @@ mat4 canvas_pose();
 Image *canvas_image();
 int canvas_layers();
 
-ivec2 canvas_get_uv(vec4 pointer_pos);
+ivec2 canvas_get_cr(vec4 pointer_pos);
 
 void canvas_clear();
 

@@ -55,16 +55,16 @@ void brush_pointer_event(ePointer_s pointer) {
     
 }
 
-bool brush_draw_pixel(int x, int y) {
+bool brush_draw_pixel(int c, int r) {
 	Image *img = canvas_image();
 	int layer = canvas.current_layer;
-	if (!image_contains(img, x, y))
+	if (!image_contains(img, c, r))
         return false;
         
-    if(!selection_contains(x, y))
+    if(!selection_contains(c, r))
         return false;
         
-    Color_s *pixel = image_pixel(img, layer, y, x);
+    Color_s *pixel = image_pixel(img, layer, c, r);
     if (brush.shading_active) {
     	if(!color_equals(*pixel, brush.secondary_color))
     	    return false;
@@ -75,12 +75,12 @@ bool brush_draw_pixel(int x, int y) {
 }
 
 
-bool brush_draw(int x, int y) {
+bool brush_draw(int c, int r) {
 	if(brush.mode == BRUSH_MODE_DITHER)
-	    return brush_shape_draw_dither(x, y, true);
+	    return brush_shape_draw_dither(c, r, true);
 	if(brush.mode == BRUSH_MODE_DITHER2)
-	    return brush_shape_draw_dither(x, y, false);
-	return brush_shape_draw(x, y);
+	    return brush_shape_draw_dither(c, r, false);
+	return brush_shape_draw(c, r);
 }
 
 void brush_abort_current_draw() {

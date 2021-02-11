@@ -38,7 +38,7 @@ Image *io_load_image(const char *file) {
         return NULL;
     }
 
-    Image *image = image_new_empty(1, img->h, img->w);
+    Image *image = image_new_empty(1, img->w, img->h);
     memcpy(image->data, img->pixels, sizeof(Color_s) * img->w * img->h);
     SDL_FreeSurface(img);
     return image;

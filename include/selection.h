@@ -2,10 +2,11 @@
 #define PIXELC_SELECTION_H
 
 #include <stdbool.h>
+#include "mathc/types/int.h"
 #include "image.h"
 
 
-void selection_init(int x, int y, int w, int h);
+void selection_init(int left, int top, int cols, int rows);
 
 void selection_kill();
 
@@ -14,9 +15,9 @@ bool selection_active();
 ivec2 selection_pos();
 ivec2 selection_size();
 
-void selection_move(int x, int y);
+void selection_move(int left, int top);
 
-bool selection_contains(int x, int y);
+bool selection_contains(int c, int r);
 
 void selection_copy(const Image *from, int layer);
 
