@@ -262,12 +262,8 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if(button_toggled(&L.selection, pointer)) {
-    	if(button_is_pressed(&L.selection)) {
-    		selection_init(-5, 5, 10, 10);
-    	} else {
-    		selection_kill();
-    	}
-    	
+        bool pressed = button_is_pressed(&L.selection);
+        brush_set_selection_active(pressed);
     }
 
     return true;

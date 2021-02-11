@@ -9,8 +9,30 @@ struct BrushGlobals_s brush;
 
 static struct {
     bool change;
+    bool selection_active;
+    bool selection_set;
+    ivec2 selection_pos;
 } L;
 
+
+static void setup_selection(ePointer_s pointer) {
+	ivec2 cr = canvas_get_cr(pointer.pos);
+	if(!image_contains(canvas_image(), cr.x, cr.y))
+	    return;
+	    
+	if(L.selection_pos.x < 0) {
+	    if(pointer.action == E_POINTER_DOWN)
+	        L.selection_pos = cr;
+	    return;
+	}
+    int left = cr.x < L.selection_pos.x ? cr.x : L.selection_pos.x;
+    int top = cr.y < L.selection_pos.y ? cr.y : L.selection_pos.y;
+    int cols = 1+abs(cr.x - L.selection_pos.x);
+    int rows = 1+abs(cr.y - L.selection_pos.y);
+    selection_init(left, top, cols, rows);
+    if(pointer.action == E_POINTER_UP)
+    	L.selection_set = true;
+}
 
 void brush_init() {
     brush.current_color = COLOR_TRANSPARENT;
@@ -23,6 +45,11 @@ void brush_init() {
 void brush_pointer_event(ePointer_s pointer) {
     if(pointer.id!=0)
         return;
+        
+    if(L.selection_active && !L.selection_set) {
+        setup_selection(pointer);
+        return;
+    }
         
     bool change = false;
     switch (brush.mode) {
@@ -89,4 +116,11 @@ void brush_abort_current_draw() {
 		brush_mode_reset(); // sets drawing to false
 		L.change = false;
 	}
+}
+
+void brush_set_selection_active(bool active) {
+	L.selection_active = active;
+	L.selection_set = false;
+	L.selection_pos = (ivec2) {{-1, -1}};
+	selection_kill();
 }

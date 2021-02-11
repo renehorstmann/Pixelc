@@ -19,7 +19,6 @@ struct BrushGlobals_s {
     enum brushmodes mode;
     int shape;
     bool shading_active;
-    bool selection_active;
 };
 extern struct BrushGlobals_s brush;
 
@@ -33,5 +32,8 @@ bool brush_draw_pixel(int c, int r);
 bool brush_draw(int c, int r);
 
 void brush_abort_current_draw();
+
+void brush_set_selection_active(bool active);
+
 
 #endif //PIXELC_BRUSH_H
