@@ -143,18 +143,19 @@ void toolbar_update(float dtime) {
 
     if (button_is_pressed(&L.shape_minus)) {
         L.shape_minus_time += dtime;
-        if (L.shape_minus_time > LONG_PRESS_TIME)
+        if (L.shape_minus_time > LONG_PRESS_TIME) {
             brush.shape = 0;
+        }
     } else
         L.shape_minus_time = 0;
 
     if (button_is_pressed(&L.shape_plus)) {
         L.shape_plus_time += dtime;
-        if (L.shape_plus_time > LONG_PRESS_TIME)
+        if (L.shape_plus_time > LONG_PRESS_TIME) {
             brush.shape = BRUSH_NUM_SHAPES - 1;
+        }
     } else
         L.shape_plus_time = 0;
-
 
     L.grid.rect.pose = pose16(80, 26);
     L.camera.rect.pose = pose16(80, 9);
@@ -225,17 +226,14 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     if (button_clicked(&L.shape_minus, pointer)) {
         brush.shape--;
-        if (brush.shape <= 0) {
+        if (brush.shape < 0)
             brush.shape = 0;
-            
-        }
     }
 
     if (button_clicked(&L.shape_plus, pointer)) {
         brush.shape++;
-        if (brush.shape >= BRUSH_NUM_SHAPES-1) {
+        if (brush.shape >= BRUSH_NUM_SHAPES)
             brush.shape = BRUSH_NUM_SHAPES - 1;
-        }
     }
 
 
