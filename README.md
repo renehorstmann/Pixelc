@@ -10,9 +10,6 @@ Palette, brush, size can be configured in code
 ![example_image](example.jpg)
 
 ## Todo
-- width, height, (x, y, u, v) for floats
-- cols, rows, (c, r, l, t) for ints
-    - x, w, c, before y, h, r in function parameters
 - new camera coords
     - top left is 0, 0 (-scale pixels?)
     - bottom right is 180*16/9, 180 (+scale pixels)
