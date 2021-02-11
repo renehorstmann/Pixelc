@@ -10,6 +10,9 @@ Palette, brush, size can be configured in code
 ![example_image](example.jpg)
 
 ## Todo
+- width, height, (x, y, u, v) for floats
+- cols, rows, (c, r, l, t) for ints
+    - x, w, c, before y, h, r in function parameters
 - Toolbar
   - undo, clear
   - Brush mode
