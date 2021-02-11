@@ -43,7 +43,7 @@ static struct {
 
 static bool pos_in_toolbar(vec2 pos) {
     if (camera_is_portrait_mode())
-        return pos.y >= camera_top() - 34;
+        return pos.y <= camera_top() + 34;
     return pos.x <= camera_left() + 34;
 }
 
@@ -59,7 +59,7 @@ static void unpress(rRoSingle *btns, int n, int ignore) {
 static mat4 pose_wh(float col, float row, float w, float h) {
     mat4 pose = mat4_eye();
     if (camera_is_portrait_mode()) {
-        u_pose_set(&pose, col, camera_top() - row, w, h, 0);
+        u_pose_set(&pose, col, camera_top() + row, w, h, 0);
     } else {
         u_pose_set(&pose, camera_left() + row, col, w, h, 0);
     }

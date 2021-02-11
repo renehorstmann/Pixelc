@@ -48,10 +48,10 @@ void animation_update(float dtime) {
     float x, y;
     if(camera_is_portrait_mode()) {
     	x = camera_right() - w / 2 - 2;
-        y = camera_bottom() + palette_get_hud_size() + h / 2 + 2;
+        y = camera_bottom() - palette_get_hud_size() - h / 2 + 2;
     } else {
     	x = camera_right() - palette_get_hud_size() - w / 2 - 2;
-    	y = camera_top() - h / 2 - 2;
+    	y = camera_top() + h / 2 + 2;
     }
     
     u_pose_set(&L.ro.rect.pose, 

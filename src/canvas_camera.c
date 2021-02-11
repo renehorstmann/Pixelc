@@ -37,9 +37,9 @@ void canvas_camera_update() {
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
     L.left = -floorf(width_2);
-    L.top = floorf(height_2);
+    L.top = -floorf(height_2);
     L.right = width_2 + (width_2 - floorf(width_2));
-    L.bottom = -height_2 - (height_2 - floorf(height_2));
+    L.bottom = height_2 + (height_2 - floorf(height_2));
 
     canvas_camera.matrices.p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
 
