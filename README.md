@@ -10,9 +10,6 @@ Palette, brush, size can be configured in code
 ![example_image](example.jpg)
 
 ## Todo
-- new camera coords
-    - top left is 0, 0 (-scale pixels?)
-    - bottom right is 180*16/9, 180 (+scale pixels)
 - Toolbar
   - undo, clear
   - Brush mode
