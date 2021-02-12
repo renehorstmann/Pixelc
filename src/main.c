@@ -115,8 +115,8 @@ static void main_loop(float delta_time) {
     r_render_begin_frame(e_window.size.x, e_window.size.y);
 
     background_render();
-    canvas_render();
     animation_render();
+    canvas_render();
     palette_render();
     toolbar_render();
 
