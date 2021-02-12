@@ -142,16 +142,18 @@ void toolbar_update(float dtime) {
     L.undo.rect.pose = pose16(-80, 26);
     L.clear.rect.pose = pose16(-80, 9);
     L.import.rect.pose = pose16(-62, 9);
+    L.selection.rect.pose = pose16(-44, 9);
+
 
     for (int i = 0; i < MODES; i++) {
         L.modes[i].rect.pose = pose16(-55 + 16 * i, 26);
     }
     
-    L.shape.rect.pose = pose16(-30, 9);  // should be 16x16
+    L.shape.rect.pose = pose16(-22, 10);  // should be 16x16
     L.shape.rect.uv = brush_shape_kernel_texture_uv(brush.shape);
 
-    L.shape_minus.rect.pose = pose16(0, 9);
-    L.shape_plus.rect.pose = pose16(16, 9);
+    L.shape_minus.rect.pose = pose16(9, 9);
+    L.shape_plus.rect.pose = pose16(25, 9);
 
     if (button_is_pressed(&L.shape_minus)) {
         L.shape_minus_time += dtime;
@@ -178,8 +180,6 @@ void toolbar_update(float dtime) {
 
     L.shade.rect.pose = pose16(48, 9);
     
-    L.selection.rect.pose = pose16(48, 26);
-
 
     L.selection_copy.rect.pose = pose16(-8, 43);
     L.selection_cut.rect.pose = pose16(8, 43);
