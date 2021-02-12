@@ -56,9 +56,13 @@ static void move_selection(ePointer_s pointer) {
 	    
 	ivec2 cr = canvas_get_cr(pointer.pos);
 	    
-	if(brush.selection_mode != BRUSH_SELECTION_PASTE && pointer.action == E_POINTER_DOWN) {
+	if(brush.selection_mode != BRUSH_SELECTION_PASTE) {
+	    if(!image_contains(img, cr.x, cr.y))
+	        return;
+	    
 	    assert(brush.selection_mode == BRUSH_SELECTION_COPY 
 	            || brush.selection_mode == BRUSH_SELECTION_CUT);
+	    
 	    if(brush.selection_mode == BRUSH_SELECTION_COPY)
 	        selection_copy(img, layer);
 	    else
