@@ -12,10 +12,9 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Todo
 - selection code style
-- import button to load import.png as selection
-- Tile repeat
-- Layer Selection
+- Tile repeat as background
 - Frame Selection (or grid shows frames?)
+- Layer Selection
 - VertexColors?
   - white to color like the palette
 - background image option?
