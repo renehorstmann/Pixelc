@@ -284,10 +284,14 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if(button_toggled(&L.selection, pointer)) {
         bool pressed = button_is_pressed(&L.selection);
         brush_set_selection_active(pressed);
-        toolbar.show_selection_copy_cut = false;
-        toolbar.show_selection_ok = false;
         button_set_pressed(&L.selection_copy, false);
         button_set_pressed(&L.selection_cut, false);
+        
+        if(!pressed && toolbar.show_selection_ok) {
+        	canvas_redo_image();
+        }
+        toolbar.show_selection_copy_cut = false;
+        toolbar.show_selection_ok = false;
     }
     
     if(toolbar.show_selection_copy_cut) {
@@ -312,7 +316,10 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     
     if(toolbar.show_selection_ok) {
     	if(button_clicked(&L.selection_ok, pointer)) {
-    		
+    		canvas_save();
+    		brush_set_selection_active(false);
+    		toolbar.show_selection_ok = false;
+    		button_set_pressed(&L.selection, false);
     	}
     }
 
