@@ -37,6 +37,30 @@ static void setup_selection(ePointer_s pointer) {
     }
 }
 
+static void move_selection(ePointer_s pointer) {
+	if(pointer.action == E_POINTER_UP)
+	    return;
+	    
+	ivec2 cr = canvas_get_cr(pointer.pos);
+	    
+	if(brush.selection_mode != BRUSH_SELECTION_PASTE && pointer.action == E_POINTER_DOWN) {
+	    brush.selection_mode = BRUSH_SELECTION_PASTE;
+	    if(brush.selection_mode == BRUSH_SELECTION_COPY)
+	        selection_copy(canvas_image(), canvas.current_layer);
+	    else
+	        selection_cut(canvas_image(), canvas.current_layer, brush.secondary_color);
+	    
+	    toolbar.show_selection_copy_cut = false;
+	    toolbar.show_selection_ok = true;
+	}
+	
+	selection_move(cr.x-selection_size().x/2, 
+	        cr.y-selection_size().y/2);
+	
+	canvas_redo_image();
+    selection_paste(canvas_image(), canvas.current_layer);
+}
+
 void brush_init() {
     brush.current_color = COLOR_TRANSPARENT;
     brush.secondary_color = COLOR_TRANSPARENT;
@@ -52,6 +76,10 @@ void brush_pointer_event(ePointer_s pointer) {
     if(L.selection_active && !L.selection_set) {
         setup_selection(pointer);
         return;
+    }
+    
+    if(L.selection_set && brush.selection_mode != BRUSH_SELECTION_NONE) {
+        move_selection(pointer);
     }
         
     bool change = false;
@@ -126,4 +154,5 @@ void brush_set_selection_active(bool active) {
 	L.selection_set = false;
 	L.selection_pos = (ivec2) {{-1, -1}};
 	selection_kill();
+	brush.selection_mode = BRUSH_SELECTION_NONE;
 }

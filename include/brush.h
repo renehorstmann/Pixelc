@@ -13,12 +13,21 @@ enum brushmodes {
     BRUSH_MODE_FILL8,
     BRUSH_NUM_MODES};
 
+enum selectionmode {
+	BRUSH_SELECTION_NONE,
+	BRUSH_SELECTION_COPY,
+	BRUSH_SELECTION_CUT,
+	BRUSH_SELECTION_PASTE,
+	BRUSH_NUM_SELECTION_MODES
+};
+
 struct BrushGlobals_s {
 	Color_s current_color;
     Color_s secondary_color;
     enum brushmodes mode;
     int shape;
     bool shading_active;
+    enum selectionmode selection_mode;
 };
 extern struct BrushGlobals_s brush;
 

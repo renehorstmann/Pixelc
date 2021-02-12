@@ -296,6 +296,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     		
     		if(pressed) {
     			button_set_pressed(&L.selection_cut, false);
+    			brush.selection_mode = BRUSH_SELECTION_COPY;
     		}
     	}
     	
@@ -304,7 +305,14 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     		
     		if(pressed) {
     			button_set_pressed(&L.selection_copy, false);
+    			brush.selection_mode = BRUSH_SELECTION_CUT;
     		}
+    	}
+    }
+    
+    if(toolbar.show_selection_ok) {
+    	if(button_clicked(&L.selection_ok, pointer)) {
+    		
     	}
     }
 
