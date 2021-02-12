@@ -5,6 +5,7 @@ An opensource tile/sprite editor in C, using SDL2 and OpenGL, also running on An
 Ready to draw.
 Saves after each tip on the screen to sprite.png.
 Loads sprite.png at start, if available.
+An import button can load import.png as selection, if available.
 Palette, canvas size, animation size can be configured in code (main.c).
 
 ![example_image](example.jpg)
