@@ -10,27 +10,8 @@ Palette, brush, size can be configured in code
 ![example_image](example.jpg)
 
 ## Todo
-- Toolbar
-  - undo, clear
-  - Brush mode
-    - free
-    - dot
-    - dither
-    - dither2
-    - fill
-    - fill8
-    - line?
-    - circle?
-  - Brush size/shape
-    - Left, Right buttons
-    - dot, cross, 9, ball, ...
-  - shade
-    - color drop
-  - camera, grid, animation
-  - replace (from color to color)?
-  - selection
-    - new appearing copy, cut, load.png
-      - move until ok
+- selection code style
+- import button to load import.png as selection
 - Tile repeat
 - Layer Selection
 - Frame Selection (or grid shows frames?)
