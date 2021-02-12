@@ -1,6 +1,7 @@
 #include "canvas.h"
 #include "selection.h"
 #include "savestate.h"
+#include "toolbar.h"
 #include "brush_mode.h"
 #include "brush_shape.h"
 #include "brush.h"
@@ -30,8 +31,10 @@ static void setup_selection(ePointer_s pointer) {
     int cols = 1+abs(cr.x - L.selection_pos.x);
     int rows = 1+abs(cr.y - L.selection_pos.y);
     selection_init(left, top, cols, rows);
-    if(pointer.action == E_POINTER_UP)
+    if(pointer.action == E_POINTER_UP) {
     	L.selection_set = true;
+    	toolbar.show_selection_copy_cut = true;
+    }
 }
 
 void brush_init() {

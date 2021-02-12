@@ -4,6 +4,11 @@
 #include <stdbool.h>
 #include "e/input.h"
 
+struct ToolbarGlobals_s {
+	bool show_selection_copy_cut;
+	bool show_selection_ok;
+};
+extern struct ToolbarGlobals_s toolbar;
 
 void toolbar_init();
 

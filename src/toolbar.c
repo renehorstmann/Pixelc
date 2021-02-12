@@ -14,6 +14,8 @@
 #define MODES 6
 #define LONG_PRESS_TIME 1.0
 
+struct ToolbarGlobals_s toolbar;
+
 
 static struct {
     rRoSingle undo;
@@ -37,14 +39,20 @@ static struct {
     
     rRoSingle selection;
 
-
+    rRoSingle selection_copy;
+    rRoSingle selection_cut;
+    rRoSingle selection_ok;
+    
     float bottom;
 } L;
 
 static bool pos_in_toolbar(vec2 pos) {
+    float size = toolbar.show_selection_copy_cut 
+            || toolbar.show_selection_ok ?
+            53 : 34;
     if (camera_is_portrait_mode())
-        return pos.y >= camera_top() - 34;
-    return pos.x <= camera_left() + 34;
+        return pos.y >= camera_top() - size;
+    return pos.x <= camera_left() + size;
 }
 
 static void unpress(rRoSingle *btns, int n, int ignore) {
@@ -116,15 +124,15 @@ void toolbar_init() {
 
 
     button_init(&L.selection, r_texture_init_file("res/button_selection.png", NULL));
+    
+    
+    button_init(&L.selection_copy, r_texture_init_file("res/button_copy.png", NULL));
+    
+    button_init(&L.selection_cut, r_texture_init_file("res/button_cut.png", NULL));
+    
+    button_init(&L.selection_ok, r_texture_init_file("res/button_ok.png", NULL));
+    
 }
-const vec4 vertices[6] = {
-        {-0.5, -0.5, 0, 1},
-        {+0.5, -0.5, 0, 1},
-        {-0.5, +0.5, 0, 1},
-        {-0.5, +0.5, 0, 1},
-        {+0.5, -0.5, 0, 1},
-        {+0.5, +0.5, 0, 1}
-};
 
 void toolbar_update(float dtime) {
     L.undo.rect.pose = pose16(-80, 26);
@@ -161,13 +169,17 @@ void toolbar_update(float dtime) {
     L.camera.rect.pose = pose16(80, 9);
     L.animation.rect.pose = pose16(64, 26);
 
-    L.color_bg.rect.pose = L.color_drop.rect.pose = pose16(64, 10);
+    L.color_bg.rect.pose = L.color_drop.rect.pose = pose16(64, 9);
     L.color_drop.rect.color = color_to_vec4(brush.secondary_color);
 
-    L.shade.rect.pose = pose16(48, 10);
+    L.shade.rect.pose = pose16(48, 9);
     
     L.selection.rect.pose = pose16(48, 26);
 
+
+    L.selection_copy.rect.pose = pose16(-8, 43);
+    L.selection_cut.rect.pose = pose16(8, 43);
+    L.selection_ok.rect.pose = pose16(0, 43);
 }
 
 void toolbar_render() {
@@ -193,6 +205,14 @@ void toolbar_render() {
 
     r_ro_single_render(&L.shade);
     r_ro_single_render(&L.selection);
+    
+    if(toolbar.show_selection_copy_cut) {
+    	r_ro_single_render(&L.selection_copy);
+    	r_ro_single_render(&L.selection_cut);
+    }
+    if(toolbar.show_selection_ok) {
+    	r_ro_single_render(&L.selection_ok);
+    }
 
 }
 
@@ -264,6 +284,28 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if(button_toggled(&L.selection, pointer)) {
         bool pressed = button_is_pressed(&L.selection);
         brush_set_selection_active(pressed);
+        toolbar.show_selection_copy_cut = false;
+        toolbar.show_selection_ok = false;
+        button_set_pressed(&L.selection_copy, false);
+        button_set_pressed(&L.selection_cut, false);
+    }
+    
+    if(toolbar.show_selection_copy_cut) {
+    	if(button_toggled(&L.selection_copy, pointer)) {
+    		bool pressed = button_is_pressed(&L.selection_copy);
+    		
+    		if(pressed) {
+    			button_set_pressed(&L.selection_cut, false);
+    		}
+    	}
+    	
+    	if(button_toggled(&L.selection_cut, pointer)) {
+    		bool pressed = button_is_pressed(&L.selection_cut);
+    		
+    		if(pressed) {
+    			button_set_pressed(&L.selection_copy, false);
+    		}
+    	}
     }
 
     return true;
