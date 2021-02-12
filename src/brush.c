@@ -45,11 +45,13 @@ static void move_selection(ePointer_s pointer) {
 	    
 	if(brush.selection_mode != BRUSH_SELECTION_PASTE && pointer.action == E_POINTER_DOWN) {
 	    brush.selection_mode = BRUSH_SELECTION_PASTE;
+	    puts("cpycut");
 	    if(brush.selection_mode == BRUSH_SELECTION_COPY)
 	        selection_copy(canvas_image(), canvas.current_layer);
 	    else
 	        selection_cut(canvas_image(), canvas.current_layer, brush.secondary_color);
 	    
+	    canvas_save();
 	    toolbar.show_selection_copy_cut = false;
 	    toolbar.show_selection_ok = true;
 	}

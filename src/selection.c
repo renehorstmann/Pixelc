@@ -61,7 +61,7 @@ void selection_copy(const Image *from, int layer) {
 		for(int c=0; c<L.cols; c++) {
 		    L.opt_data[r*L.cols + c] =
 		            *image_pixel((Image *)from, layer, 
-		            r+L.top, c+L.left);
+		            c+L.left, r+L.top);
 		}
 	}
 }
@@ -75,7 +75,7 @@ void selection_cut(Image *from, int layer, Color_s replace) {
 	
 	for(int r=0; r<L.rows; r++) {
 		for(int c=0; c<L.cols; c++) {
-			*image_pixel(from, layer, r+L.left, c+L.top) = replace;
+			*image_pixel(from, layer, c+L.left, r+L.top) = replace;
 		}
 	}
 }
@@ -94,7 +94,7 @@ void selection_paste(Image *to, int layer) {
 		    if(to_c<0 || to_c >= to->cols)
 		        continue;
 		        
-		    *image_pixel(to, layer, to_r, to_c) =
+		    *image_pixel(to, layer, to_c, to_r) =
 		            L.opt_data[r*L.cols + c]; 
 		}
 	}
