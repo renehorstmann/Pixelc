@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "r/texture.h"
 #include "button.h"
 #include "u/pose.h"
@@ -15,11 +16,22 @@
 #define MODES 6
 #define LONG_PRESS_TIME 1.0
 
+#define TOOL_MAX 32
+
 struct ToolbarGlobals_s toolbar;
+
+typedef struct {
+	rRoSingle btn;
+	float x, y;
+} Tool;
 
 
 static struct {
-    rRoSingle undo;
+    Tool tools[TOOL_MAX];
+    int tools_size;
+    
+    Tool *undo;
+    
     rRoSingle clear;
     rRoSingle import;
 
@@ -47,6 +59,16 @@ static struct {
     
     float bottom;
 } L;
+
+static Tool *tool_append(float x, float y, const char *btn_file) {
+	assert(L.tools_size < TOOL_MAX);
+	Tool *self = &L.tools[L.tools_size++];
+	
+	button_init(&self->btn, r_texture_init_file(btn_file, NULL));
+	self->x = x;
+	self->y = y;
+	return self;
+}
 
 static bool pos_in_toolbar(vec2 pos) {
     float size = toolbar.show_selection_copy_cut 
@@ -82,8 +104,9 @@ static mat4 pose16(float col, float row) {
 
 
 void toolbar_init() {
-    button_init(&L.undo, r_texture_init_file("res/button_undo.png", NULL));
-
+    L.undo = tool_append(-80, 26, "res/button_undo.png");
+    
+    
     button_init(&L.clear, r_texture_init_file("res/button_clear.png", NULL));
     
     button_init(&L.import, r_texture_init_file("res/button_import.png", NULL));
@@ -139,7 +162,12 @@ void toolbar_init() {
 }
 
 void toolbar_update(float dtime) {
-    L.undo.rect.pose = pose16(-80, 26);
+    for(int i=0; i<L.tools_size; i++) {
+        Tool *t = &L.tools[i];
+        t->btn.rect.pose = pose16(t->x, t->y);
+    }
+     
+    
     L.clear.rect.pose = pose16(-80, 9);
     L.import.rect.pose = pose16(-62, 9);
     L.selection.rect.pose = pose16(-44, 9);
@@ -187,7 +215,10 @@ void toolbar_update(float dtime) {
 }
 
 void toolbar_render() {
-    r_ro_single_render(&L.undo);
+    for(int i=0; i<L.tools_size; i++) {
+    	r_ro_single_render(&L.tools[i].btn);
+    }
+    
     r_ro_single_render(&L.clear);
     r_ro_single_render(&L.import);
 
@@ -226,7 +257,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if (!pos_in_toolbar(pointer.pos.xy))
         return false;
 
-    if (button_clicked(&L.undo, pointer)) {
+    if (button_clicked(&L.undo->btn, pointer)) {
         savestate_undo();
     }
     
