@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     canvas_camera_init();
     background_init();
     canvas_init(32, 16);
-    animation_init(8, 4);
+    animation_init(2, 2);
     brush_init();
     canvas_camera_control_init();
     palette_init();

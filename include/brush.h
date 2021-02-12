@@ -42,7 +42,7 @@ bool brush_draw(int c, int r);
 
 void brush_abort_current_draw();
 
-void brush_set_selection_active(bool active);
+void brush_set_selection_active(bool active, bool reset);
 
 
 #endif //PIXELC_BRUSH_H

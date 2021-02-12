@@ -94,11 +94,15 @@ void brush_pointer_event(ePointer_s pointer) {
         return;
         
     if(L.selection_active) {
-        if(!L.selection_set)
+        if(!L.selection_set) {
             setup_selection(pointer);
-        else if(brush.selection_mode != BRUSH_SELECTION_NONE)
+            return;
+        }
+        
+        if(brush.selection_mode != BRUSH_SELECTION_NONE) {
             move_selection(pointer);
-        return;
+            return;
+        }
     }
         
     bool change = false;
@@ -168,10 +172,12 @@ void brush_abort_current_draw() {
 	}
 }
 
-void brush_set_selection_active(bool active) {
+void brush_set_selection_active(bool active, bool reset) {
 	L.selection_active = active;
-	L.selection_set = false;
-	L.selection_pos = (ivec2) {{-1, -1}};
-	selection_kill();
-	brush.selection_mode = BRUSH_SELECTION_NONE;
+	if(reset) {
+    	L.selection_set = false;
+    	L.selection_pos = (ivec2) {{-1, -1}};
+    	selection_kill();
+    	brush.selection_mode = BRUSH_SELECTION_NONE;
+	}
 }

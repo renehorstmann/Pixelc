@@ -9,6 +9,7 @@
 #include "animation.h"
 #include "selection.h"
 #include "savestate.h"
+#include "io.h"
 #include "toolbar.h"
 
 #define MODES 6
@@ -20,6 +21,7 @@ struct ToolbarGlobals_s toolbar;
 static struct {
     rRoSingle undo;
     rRoSingle clear;
+    rRoSingle import;
 
     rRoSingle modes[MODES];
 
@@ -83,6 +85,8 @@ void toolbar_init() {
     button_init(&L.undo, r_texture_init_file("res/button_undo.png", NULL));
 
     button_init(&L.clear, r_texture_init_file("res/button_clear.png", NULL));
+    
+    button_init(&L.import, r_texture_init_file("res/button_import.png", NULL));
 
     // modes
     for (int i = 0; i < MODES; i++) {
@@ -137,17 +141,17 @@ void toolbar_init() {
 void toolbar_update(float dtime) {
     L.undo.rect.pose = pose16(-80, 26);
     L.clear.rect.pose = pose16(-80, 9);
+    L.import.rect.pose = pose16(-62, 9);
 
     for (int i = 0; i < MODES; i++) {
-        L.modes[i].rect.pose = pose16(-60 + 16 * i, 9);
+        L.modes[i].rect.pose = pose16(-55 + 16 * i, 26);
     }
     
-    L.shape.rect.pose = pose_wh(-60, 26,
-                                BRUSH_KERNEL_TEXTURE_SIZE*2, BRUSH_KERNEL_TEXTURE_SIZE*2);  // should be 16x16
+    L.shape.rect.pose = pose16(-30, 9);  // should be 16x16
     L.shape.rect.uv = brush_shape_kernel_texture_uv(brush.shape);
 
-    L.shape_minus.rect.pose = pose16(0, 26);
-    L.shape_plus.rect.pose = pose16(16, 26);
+    L.shape_minus.rect.pose = pose16(0, 9);
+    L.shape_plus.rect.pose = pose16(16, 9);
 
     if (button_is_pressed(&L.shape_minus)) {
         L.shape_minus_time += dtime;
@@ -185,6 +189,7 @@ void toolbar_update(float dtime) {
 void toolbar_render() {
     r_ro_single_render(&L.undo);
     r_ro_single_render(&L.clear);
+    r_ro_single_render(&L.import);
 
     for (int i = 0; i < MODES; i++) {
         r_ro_single_render(&L.modes[i]);
@@ -223,6 +228,28 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     if (button_clicked(&L.undo, pointer)) {
         savestate_undo();
+    }
+    
+    if (button_clicked(&L.import, pointer)) {
+    	brush_set_selection_active(false, true);
+    	if(toolbar.show_selection_ok) {
+    		canvas_redo_image();
+    	}
+    	toolbar.show_selection_copy_cut = false;
+    	
+    	Image *img = io_load_image("import.png");
+    	button_set_pressed(&L.selection, img!=NULL);
+    	toolbar.show_selection_ok = img!=NULL;
+    	
+    	
+    	if(img) {
+    		selection_init(0, 0, img->cols, img->rows);
+    		selection_copy(img, 0);
+    		selection_paste(canvas_image(), canvas.current_layer);
+    		image_delete(img);
+    		brush.selection_mode = BRUSH_SELECTION_PASTE;
+    		brush_set_selection_active(true, false);
+    	}
     }
 
     for (int i = 0; i < MODES; i++) {
@@ -283,7 +310,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     if(button_toggled(&L.selection, pointer)) {
         bool pressed = button_is_pressed(&L.selection);
-        brush_set_selection_active(pressed);
+        brush_set_selection_active(pressed, true);
         button_set_pressed(&L.selection_copy, false);
         button_set_pressed(&L.selection_cut, false);
         
@@ -317,7 +344,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if(toolbar.show_selection_ok) {
     	if(button_clicked(&L.selection_ok, pointer)) {
     		canvas_save();
-    		brush_set_selection_active(false);
+    		brush_set_selection_active(false, true);
     		toolbar.show_selection_ok = false;
     		button_set_pressed(&L.selection, false);
     	}
