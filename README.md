@@ -10,7 +10,6 @@ Palette, brush, size can be configured in code
 ![example_image](example.jpg)
 
 ## Todo
-- selection size bug
 - selection code style
 - import button to load import.png as selection
 - Tile repeat

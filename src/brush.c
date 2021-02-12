@@ -18,27 +18,39 @@ static struct {
 
 
 static void setup_selection(ePointer_s pointer) {
+    Image *img = canvas_image();
+    int layer = canvas.current_layer;
+    
+    if(selection_active() && pointer.action == E_POINTER_UP) {
+    	L.selection_set = true;
+    	return;
+    }
 	ivec2 cr = canvas_get_cr(pointer.pos);
-	if(!image_contains(canvas_image(), cr.x, cr.y))
+	if(!image_contains(img, cr.x, cr.y))
 	    return;
 	    
 	if(L.selection_pos.x < 0) {
-	    if(pointer.action == E_POINTER_DOWN)
+	    if(pointer.action == E_POINTER_DOWN) {
 	        L.selection_pos = cr;
-	    return;
+	        toolbar.show_selection_copy_cut = true;
+	    }
 	}
+	
+	if(L.selection_pos.x < 0)
+	    return;
+	    
     int left = cr.x < L.selection_pos.x ? cr.x : L.selection_pos.x;
     int top = cr.y < L.selection_pos.y ? cr.y : L.selection_pos.y;
     int cols = 1+abs(cr.x - L.selection_pos.x);
     int rows = 1+abs(cr.y - L.selection_pos.y);
+    
     selection_init(left, top, cols, rows);
-    if(pointer.action == E_POINTER_UP) {
-    	L.selection_set = true;
-    	toolbar.show_selection_copy_cut = true;
-    }
 }
 
 static void move_selection(ePointer_s pointer) {
+	Image *img = canvas_image();
+    int layer = canvas.current_layer;
+    
 	if(pointer.action == E_POINTER_UP)
 	    return;
 	    
@@ -48,9 +60,9 @@ static void move_selection(ePointer_s pointer) {
 	    assert(brush.selection_mode == BRUSH_SELECTION_COPY 
 	            || brush.selection_mode == BRUSH_SELECTION_CUT);
 	    if(brush.selection_mode == BRUSH_SELECTION_COPY)
-	        selection_copy(canvas_image(), canvas.current_layer);
+	        selection_copy(img, layer);
 	    else
-	        selection_cut(canvas_image(), canvas.current_layer, brush.secondary_color);
+	        selection_cut(img, layer, brush.secondary_color);
 	    
 	    canvas_save();
 	    brush.selection_mode = BRUSH_SELECTION_PASTE;
@@ -62,7 +74,7 @@ static void move_selection(ePointer_s pointer) {
 	        cr.y-selection_size().y/2);
 	
 	canvas_redo_image();
-    selection_paste(canvas_image(), canvas.current_layer);
+    selection_paste(img, layer);
 }
 
 void brush_init() {
@@ -77,13 +89,11 @@ void brush_pointer_event(ePointer_s pointer) {
     if(pointer.id!=0)
         return;
         
-    if(L.selection_active && !L.selection_set) {
-        setup_selection(pointer);
-        return;
-    }
-    
-    if(L.selection_set && brush.selection_mode != BRUSH_SELECTION_NONE) {
-        move_selection(pointer);
+    if(L.selection_active) {
+        if(!L.selection_set)
+            setup_selection(pointer);
+        else if(brush.selection_mode != BRUSH_SELECTION_NONE)
+            move_selection(pointer);
         return;
     }
         
