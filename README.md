@@ -13,7 +13,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ## Todo
 - selection code style
 - apply new button style
-- Tile repeat as background
 - Frame Selection (or grid shows frames?)
 - Layer Selection
 - VertexColors?

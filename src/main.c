@@ -16,6 +16,42 @@
 #include "input.h"
 #include "savestate.h"
 
+//
+// options
+//
+
+// canvas size
+#define COLS 16
+#define ROWS 16
+
+// animation + tiles
+// screen size is >=180 pixel
+// 16 Pixel * 11 cols = 180...
+#define PLAY_COLS 11
+#define PLAY_ROWS 3
+#define PLAY_FRAMES 1
+#define PLAY_FPS 2.0
+ 
+// #define PALETTE grayscale
+// #define PALETTE grayscale_alpha
+// #define PALETTE grayscale
+// #define PALETTE pixilmatt
+// #define PALETTE slso8
+// #define PALETTE gameboy
+// #define PALETTE endesga32
+// #define PALETTE endesga64
+// #define PALETTE nes
+ #define PALETTE aap64
+
+//
+// end of options
+//
+
+
+// macro to call palette_presave_PALETTE()
+#define Cat(a, b) a ## b
+#define PalettePresave(pal) Cat(palette_presave_, pal)
+
 
 static void main_loop(float delta_time);
 
@@ -36,8 +72,8 @@ int main(int argc, char **argv) {
     camera_init();
     canvas_camera_init();
     background_init();
-    canvas_init(32, 16);
-    animation_init(2, 2);
+    canvas_init(COLS, ROWS);
+    animation_init(PLAY_COLS, PLAY_ROWS, PLAY_FRAMES, PLAY_FPS);
     brush_init();
     canvas_camera_control_init();
     palette_init();
@@ -45,15 +81,9 @@ int main(int argc, char **argv) {
     input_init();
     savestate_init();
 
-//    palette_presave_grayscale();
-//    palette_presave_grayscale_alpha();
-    palette_presave_pixilmatt();
-//    palette_presave_slso8();
-//    palette_presave_gameboy();
-//    palette_presave_endesga32();
-//    palette_presave_endesga64();
-//    palette_presave_nes();
-//    palette_presave_aap64();
+    // calls "palette_presave_PALETTE();"
+    PalettePresave(PALETTE)();
+
 
     // save start frame
     savestate_save();
