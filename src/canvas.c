@@ -131,7 +131,7 @@ void canvas_init(int cols, int rows) {
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
 
-    Image *img = io_load_image("sprite.png");
+    Image *img = io_load_image(io.default_image_file);
     if(img) {
         image_copy(L.image, img);
         image_delete(img);
@@ -222,7 +222,7 @@ void canvas_save() {
 	if(!image_equals(L.image, L.last_image)) {
 	    image_copy(L.last_image, L.image);
 	    savestate_save();
-        io_save_image(canvas_image(), "sprite.png");
+        io_save_image(canvas_image(), io.default_image_file);
 	}
 }
 
@@ -241,6 +241,6 @@ static void load_state(const void *data, size_t size) {
 	L.image = image_new_clone(data);
 	image_copy(L.last_image, L.image);
 	assert(image_full_size(L.image) == size);
-	io_save_image(canvas_image(), "sprite.png");
+	io_save_image(canvas_image(), io.default_image_file);
 }
 

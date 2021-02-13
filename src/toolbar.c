@@ -268,7 +268,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     	}
     	toolbar.show_selection_copy_cut = false;
     	
-    	Image *img = io_load_image("import.png");
+    	Image *img = io_load_image(io.default_import_file);
     	button_set_pressed(&L.selection, img!=NULL);
     	toolbar.show_selection_ok = img!=NULL;
     	

@@ -2,6 +2,12 @@
 #include "canvas.h"
 #include "io.h"
 
+struct IoGlobals_s io = {
+	"sprite.png",
+	"import.png"
+};
+
+
 static SDL_Surface *load_buffer(void *data, int width, int height) {
     // Set up the pixel format color masks for RGB(A) byte arrays.
     Uint32 rmask, gmask, bmask, amask;
