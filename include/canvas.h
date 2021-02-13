@@ -12,7 +12,7 @@ struct CanvasGlobals_s {
 };
 extern struct CanvasGlobals_s canvas;
 
-void canvas_init(int cols, int rows);
+void canvas_init(int cols, int rows, int grid_cols, int grid_rows);
 
 void canvas_update(float dtime);
 

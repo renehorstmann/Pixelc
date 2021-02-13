@@ -23,7 +23,7 @@ static bool intersection_plane_plane(vec3 *out_pos, vec3 *out_dir,
     // hessian: (nx, ny, nz, d)
     // distance point to plane = x*nx + y*ny + z*nz + 1*d
 
-    mat3 A;
+    mat3 A = {{0}};
     A = mat3_set_row(A, plane_hessian_a.xyz, 0);
     A = mat3_set_row(A, plane_hessian_b.xyz, 1);
     A = mat3_set_row(A, dir, 2);

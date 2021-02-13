@@ -11,8 +11,8 @@ void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink) {
     self->vp = vp;
 
     self->program = r_compile_glsl_from_files((char *[]) {
-            "res/shader/r/single.vsh",
-            "res/shader/r/single.fsh",
+            "res/r/single.vsh",
+            "res/r/single.fsh",
             NULL
     });
 

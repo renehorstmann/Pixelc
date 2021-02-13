@@ -29,8 +29,8 @@ void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink) 
     self->vp = vp;
 
     self->program = r_compile_glsl_from_files((char *[]) {
-            "res/shader/r/batch.vsh",
-            "res/shader/r/batch.fsh",
+            "res/r/batch.vsh",
+            "res/r/batch.fsh",
             NULL});
     const int loc_pose = 0;
     const int loc_uv = 4;

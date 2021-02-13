@@ -39,8 +39,8 @@ void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_
     self->vp = vp;
 
     self->program = r_compile_glsl_from_files((char *[]) {
-            "res/shader/r/particle.vsh",
-            "res/shader/r/particle.fsh",
+            "res/r/particle.vsh",
+            "res/r/particle.fsh",
             NULL});
     const int loc_pose = 0;
     const int loc_uv = 4;

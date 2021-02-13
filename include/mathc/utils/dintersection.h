@@ -23,7 +23,7 @@ static bool dintersection_plane_plane(dvec3 *out_pos, dvec3 *out_dir,
     // hessian: (nx, ny, nz, d)
     // distance point to plane = x*nx + y*ny + z*nz + 1*d
 
-    dmat3 A;
+    dmat3 A = {{0}};
     A = dmat3_set_row(A, plane_hessian_a.xyz, 0);
     A = dmat3_set_row(A, plane_hessian_b.xyz, 1);
     A = dmat3_set_row(A, dir, 2);

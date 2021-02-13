@@ -11,7 +11,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
-- rRoText -> batched text from texture
 - create SOME Framework
    - comments
 - Frame Selection (or grid shows frames?)

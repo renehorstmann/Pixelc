@@ -93,7 +93,7 @@ static void save_state(void **data, size_t *size);
 static void load_state(const void *data, size_t size);
 
 
-void canvas_init(int cols, int rows) {
+void canvas_init(int cols, int rows, int grid_cols, int grid_rows) {
     int layers = 1;
     
     L.save_id = savestate_register(save_state, load_state);
@@ -126,8 +126,8 @@ void canvas_init(int cols, int rows) {
     r_texture_filter_nearest(bg_tex);
     r_ro_single_init(&L.bg, canvas_camera.gl, bg_tex);
     {    
-        float w = cols <= 8 ? 1 : cols/16.0f;
-        float h = rows <= 8 ? 1 : rows/16.0f;
+        float w = (float) cols/(2*grid_cols);
+        float h = (float) rows/(2*grid_rows);
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
 

@@ -1,4 +1,5 @@
 #include "mathc/float.h"
+#include "mathc/utils/float.h"
 #include "e/e.h"
 #include "r/r.h"
 #include "u/u.h"
@@ -28,9 +29,9 @@
 // animation + tiles
 // screen size is >=180 pixel
 // 16 Pixel * 11 cols = 180...
-#define PLAY_COLS 11
-#define PLAY_ROWS 3
-#define PLAY_FRAMES 2
+#define PLAY_COLS 1
+#define PLAY_ROWS 1
+#define PLAY_FRAMES 1
 #define PLAY_FPS 2.0
  
 // uncomment the used palette:
@@ -48,6 +49,9 @@
 
 #define BG_COLOR_A "#222222"
 #define BG_COLOR_B "#333344"
+
+#define GRID_COLS 5
+#define GRID_ROWS 5
 
 
 // uncomment to change the file locations:
@@ -89,7 +93,7 @@ int main(int argc, char **argv) {
     camera_init();
     canvas_camera_init();
     background_init(color_from_hex(BG_COLOR_A), color_from_hex(BG_COLOR_B));
-    canvas_init(COLS, ROWS);
+    canvas_init(COLS, ROWS, GRID_COLS, GRID_ROWS);
     animation_init(PLAY_COLS, PLAY_ROWS, PLAY_FRAMES, PLAY_FPS);
     brush_init();
     canvas_camera_control_init();
@@ -99,8 +103,7 @@ int main(int argc, char **argv) {
     savestate_init();
 
     // calls "palette_presave_PALETTE();"
-    PalettePresave(PALETTE)();
-
+    PalettePresave(PALETTE)();    
 
     // save start frame
     savestate_save();
