@@ -1,6 +1,7 @@
 #ifndef R_DEFINITIONS_H
 #define R_DEFINITIONS_H
 
+// will be appended on the top of a shader
 #if defined GLES || __EMSCRIPTEN__
 #define R_VERTEX_BEGIN "#version 300 es\n"
 #define R_FRAGMENT_BEGIN "#version 300 es\nprecision mediump float;\n"

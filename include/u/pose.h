@@ -5,6 +5,21 @@
 #include <math.h>
 #include "mathc/mat/mat4.h"
 
+// Pose matrix:
+// Xx Yx Zx Tx
+// Xy Yy Zy Ty
+// Xz Yz Zz Tz
+// 0  0  0  1
+
+// Pose in form of eye will be at position 0, 0, with a size of 1, 1
+
+// Example for 2D X,Y,W,W: 10, 20, 34, 44
+// 17 22 0  10
+// 17 22 0  20
+// 0  0  1  0
+// 0  0  0  1
+
+// u_pose_aa_* are axis aligned (angle=0)
 
 static float u_pose_get_x(mat4 p) {
     return p.m30;

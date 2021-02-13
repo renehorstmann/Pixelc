@@ -6,6 +6,7 @@
 // return true for a newline
 typedef bool (*r_ro_text_uv_fn)(mat4 *uv, char c);
 
+// Uses rRoBatch to render a text, based on a font sprite sheet
 typedef struct {
     rRoBatch ro;
     r_ro_text_uv_fn uv_fn;

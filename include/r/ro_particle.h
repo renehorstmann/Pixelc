@@ -18,6 +18,7 @@ typedef struct {
     float start_time;
 } rParticleRect_s;
 
+// Particle system
 typedef struct {
     rParticleRect_s *rects;
     int num;

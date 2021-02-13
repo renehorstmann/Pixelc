@@ -5,6 +5,7 @@
 #include "core.h"
 #include "rect.h"
 
+// Renders a single rect in a draw call
 typedef struct {
     rRect_s rect;
     const float *vp;

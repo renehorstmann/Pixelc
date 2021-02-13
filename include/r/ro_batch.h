@@ -5,7 +5,7 @@
 #include "core.h"
 #include "rect.h"
 
-
+// Renders multiple rects with a single draw call
 typedef struct {
     rRect_s *rects;
     int num;
