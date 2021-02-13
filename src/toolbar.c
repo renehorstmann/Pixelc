@@ -55,7 +55,6 @@ static struct {
     rRoSingle selection_cut;
     rRoSingle selection_ok;
     
-    float bottom;
 } L;
 
 static rRoSingle *tool_append(float x, float y, const char *btn_file) {
