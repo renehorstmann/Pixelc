@@ -22,6 +22,8 @@ void canvas_camera_init() {
     canvas_camera.matrices.p_inv = mat4_eye();
     canvas_camera.matrices.vp = mat4_eye();
     canvas_camera.matrices.v_p_inv = mat4_eye();
+   
+    canvas_camera_update();
 }
 
 void canvas_camera_update() {

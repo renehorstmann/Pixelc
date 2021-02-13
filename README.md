@@ -1,5 +1,6 @@
 # Pixelc
-An opensource tile/sprite editor in C, using SDL2 and OpenGL, also running on Android
+An opensource tile/sprite editor in C, using SDL2 and OpenGL, also running on Android.
+Based on [some](https://github.com/renehorstmann/some) framework.
 
 ## Status:
 Ready to draw.
