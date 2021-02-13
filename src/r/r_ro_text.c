@@ -3,8 +3,32 @@
 #include "r/ro_text.h"
 #include "r/texture.h"
 
-// todo remove
-#include "u/pose.h"
+// from u/pose
+static void u_pose_set_x(mat4 *p, float x) {
+    p->m30 = x;
+}
+static void u_pose_set_y(mat4 *p, float y) {
+    p->m31 = y;
+}
+static void u_pose_set_xy(mat4 *p, float x, float y) {
+    u_pose_set_x(p, x);
+    u_pose_set_y(p, y);
+}
+static void u_pose_set_size_angle(mat4 *p, float w, float h, float angle_rad) {
+    p->m00 = cosf(angle_rad) * w;
+    p->m01 = sinf(angle_rad) * w;
+    p->m10 = -sinf(angle_rad) * h;
+    p->m11 = cosf(angle_rad) * h;
+}
+static void u_pose_set(mat4 *p, float x, float y, float w, float h, float angle_rad) {
+    u_pose_set_xy(p, x, y);
+    u_pose_set_size_angle(p, w, h, angle_rad);
+}
+static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
+	u_pose_set(p, l+w/2, t+w/2, w, h, 0);
+}
+// end of u/pose copy
+
 
 
 static void hide(rRoText *self, int from) {

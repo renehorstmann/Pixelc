@@ -9,9 +9,11 @@
 #define E_MAX_POINTER_EVENTS 32
 #define E_MAX_WHEEL_EVENTS 32
 
+// ePointer_s::id for middle and right button clicks
 #define E_POINTER_BUTTON_MIDDLE -1
 #define E_POINTER_BUTTON_RIGHT -2
 
+// Keyboard state
 typedef struct {
     bool up, left, right, down;
     bool enter, space;
@@ -19,8 +21,10 @@ typedef struct {
 
 struct eInputGloabals_s {
     eInputKeys keys;
+    
+    // acceleration sensor (mobile)
     bool accel_active;
-    float accel[3];
+    vec3 accel;
 };
 extern struct eInputGloabals_s e_input;
 
@@ -44,10 +48,13 @@ typedef void (*eWheelEventFn)(bool up, void *user_data);
 
 void e_input_init();
 
+// runs the sdl event loop
 void e_input_update();
 
+// registers a callback for mouse and touch
 void e_input_register_pointer_event(ePointerEventFn event, void *user_data);
 
+// registers a callback for mouse wheel
 void e_input_register_wheel_event(eWheelEventFn event, void *user_data);
 
 #endif //E_INPUT_H

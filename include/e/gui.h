@@ -1,6 +1,8 @@
 #ifndef E_GUI_H
 #define E_GUI_H
 
+
+// setup nuklear
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
@@ -25,11 +27,13 @@ void e_gui_init();
 
 void e_gui_kill();
 
+void e_gui_render();
+
+// creates a nuklear window to set the float attribute with a slider
 void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, float max, float step);
 
+// nuklear test window
 void e_gui_test();
-
-void e_gui_render();
 
 
 #endif //E_GUI_H

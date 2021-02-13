@@ -33,6 +33,11 @@ void e_gui_kill() {
     nk_sdl_shutdown();
 }
 
+void e_gui_render() {
+    L.auto_offset = 0;
+    nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
+}
+
 void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, float max, float step) {
 
     struct nk_context *ctx = e_gui.ctx;
@@ -87,9 +92,4 @@ void e_gui_test() {
 
 
     printf("bg: %f %f %f %f\n", bg.r, bg.g, bg.b, bg.a);
-}
-
-void e_gui_render() {
-    L.auto_offset = 0;
-    nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
 }

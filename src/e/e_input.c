@@ -155,7 +155,7 @@ static void input_handle_sensors(SDL_Event *event) {
     }
     
     const float *data = event->sensor.data;
-    memcpy(e_input.accel, data, sizeof(e_input.accel));
+    memcpy(e_input.accel.v, data, sizeof(e_input.accel));
     
     //SDL_Log("Gyro update: %.2f, %.2f, %.2f\n", data[0], data[1], data[2]);
       

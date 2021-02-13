@@ -18,7 +18,7 @@ GLuint r_ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
 }
 
 
-// from u/pose.h
+// from u/pose
 static float u_pose_get_w(mat4 p) {
     return sqrtf(powf(p.m00, 2) + powf(p.m01, 2));
 }
@@ -39,6 +39,7 @@ static void u_pose_set_size(mat4 *p, float w, float h) {
     u_pose_set_w(p, w);
     u_pose_set_h(p, h);
 }
+// end of u/pose copy
 
 
 void r_ro_ttftext_init(rRoTtfText *self, const float *vp, vec4 color, const char *text) {

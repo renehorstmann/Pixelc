@@ -23,8 +23,8 @@
 //
 
 // canvas size
-#define COLS 64
-#define ROWS 64
+#define COLS 32
+#define ROWS 32
 
 // animation + tiles
 // screen size is >=180 pixel
@@ -50,8 +50,8 @@
 #define BG_COLOR_A "#222222"
 #define BG_COLOR_B "#333344"
 
-#define GRID_COLS 5
-#define GRID_ROWS 5
+#define GRID_COLS 8
+#define GRID_ROWS 8
 
 
 // uncomment to change the file locations:
