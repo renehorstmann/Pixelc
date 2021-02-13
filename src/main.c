@@ -22,8 +22,8 @@
 //
 
 // canvas size
-#define COLS 32
-#define ROWS 16
+#define COLS 64
+#define ROWS 64
 
 // animation + tiles
 // screen size is >=180 pixel
