@@ -43,6 +43,10 @@
 // #define PALETTE nes
  #define PALETTE aap64
 
+
+#define BG_COLOR_A "#222222"
+#define BG_COLOR_B "#333344"
+
 //
 // end of options
 //
@@ -71,7 +75,7 @@ int main(int argc, char **argv) {
     // init systems
     camera_init();
     canvas_camera_init();
-    background_init();
+    background_init(color_from_hex(BG_COLOR_A), color_from_hex(BG_COLOR_B));
     canvas_init(COLS, ROWS);
     animation_init(PLAY_COLS, PLAY_ROWS, PLAY_FRAMES, PLAY_FPS);
     brush_init();
