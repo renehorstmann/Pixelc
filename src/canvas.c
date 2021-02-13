@@ -86,7 +86,7 @@ static void setup_selection() {
 		u_pose_set(&L.selection_border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
 	}
 	
-	r_ro_batch_update(&L.selection_border, 0, L.selection_border.num);
+	r_ro_batch_update(&L.selection_border);
 }
 
 static void save_state(void **data, size_t *size);

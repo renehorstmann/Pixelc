@@ -167,7 +167,7 @@ void r_ro_particle_kill(rRoParticle *self) {
     *self = (rRoParticle) {0};
 }
 
-void r_ro_particle_update(rRoParticle *self, int offset, int size) {
+void r_ro_particle_update_sub(rRoParticle *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
     offset = clamp_range(offset, 0, self->num);
@@ -196,7 +196,7 @@ void r_ro_particle_update(rRoParticle *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void r_ro_particle_render(rRoParticle *self, float time) {
+void r_ro_particle_render_sub(rRoParticle *self, float time, int num) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
@@ -209,7 +209,7 @@ void r_ro_particle_render(rRoParticle *self, float time) {
 
     {
         glBindVertexArray(self->vao);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, self->num);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }
 

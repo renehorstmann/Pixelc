@@ -33,10 +33,19 @@ void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_
 
 void r_ro_particle_kill(rRoParticle *self);
 
-void r_ro_particle_update(rRoParticle *self, int offset, int size);
+void r_ro_particle_update_sub(rRoParticle *self, int offset, int size);
 
-void r_ro_particle_render(rRoParticle *self, float time);
+void r_ro_particle_render_sub(rRoParticle *self, float time, int num);
 
 void r_ro_particle_set_texture(rRoParticle *self, GLuint tex_sink);
+
+
+static void r_ro_particle_update(rRoParticle *self) {
+	r_ro_particle_update_sub(self, 0, self->num);
+}
+
+static void r_ro_particle_render(rRoParticle *self, float time) {
+	r_ro_particle_render_sub(self, time, self->num);
+}
 
 #endif //R_RO_PARTICLE_H

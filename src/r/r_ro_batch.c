@@ -100,7 +100,7 @@ void r_ro_batch_kill(rRoBatch *self) {
     *self = (rRoBatch) {0};
 }
 
-void r_ro_batch_update(rRoBatch *self, int offset, int size) {
+void r_ro_batch_update_sub(rRoBatch *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
     offset = clamp_range(offset, 0, self->num);
@@ -130,7 +130,7 @@ void r_ro_batch_update(rRoBatch *self, int offset, int size) {
 }
 
 
-void r_ro_batch_render(rRoBatch *self) {
+void r_ro_batch_render_sub(rRoBatch *self, int num) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
@@ -141,7 +141,7 @@ void r_ro_batch_render(rRoBatch *self) {
 
     {
         glBindVertexArray(self->vao);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, self->num);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }
 

@@ -129,8 +129,8 @@ void palette_update(float dtime) {
 
     L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
 
-    r_ro_batch_update(&L.palette_ro, 0, L.palette_ro.num);
-    r_ro_batch_update(&L.background_ro, 0, L.background_ro.num);
+    r_ro_batch_update(&L.palette_ro);
+    r_ro_batch_update(&L.background_ro);
 }
 
 void palette_render() {
