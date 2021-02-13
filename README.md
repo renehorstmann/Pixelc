@@ -12,8 +12,9 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Todo
 - selection code style
-- apply new button style
 - rRoText -> batched text from texture
+- create SOME Framework
+   - comments
 - Frame Selection (or grid shows frames?)
 - Layer Selection
 - VertexColors?
