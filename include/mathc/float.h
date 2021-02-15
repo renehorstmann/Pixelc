@@ -5,6 +5,8 @@
 
 #include "io/float.h"
 
+#include "sca/float.h"
+
 #include "vec/float.h"
 
 #include "mat/float.h"

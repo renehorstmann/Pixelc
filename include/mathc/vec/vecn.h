@@ -197,7 +197,7 @@ static void vecN_abs(float *dst_vec, const float *vec_x, int n) {
 /** dst = x > 0 ? 1 : (x < 0 ? -1 : 0) */
 static void vecN_sign(float *dst_vec, const float *vec_x, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = vec_x[i] > 0 ? 1 : (vec_x[i] < 0 ? -1 : 0);
+        dst_vec[i] = vec_x[i] > 0.0 ? 1.0 : (vec_x[i] < 0.0 ? -1.0 : 0.0);
 }
 
 /** dst = floor(x) */
@@ -294,7 +294,7 @@ static void vecN_step_vec(float *dst_vec, const float *vec_x, const float *vec_e
 static void vecN_smoothstep(float *dst_vec, const float *vec_x, float edge1, float edge2, int n) {
     for (int i = 0; i < n; i++) {
         float x = vec_x[i];
-        dst_vec[i] = x < edge1 ? 0.0f : (x > edge2 ? 1.0f : x * x * (3 - 2 * x));
+        dst_vec[i] = x < edge1 ? 0.0f : (x > edge2 ? 1.0f : x * x * (3.0f - 2.0f * x));
     }
 }
 
@@ -303,7 +303,7 @@ static void
 vecN_smoothstep_vec(float *dst_vec, const float *vec_x, const float *vec_edge1, const float *vec_edge2, int n) {
     for (int i = 0; i < n; i++) {
         float x = vec_x[i];
-        dst_vec[i] = x < vec_edge1[i] ? 0.0f : (x > vec_edge2[i] ? 1.0f : x * x * (3 - 2 * x));
+        dst_vec[i] = x < vec_edge1[i] ? 0.0f : (x > vec_edge2[i] ? 1.0f : x * x * (3.0 - 2.0 * x));
     }
 }
 
@@ -364,7 +364,7 @@ static void vecN_normalize_unsafe(float *dst_vec, const float *vec, int n) {
 /** dst = vec / (norm(vec) > 0 ? norm(vec) : 1) */
 static void vecN_normalize(float *dst_vec, const float *vec, int n) {
     float norm = vecN_norm(vec, n);
-    vecN_scale(dst_vec, vec, 1.0f / (norm > 0 ? norm : 1), n);
+    vecN_scale(dst_vec, vec, 1.0f / (norm > 0.0 ? norm : 1.0), n);
 }
 
 /** returns length of a vector, see vecN_norm. Just here to match glsl */
@@ -407,7 +407,7 @@ static void vecN_refract(float *dst_vec, const float *vec_I, const float *vec_N,
     float t[3];
     vecN_scale(t, vec_I, eta, n);
     vecN_add_vec(t, t, dst_vec, n);
-    vecN_scale(dst_vec, t, cost2 > 0, n);
+    vecN_scale(dst_vec, t, cost2 > 0.0, n);
 }
 
 /** dst = a < b */

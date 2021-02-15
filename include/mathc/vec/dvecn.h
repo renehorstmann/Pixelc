@@ -197,7 +197,7 @@ static void dvecN_abs(double *dst_vec, const double *vec_x, int n) {
 /** dst = x > 0 ? 1 : (x < 0 ? -1 : 0) */
 static void dvecN_sign(double *dst_vec, const double *vec_x, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = vec_x[i] > 0 ? 1 : (vec_x[i] < 0 ? -1 : 0);
+        dst_vec[i] = vec_x[i] > 0.0 ? 1.0 : (vec_x[i] < 0.0 ? -1.0 : 0.0);
 }
 
 /** dst = floor(x) */
@@ -294,7 +294,7 @@ static void dvecN_step_vec(double *dst_vec, const double *vec_x, const double *v
 static void dvecN_smoothstep(double *dst_vec, const double *vec_x, double edge1, double edge2, int n) {
     for (int i = 0; i < n; i++) {
         double x = vec_x[i];
-        dst_vec[i] = x < edge1 ? 0.0 : (x > edge2 ? 1.0 : x * x * (3 - 2 * x));
+        dst_vec[i] = x < edge1 ? 0.0 : (x > edge2 ? 1.0 : x * x * (3.0 - 2.0 * x));
     }
 }
 
@@ -303,7 +303,7 @@ static void
 dvecN_smoothstep_vec(double *dst_vec, const double *vec_x, const double *vec_edge1, const double *vec_edge2, int n) {
     for (int i = 0; i < n; i++) {
         double x = vec_x[i];
-        dst_vec[i] = x < vec_edge1[i] ? 0.0 : (x > vec_edge2[i] ? 1.0 : x * x * (3 - 2 * x));
+        dst_vec[i] = x < vec_edge1[i] ? 0.0 : (x > vec_edge2[i] ? 1.0 : x * x * (3.0 - 2.0 * x));
     }
 }
 
@@ -364,7 +364,7 @@ static void dvecN_normalize_unsafe(double *dst_vec, const double *vec, int n) {
 /** dst = vec / (norm(vec) > 0 ? norm(vec) : 1) */
 static void dvecN_normalize(double *dst_vec, const double *vec, int n) {
     double norm = dvecN_norm(vec, n);
-    dvecN_scale(dst_vec, vec, 1.0 / (norm > 0 ? norm : 1), n);
+    dvecN_scale(dst_vec, vec, 1.0 / (norm > 0.0 ? norm : 1.0), n);
 }
 
 /** returns length of a vector, see dvecN_norm. Just here to match glsl */
@@ -407,7 +407,7 @@ static void dvecN_refract(double *dst_vec, const double *vec_I, const double *ve
     double t[3];
     dvecN_scale(t, vec_I, eta, n);
     dvecN_add_vec(t, t, dst_vec, n);
-    dvecN_scale(dst_vec, t, cost2 > 0, n);
+    dvecN_scale(dst_vec, t, cost2 > 0.0, n);
 }
 
 /** dst = a < b */

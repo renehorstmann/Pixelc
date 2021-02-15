@@ -5,6 +5,8 @@
 
 #include "io/int.h"
 
+#include "sca/int.h"
+
 #include "vec/int.h"
 
 #include "mat/int.h"
