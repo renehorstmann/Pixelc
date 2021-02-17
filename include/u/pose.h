@@ -147,7 +147,7 @@ static void u_pose_aa_set_bottom(mat4 *p, float b) {
 }
 
 static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
-	u_pose_set(p, l+w/2, t+w/2, w, h, 0);
+	u_pose_set(p, l+w/2, t-w/2, w, h, 0);
 }
 
 

@@ -23,13 +23,18 @@
 //
 
 // canvas size
-#define COLS 32
-#define ROWS 32
+#define COLS 64
+#define ROWS 64
+
+// JumpHare
+//#define COLS 32*4
+//#define ROWS 32*4
+
 
 // animation + tiles
 // screen size is >=180 pixel
 // 16 Pixel * 11 cols = 180...
-#define PLAY_COLS 1
+#define PLAY_COLS 11
 #define PLAY_ROWS 1
 #define PLAY_FRAMES 1
 #define PLAY_FPS 2.0
@@ -38,17 +43,17 @@
 // #define PALETTE grayscale
 // #define PALETTE grayscale_alpha
 // #define PALETTE grayscale
- #define PALETTE pixilmatt
+// #define PALETTE pixilmatt
 // #define PALETTE slso8
 // #define PALETTE gameboy
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-// #define PALETTE aap64
+ #define PALETTE aap64
 
 
-#define BG_COLOR_A "#222222"
-#define BG_COLOR_B "#333344"
+#define BG_COLOR_A "#aaaacc"
+#define BG_COLOR_B "#9999dd"
 
 #define GRID_COLS 8
 #define GRID_ROWS 8
