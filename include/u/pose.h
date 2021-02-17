@@ -22,7 +22,17 @@
 
 // u_pose_aa_* are axis aligned (angle=0)
 
-static mat4 u_pose_new(float x, float y, float w, float h, float angle_rad) {
+static mat4 u_pose_new(float x, float y, float w, float h) {
+	// mat4 has column major order
+	return (mat4) {{
+		w, 0, 0, 0,
+        0, h, 0, 0,
+        0, 0, 1, 0,
+        x, y, 0, 1
+	}};
+}
+
+static mat4 u_pose_new_angle(float x, float y, float w, float h, float angle_rad) {
 	// mat4 has column major order
 	return (mat4) {{
 		cosf(angle_rad) * w, sinf(angle_rad) * w, 0, 0,
@@ -32,24 +42,12 @@ static mat4 u_pose_new(float x, float y, float w, float h, float angle_rad) {
 	}};
 }
 
-static mat4 u_pose_aa_new(float l, float t, float w, float h) {
-	// mat4 has column major order
-	return (mat4) {{
-		 w, 0, 0, 0,
-		 0, h, 0, 0,
-		 0, 0, 1, 0,
-		 l+w/2, t-h/2, 0, 1
-	}};
+static mat4 u_pose_new_aa(float l, float t, float w, float h) {
+	return u_pose_new(l+w/2, t-h/2, w, h);
 }
 
 static mat4 u_pose_new_hidden() {
-	// mat4 has column major order
-	return (mat4) {{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		FLT_MAX, FLT_MAX, 0, 1
-	}};
+	return u_pose_new(FLT_MAX, FLT_MAX, 1, 1);
 }
 
 static float u_pose_get_x(mat4 p) {

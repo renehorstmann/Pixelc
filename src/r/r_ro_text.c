@@ -4,23 +4,20 @@
 #include "r/texture.h"
 
 // from u/pose
-static mat4 u_pose_aa_new(float l, float t, float w, float h) {
+static mat4 u_pose_new(float x, float y, float w, float h) {
 	// mat4 has column major order
 	return (mat4) {{
-		 w, 0, 0, 0,
-		 0, h, 0, 0,
-		 0, 0, 1, 0,
-		 l+w/2, t-h/2, 0, 1
+		w, 0, 0, 0,
+        0, h, 0, 0,
+        0, 0, 1, 0,
+        x, y, 0, 1
 	}};
 }
+static mat4 u_pose_new_aa(float l, float t, float w, float h) {
+	return u_pose_new(l+w/2, t-h/2, w, h);
+}
 static mat4 u_pose_new_hidden() {
-	// mat4 has column major order
-	return (mat4) {{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		FLT_MAX, FLT_MAX, 0, 1
-	}};
+	return u_pose_new(FLT_MAX, FLT_MAX, 1, 1);
 }
 // end of u/pose copy
 
@@ -33,7 +30,7 @@ static void hide(rRoText *self, int from) {
 }
 
 static mat4 pose(rRoText *self, int c, int r) {
-	return u_pose_aa_new(c*self->offset.x, -r*self->offset.y, self->size.x, self->size.y);
+	return u_pose_new_aa(c*self->offset.x, -r*self->offset.y, self->size.x, self->size.y);
 }
 
 
@@ -128,7 +125,7 @@ static bool font55_uv_cb(mat4 *uv, char c) {
 	float w = (float) size_x/cols;
 	float h = (float) size_y/rows;
 	
-	*uv = u_pose_aa_new(col*w-w/2, row*h+h/2, w, h);
+	*uv = u_pose_new(col*w, row*h, w, h);
 	
 	return nl;
 }
