@@ -27,7 +27,7 @@ void r_ro_text_render(rRoText *self);
 
 void r_ro_text_set_text(rRoText *self, const char *text);
 
-
+vec2 r_ro_text_get_size(rRoText *self, const char *text);
 
 
 
