@@ -13,7 +13,7 @@
 #include "io.h"
 #include "toolbar.h"
 
-#define MODES 6
+#define MODES 7
 #define LONG_PRESS_TIME 1.0
 
 #define TOOL_MAX 32
@@ -118,7 +118,8 @@ void toolbar_init() {
                 "res/button_dither.png",
                 "res/button_dither2.png",
                 "res/button_fill.png",
-                "res/button_fill8.png"
+                "res/button_fill8.png",
+                "res/button_replace.png"
         }[i]);
     }
     button_set_pressed(L.modes[0], true);
@@ -289,6 +290,8 @@ bool toolbar_pointer_event(ePointer_s pointer) {
                 brush.mode = BRUSH_MODE_FILL;
             else if (i == 5)
                 brush.mode = BRUSH_MODE_FILL8;
+            else if (i == 6)
+                brush.mode = BRUSH_MODE_REPLACE;
         }
     }
 

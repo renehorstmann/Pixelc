@@ -11,6 +11,7 @@ enum brushmodes {
     BRUSH_MODE_DITHER2,
     BRUSH_MODE_FILL, 
     BRUSH_MODE_FILL8,
+    BRUSH_MODE_REPLACE,
     BRUSH_NUM_MODES};
 
 enum selectionmode {

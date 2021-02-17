@@ -63,3 +63,31 @@ bool brush_mode_fill(ePointer_s pointer, bool mode8) {
     return true;
 }
 
+bool brush_mode_replace(ePointer_s pointer) {
+	if (pointer.action != E_POINTER_DOWN)
+        return false;
+
+    Image *img = canvas_image();
+    int layer = canvas.current_layer;
+
+    ivec2 cr = canvas_get_cr(pointer.pos);
+    if(!image_contains(img, cr.x, cr.y))
+        return false;
+    
+    brush.secondary_color = *image_pixel(img, layer, cr.x, cr.y);
+    if(color_equals(brush.current_color, brush.secondary_color))
+        return false;
+    
+    bool shading_was_active = brush.shading_active;
+    brush.shading_active = true;
+
+	for(int r=0; r<img->rows; r++) {
+		for(int c=0; c<img->cols; c++) {
+			brush_draw_pixel(c, r);
+		}
+	}
+	
+	brush.shading_active = shading_was_active;
+    return true;
+}
+

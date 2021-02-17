@@ -121,7 +121,9 @@ void brush_pointer_event(ePointer_s pointer) {
         case BRUSH_MODE_FILL8:
             change = brush_mode_fill(pointer, true);
             break;
-            
+        case BRUSH_MODE_REPLACE:
+            change = brush_mode_replace(pointer);
+            break;
         default:
             SDL_Log("brush unknown mode");
     }
