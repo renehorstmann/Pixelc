@@ -25,7 +25,7 @@ static void u_pose_set(mat4 *p, float x, float y, float w, float h, float angle_
     u_pose_set_size_angle(p, w, h, angle_rad);
 }
 static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
-	u_pose_set(p, l+w/2, t+w/2, w, h, 0);
+	u_pose_set(p, l+w/2, t-w/2, w, h, 0);
 }
 // end of u/pose copy
 
@@ -38,7 +38,7 @@ static void hide(rRoText *self, int from) {
 }
 
 static void set_pose(rRoText *self, mat4 *p, int c, int r) {
-	u_pose_aa_set(p, c*self->offset.x, (-r-1)*self->offset.y, self->size.x, self->size.y);
+	u_pose_aa_set(p, c*self->offset.x, -r*self->offset.y, self->size.x, self->size.y);
 }
 
 

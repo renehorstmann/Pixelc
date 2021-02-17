@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <math.h>
+#include <limits.h>  // FLT_MAX
 #include "mathc/mat/mat4.h"
 
 // Pose matrix:
@@ -20,6 +21,36 @@
 // 0  0  0  1
 
 // u_pose_aa_* are axis aligned (angle=0)
+
+static mat4 u_pose_new(float x, float y, float w, float h, float angle_rad) {
+	// mat4 has column major order
+	return (mat4) {{
+		cosf(angle_rad) * w, sinf(angle_rad) * w, 0, 0,
+        -sinf(angle_rad) * h, cosf(angle_rad) * h, 0, 0,
+        0, 0, 1, 0,
+        x, y, 0, 1
+	}};
+}
+
+static mat4 u_pose_aa_new(float l, float t, float w, float h) {
+	// mat4 has column major order
+	return (mat4) {{
+		 w, 0, 0, 0,
+		 0, h, 0, 0,
+		 0, 0, 1, 0,
+		 l+w/2, t-h/2, 0, 1
+	}};
+}
+
+static mat4 u_pose_new_hidden() {
+	// mat4 has column major order
+	return (mat4) {{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		FLT_MAX, FLT_MAX, 0, 1
+	}};
+}
 
 static float u_pose_get_x(mat4 p) {
     return p.m30;
@@ -69,6 +100,10 @@ static void u_pose_set_y(mat4 *p, float y) {
 static void u_pose_set_xy(mat4 *p, float x, float y) {
     u_pose_set_x(p, x);
     u_pose_set_y(p, y);
+}
+
+static void u_pose_set_hidden(mat4 *p) {
+	u_pose_set_xy(p, FLT_MAX, FLT_MAX);
 }
 
 static void u_pose_set_size_angle(mat4 *p, float w, float h, float angle_rad) {
