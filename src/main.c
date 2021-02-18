@@ -25,10 +25,12 @@
 // canvas size
 #define COLS 32
 #define ROWS 16
+#define LAYERS 3
 
 // JumpHare
 //#define COLS 32*4
 //#define ROWS 32*4
+//#define LAYERS 1
 
 
 // animation + tiles
@@ -98,7 +100,7 @@ int main(int argc, char **argv) {
     camera_init();
     canvas_camera_init();
     background_init(color_from_hex(BG_COLOR_A), color_from_hex(BG_COLOR_B));
-    canvas_init(COLS, ROWS, GRID_COLS, GRID_ROWS);
+    canvas_init(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
     animation_init(PLAY_COLS, PLAY_ROWS, PLAY_FRAMES, PLAY_FPS);
     brush_init();
     canvas_camera_control_init();

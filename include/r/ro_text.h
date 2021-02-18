@@ -25,8 +25,10 @@ void r_ro_text_kill(rRoText *self);
 
 void r_ro_text_render(rRoText *self);
 
-void r_ro_text_set_text(rRoText *self, const char *text);
+// returns the used size
+vec2 r_ro_text_set_text(rRoText *self, const char *text);
 
+// returns the size, without setting the text
 vec2 r_ro_text_get_size(rRoText *self, const char *text);
 
 

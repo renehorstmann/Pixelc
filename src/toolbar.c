@@ -1,5 +1,7 @@
 #include <assert.h>
+#include "mathc/float.h"
 #include "r/texture.h"
+#include "r/ro_text.h"
 #include "button.h"
 #include "u/pose.h"
 #include "camera.h"
@@ -43,7 +45,6 @@ static struct {
     
     rRoSingle *shape_minus;
     rRoSingle *shape_plus;
-
     
     //non tools:
     rRoSingle shape;
@@ -54,6 +55,10 @@ static struct {
     rRoSingle selection_copy;
     rRoSingle selection_cut;
     rRoSingle selection_ok;
+    
+    rRoSingle layer_prev;
+    rRoSingle layer_next;
+    rRoText layer_num;
     
 } L;
 
@@ -69,7 +74,8 @@ static rRoSingle *tool_append(float x, float y, const char *btn_file) {
 
 static bool pos_in_toolbar(vec2 pos) {
     float size = toolbar.show_selection_copy_cut 
-            || toolbar.show_selection_ok ?
+            || toolbar.show_selection_ok
+            || canvas_image()->layers > 1 ?
             53 : 34;
     if (camera_is_portrait_mode())
         return pos.y >= camera_top() - size;
@@ -144,6 +150,13 @@ void toolbar_init() {
     
     button_init(&L.selection_ok, r_texture_init_file("res/button_ok.png", NULL));
     
+    // layer:
+    button_init(&L.layer_prev, r_texture_init_file("res/button_prev.png", NULL));
+    
+    button_init(&L.layer_next, r_texture_init_file("res/button_next.png", NULL));
+    
+    r_ro_text_init_font55(&L.layer_num, 3, camera.gl);
+    
 }
 
 void toolbar_update(float dtime) {
@@ -165,6 +178,13 @@ void toolbar_update(float dtime) {
     L.selection_cut.rect.pose = pose16(8, 43);
     L.selection_ok.rect.pose = pose16(0, 43);
     
+    // layer:
+    L.layer_prev.rect.pose = pose16(50, 43);
+    L.layer_next.rect.pose = pose16(80, 43);
+    char buf[8];
+    sprintf(buf, "%d", canvas.current_layer);
+    vec2 size = r_ro_text_set_text(&L.layer_num, buf);
+    L.layer_num.pose = pose_wh(65-size.x/2, 43-size.y/2+1, 1, 1);
     
     // shape longpress:
     if (button_is_pressed(L.shape_minus)) {
@@ -206,6 +226,11 @@ void toolbar_render() {
     	r_ro_single_render(&L.selection_ok);
     }
 
+    if(canvas_image()->layers>1) {
+    	r_ro_single_render(&L.layer_prev);
+    	r_ro_single_render(&L.layer_next);
+    	r_ro_text_render(&L.layer_num);
+    }
 }
 
 // return true if the pointer was used (indicate event done)
@@ -229,7 +254,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     	}
     	toolbar.show_selection_copy_cut = false;
     	
-    	Image *img = io_load_image(io.default_import_file);
+    	Image *img = io_load_image(io.default_import_file, 1);
     	button_set_pressed(L.selection, img!=NULL);
     	toolbar.show_selection_ok = img!=NULL;
     	
@@ -342,6 +367,16 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     		brush_set_selection_active(false, true);
     		toolbar.show_selection_ok = false;
     		button_set_pressed(L.selection, false);
+    	}
+    }
+    
+    
+    if(canvas_image()->layers>1) {
+    	if(button_clicked(&L.layer_prev, pointer)) {
+    		canvas.current_layer = sca_max(0, canvas.current_layer-1);
+    	}
+    	if(button_clicked(&L.layer_next, pointer)) {
+    		canvas.current_layer = sca_min(canvas_image()->layers-1, canvas.current_layer+1);
     	}
     }
 

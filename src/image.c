@@ -30,6 +30,7 @@ void image_delete(Image *self) {
 }
 
 bool image_copy(Image *self, const Image *from) {
+    printf("s f %d %d\n", self->layers, from->layers);
     if(self->layers == from->layers
        && self->rows == from->rows 
        && self->cols == from->cols) {

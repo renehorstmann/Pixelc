@@ -25,7 +25,6 @@ static struct {
     Image *image;
     Image *last_image;
     rRoSingle *render_objects;
-    int layers;
     
     rRoSingle bg;
     rRoSingle grid;
@@ -37,7 +36,7 @@ static struct {
 
 
 static void init_render_objects() {
-    for(int i=0; i<L.layers; i++) {
+    for(int i=0; i<L.image->layers; i++) {
         GLuint tex = r_texture_init(L.image->cols, L.image->rows, image_layer(L.image, i));
         r_ro_single_init(&L.render_objects[i], canvas_camera.gl, tex);
     }
@@ -93,8 +92,7 @@ static void save_state(void **data, size_t *size);
 static void load_state(const void *data, size_t size);
 
 
-void canvas_init(int cols, int rows, int grid_cols, int grid_rows) {
-    int layers = 1;
+void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     
     L.save_id = savestate_register(save_state, load_state);
      
@@ -102,7 +100,6 @@ void canvas_init(int cols, int rows, int grid_cols, int grid_rows) {
 
     L.image = image_new_zeros(layers, cols, rows);
     L.render_objects = New0(rRoSingle , layers);
-    L.layers = layers;
     canvas.current_layer = 0;
 
     init_render_objects();
@@ -131,7 +128,7 @@ void canvas_init(int cols, int rows, int grid_cols, int grid_rows) {
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
 
-    Image *img = io_load_image(io.default_image_file);
+    Image *img = io_load_image(io.default_image_file, layers);
     if(img) {
         image_copy(L.image, img);
         image_delete(img);
@@ -156,7 +153,7 @@ void canvas_update(float dtime) {
     
     u_pose_set(&L.pose, x, y, w, h, 0);
 
-    for(int i=0; i<L.layers; i++) {
+    for(int i=0; i<L.image->layers; i++) {
         r_texture_update(L.render_objects[i].tex, L.image->cols, L.image->rows, image_layer(L.image, i));
 
         // set pose
@@ -173,6 +170,8 @@ void canvas_render() {
     r_ro_single_render(&L.bg);
 
     for(int i=0; i<=canvas.current_layer; i++) {
+        float alpha = (i+1.0) / (canvas.current_layer + 1.0);
+        L.render_objects[i].rect.color.w = alpha;
         r_ro_single_render(&L.render_objects[i]);
     }
 
@@ -192,9 +191,6 @@ Image *canvas_image() {
     return L.image;
 }
 
-int canvas_layers() {
-    return L.layers;
-}
 
 ivec2 canvas_get_cr(vec4 pointer_pos) {
     mat4 pose_inv = mat4_inv(L.pose);
@@ -222,7 +218,7 @@ void canvas_save() {
 	if(!image_equals(L.image, L.last_image)) {
 	    image_copy(L.last_image, L.image);
 	    savestate_save();
-        io_save_image(canvas_image(), io.default_image_file);
+        io_save_image(io.default_image_file, canvas_image());
 	}
 }
 
@@ -241,6 +237,6 @@ static void load_state(const void *data, size_t size) {
 	L.image = image_new_clone(data);
 	image_copy(L.last_image, L.image);
 	assert(image_full_size(L.image) == size);
-	io_save_image(canvas_image(), io.default_image_file);
+	io_save_image(io.default_image_file, canvas_image());
 }
 

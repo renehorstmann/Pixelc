@@ -55,11 +55,12 @@ void r_ro_text_render(rRoText *self) {
 	r_ro_batch_render(&self->ro);
 }
 
-void r_ro_text_set_text(rRoText *self, const char *text) {
+vec2 r_ro_text_set_text(rRoText *self, const char *text) {
 	int i=0;
 	int col=0;
 	int row=0;
-	while(*text) {
+	int cols = 0;
+	while(*text && i<self->ro.num) {
 		bool newline = self->uv_fn(&self->ro.rects[i].uv, *text);
 		self->ro.rects[i].pose = pose(self, col, row);
 		
@@ -68,19 +69,29 @@ void r_ro_text_set_text(rRoText *self, const char *text) {
 		    col=0;
 		    row++;
 		}
+		cols = sca_max(cols, col);
 		text++;
 		i++;
 	}
 	hide(self, i);
 	r_ro_batch_update(&self->ro);
+	
+	if(cols == 0)
+	    return vec2_set(0);
+	    
+	return (vec2) {{
+		(cols-1) * self->offset.x + self->size.x,
+		row * self->offset.y + self->size.y
+	}};
 }
 
 vec2 r_ro_text_get_size(rRoText *self, const char *text) {
 	int cols = 0;
 	int rows = 0;
 	int c = 0;
+	int i = 0;
 	mat4 uv = mat4_eye();
-	while(*text) {
+	while(*text && i<self->ro.num) {
 	    if(self->uv_fn(&uv, *text++)) {
 	    	rows++;
 	    	c = 0;
@@ -88,6 +99,7 @@ vec2 r_ro_text_get_size(rRoText *self, const char *text) {
 	    	c++;
 	    	cols = sca_max(cols, c);
 	    }
+	    i++;
 	}
 	
 	if(cols == 0)

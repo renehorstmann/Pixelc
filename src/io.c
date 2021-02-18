@@ -1,3 +1,4 @@
+#include "utilc/assume.h"
 #include "SDL_image.h"
 #include "canvas.h"
 #include "io.h"
@@ -31,7 +32,8 @@ static SDL_Surface *load_buffer(void *data, int width, int height) {
 }
 
 
-Image *io_load_image(const char *file) {
+Image *io_load_image(const char *file, int layers) {
+    assume(layers>0, "A single layer needed");
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
         SDL_Log("io_load_layer (%s) failed: %s", file, IMG_GetError());
@@ -44,15 +46,15 @@ Image *io_load_image(const char *file) {
         return NULL;
     }
 
-    Image *image = image_new_empty(1, img->w, img->h);
+    Image *image = image_new_empty(layers, img->w, img->h/layers);
     memcpy(image->data, img->pixels, sizeof(Color_s) * img->w * img->h);
     SDL_FreeSurface(img);
     return image;
 }
 
 
-bool io_save_image(const Image *image, const char *file) {
-    SDL_Surface *img = load_buffer((void *)image->data, image->cols, image->rows);
+bool io_save_image(const char *file, const Image *image) {
+    SDL_Surface *img = load_buffer((void *)image->data, image->cols, image->rows * image->layers);
     int ret = IMG_SavePNG(img, file);
     SDL_FreeSurface(img);
     if(ret) {
