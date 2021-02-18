@@ -12,8 +12,8 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
-- Frame Selection (or grid shows frames?)
-- Layer Selection
+- combine layers and save them to combined.png
+- Frame Selection? (or grid shows frames?)
 - VertexColors?
   - white to color like the palette
 - background image option?
