@@ -8,11 +8,11 @@ static dvec3 dvec3_rgb2hsv(dvec3 rgb) {
     dvec3 hsv;
     double min, max, delta;
 
-    min = rgb.v0 < rgb.v1 ? rgb.v0 : rgb.v1;
-    min = min  < rgb.v2 ? min  : rgb.v2;
+    min = rgb.r < rgb.g ? rgb.r : rgb.g;
+    min = min  < rgb.b ? min  : rgb.b;
 
-    max = rgb.v0 > rgb.v1 ? rgb.v0 : rgb.v1;
-    max = max  > rgb.v2 ? max  : rgb.v2;
+    max = rgb.r > rgb.g ? rgb.r : rgb.g;
+    max = max  > rgb.b ? max  : rgb.b;
 
     hsv.v2 = max;
     delta = max - min;
@@ -31,15 +31,15 @@ static dvec3 dvec3_rgb2hsv(dvec3 rgb) {
         hsv.v1 = 0;
         return hsv;
     }
-    if(rgb.v0 >= max )
+    if(rgb.r >= max )
         // > is bogus, just keeps compilor happy
-        hsv.v0 = (rgb.v1 - rgb.v2) / delta;
+        hsv.v0 = (rgb.g - rgb.b) / delta;
         // between yellow & magenta
-    else if(rgb.v1 >= max )
-        hsv.v0 = 2.0 + (rgb.v2 - rgb.v0) / delta;
+    else if(rgb.g >= max )
+        hsv.v0 = 2.0 + (rgb.b - rgb.r) / delta;
         // between cyan & yellow
     else
-        hsv.v0 = 4.0 + (rgb.v0 - rgb.v1) / delta;
+        hsv.v0 = 4.0 + (rgb.r - rgb.g) / delta;
     // between magenta & cyan
 
     hsv.v0 *= 60.0; // degrees
@@ -57,9 +57,9 @@ static dvec3 dvec3_hsv2rgb(dvec3 hsv) {
 
     if(hsv.v1 <= 0.0) {
         // < is bogus, just shuts up warnings
-        rgb.v0 = hsv.v2;
-        rgb.v1 = hsv.v2;
-        rgb.v2 = hsv.v2;
+        rgb.r = hsv.v2;
+        rgb.g = hsv.v2;
+        rgb.b = hsv.v2;
         return rgb;
     }
     hh = hsv.v0;
@@ -73,36 +73,36 @@ static dvec3 dvec3_hsv2rgb(dvec3 hsv) {
 
     switch(i) {
         case 0:
-            rgb.v0 = hsv.v2;
-            rgb.v1 = t;
-            rgb.v2 = p;
+            rgb.r = hsv.v2;
+            rgb.g = t;
+            rgb.b = p;
             break;
         case 1:
-            rgb.v0 = q;
-            rgb.v1 = hsv.v2;
-            rgb.v2 = p;
+            rgb.r = q;
+            rgb.g = hsv.v2;
+            rgb.b = p;
             break;
         case 2:
-            rgb.v0 = p;
-            rgb.v1 = hsv.v2;
-            rgb.v2 = t;
+            rgb.r = p;
+            rgb.g = hsv.v2;
+            rgb.b = t;
             break;
 
         case 3:
-            rgb.v0 = p;
-            rgb.v1 = q;
-            rgb.v2 = hsv.v2;
+            rgb.r = p;
+            rgb.g = q;
+            rgb.b = hsv.v2;
             break;
         case 4:
-            rgb.v0 = t;
-            rgb.v1 = p;
-            rgb.v2 = hsv.v2;
+            rgb.r = t;
+            rgb.g = p;
+            rgb.b = hsv.v2;
             break;
         case 5:
         default:
-            rgb.v0 = hsv.v2;
-            rgb.v1 = p;
-            rgb.v2 = q;
+            rgb.r = hsv.v2;
+            rgb.g = p;
+            rgb.b = q;
             break;
     }
     return rgb;

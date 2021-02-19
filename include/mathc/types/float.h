@@ -6,13 +6,16 @@
 #endif
 
 
-typedef union vec2 {
+typedef union {
     float v[2];
     struct {
         float v0, v1;
     };
     struct {
         float x, y;
+    };
+    struct {
+        float r, g;
     };
 } vec2;
 static_assert(sizeof(vec2) == sizeof(float) * 2, "[Mathc] wrong expected size");
@@ -24,7 +27,7 @@ static_assert(sizeof(vec2) == sizeof(float) * 2, "[Mathc] wrong expected size");
 #define ConstVec2(vec) (*(const vec2 *) (vec))
 
 
-typedef union mat2 {
+typedef union {
     float v[4];
     float m[2][2];
     vec2 col[2];
@@ -45,7 +48,7 @@ static_assert(sizeof(mat2) == sizeof(float) * 4, "[Mathc] wrong expected size");
 /** casts a float * to a dereferenced const mat2 */
 #define ConstMat2(mat) (*(const mat2 *) (mat))
 
-typedef union vec3 {
+typedef union {
     float v[3];
     struct {
         float v0, v1, v2;
@@ -60,6 +63,16 @@ typedef union vec3 {
             vec2 yz;
         };
     };
+    vec2 rg;
+    struct {
+        float r;
+        union {
+            struct {
+                float g, b;
+            };
+            vec2 gb;
+        };
+    };
 } vec3;
 static_assert(sizeof(vec3) == sizeof(float) * 3, "[Mathc] wrong expected size");
 
@@ -70,7 +83,7 @@ static_assert(sizeof(vec3) == sizeof(float) * 3, "[Mathc] wrong expected size");
 #define ConstVec3(vec) (*(const vec3 *) (vec))
 
 
-typedef union mat3 {
+typedef union {
     float v[9];
     float m[3][3];
     vec3 col[3];
@@ -94,7 +107,7 @@ static_assert(sizeof(mat3) == sizeof(float) * 9, "[Mathc] wrong expected size");
 #define ConstMat3(mat) (*(const mat3 *) (mat))
 
 
-typedef union vec4 {
+typedef union {
     float v[4];
     struct {
         float v0, v1, v2, v3;
@@ -117,6 +130,24 @@ typedef union vec4 {
             vec3 yzw;
         };
     };
+    vec2 rg;
+    vec3 rgb;
+    struct {
+        float r;
+        union {
+            struct {
+                float g;
+                union {
+                    struct {
+                        float b, a;
+                    };
+                    vec2 ba;
+                };
+            };
+            vec2 gb;
+            vec3 gba;
+        };
+    };
 } vec4;
 static_assert(sizeof(vec4) == sizeof(float) * 4, "[Mathc] wrong expected size");
 
@@ -127,7 +158,7 @@ static_assert(sizeof(vec4) == sizeof(float) * 4, "[Mathc] wrong expected size");
 #define ConstVec4(vec) (*(const vec4 *) (vec))
 
 
-typedef union mat4 {
+typedef union {
     float v[16];
     float m[4][4];
     vec4 col[4];

@@ -17,6 +17,11 @@
 #  define MATHC_PRINT_MAX_TO_SHORT 1e5
 #endif
 
+#ifdef MATHC_NO_PRINT_COLOR
+#define MATHC_PRINT_COLOR ""
+#define MATHC_PRINT_COLOR_RESET ""
+#endif
+
 #ifndef MATHC_PRINT_COLOR
 #  define MATHC_PRINT_COLOR "\033[36m"
 #endif
