@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <math.h>
-#include <limits.h>  // FLT_MAX
+#include <float.h>  // FLT_MAX
 #include "mathc/mat/mat4.h"
 
 // Pose matrix:
