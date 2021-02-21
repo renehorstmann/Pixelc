@@ -55,7 +55,7 @@ void selection_copy(const Image *from, int layer) {
 		SDL_Log("selection_copy failed");
 		return;
 	}
-    L.opt_data = ReNew(Color_s, L.opt_data, L.rows * L.cols);
+    L.opt_data = ReNew(Color_s, L.opt_data, L.cols * L.rows);
     
     for(int r=0; r<L.rows; r++) {
 		for(int c=0; c<L.cols; c++) {
@@ -81,7 +81,7 @@ void selection_cut(Image *from, int layer, Color_s replace) {
 }
 
 void selection_paste(Image *to, int layer) {
-	if(!L.opt_data || L.rows <=0 || L.rows <=0) {
+	if(!L.opt_data || L.cols <=0 || L.rows <=0) {
 	    SDL_Log("selection_paste failed");
 	    return;
     }
@@ -100,3 +100,48 @@ void selection_paste(Image *to, int layer) {
 	}
 }
 
+void selection_rotate(bool right) {
+	if(!L.opt_data || L.cols <=0 || L.rows <=0) {
+	    SDL_Log("selection_rotate failed");
+	    return;
+    }
+    
+    Color_s *tmp = New(Color_s, L.cols * L.rows);
+    memcpy(tmp, L.opt_data, sizeof(Color_s) * L.cols * L.rows);
+    
+    int cols = L.rows;
+    int rows = L.cols;
+    
+    for(int r=0; r < rows; r++) {
+		for(int c=0; c<cols; c++) {
+			int mc = right? r : rows - 1 - r;
+			int mr = right? cols - 1 - c : c;
+			L.opt_data[r * cols + c] = tmp[mr * L.cols + mc];
+	    }
+    }
+    
+    free(tmp);
+    
+    L.cols = cols;
+    L.rows = rows;
+}
+
+void selection_mirror(bool vertical) {
+	if(!L.opt_data || L.cols <=0 ||  L.rows <=0) {
+	    SDL_Log("selection_mirror failed");
+	    return;
+    }
+    
+    Color_s *tmp = New(Color_s, L.cols * L.rows);
+    memcpy(tmp, L.opt_data, sizeof(Color_s) * L.cols * L.rows);
+    
+    for(int r=0; r < L.rows; r++) {
+		for(int c=0; c<L.cols; c++) {
+			int mc = vertical? L.cols - 1 - c : c;
+			int mr = vertical? r : L.rows - 1 - r;
+			L.opt_data[r * L.cols + c] = tmp[mr * L.cols + mc];
+	    }
+    }
+    
+    free(tmp);
+}

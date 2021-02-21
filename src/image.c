@@ -49,3 +49,37 @@ bool image_equals(const Image *self, const Image *from) {
 	return memcmp(self, from, image_full_size(self)) == 0;
 }
 
+
+void image_rotate(Image *self, bool right) {
+	Image *tmp = image_new_clone(self);
+	self->cols = tmp->rows;
+	self->rows = tmp->cols;
+	for(int l=0; l<self->layers; l++) {
+		for(int r=0; r<self->rows; r++) {
+			for(int c=0; c<self->rows; c++) {
+			    int mc = right? r : tmp->cols - 1 - r;
+			    int mr = right? tmp->rows - 1 - c : c;
+			    *image_pixel(self, l, c, r) = *image_pixel(tmp, l, mc, mr);
+		    }
+		}
+	}
+	
+	image_delete(tmp);
+}
+
+void image_mirror(Image *self, bool vertical) {
+	Image *tmp = image_new_clone(self);
+	
+	for(int l=0; l<self->layers; l++) {
+		for(int r=0; r<self->rows; r++) {
+			for(int c=0; c<self->rows; c++) {
+			    int mc = vertical? self->cols - 1 - c : c;
+			    int mr = vertical? r : self->rows - 1 - r;
+			    *image_pixel(self, l, c, r) = *image_pixel(tmp, l, mc, mr);
+		    }
+		}
+	}
+	
+	image_delete(tmp);
+}
+

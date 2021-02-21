@@ -22,6 +22,10 @@ bool image_copy(Image *self, const Image *from);
 
 bool image_equals(const Image *self, const Image *from);
 
+void image_rotate(Image *self, bool right);
+
+void image_mirror(Image *self, bool vertical);
+
 static size_t image_data_size(const Image *self) {
 	return sizeof(Color_s) * self->layers * self->rows * self->cols;
 }

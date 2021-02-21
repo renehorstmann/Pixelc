@@ -25,4 +25,8 @@ void selection_cut(Image *from, int layer, Color_s replace);
 
 void selection_paste(Image *to, int layer);
 
+void selection_rotate(bool right);
+
+void selection_mirror(bool vertical);
+
 #endif //PIXELC_SELECTION_H

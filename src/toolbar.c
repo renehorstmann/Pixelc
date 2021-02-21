@@ -54,6 +54,10 @@ static struct {
 
     rRoSingle selection_copy;
     rRoSingle selection_cut;
+    rRoSingle selection_rotate_left;
+    rRoSingle selection_rotate_right;
+    rRoSingle selection_mirror_horizontal;
+    rRoSingle selection_mirror_vertical;
     rRoSingle selection_ok;
     
     rRoSingle layer_prev;
@@ -148,6 +152,14 @@ void toolbar_init() {
     
     button_init(&L.selection_cut, r_texture_init_file("res/button_cut.png", NULL));
     
+    button_init(&L.selection_rotate_left, r_texture_init_file("res/button_rotate_left.png", NULL));
+    
+    button_init(&L.selection_rotate_right, r_texture_init_file("res/button_rotate_right.png", NULL));
+    
+    button_init(&L.selection_mirror_horizontal, r_texture_init_file("res/button_horizontal.png", NULL));
+    
+    button_init(&L.selection_mirror_vertical, r_texture_init_file("res/button_vertical.png", NULL));
+    
     button_init(&L.selection_ok, r_texture_init_file("res/button_ok.png", NULL));
     
     // layer:
@@ -176,7 +188,11 @@ void toolbar_update(float dtime) {
     // selection buttons:
     L.selection_copy.rect.pose = pose16(-8, 43);
     L.selection_cut.rect.pose = pose16(8, 43);
-    L.selection_ok.rect.pose = pose16(0, 43);
+    L.selection_rotate_left.rect.pose = pose16(-48, 43);
+    L.selection_rotate_right.rect.pose = pose16(-32, 43);
+    L.selection_mirror_horizontal.rect.pose = pose16(-16, 43);
+    L.selection_mirror_vertical.rect.pose = pose16(0, 43);
+    L.selection_ok.rect.pose = pose16(20, 43);
     
     // layer:
     L.layer_prev.rect.pose = pose16(50, 43);
@@ -223,6 +239,10 @@ void toolbar_render() {
     	r_ro_single_render(&L.selection_cut);
     }
     if(toolbar.show_selection_ok) {
+    	r_ro_single_render(&L.selection_rotate_left);
+        r_ro_single_render(&L.selection_rotate_right);
+        r_ro_single_render(&L.selection_mirror_horizontal);
+        r_ro_single_render(&L.selection_mirror_vertical);
     	r_ro_single_render(&L.selection_ok);
     }
 
@@ -362,6 +382,30 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
     
     if(toolbar.show_selection_ok) {
+    	bool changed = false;
+    	if(button_clicked(&L.selection_rotate_left, pointer)) {
+    		selection_rotate(false);
+    		changed = true;
+    	}
+    	if(button_clicked(&L.selection_rotate_right, pointer)) {
+    		selection_rotate(true);
+    		changed = true;
+    	}
+    	
+    	if(button_clicked(&L.selection_mirror_horizontal, pointer)) {
+    		selection_mirror(false);
+    		changed = true;
+    	}	
+    	if(button_clicked(&L.selection_mirror_vertical, pointer)) {
+    		selection_mirror(true);
+    		changed = true;
+    	}
+    	
+    	if(changed) {
+    		canvas_redo_image();
+    		selection_paste(canvas_image(), canvas.current_layer);
+    	}
+    	
     	if(button_clicked(&L.selection_ok, pointer)) {
     		canvas_save();
     		brush_set_selection_active(false, true);
