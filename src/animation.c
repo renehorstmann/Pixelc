@@ -70,7 +70,7 @@ void animation_update(float dtime) {
 		        ceilf(camera_bottom() + palette_get_hud_size() + 6));
 	    else
 		    u_pose_set_xy(&L.horsimann.pose,
-		       camera_left()+30, ceilf(camera_bottom() + 6));	
+		       camera_left()+40, ceilf(camera_bottom() + 6));	
 	    return;
 	}
 	
