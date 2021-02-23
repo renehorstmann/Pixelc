@@ -18,13 +18,8 @@ void background_init(Color_s a, Color_s b) {
 }
 
 void background_update(float dtime) {
-    u_pose_set_size(&L.ro.rect.pose, camera_width(), camera_height());
+    L.ro.rect.pose = u_pose_new_aa(camera_left(), camera_top(), camera_width(), camera_height());
     u_pose_set_size(&L.ro.rect.uv, camera_width() / 2, camera_height() / 2);
-
-    float ux = -(camera_right() + camera_left()) / 4;
-    float uy = (camera_bottom() + camera_top()) / 4;
-    
-    u_pose_set_xy(&L.ro.rect.uv, ux, uy);
 }
 
 void background_render() {
