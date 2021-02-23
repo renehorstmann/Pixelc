@@ -13,8 +13,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
-- Selection Mirror, Rotate Buttons
-- New example.jpg
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?
