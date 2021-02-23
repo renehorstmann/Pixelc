@@ -25,7 +25,7 @@
 // canvas size
 #define COLS 16*8
 #define ROWS 16*8
-#define LAYERS 1
+#define LAYERS 3
 
 // JumpHare
 //#define COLS 32*4
