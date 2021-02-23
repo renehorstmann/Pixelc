@@ -16,6 +16,7 @@
 #include "savestate.h"
 #include "canvas.h"
 
+#define SELECTION_BORDER_FACTOR 4
 
 struct CanvasGlobals_s canvas;
 
@@ -56,36 +57,43 @@ static mat4 pixel_pose(int x, int y) {
 }
 
 static void setup_selection() {
-	int x = selection_pos().x;
-	int y = selection_pos().y;
-	int w = selection_size().x;
-	int h = selection_size().y;
-	
-	int idx = 0;
-	for(int i=0;i<h;i++) {
-		L.selection_border.rects[idx].pose = pixel_pose(x-1, y+i);
-		u_pose_set(&L.selection_border.rects[idx].uv, 0, 0, 0.5, 0.5, 0);
-		idx++;
-		
-		L.selection_border.rects[idx].pose = pixel_pose(x+w, y+i);
-		u_pose_set(&L.selection_border.rects[idx].uv, 0, 0.5, 0.5, 0.5, 0);
-		idx++;
-	}
-	for(int i=0;i<w;i++) {
-		L.selection_border.rects[idx].pose = pixel_pose(x+i, y-1);
-		u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0, 0.5, 0.5, 0);
-		idx++;
-		
-		L.selection_border.rects[idx].pose = pixel_pose(x+i, y+h);
-		u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0.5, 0.5, 0.5, 0);
-		idx++;
-	}
-	
-	for(;idx < L.selection_border.num; idx++) {
-		u_pose_set(&L.selection_border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-	}
-	
-	r_ro_batch_update(&L.selection_border);
+    int x = selection_pos().x;
+    int y = selection_pos().y;
+    int w = selection_size().x;
+    int h = selection_size().y;
+
+    int max = L.selection_border.num;
+
+    int idx = 0;
+    for(int i=0;i<h;i++) {
+        L.selection_border.rects[idx].pose = pixel_pose(x-1, y+i);
+        u_pose_set(&L.selection_border.rects[idx].uv, 0, 0, 0.5, 0.5, 0);
+        idx++;
+        if(idx>=max) goto UPDATE;
+
+        L.selection_border.rects[idx].pose = pixel_pose(x+w, y+i);
+        u_pose_set(&L.selection_border.rects[idx].uv, 0, 0.5, 0.5, 0.5, 0);
+        idx++;
+        if(idx>=max) goto UPDATE;
+    }
+    for(int i=0;i<w;i++) {
+        L.selection_border.rects[idx].pose = pixel_pose(x+i, y-1);
+        u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0, 0.5, 0.5, 0);
+        idx++;
+        if(idx>=max) goto UPDATE;
+
+        L.selection_border.rects[idx].pose = pixel_pose(x+i, y+h);
+        u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0.5, 0.5, 0.5, 0);
+        idx++;
+        if(idx>=max) goto UPDATE;
+    }
+
+    for(;idx < L.selection_border.num; idx++) {
+        u_pose_set(&L.selection_border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+    }
+
+    UPDATE:
+    r_ro_batch_update(&L.selection_border);
 }
 
 static void save_state(void **data, size_t *size);
@@ -109,7 +117,7 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
-    r_ro_batch_init(&L.selection_border, 2*(rows+cols), canvas_camera.gl,
+    r_ro_batch_init(&L.selection_border, 2*(rows+cols)*SELECTION_BORDER_FACTOR, canvas_camera.gl,
             r_texture_init_file("res/selection_border.png", NULL));
     for(int i=0; i<L.selection_border.num; i++) {
         L.selection_border.rects[i].color = color_to_vec4(color_from_hex("#357985"));       
