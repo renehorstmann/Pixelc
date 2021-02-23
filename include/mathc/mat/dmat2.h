@@ -15,21 +15,21 @@ static dmat2 dmat2_eye() {
 /** dst = (dmat2) v */
 static dmat2 dmat2_cast_from_float(const float *v) {
     dmat2 res;
-    vecN_cast_into(res.v, v, 2*2);
+    dvecN_cast_into(res.v, v, 2*2);
     return res;
 }
 
 /** dst = (dmat2) v */
 static dmat2 dmat2_cast_from_int(const int *v) {
     dmat2 res;
-    vecN_cast_into(res.v, v, 2*2);
+    dvecN_cast_into(res.v, v, 2*2);
     return res;
 }
 
 /** dst = (dmat2) v */
 static dmat2 dmat2_cast_from_unsigned(const unsigned *v) {
     dmat2 res;
-    vecN_cast_into(res.v, v, 2*2);
+    dvecN_cast_into(res.v, v, 2*2);
     return res;
 }
 

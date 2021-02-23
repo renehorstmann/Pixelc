@@ -15,21 +15,21 @@ static umat2 umat2_eye() {
 /** dst = (umat2) v */
 static umat2 umat2_cast_from_float(const float *v) {
     umat2 res;
-    vecN_cast_into(res.v, v, 2*2);
+    uvecN_cast_into(res.v, v, 2*2);
     return res;
 }
 
 /** dst = (umat2) v */
 static umat2 umat2_cast_from_double(const double *v) {
     umat2 res;
-    vecN_cast_into(res.v, v, 2*2);
+    uvecN_cast_into(res.v, v, 2*2);
     return res;
 }
 
 /** dst = (umat2) v */
 static umat2 umat2_cast_from_int(const int *v) {
     umat2 res;
-    vecN_cast_into(res.v, v, 2*2);
+    uvecN_cast_into(res.v, v, 2*2);
     return res;
 }
 

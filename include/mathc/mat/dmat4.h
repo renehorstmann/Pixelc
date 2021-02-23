@@ -17,21 +17,21 @@ static dmat4 dmat4_eye() {
 /** dst = (dmat4) v */
 static dmat4 dmat4_cast_from_float(const float *v) {
     dmat4 res;
-    vecN_cast_into(res.v, v, 4*4);
+    dvecN_cast_into(res.v, v, 4*4);
     return res;
 }
 
 /** dst = (dmat4) v */
 static dmat4 dmat4_cast_from_int(const int *v) {
     dmat4 res;
-    vecN_cast_into(res.v, v, 4*4);
+    dvecN_cast_into(res.v, v, 4*4);
     return res;
 }
 
 /** dst = (dmat4) v */
 static dmat4 dmat4_cast_from_unsigned(const unsigned *v) {
     dmat4 res;
-    vecN_cast_into(res.v, v, 4*4);
+    dvecN_cast_into(res.v, v, 4*4);
     return res;
 }
 
