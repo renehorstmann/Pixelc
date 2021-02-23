@@ -12,6 +12,27 @@ static dmat2 dmat2_eye() {
     return res;
 }
 
+/** dst = (dmat2) v */
+static dmat2 dmat2_cast_from_float(const float *v) {
+    dmat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (dmat2) v */
+static dmat2 dmat2_cast_from_int(const int *v) {
+    dmat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (dmat2) v */
+static dmat2 dmat2_cast_from_unsigned(const unsigned *v) {
+    dmat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
 
 /** dst = mat[row][:] */
 static dvec2 dmat2_get_row(dmat2 mat, int row) {

@@ -13,6 +13,27 @@ static mat4 mat4_eye() {
     return res;
 }
 
+/** dst = (mat4) v */
+static mat4 mat4_cast_from_double(const double *v) {
+    mat4 res;
+    vecN_cast_into(res.v, v, 4*4);
+    return res;
+}
+
+/** dst = (mat4) v */
+static mat4 mat4_cast_from_int(const int *v) {
+    mat4 res;
+    vecN_cast_into(res.v, v, 4*4);
+    return res;
+}
+
+/** dst = (mat4) v */
+static mat4 mat4_cast_from_unsigned(const unsigned *v) {
+    mat4 res;
+    vecN_cast_into(res.v, v, 4*4);
+    return res;
+}
+
 
 /** dst = mat[row][:] */
 static vec4 mat4_get_row(mat4 mat, int row) {

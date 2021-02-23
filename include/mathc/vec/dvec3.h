@@ -29,6 +29,34 @@ static dvec3 dvec3_set(double scalar) {
     return res;
 }
 
+/** dst = (dvec3) v */
+static dvec3 dvec3_cast_from_float(const float *v) {
+    dvec3 res;
+    dvecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (dvec3) v */
+static dvec3 dvec3_cast_from_int(const int *v) {
+    dvec3 res;
+    dvecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (dvec3) v */
+static dvec3 dvec3_cast_from_unsigned(const unsigned *v) {
+    dvec3 res;
+    dvecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (dvec3) v */
+static dvec3 dvec3_cast_from_bool(const bool *v) {
+    dvec3 res;
+    dvecN_cast_into(res.v, v, 3);
+    return res;
+}
+
 
 /** dst = -vec */
 static dvec3 dvec3_neg(dvec3 vec) {

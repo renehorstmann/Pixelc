@@ -13,6 +13,27 @@ static umat3 umat3_eye() {
     return res;
 }
 
+/** dst = (umat3) v */
+static umat3 umat3_cast_from_float(const float *v) {
+    umat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** dst = (umat3) v */
+static umat3 umat3_cast_from_double(const double *v) {
+    umat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** dst = (umat3) v */
+static umat3 umat3_cast_from_int(const int *v) {
+    umat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
 
 /** dst = mat[row][:] */
 static uvec3 umat3_get_row(umat3 mat, int row) {

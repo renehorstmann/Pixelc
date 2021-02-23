@@ -14,6 +14,27 @@ static dmat3 dmat3_eye() {
 }
 
 
+/** dst = (dmat3) v */
+static dmat3 dmat3_cast_from_float(const float *v) {
+    dmat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** dst = (dmat3) v */
+static dmat3 dmat3_cast_from_int(const int *v) {
+    dmat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** dst = (dmat3) v */
+static dmat3 dmat3_cast_from_unsigned(const unsigned *v) {
+    dmat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
 /** dst = mat[row][:] */
 static dvec3 dmat3_get_row(dmat3 mat, int row) {
     dvec3 res;

@@ -34,6 +34,34 @@ static dvec4 dvec4_set(double scalar) {
     return res;
 }
 
+/** dst = (dvec4) v */
+static dvec4 dvec4_cast_from_float(const float *v) {
+    dvec4 res;
+    dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (dvec4) v */
+static dvec4 dvec4_cast_from_int(const int *v) {
+    dvec4 res;
+    dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (dvec4) v */
+static dvec4 dvec4_cast_from_unsigned(const unsigned *v) {
+    dvec4 res;
+    dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (dvec4) v */
+static dvec4 dvec4_cast_from_bool(const bool *v) {
+    dvec4 res;
+    dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
 
 /** dst = -vec */
 static dvec4 dvec4_neg(dvec4 vec) {

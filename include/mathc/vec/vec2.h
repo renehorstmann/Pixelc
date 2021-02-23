@@ -5,7 +5,6 @@
 #include "../types/float.h"
 #include "../types/bool.h"
 
-
 /** dst = unit_x */
 static vec2 vec2_unit_x() {
     return (vec2) {{1, 0}};
@@ -16,6 +15,33 @@ static vec2 vec2_unit_y() {
     return (vec2) {{0, 1}};
 }
 
+/** dst = (vec2) v */
+static vec2 vec2_cast_from_double(const double *v) {
+    vec2 res;
+    vecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (vec2) v */
+static vec2 vec2_cast_from_int(const int *v) {
+    vec2 res;
+    vecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (vec2) v */
+static vec2 vec2_cast_from_unsigned(const unsigned *v) {
+    vec2 res;
+    vecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (vec2) v */
+static vec2 vec2_cast_from_bool(const bool *v) {
+    vec2 res;
+    vecN_cast_into(res.v, v, 2);
+    return res;
+}
 
 /** dst = scalar */
 static vec2 vec2_set(float scalar) {

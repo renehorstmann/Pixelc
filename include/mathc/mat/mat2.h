@@ -12,6 +12,26 @@ static mat2 mat2_eye() {
     return res;
 }
 
+/** dst = (mat2) v */
+static mat2 mat2_cast_from_double(const double *v) {
+    mat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (mat2) v */
+static mat2 mat2_cast_from_int(const int *v) {
+    mat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (mat2) v */
+static mat2 mat2_cast_from_unsigned(const unsigned *v) {
+    mat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
 
 /** dst = mat[row][:] */
 static vec2 mat2_get_row(mat2 mat, int row) {

@@ -25,6 +25,36 @@ static uvec2 uvec2_set(unsigned scalar) {
 }
 
 
+/** dst = (uvec2) v */
+static uvec2 uvec2_cast_from_float(const float *v) {
+    uvec2 res;
+    uvecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (uvec2) v */
+static uvec2 uvec2_cast_from_double(const double *v) {
+    uvec2 res;
+    uvecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (uvec2) v */
+static uvec2 uvec2_cast_from_int(const int *v) {
+    uvec2 res;
+    uvecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+
+/** dst = (uvec2) v */
+static uvec2 uvec2_cast_from_bool(const bool *v) {
+    uvec2 res;
+    uvecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+
 /** dst = a + b */
 static uvec2 uvec2_add_vec(uvec2 vec_a, uvec2 vec_b) {
     uvec2 res;

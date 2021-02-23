@@ -21,6 +21,34 @@ static vec3 vec3_unit_z() {
     return (vec3) {{0, 0, 1}};
 }
 
+/** dst = (vec3) v */
+static vec3 vec3_cast_from_double(const double *v) {
+    vec3 res;
+    vecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (vec3) v */
+static vec3 vec3_cast_from_int(const int *v) {
+    vec3 res;
+    vecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (vec3) v */
+static vec3 vec3_cast_from_unsigned(const unsigned *v) {
+    vec3 res;
+    vecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (vec3) v */
+static vec3 vec3_cast_from_bool(const bool *v) {
+    vec3 res;
+    vecN_cast_into(res.v, v, 3);
+    return res;
+}
+
 
 /** dst = scalar */
 static vec3 vec3_set(float scalar) {

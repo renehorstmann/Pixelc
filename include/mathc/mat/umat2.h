@@ -12,6 +12,27 @@ static umat2 umat2_eye() {
     return res;
 }
 
+/** dst = (umat2) v */
+static umat2 umat2_cast_from_float(const float *v) {
+    umat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (umat2) v */
+static umat2 umat2_cast_from_double(const double *v) {
+    umat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (umat2) v */
+static umat2 umat2_cast_from_int(const int *v) {
+    umat2 res;
+    vecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
 
 /** dst = mat[row][:] */
 static uvec2 umat2_get_row(umat2 mat, int row) {

@@ -34,6 +34,35 @@ static ivec4 ivec4_set(int scalar) {
     return res;
 }
 
+/** dst = (ivec4) v */
+static ivec4 ivec4_cast_from_float(const float *v) {
+    ivec4 res;
+    ivecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (ivec4) v */
+static ivec4 ivec4_cast_from_double(const double *v) {
+    ivec4 res;
+    ivecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (ivec4) v */
+static ivec4 ivec4_cast_from_unsigned(const unsigned *v) {
+    ivec4 res;
+    ivecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (ivec4) v */
+static ivec4 ivec4_cast_from_bool(const bool *v) {
+    ivec4 res;
+    ivecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+
 
 /** dst = -vec */
 static ivec4 ivec4_neg(ivec4 vec) {
