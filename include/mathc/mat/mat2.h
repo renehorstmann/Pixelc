@@ -3,6 +3,7 @@
 
 #include "matn.h"
 #include "../types/float.h"
+#include "../vec/vecn.h"
 
 
 /** dst = r==c ? 1 : 0 (identity)  */

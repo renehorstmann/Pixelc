@@ -3,6 +3,7 @@
 
 #include "dmatn.h"
 #include "../types/double.h"
+#include "../vec/dvecn.h"
 
 
 /** dst = r==c ? 1 : 0 (identity)  */

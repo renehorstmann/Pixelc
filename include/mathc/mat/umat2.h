@@ -3,6 +3,7 @@
 
 #include "umatn.h"
 #include "../types/uint.h"
+#include "../vec/uvecn.h"
 
 
 /** dst = r==c ? 1 : 0 (identity)  */

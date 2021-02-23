@@ -3,6 +3,7 @@
 
 #include "imatn.h"
 #include "../types/int.h"
+#include "../vec/ivecn.h"
 
 
 /** dst = r==c ? 1 : 0 (identity)  */
