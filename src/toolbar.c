@@ -197,11 +197,21 @@ void toolbar_update(float dtime) {
     // layer:
     L.layer_prev.rect.pose = pose16(50, 43);
     L.layer_next.rect.pose = pose16(80, 43);
-    char buf[8];
-    sprintf(buf, "%d", canvas.current_layer);
-    vec2 size = r_ro_text_set_text(&L.layer_num, buf);
-    L.layer_num.pose = pose_wh(65-size.x/2, 43-size.y/2+1, 1, 1);
-    
+    {
+        char buf[8];
+        sprintf(buf, "%d", canvas.current_layer);
+        vec2 size = r_ro_text_set_text(&L.layer_num, buf);
+        float x, y;
+        if (camera_is_portrait_mode()) {
+            x =65 - size.x / 2;
+            y = camera_top() - 43 + size.y / 2;
+        } else {
+            x =camera_left() + 43 - size.x / 2;
+            y = 65 + size.y / 2;
+        }
+        u_pose_set_xy(&L.layer_num.pose, floorf(x), floorf(y));
+    }
+
     // shape longpress:
     if (button_is_pressed(L.shape_minus)) {
         L.shape_minus_time += dtime;
