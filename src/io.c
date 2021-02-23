@@ -1,6 +1,5 @@
-#include "utilc/assume.h"
 #include "SDL_image.h"
-#include "canvas.h"
+#include "utilc/assume.h"
 #include "io.h"
 
 struct IoGlobals_s io = {
