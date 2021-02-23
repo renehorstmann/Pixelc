@@ -21,8 +21,8 @@ void background_update(float dtime) {
     u_pose_set_size(&L.ro.rect.pose, camera_width(), camera_height());
     u_pose_set_size(&L.ro.rect.uv, camera_width() / 2, camera_height() / 2);
     
-    float ux = -(camera_right() + camera_left()) / 4;
-    float uy = (camera_bottom() + camera_top()) / 4;
+    float ux = camera_width() / 4;
+    float uy = camera_height() / 4;
     
     u_pose_set_xy(&L.ro.rect.uv, ux, uy);
 }
