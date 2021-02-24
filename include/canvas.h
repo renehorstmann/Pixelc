@@ -9,6 +9,7 @@
 struct CanvasGlobals_s {
     int current_layer;
     bool show_grid;
+    float alpha;
 };
 extern struct CanvasGlobals_s canvas;
 

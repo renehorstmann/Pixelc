@@ -101,6 +101,7 @@ static void load_state(const void *data, size_t size);
 
 
 void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
+    canvas.alpha = 1.0;
     
     L.save_id = savestate_register(save_state, load_state);
      
@@ -179,7 +180,7 @@ void canvas_render() {
 
     for(int i=0; i<=canvas.current_layer; i++) {
         float alpha = (i+1.0) / (canvas.current_layer + 1.0);
-        L.render_objects[i].rect.color.w = alpha;
+        L.render_objects[i].rect.color.w = alpha * canvas.alpha;
         r_ro_single_render(&L.render_objects[i]);
     }
 

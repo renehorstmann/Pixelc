@@ -37,6 +37,8 @@ static struct {
     rRoSingle *import;
     rRoSingle *selection;
     rRoSingle *grid;
+    bool grid_status;
+    
     rRoSingle *camera;
     rRoSingle *animation;
     rRoSingle *shade;
@@ -313,7 +315,13 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
     
     if (button_toggled(L.grid, pointer)) {
-        canvas.show_grid = button_is_pressed(L.grid);
+        bool pressed = button_is_pressed(L.grid);
+        canvas.show_grid = pressed;
+        
+        if(pressed) {
+            canvas.alpha = L.grid_status? 1 : 0.5;
+            L.grid_status = !L.grid_status;
+        }
     }
 
     if (button_clicked(L.camera, pointer)) {
