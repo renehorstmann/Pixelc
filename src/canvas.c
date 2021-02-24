@@ -5,6 +5,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "utilc/alloc.h"
+#include "utilc/assume.h"
 #include "mathc/mat/float.h"
 
 #include "image.h"
@@ -16,6 +17,7 @@
 #include "savestate.h"
 #include "canvas.h"
 
+#define MAX_LAYERS 16
 #define SELECTION_BORDER_FACTOR 4
 
 struct CanvasGlobals_s canvas;
@@ -25,7 +27,7 @@ static struct {
 
     Image *image;
     Image *last_image;
-    rRoSingle *render_objects;
+    rRoSingle render_objects[MAX_LAYERS];
     
     rRoSingle bg;
     rRoSingle grid;
@@ -101,6 +103,7 @@ static void load_state(const void *data, size_t size);
 
 
 void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
+    assume(layers<=MAX_LAYERS, "too many layers");
     canvas.alpha = 1.0;
     
     L.save_id = savestate_register(save_state, load_state);
@@ -108,7 +111,6 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     L.pose = mat4_eye();
 
     L.image = image_new_zeros(layers, cols, rows);
-    L.render_objects = New0(rRoSingle , layers);
     canvas.current_layer = 0;
 
     init_render_objects();
