@@ -23,9 +23,14 @@
 //
 
 // canvas size
-#define COLS 256
-#define ROWS 128
-#define LAYERS 6
+//#define COLS 256
+//#define ROWS 128
+//#define LAYERS 6
+
+// Tilec
+#define COLS 16*8
+#define ROWS 16*8
+#define LAYERS 2
 
 // JumpHare
 //#define COLS 32*4
