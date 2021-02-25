@@ -17,7 +17,6 @@
 #include "savestate.h"
 #include "canvas.h"
 
-#define MAX_LAYERS 16
 #define SELECTION_BORDER_FACTOR 4
 
 struct CanvasGlobals_s canvas;
@@ -27,7 +26,7 @@ static struct {
 
     Image *image;
     Image *last_image;
-    rRoSingle render_objects[MAX_LAYERS];
+    rRoSingle render_objects[IMAGE_MAX_LAYERS];
     
     rRoSingle bg;
     rRoSingle grid;
@@ -103,7 +102,7 @@ static void load_state(const void *data, size_t size);
 
 
 void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
-    assume(layers<=MAX_LAYERS, "too many layers");
+    assume(layers<=IMAGE_MAX_LAYERS, "too many layers");
     canvas.alpha = 1.0;
     
     L.save_id = savestate_register(save_state, load_state);

@@ -23,9 +23,9 @@
 //
 
 // canvas size
-#define COLS 16*8
-#define ROWS 16*8
-#define LAYERS 1
+#define COLS 256
+#define ROWS 128
+#define LAYERS 6
 
 // JumpHare
 //#define COLS 32*4
@@ -36,8 +36,9 @@
 // animation + tiles
 // screen size is >=180 pixel
 // 16 Pixel * 11 cols = 180...
-#define PLAY_COLS 1
+#define PLAY_COLS 3
 #define PLAY_ROWS 1
+#define PLAY_SIZE 0.5
 #define PLAY_FRAMES 1
 #define PLAY_FPS 2.0
  
@@ -101,7 +102,7 @@ int main(int argc, char **argv) {
     canvas_camera_init();
     background_init(color_from_hex(BG_COLOR_A), color_from_hex(BG_COLOR_B));
     canvas_init(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
-    animation_init(PLAY_COLS, PLAY_ROWS, PLAY_FRAMES, PLAY_FPS);
+    animation_init(PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     brush_init();
     canvas_camera_control_init();
     palette_init();

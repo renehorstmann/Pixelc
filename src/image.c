@@ -1,9 +1,11 @@
 #include <string.h>  // memcmp
+#include "utilc/assume.h"
 #include "utilc/alloc.h"
 #include "image.h"
 
 
 Image *image_new_empty(int layers, int cols, int rows) {
+    assume(layers<=IMAGE_MAX_LAYERS, "too many layers");
     Image *self = raising_malloc(1, sizeof(Image) + sizeof(Color_s) * layers * rows * cols, SIGABRT);
     self->layers = layers;
     self->rows = rows;
@@ -12,6 +14,7 @@ Image *image_new_empty(int layers, int cols, int rows) {
 }
 
 Image *image_new_zeros(int layers, int cols, int rows) {
+    assume(layers<=IMAGE_MAX_LAYERS, "too many layers");
     Image *self = raising_calloc(1, sizeof(Image) + sizeof(Color_s) * layers * rows * cols, SIGABRT);
     self->layers = layers;
     self->rows = rows;

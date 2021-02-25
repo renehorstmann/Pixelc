@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "color.h"
 
+#define IMAGE_MAX_LAYERS 16
+
 typedef struct {
     int layers;
 	int rows, cols;
