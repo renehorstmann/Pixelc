@@ -12,17 +12,17 @@
 
 #define CANVAS_CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
 
-typedef struct {
+struct CanvasCameraMatrices_s {
     mat4 v;
     mat4 v_inv;
     mat4 p;
     mat4 p_inv;
     mat4 vp;
     mat4 v_p_inv;   // v @ p_inv
-} CanvasCameraMatrices_s;
+};
 
 struct CanvasCameraGlobals_s {
-    CanvasCameraMatrices_s matrices;
+    struct CanvasCameraMatrices_s matrices;
     const float *gl;
 };
 extern struct CanvasCameraGlobals_s canvas_camera;

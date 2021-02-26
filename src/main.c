@@ -23,29 +23,29 @@
 //
 
 // canvas size
-//#define COLS 256
-//#define ROWS 128
-//#define LAYERS 6
+//#define COLS 32
+//#define ROWS 32
+//#define LAYERS 1
 
 // Tilec
-#define COLS 16*8
-#define ROWS 16*8
-#define LAYERS 2
+//#define COLS 16*8
+//#define ROWS 16*8
+//#define LAYERS 2
 
 // JumpHare
-//#define COLS 32*4
-//#define ROWS 32*4
-//#define LAYERS 1
+#define COLS 32*4
+#define ROWS 32*4
+#define LAYERS 1
 
 
 // animation + tiles
 // screen size is >=180 pixel
 // 16 Pixel * 11 cols = 180...
-#define PLAY_COLS 3
+#define PLAY_COLS 1
 #define PLAY_ROWS 1
-#define PLAY_SIZE 0.5
-#define PLAY_FRAMES 1
-#define PLAY_FPS 2.0
+#define PLAY_SIZE 1
+#define PLAY_FRAMES 4
+#define PLAY_FPS 6.0
  
 // uncomment the used palette:
 // #define PALETTE grayscale
@@ -63,8 +63,8 @@
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
 
-#define GRID_COLS 16
-#define GRID_ROWS 16
+#define GRID_COLS 8
+#define GRID_ROWS 8
 
 
 // uncomment to change the file locations:

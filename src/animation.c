@@ -90,7 +90,7 @@ void animation_update(float dtime) {
 	
 	L.time = fmodf(L.time + dtime, L.frames / L.fps);
 	float u = floorf(L.time * L.fps) / L.frames;
-	for(int i=0; i<canvas.current_layer; i++) {
+	for(int i=0; i<=canvas.current_layer; i++) {
 		for(int j=0; j<L.ro[i].num; j++) {
 			u_pose_set_x(&L.ro[i].rects[j].uv, u);
 		}

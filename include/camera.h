@@ -11,13 +11,13 @@
 
 #define CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
 
-typedef struct {
+struct CameraMatrices_s {
     mat4 p;
     mat4 p_inv;
-} CameraMatrices_s;
+};
 
 struct CameraGlobals_s {
-    CameraMatrices_s matrices;
+    struct CameraMatrices_s matrices;
     const float *gl;
 };
 extern struct CameraGlobals_s camera;

@@ -15,6 +15,7 @@ static struct {
 
 
 void canvas_camera_init() {
+    assert(CANVAS_CAMERA_SIZE % 2 == 0 && "CANVAS_CAMERA_SIZE must be even");
     canvas_camera.gl = &canvas_camera.matrices.vp.m00;
     canvas_camera.matrices.v = mat4_eye();
     canvas_camera.matrices.v_inv = mat4_eye();
