@@ -4,36 +4,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "e/core.h"
-#include "mathc/types/float.h"
+#include "mathc/vec/ucvec4.h"
+#include "mathc/vec/vec4.h"
 
-typedef union {
-    uint8_t v[4];
-    struct {
-        uint8_t r, g, b, a;
-    };
-} Color_s;
-_Static_assert(sizeof(Color_s) == 4, "color not packed?");
+typedef ucvec4 Color_s;
 
 static bool color_equals(Color_s a, Color_s b) {
-	return *(uint32_t *) &a == *(uint32_t *) &b;
+	return ucvec4_cmp(a, b);
 }
 
-static vec4 color_to_vec4(Color_s c) {
-	return (vec4) {{
-		c.r / 255.0f,
-		c.g / 255.0f,
-		c.b / 255.0f,
-		c.a / 255.0f
-	}};
-}
-
-static Color_s color_from_vec4(vec4 v) {
-    return (Color_s) {
-        v.x * 255,
-        v.y * 255,
-        v.z * 255,
-        v.w * 255
-    };
+static vec4 color_to_vec4(Color_s color) {
+    return vec4_cast_from_uchar_1(color.v);
 }
 
 static Color_s color_from_hex(const char *hex_string) {
@@ -65,10 +46,6 @@ static Color_s color_from_hex(const char *hex_string) {
     // error
     SDL_Log("color_from_hex failed for: %s", hex_string);
     return c;
-}
-
-static void color_print(Color_s c) {
-    SDL_Log("(color) {%d, %d, %d, %d}", c.r, c.g, c.b, c.a);
 }
 
 static const Color_s COLOR_TRANSPARENT = {0, 0, 0, 0};

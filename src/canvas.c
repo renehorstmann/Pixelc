@@ -135,7 +135,7 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     r_ro_batch_init(&L.selection_border, 2*(rows+cols)*SELECTION_BORDER_FACTOR, canvas_camera.gl,
             r_texture_init_file("res/selection_border.png", NULL));
     for(int i=0; i<L.selection_border.num; i++) {
-        L.selection_border.rects[i].color = color_to_vec4(color_from_hex("#357985"));       
+        L.selection_border.rects[i].color = color_to_vec4(color_from_hex("#357985"));
     }
             
 
