@@ -97,8 +97,21 @@ static void setup_selection() {
     r_ro_batch_update(&L.selection_border);
 }
 
-static void save_state(void **data, size_t *size);
-static void load_state(const void *data, size_t size);
+
+static void save_state(void **data, size_t *size) {
+	*data = L.image;
+	*size = image_full_size(L.image);
+}
+
+static void load_state(const void *data, size_t size) {
+	// todo: check new layers, rows, cols
+	image_delete(L.image);
+	L.image = image_new_clone(data);
+	image_copy(L.last_image, L.image);
+	assert(image_full_size(L.image) == size);
+	io_save_image(io.default_image_file, canvas_image());
+}
+
 
 
 void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
@@ -130,7 +143,6 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     buf[0] = buf[3] = color_from_hex("#999999");
     buf[1] = buf[2] = color_from_hex("#777777");
     GLuint bg_tex = r_texture_init(2, 2, buf);
-    r_texture_filter_nearest(bg_tex);
     r_ro_single_init(&L.bg, canvas_camera.gl, bg_tex);
     {    
         float w = (float) cols/(2*grid_cols);
@@ -234,19 +246,5 @@ void canvas_save() {
 
 void canvas_redo_image() {
 	image_copy(L.image, L.last_image);
-}
-
-
-static void save_state(void **data, size_t *size) {
-	*data = L.image;
-	*size = image_full_size(L.image);
-}
-static void load_state(const void *data, size_t size) {
-	// todo: check new layers, rows, cols
-	image_delete(L.image);
-	L.image = image_new_clone(data);
-	image_copy(L.last_image, L.image);
-	assert(image_full_size(L.image) == size);
-	io_save_image(io.default_image_file, canvas_image());
 }
 
