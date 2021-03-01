@@ -49,13 +49,13 @@ static unsigned usca_clamp(unsigned x, unsigned min, unsigned max) {
 }
 
 /** dst = a * (1-t) + b * t */
-static unsigned usca_mix(unsigned a, unsigned b, unsigned t) {
+static unsigned usca_mix(unsigned a, unsigned b, float t) {
     return a * (1.0-t) + b * t;
 }
 
 /** dst = x < edge ? 0 : 1 */
 static unsigned usca_step(unsigned x, unsigned edge) {
-    return x < edge ? 0.0 : 1.0;
+    return x < edge ? 0 : 1;
 }
 
 #endif //MATHC_SCA_UINT_H

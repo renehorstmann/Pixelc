@@ -34,6 +34,10 @@ static umat2 umat2_cast_from_int(const int *v) {
     return res;
 }
 
+/** mat_a == mat_b */
+static bool umat2_cmp(umat2 a, umat2 b) {
+    return uvecN_cmp(a.v, b.v, 2*2);
+}
 
 /** dst = mat[row][:] */
 static uvec2 umat2_get_row(umat2 mat, int row) {

@@ -15,6 +15,10 @@ static bvec2 bvec2_unit_y() {
     return (bvec2) {{false, true}};
 }
 
+/** bvec_a == bvec_b */
+static bool bvec2_cmp(bvec2 a, bvec2 b) {
+    return bvecN_cmp(a.v, b.v, 2);
+}
 
 /** dst = scalar */
 static bvec2 bvec2_set(bool set) {

@@ -34,6 +34,10 @@ static umat3 umat3_cast_from_int(const int *v) {
     return res;
 }
 
+/** mat_a == mat_b */
+static bool umat3_cmp(umat3 a, umat3 b) {
+    return uvecN_cmp(a.v, b.v, 3*3);
+}
 
 /** dst = mat[row][:] */
 static uvec3 umat3_get_row(umat3 mat, int row) {

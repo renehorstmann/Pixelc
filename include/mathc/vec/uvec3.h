@@ -21,6 +21,11 @@ static uvec3 uvec3_unit_z() {
     return (uvec3) {{0, 0, 1}};
 }
 
+/** uvec_a == uvec_b */
+static bool uvec3_cmp(uvec3 a, uvec3 b) {
+    return uvecN_cmp(a.v, b.v, 3);
+}
+
 
 /** dst = scalar */
 static uvec3 uvec3_set(unsigned scalar) {
@@ -45,6 +50,20 @@ static uvec3 uvec3_cast_from_double(const double *v) {
 
 /** dst = (uvec3) v */
 static uvec3 uvec3_cast_from_int(const int *v) {
+    uvec3 res;
+    uvecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (uvec3) v */
+static uvec3 uvec3_cast_from_char(const char *v) {
+    uvec3 res;
+    uvecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (uvec3) v */
+static uvec3 uvec3_cast_from_uchar(const unsigned char *v) {
     uvec3 res;
     uvecN_cast_into(res.v, v, 3);
     return res;
@@ -247,6 +266,54 @@ static uvec3 uvec3_clamp_vec(uvec3 vec_x, uvec3 vec_min, uvec3 vec_max) {
 /** dst = x < min ? min : (x > max ? max : x) */
 static uvec3 uvec3_clamp_vec_v(const unsigned *vec_x, const unsigned *vec_min, const unsigned *vec_max) {
     return uvec3_clamp_vec(UVec3(vec_x), UVec3(vec_min), UVec3(vec_max));
+}
+
+
+/** dst = a * (1-t) + b * t */
+static uvec3 uvec3_mix(uvec3 vec_a, uvec3 vec_b, float t) {
+    uvec3 res;
+    uvecN_mix(res.v, vec_a.v, vec_b.v, t, 3);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static uvec3 uvec3_mix_v(const unsigned *vec_a, const unsigned *vec_b, float t) {
+    return uvec3_mix(UVec3(vec_a), UVec3(vec_b), t);
+}
+
+
+/** dst = a * (1-t) + b * t */
+static uvec3 uvec3_mix_vec(uvec3 vec_a, uvec3 vec_b, const float *vec_t) {
+    uvec3 res;
+    uvecN_mix_vec(res.v, vec_a.v, vec_b.v, vec_t, 3);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static uvec3 uvec3_mix_vec_v(const unsigned *vec_a, const unsigned *vec_b, const float *vec_t) {
+    return uvec3_mix_vec(UVec3(vec_a), UVec3(vec_b), vec_t);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static uvec3 uvec3_step(uvec3 vec_x, unsigned edge) {
+    uvec3 res;
+    uvecN_step(res.v, vec_x.v, edge, 3);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static uvec3 uvec3_step_v(const unsigned *vec_x, unsigned edge) {
+    return uvec3_step(UVec3(vec_x), edge);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static uvec3 uvec3_step_vec(uvec3 vec_x, uvec3 vec_edge) {
+    uvec3 res;
+    uvecN_step_vec(res.v, vec_x.v, vec_edge.v, 3);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static uvec3 uvec3_step_vec_v(const unsigned *vec_x, const unsigned *vec_edge) {
+    return uvec3_step_vec(UVec3(vec_x), UVec3(vec_edge));
 }
 
 

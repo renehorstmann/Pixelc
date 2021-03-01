@@ -26,6 +26,11 @@ static bvec4 bvec4_unit_w() {
 }
 
 
+/** bvec_a == bvec_b */
+static bool bvec4_cmp(bvec4 a, bvec4 b) {
+    return bvecN_cmp(a.v, b.v, 4);
+}
+
 /** dst = scalar */
 static bvec4 bvec4_set(bool set) {
     bvec4 res;

@@ -26,14 +26,6 @@ static dvec4 dvec4_unit_w() {
     return (dvec4) {{0, 0, 0, 1}};
 }
 
-
-/** dst = scalar */
-static dvec4 dvec4_set(double scalar) {
-    dvec4 res;
-    dvecN_set(res.v, scalar, 4);
-    return res;
-}
-
 /** dst = (dvec4) v */
 static dvec4 dvec4_cast_from_float(const float *v) {
     dvec4 res;
@@ -56,9 +48,43 @@ static dvec4 dvec4_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (dvec4) v */
+static dvec4 dvec4_cast_from_char(const char *v) {
+    dvec4 res;
+    dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (dvec4) v */
+static dvec4 dvec4_cast_from_uchar(const unsigned char *v) {
+    dvec4 res;
+    dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (dvec4) v */
 static dvec4 dvec4_cast_from_bool(const bool *v) {
     dvec4 res;
     dvecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = vec / 255 v */
+static dvec4 dvec4_cast_from_uchar_1(const unsigned char *v) {
+    dvec4 res;
+    dvecN_cast_from_uchar_1(res.v, v, 4);
+    return res;
+}
+
+/** dvec_a == dvec_b */
+static bool dvec4_cmp(dvec4 a, dvec4 b) {
+    return dvecN_cmp(a.v, b.v, 4);
+}
+
+
+/** dst = scalar */
+static dvec4 dvec4_set(double scalar) {
+    dvec4 res;
+    dvecN_set(res.v, scalar, 4);
     return res;
 }
 
@@ -267,15 +293,15 @@ static dvec4 dvec4_atan_v(const double *vec_x) {
 }
 
 
-/** dst = atan4(y, x) */
-static dvec4 dvec4_atan4(dvec4 vec_y, dvec4 vec_x) {
+/** dst = atan2(y, x) */
+static dvec4 dvec4_atan2(dvec4 vec_y, dvec4 vec_x) {
     dvec4 res;
     dvecN_atan2(res.v, vec_y.v, vec_x.v, 4);
     return res;
 }
-/** dst = atan4(y, x) */
-static dvec4 dvec4_atan4_v(const double *vec_y, const double *vec_x) {
-    return dvec4_atan4(DVec4(vec_y), DVec4(vec_x));
+/** dst = atan2(y, x) */
+static dvec4 dvec4_atan2_v(const double *vec_y, const double *vec_x) {
+    return dvec4_atan2(DVec4(vec_y), DVec4(vec_x));
 }
 
 
@@ -327,27 +353,27 @@ static dvec4 dvec4_log_v(const double *vec_x) {
 }
 
 
-/** dst = exp4(x) */
-static dvec4 dvec4_exp4(dvec4 vec_x) {
+/** dst = exp2(x) */
+static dvec4 dvec4_exp2(dvec4 vec_x) {
     dvec4 res;
     dvecN_exp2(res.v, vec_x.v, 4);
     return res;
 }
-/** dst = exp4(x) */
-static dvec4 dvec4_exp4_v(const double *vec_x) {
-    return dvec4_exp4(DVec4(vec_x));
+/** dst = exp2(x) */
+static dvec4 dvec4_exp2_v(const double *vec_x) {
+    return dvec4_exp2(DVec4(vec_x));
 }
 
 
-/** dst = log4(x) */
-static dvec4 dvec4_log4(dvec4 vec_x) {
+/** dst = log2(x) */
+static dvec4 dvec4_log2(dvec4 vec_x) {
     dvec4 res;
     dvecN_log2(res.v, vec_x.v, 4);
     return res;
 }
-/** dst = log4(x) */
-static dvec4 dvec4_log4_v(const double *vec_x) {
-    return dvec4_log4(DVec4(vec_x));
+/** dst = log2(x) */
+static dvec4 dvec4_log2_v(const double *vec_x) {
+    return dvec4_log2(DVec4(vec_x));
 }
 
 

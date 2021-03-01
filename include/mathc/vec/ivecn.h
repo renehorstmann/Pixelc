@@ -7,6 +7,7 @@
 #endif
 #endif
 
+#include <string.h>     // memcmp
 #include <stdlib.h>     // abs
 #include <stdbool.h>
 #include <math.h>
@@ -20,6 +21,10 @@ do { \
         (dst_vec)[ivecN_cast_into_i_] = (int) (vec)[ivecN_cast_into_i_]; \
 } while(0)
 
+/** vec_a == vec_b */
+static bool ivecN_cmp(const int *vec_a, const int *vec_b, int n) {
+    return memcmp(vec_a, vec_b, n * sizeof(int)) == 0;
+}
 
 /** dst = vec */
 static void ivecN_copy(int *dst_vec, const int *vec, int n) {
@@ -146,6 +151,32 @@ static void ivecN_clamp_vec(int *dst_vec, const int *vec_x, const int *vec_min, 
     for (int i = 0; i < n; i++)
         dst_vec[i] = vec_x[i] < vec_min[i] ? vec_min[i] : (vec_x[i] > vec_max[i] ? vec_max[i] : vec_x[i]);
 }
+
+
+/** dst = a * (1-t) + b * t */
+static void ivecN_mix(int *dst_vec, const int *vec_a, const int *vec_b, float t, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_a[i] * (1.0f - t) + vec_b[i] * t;
+}
+
+/** dst = a * (1-t) + b * t */
+static void ivecN_mix_vec(int *dst_vec, const int *vec_a, const int *vec_b, const float *vec_t, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_a[i] * (1.0f - vec_t[i]) + vec_b[i] * vec_t[i];
+}
+
+/** dst = x < edge ? 0 : 1 */
+static void ivecN_step(int *dst_vec, const int *vec_x, int edge, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_x[i] < edge ? 0 : 1;
+}
+
+/** dst = x < edge ? 0 : 1 */
+static void ivecN_step_vec(int *dst_vec, const int *vec_x, const int *vec_edge, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_x[i] < vec_edge[i] ? 0 : 1;
+}
+
 
 /** returns vec[0] + vec[1] + ... + vec[n-1] */
 static int ivecN_sum(const int *vec, int n) {

@@ -20,6 +20,11 @@ static bvec3 bvec3_unit_z() {
     return (bvec3) {{false, false, true}};
 }
 
+/** bvec_a == bvec_b */
+static bool bvec3_cmp(bvec3 a, bvec3 b) {
+    return bvecN_cmp(a.v, b.v, 3);
+}
+
 
 /** dst = scalar */
 static bvec3 bvec3_set(bool set) {

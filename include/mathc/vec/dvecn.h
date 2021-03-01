@@ -7,6 +7,7 @@
 #endif
 #endif
 
+#include <string.h>     // memcmp
 #include <stdbool.h>
 #include <math.h>
 #include <assert.h>
@@ -19,6 +20,17 @@ do { \
         (dst_vec)[dvecN_cast_into_i_] = (double) (vec)[dvecN_cast_into_i_]; \
 } while(0)
 
+
+/** dst = vec / 255 */
+static void dvecN_cast_from_uchar_1(double *dst_vec, const unsigned char *vec, int n) {
+    for(int i = 0; i < n; i++)
+        dst_vec[i] = (double) vec[i] / 255.0;
+}
+
+/** vec_a == vec_b */
+static bool dvecN_cmp(const double *vec_a, const double *vec_b, int n) {
+    return memcmp(vec_a, vec_b, n * sizeof(double)) == 0;
+}
 
 /** dst = vec */
 static void dvecN_copy(double *dst_vec, const double *vec, int n) {

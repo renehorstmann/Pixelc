@@ -55,13 +55,13 @@ static int isca_clamp(int x, int min, int max) {
 }
 
 /** dst = a * (1-t) + b * t */
-static int isca_mix(int a, int b, int t) {
+static int isca_mix(int a, int b, float t) {
     return a * (1.0-t) + b * t;
 }
 
 /** dst = x < edge ? 0 : 1 */
 static int isca_step(int x, int edge) {
-    return x < edge ? 0.0 : 1.0;
+    return x < edge ? 0 : 1;
 }
 
 #endif //MATHC_SCA_INT_H

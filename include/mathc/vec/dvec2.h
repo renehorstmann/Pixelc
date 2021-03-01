@@ -16,14 +16,6 @@ static dvec2 dvec2_unit_y() {
     return (dvec2) {{0, 1}};
 }
 
-
-/** dst = scalar */
-static dvec2 dvec2_set(double scalar) {
-    dvec2 res;
-    dvecN_set(res.v, scalar, 2);
-    return res;
-}
-
 /** dst = (dvec2) v */
 static dvec2 dvec2_cast_from_float(const float *v) {
     dvec2 res;
@@ -45,11 +37,44 @@ static dvec2 dvec2_cast_from_unsigned(const unsigned *v) {
     return res;
 }
 
+/** dst = (dvec2) v */
+static dvec2 dvec2_cast_from_char(const char *v) {
+    dvec2 res;
+    dvecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (dvec2) v */
+static dvec2 dvec2_cast_from_uchar(const unsigned char *v) {
+    dvec2 res;
+    dvecN_cast_into(res.v, v, 2);
+    return res;
+}
 
 /** dst = (dvec2) v */
 static dvec2 dvec2_cast_from_bool(const bool *v) {
     dvec2 res;
     dvecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = vec / 255 v */
+static dvec2 dvec2_cast_from_uchar_1(const unsigned char *v) {
+    dvec2 res;
+    dvecN_cast_from_uchar_1(res.v, v, 2);
+    return res;
+}
+
+/** dvec_a == dvec_b */
+static bool dvec2_cmp(dvec2 a, dvec2 b) {
+    return dvecN_cmp(a.v, b.v, 2);
+}
+
+
+/** dst = scalar */
+static dvec2 dvec2_set(double scalar) {
+    dvec2 res;
+    dvecN_set(res.v, scalar, 2);
     return res;
 }
 

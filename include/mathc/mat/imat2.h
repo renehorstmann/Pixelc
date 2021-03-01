@@ -34,6 +34,26 @@ static imat2 imat2_cast_from_unsigned(const unsigned *v) {
     return res;
 }
 
+/** dst = (imat2) v */
+static imat2 imat2_cast_from_char(const char *v) {
+    imat2 res;
+    ivecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (imat2) v */
+static imat2 imat2_cast_from_uchar(const unsigned char *v) {
+    imat2 res;
+    ivecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+
+/** mat_a == mat_b */
+static bool imat2_cmp(imat2 a, imat2 b) {
+    return ivecN_cmp(a.v, b.v, 2*2);
+}
+
 /** dst = mat[row][:] */
 static ivec2 imat2_get_row(imat2 mat, int row) {
     ivec2 res;

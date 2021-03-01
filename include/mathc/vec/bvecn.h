@@ -1,7 +1,13 @@
 #ifndef MATHC_VEC_BVECN_H
 #define MATHC_VEC_BVECN_H
 
+#include <string.h>     // memcmp
 #include <stdbool.h>
+
+/** vec_a == vec_b */
+static bool bvecN_cmp(const bool *vec_a, const bool *vec_b, int n) {
+    return memcmp(vec_a, vec_b, n * sizeof(bool)) == 0;
+}
 
 /** dst = vec */
 static void bvecN_copy(bool *dst_vec, const bool *vec, int n) {

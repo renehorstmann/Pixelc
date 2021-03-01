@@ -9,14 +9,6 @@
 // from cglm/io.h
 //
 
-#ifndef MATHC_PRINT_PRECISION
-#  define MATHC_PRINT_PRECISION 5
-#endif
-
-#ifndef MATHC_PRINT_MAX_TO_SHORT
-#  define MATHC_PRINT_MAX_TO_SHORT 1e5
-#endif
-
 #ifdef MATHC_NO_PRINT_COLOR
 #define MATHC_PRINT_COLOR ""
 #define MATHC_PRINT_COLOR_RESET ""

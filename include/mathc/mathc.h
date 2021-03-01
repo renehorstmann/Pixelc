@@ -6,6 +6,8 @@
 #include "double.h"
 #include "int.h"
 #include "uint.h"
+#include "char.h"
+#include "uchar.h"
 
 #include "utils/float.h"
 #include "utils/double.h"

@@ -9,14 +9,6 @@
 // from cglm/io.h
 //
 
-#ifndef MATHC_PRINT_PRECISION
-#  define MATHC_PRINT_PRECISION 5
-#endif
-
-#ifndef MATHC_PRINT_MAX_TO_SHORT
-#  define MATHC_PRINT_MAX_TO_SHORT 1e5
-#endif
-
 #ifdef MATHC_NO_PRINT_COLOR
 #define MATHC_PRINT_COLOR ""
 #define MATHC_PRINT_COLOR_RESET ""
@@ -62,7 +54,7 @@ static void umat2_println_f(umat2 mat, FILE *ostream) {
     fprintf(ostream, "umat2: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 2; r++) {
         fprintf(ostream, "  |");
-        for (unsigned c = 0; c < 2; c++)
+        for (int c = 0; c < 2; c++)
             fprintf(ostream, " %u", mat.m[c][r]);
 
         fprintf(ostream, " |\n");
@@ -131,7 +123,7 @@ static void umat3_println_f(umat3 mat, FILE *ostream) {
     fprintf(ostream, "umat3: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 3; r++) {
         fprintf(ostream, "  |");
-        for (unsigned c = 0; c < 3; c++)
+        for (int c = 0; c < 3; c++)
             fprintf(ostream, " %u", mat.m[c][r]);
 
         fprintf(ostream, " |\n");
@@ -199,7 +191,7 @@ static void umat4_println_f(umat4 mat, FILE *ostream) {
     fprintf(ostream, "umat4: " MATHC_PRINT_COLOR "\n");
     for (int r = 0; r < 4; r++) {
         fprintf(ostream, "  |");
-        for (unsigned c = 0; c < 4; c++)
+        for (int c = 0; c < 4; c++)
             fprintf(ostream, " %u", mat.m[c][r]);
 
         fprintf(ostream, " |\n");

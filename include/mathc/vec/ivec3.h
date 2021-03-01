@@ -21,6 +21,11 @@ static ivec3 ivec3_unit_z() {
     return (ivec3) {{0, 0, 1}};
 }
 
+/** ivec_a == ivec_b */
+static bool ivec3_cmp(ivec3 a, ivec3 b) {
+    return ivecN_cmp(a.v, b.v, 3);
+}
+
 
 /** dst = scalar */
 static ivec3 ivec3_set(int scalar) {
@@ -45,6 +50,20 @@ static ivec3 ivec3_cast_from_double(const double *v) {
 
 /** dst = (ivec3) v */
 static ivec3 ivec3_cast_from_unsigned(const unsigned *v) {
+    ivec3 res;
+    ivecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (ivec3) v */
+static ivec3 ivec3_cast_from_char(const char *v) {
+    ivec3 res;
+    ivecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (ivec3) v */
+static ivec3 ivec3_cast_from_uchar(const unsigned char *v) {
     ivec3 res;
     ivecN_cast_into(res.v, v, 3);
     return res;
@@ -285,6 +304,52 @@ static ivec3 ivec3_clamp_vec_v(const int *vec_x, const int *vec_min, const int *
     return ivec3_clamp_vec(IVec3(vec_x), IVec3(vec_min), IVec3(vec_max));
 }
 
+/** dst = a * (1-t) + b * t */
+static ivec3 ivec3_mix(ivec3 vec_a, ivec3 vec_b, float t) {
+    ivec3 res;
+    ivecN_mix(res.v, vec_a.v, vec_b.v, t, 3);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static ivec3 ivec3_mix_v(const int *vec_a, const int *vec_b, float t) {
+    return ivec3_mix(IVec3(vec_a), IVec3(vec_b), t);
+}
+
+
+/** dst = a * (1-t) + b * t */
+static ivec3 ivec3_mix_vec(ivec3 vec_a, ivec3 vec_b, const float *vec_t) {
+    ivec3 res;
+    ivecN_mix_vec(res.v, vec_a.v, vec_b.v, vec_t, 3);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static ivec3 ivec3_mix_vec_v(const int *vec_a, const int *vec_b, const float *vec_t) {
+    return ivec3_mix_vec(IVec3(vec_a), IVec3(vec_b), vec_t);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static ivec3 ivec3_step(ivec3 vec_x, int edge) {
+    ivec3 res;
+    ivecN_step(res.v, vec_x.v, edge, 3);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static ivec3 ivec3_step_v(const int *vec_x, int edge) {
+    return ivec3_step(IVec3(vec_x), edge);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static ivec3 ivec3_step_vec(ivec3 vec_x, ivec3 vec_edge) {
+    ivec3 res;
+    ivecN_step_vec(res.v, vec_x.v, vec_edge.v, 3);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static ivec3 ivec3_step_vec_v(const int *vec_x, const int *vec_edge) {
+    return ivec3_step_vec(IVec3(vec_x), IVec3(vec_edge));
+}
 
 /** returns vec[0] + vec[1] + ... + vec[n-1] */
 static int ivec3_sum(ivec3 vec) {

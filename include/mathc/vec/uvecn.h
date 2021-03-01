@@ -7,6 +7,7 @@
 #endif
 #endif
 
+#include <string.h>     // memcmp
 #include <stdbool.h>
 #include <math.h>
 #include <assert.h>
@@ -15,9 +16,14 @@
 /** macro to cast a vector unsignedo a unsigned vector */
 #define uvecN_cast_into(dst_vec, vec, n) \
 do { \
-    for(unsigned uvecN_cast_into_i_=0; uvecN_cast_into_i_<(n); uvecN_cast_into_i_++) \
+    for(int uvecN_cast_into_i_=0; uvecN_cast_into_i_<(n); uvecN_cast_into_i_++) \
         (dst_vec)[uvecN_cast_into_i_] = (unsigned) (vec)[uvecN_cast_into_i_]; \
 } while(0)
+
+/** vec_a == vec_b */
+static bool uvecN_cmp(const unsigned *vec_a, const unsigned *vec_b, int n) {
+    return memcmp(vec_a, vec_b, n * sizeof(unsigned)) == 0;
+}
 
 
 /** dst = vec */
@@ -126,6 +132,30 @@ static void uvecN_clamp(unsigned *dst_vec, const unsigned *vec_x, unsigned min, 
 static void uvecN_clamp_vec(unsigned *dst_vec, const unsigned *vec_x, const unsigned *vec_min, const unsigned *vec_max, int n) {
     for (int i = 0; i < n; i++)
         dst_vec[i] = vec_x[i] < vec_min[i] ? vec_min[i] : (vec_x[i] > vec_max[i] ? vec_max[i] : vec_x[i]);
+}
+
+/** dst = a * (1-t) + b * t */
+static void uvecN_mix(unsigned *dst_vec, const unsigned *vec_a, const unsigned *vec_b, float t, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_a[i] * (1.0f - t) + vec_b[i] * t;
+}
+
+/** dst = a * (1-t) + b * t */
+static void uvecN_mix_vec(unsigned *dst_vec, const unsigned *vec_a, const unsigned *vec_b, const float *vec_t, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_a[i] * (1.0f - vec_t[i]) + vec_b[i] * vec_t[i];
+}
+
+/** dst = x < edge ? 0 : 1 */
+static void uvecN_step(unsigned *dst_vec, const unsigned *vec_x, unsigned edge, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_x[i] < edge ? 0 : 1;
+}
+
+/** dst = x < edge ? 0 : 1 */
+static void uvecN_step_vec(unsigned *dst_vec, const unsigned *vec_x, const unsigned *vec_edge, int n) {
+    for (int i = 0; i < n; i++)
+        dst_vec[i] = vec_x[i] < vec_edge[i] ? 0 : 1;
 }
 
 /** returns vec[0] + vec[1] + ... + vec[n-1] */

@@ -34,6 +34,25 @@ static mat3 mat3_cast_from_unsigned(const unsigned *v) {
     return res;
 }
 
+/** dst = (mat3) v */
+static mat3 mat3_cast_from_char(const char *v) {
+    mat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** dst = (mat3) v */
+static mat3 mat3_cast_from_uchar(const unsigned char *v) {
+    mat3 res;
+    vecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** mat_a == mat_b */
+static bool mat3_cmp(mat3 a, mat3 b) {
+    return vecN_cmp(a.v, b.v, 3*3);
+}
+
 
 /** dst = mat[row][:] */
 static vec3 mat3_get_row(mat3 mat, int row) {

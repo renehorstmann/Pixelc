@@ -26,6 +26,11 @@ static ivec4 ivec4_unit_w() {
     return (ivec4) {{0, 0, 0, 1}};
 }
 
+/** ivec_a == ivec_b */
+static bool ivec4_cmp(ivec4 a, ivec4 b) {
+    return ivecN_cmp(a.v, b.v, 4);
+}
+
 
 /** dst = scalar */
 static ivec4 ivec4_set(int scalar) {
@@ -50,6 +55,20 @@ static ivec4 ivec4_cast_from_double(const double *v) {
 
 /** dst = (ivec4) v */
 static ivec4 ivec4_cast_from_unsigned(const unsigned *v) {
+    ivec4 res;
+    ivecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (ivec4) v */
+static ivec4 ivec4_cast_from_char(const char *v) {
+    ivec4 res;
+    ivecN_cast_into(res.v, v, 4);
+    return res;
+}
+
+/** dst = (ivec4) v */
+static ivec4 ivec4_cast_from_uchar(const unsigned char *v) {
     ivec4 res;
     ivecN_cast_into(res.v, v, 4);
     return res;
@@ -291,6 +310,52 @@ static ivec4 ivec4_clamp_vec_v(const int *vec_x, const int *vec_min, const int *
     return ivec4_clamp_vec(IVec4(vec_x), IVec4(vec_min), IVec4(vec_max));
 }
 
+/** dst = a * (1-t) + b * t */
+static ivec4 ivec4_mix(ivec4 vec_a, ivec4 vec_b, float t) {
+    ivec4 res;
+    ivecN_mix(res.v, vec_a.v, vec_b.v, t, 4);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static ivec4 ivec4_mix_v(const int *vec_a, const int *vec_b, float t) {
+    return ivec4_mix(IVec4(vec_a), IVec4(vec_b), t);
+}
+
+
+/** dst = a * (1-t) + b * t */
+static ivec4 ivec4_mix_vec(ivec4 vec_a, ivec4 vec_b, const float *vec_t) {
+    ivec4 res;
+    ivecN_mix_vec(res.v, vec_a.v, vec_b.v, vec_t, 4);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static ivec4 ivec4_mix_vec_v(const int *vec_a, const int *vec_b, const float *vec_t) {
+    return ivec4_mix_vec(IVec4(vec_a), IVec4(vec_b), vec_t);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static ivec4 ivec4_step(ivec4 vec_x, int edge) {
+    ivec4 res;
+    ivecN_step(res.v, vec_x.v, edge, 4);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static ivec4 ivec4_step_v(const int *vec_x, int edge) {
+    return ivec4_step(IVec4(vec_x), edge);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static ivec4 ivec4_step_vec(ivec4 vec_x, ivec4 vec_edge) {
+    ivec4 res;
+    ivecN_step_vec(res.v, vec_x.v, vec_edge.v, 4);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static ivec4 ivec4_step_vec_v(const int *vec_x, const int *vec_edge) {
+    return ivec4_step_vec(IVec4(vec_x), IVec4(vec_edge));
+}
 
 /** returns vec[0] + vec[1] + ... + vec[n-1] */
 static int ivec4_sum(ivec4 vec) {

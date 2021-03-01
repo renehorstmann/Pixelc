@@ -16,6 +16,11 @@ static ivec2 ivec2_unit_y() {
     return (ivec2) {{0, 1}};
 }
 
+/** ivec_a == ivec_b */
+static bool ivec2_cmp(ivec2 a, ivec2 b) {
+    return ivecN_cmp(a.v, b.v, 2);
+}
+
 
 /** dst = scalar */
 static ivec2 ivec2_set(int scalar) {
@@ -40,6 +45,20 @@ static ivec2 ivec2_cast_from_double(const double *v) {
 
 /** dst = (ivec2) v */
 static ivec2 ivec2_cast_from_unsigned(const unsigned *v) {
+    ivec2 res;
+    ivecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (ivec2) v */
+static ivec2 ivec2_cast_from_char(const char *v) {
+    ivec2 res;
+    ivecN_cast_into(res.v, v, 2);
+    return res;
+}
+
+/** dst = (ivec2) v */
+static ivec2 ivec2_cast_from_uchar(const unsigned char *v) {
     ivec2 res;
     ivecN_cast_into(res.v, v, 2);
     return res;
@@ -279,6 +298,53 @@ static ivec2 ivec2_clamp_vec_v(const int *vec_x, const int *vec_min, const int *
     return ivec2_clamp_vec(IVec2(vec_x), IVec2(vec_min), IVec2(vec_max));
 }
 
+/** dst = a * (1-t) + b * t */
+static ivec2 ivec2_mix(ivec2 vec_a, ivec2 vec_b, float t) {
+    ivec2 res;
+    ivecN_mix(res.v, vec_a.v, vec_b.v, t, 2);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static ivec2 ivec2_mix_v(const int *vec_a, const int *vec_b, float t) {
+    return ivec2_mix(IVec2(vec_a), IVec2(vec_b), t);
+}
+
+
+/** dst = a * (1-t) + b * t */
+static ivec2 ivec2_mix_vec(ivec2 vec_a, ivec2 vec_b, const float *vec_t) {
+    ivec2 res;
+    ivecN_mix_vec(res.v, vec_a.v, vec_b.v, vec_t, 2);
+    return res;
+}
+/** dst = a * (1-t) + b * t */
+static ivec2 ivec2_mix_vec_v(const int *vec_a, const int *vec_b, const float *vec_t) {
+    return ivec2_mix_vec(IVec2(vec_a), IVec2(vec_b), vec_t);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static ivec2 ivec2_step(ivec2 vec_x, int edge) {
+    ivec2 res;
+    ivecN_step(res.v, vec_x.v, edge, 2);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static ivec2 ivec2_step_v(const int *vec_x, int edge) {
+    return ivec2_step(IVec2(vec_x), edge);
+}
+
+
+/** dst = x < edge ? 0 : 1 */
+static ivec2 ivec2_step_vec(ivec2 vec_x, ivec2 vec_edge) {
+    ivec2 res;
+    ivecN_step_vec(res.v, vec_x.v, vec_edge.v, 2);
+    return res;
+}
+/** dst = x < edge ? 0 : 1 */
+static ivec2 ivec2_step_vec_v(const int *vec_x, const int *vec_edge) {
+    return ivec2_step_vec(IVec2(vec_x), IVec2(vec_edge));
+}
+
 
 /** returns vec[0] + vec[1] + ... + vec[n-1] */
 static int ivec2_sum(ivec2 vec) {
@@ -351,11 +417,11 @@ static float ivec2_length_v(const int *vec) {
 
 
 /** returns norm(b-a) */
-static int ivec2_distance(ivec2 vec_a, ivec2 vec_b) {
+static float ivec2_distance(ivec2 vec_a, ivec2 vec_b) {
     return ivecN_distance(vec_a.v, vec_b.v, 2);
 }
 /** returns norm(b-a) */
-static int ivec2_distance_v(const int *vec_a, const int *vec_b) {
+static float ivec2_distance_v(const int *vec_a, const int *vec_b) {
     return ivec2_distance(IVec2(vec_a), IVec2(vec_b));
 }
 

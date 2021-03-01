@@ -102,7 +102,7 @@ static void umatN_mul_mat_no_alias(unsigned *restrict dst_mat, const unsigned *r
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst_mat[c * n + r] = 0;
-            for (unsigned k = 0; k < n; k++)
+            for (int k = 0; k < n; k++)
                 dst_mat[c * n + r] += mat_a[k * n + r] * mat_b[c * n + k];
         }
     }

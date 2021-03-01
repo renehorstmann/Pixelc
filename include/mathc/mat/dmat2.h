@@ -34,6 +34,25 @@ static dmat2 dmat2_cast_from_unsigned(const unsigned *v) {
     return res;
 }
 
+/** dst = (dmat2) v */
+static dmat2 dmat2_cast_from_char(const char *v) {
+    dmat2 res;
+    dvecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** dst = (dmat2) v */
+static dmat2 dmat2_cast_from_uchar(const unsigned char *v) {
+    dmat2 res;
+    dvecN_cast_into(res.v, v, 2*2);
+    return res;
+}
+
+/** mat_a == mat_b */
+static bool dmat2_cmp(dmat2 a, dmat2 b) {
+    return dvecN_cmp(a.v, b.v, 2*2);
+}
+
 
 /** dst = mat[row][:] */
 static dvec2 dmat2_get_row(dmat2 mat, int row) {

@@ -42,11 +42,37 @@ static vec3 vec3_cast_from_unsigned(const unsigned *v) {
     return res;
 }
 
+/** dst = (vec4) v */
+static vec3 vec3_cast_from_char(const char *v) {
+    vec3 res;
+    vecN_cast_into(res.v, v, 3);
+    return res;
+}
+
+/** dst = (vec3) v */
+static vec3 vec3_cast_from_uchar(const unsigned char *v) {
+    vec3 res;
+    vecN_cast_into(res.v, v, 3);
+    return res;
+}
+
 /** dst = (vec3) v */
 static vec3 vec3_cast_from_bool(const bool *v) {
     vec3 res;
     vecN_cast_into(res.v, v, 3);
     return res;
+}
+
+/** dst = vec / 255 */
+static vec3 vec3_cast_from_uchar_1(const unsigned char *v) {
+    vec3 res;
+    vecN_cast_from_uchar_1(res.v, v, 3);
+    return res;
+}
+
+/** vec_a == vec_b */
+static bool vec3_cmp(vec3 a, vec3 b) {
+    return vecN_cmp(a.v, b.v, 3);
 }
 
 
@@ -262,15 +288,15 @@ static vec3 vec3_atan_v(const float *vec_x) {
 }
 
 
-/** dst = atan3(y, x) */
-static vec3 vec3_atan3(vec3 vec_y, vec3 vec_x) {
+/** dst = atan2(y, x) */
+static vec3 vec3_atan2(vec3 vec_y, vec3 vec_x) {
     vec3 res;
     vecN_atan2(res.v, vec_y.v, vec_x.v, 3);
     return res;
 }
-/** dst = atan3(y, x) */
-static vec3 vec3_atan3_v(const float *vec_y, const float *vec_x) {
-    return vec3_atan3(Vec3(vec_y), Vec3(vec_x));
+/** dst = atan2(y, x) */
+static vec3 vec3_atan2_v(const float *vec_y, const float *vec_x) {
+    return vec3_atan2(Vec3(vec_y), Vec3(vec_x));
 }
 
 
@@ -322,27 +348,27 @@ static vec3 vec3_log_v(const float *vec_x) {
 }
 
 
-/** dst = exp3(x) */
-static vec3 vec3_exp3(vec3 vec_x) {
+/** dst = exp2(x) */
+static vec3 vec3_exp2(vec3 vec_x) {
     vec3 res;
     vecN_exp2(res.v, vec_x.v, 3);
     return res;
 }
-/** dst = exp3(x) */
-static vec3 vec3_exp3_v(const float *vec_x) {
-    return vec3_exp3(Vec3(vec_x));
+/** dst = exp2(x) */
+static vec3 vec3_exp2_v(const float *vec_x) {
+    return vec3_exp2(Vec3(vec_x));
 }
 
 
-/** dst = log3(x) */
-static vec3 vec3_log3(vec3 vec_x) {
+/** dst = log2(x) */
+static vec3 vec3_log2(vec3 vec_x) {
     vec3 res;
     vecN_log2(res.v, vec_x.v, 3);
     return res;
 }
-/** dst = log3(x) */
-static vec3 vec3_log3_v(const float *vec_x) {
-    return vec3_log3(Vec3(vec_x));
+/** dst = log2(x) */
+static vec3 vec3_log2_v(const float *vec_x) {
+    return vec3_log2(Vec3(vec_x));
 }
 
 
