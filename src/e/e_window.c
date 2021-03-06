@@ -15,6 +15,8 @@ static struct {
 } L;
 
 static void loop() {
+    SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
+    
     Uint32 time = SDL_GetTicks();
     float dtime = (time - L.last_time) / 1000.0f;
     L.last_time = time;
@@ -83,16 +85,12 @@ void e_window_init(const char *name) {
     SDL_Log("Using GLEW %s\n", glewGetString(GLEW_VERSION));
 #endif
 
-    e_window_update();
+    SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
 }
 
 void e_window_kill() {
     SDL_Log("Window killed");
     L.running = false;
-}
-
-void e_window_update() {
-    SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
 }
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {

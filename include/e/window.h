@@ -19,9 +19,6 @@ void e_window_init(const char *name);
 
 void e_window_kill();
 
-// updates window.size
-void e_window_update();
-
 // starts the main loop (emscripten needs a main loop function)
 void e_window_main_loop(eWindowMainLoopFn main_loop);
 
