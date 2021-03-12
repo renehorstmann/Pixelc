@@ -82,8 +82,8 @@ static void input_handle_pointer(SDL_Event *event) {
             if(event->button.button<=0 || event->button.button>3)
                 break;
             ePointer_s action = pointer_mouse(
-                E_POINTER_DOWN, 
-                1-event->button.button);
+                    E_POINTER_DOWN,
+                    1-event->button.button);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
@@ -98,8 +98,8 @@ static void input_handle_pointer(SDL_Event *event) {
             if(event->button.button<=0 || event->button.button>3)
                 break;
             ePointer_s action = pointer_mouse(
-                E_POINTER_UP, 
-                1-event->button.button);
+                    E_POINTER_UP,
+                    1-event->button.button);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
@@ -226,8 +226,47 @@ void e_input_register_pointer_event(ePointerEventFn event, void *user_data) {
     L.reg_pointer_e[L.reg_pointer_e_size++] = (RegPointer) {event, user_data};
 }
 
+void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister) {
+    int idx = -1;
+    for(int i=0; i<L.reg_pointer_e_size; i++) {
+        if(L.reg_pointer_e[i].cb == event_to_unregister) {
+            idx = i;
+            break;
+        }
+    }
+    if(idx == -1) {
+        SDL_Log("e_input_unregister_pointer_event failed, event not registered");
+        return;
+    }
+
+    // move to close hole
+    for(int i=idx; i < L.reg_pointer_e_size-1; i++) {
+        L.reg_pointer_e[i] = L.reg_pointer_e[i+1];
+    }
+    L.reg_pointer_e_size--;
+}
 
 void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
     assume(L.reg_wheel_e_size < E_MAX_WHEEL_EVENTS, "too many registered wheel events");
     L.reg_wheel_e[L.reg_wheel_e_size++] = (RegWheel) {event, user_data};
+}
+
+void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
+    int idx = -1;
+    for(int i=0; i<L.reg_wheel_e_size; i++) {
+        if(L.reg_wheel_e[i].cb == event_to_unregister) {
+            idx = i;
+            break;
+        }
+    }
+    if(idx == -1) {
+        SDL_Log("e_input_unregister_wheel_event failed, event not registered");
+        return;
+    }
+
+    // move to close hole
+    for(int i=idx; i < L.reg_wheel_e_size-1; i++) {
+        L.reg_wheel_e[i] = L.reg_wheel_e[i+1];
+    }
+    L.reg_wheel_e_size--;
 }
