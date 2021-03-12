@@ -1,4 +1,3 @@
-
 #include "u/pose.h"
 #include "camera.h"
 #include "button.h"

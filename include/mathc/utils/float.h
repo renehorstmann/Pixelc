@@ -6,5 +6,6 @@
 #include "rotation.h"
 #include "intersection.h"
 #include "color.h"
+#include "random.h"
 
 #endif //MATHC_UTILS_FLOAT_H

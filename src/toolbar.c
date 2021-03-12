@@ -1,9 +1,9 @@
 #include <assert.h>
-#include "mathc/float.h"
 #include "r/texture.h"
 #include "r/ro_text.h"
-#include "button.h"
 #include "u/pose.h"
+#include "mathc/float.h"
+#include "button.h"
 #include "camera.h"
 #include "brush.h"
 #include "brush_shape.h"

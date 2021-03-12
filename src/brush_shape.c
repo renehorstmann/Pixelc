@@ -1,6 +1,6 @@
-#include "utilc/alloc.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "utilc/alloc.h"
 #include "brush.h"
 #include "brush_shape.h"
 
