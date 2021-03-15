@@ -2,6 +2,10 @@
 #define NK_SDL_GLES2_IMPLEMENTATION
 #define NK_SDL_GL3_IMPLEMENTATION
 
+#ifdef IS_ANDROID_OS
+#define NK_SCALE 3.0f
+#endif
+
 #include "e/window.h"
 #include "e/gui.h"
 

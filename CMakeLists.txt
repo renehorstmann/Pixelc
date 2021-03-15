@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 project(Pixelc C)
 
+# Optional definitions set:
+# USING_GLES        for OpenGLES3.0 instead of OpenGL3.3
+# USING_GLEW        if GLEW is available
+# IS_ANDROID_OS     for Android
+
 set(CMAKE_C_STANDARD 11)
 
 #set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} -march=native)  # march=native for best performance
@@ -29,7 +34,9 @@ if (GL_LIB)
     target_link_libraries(pixelc ${GL_LIB})
 elseif (GLES_LIB)
     message("GLES found: Mobile mode")
-    add_definitions(-DGLES)
+    add_definitions(-DUSING_GLES)
+    add_definitions(-DUSING_TOUCH)
+    add_definitions(-DIS_ANDROID_OS)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
     target_link_libraries(pixelc ${GLES_LIB})
 else ()

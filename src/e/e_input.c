@@ -53,37 +53,40 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, i
     return res;
 }
 
-static void input_handle_pointer(SDL_Event *event) {
+static void input_handle_pointer_touch(SDL_Event *event) {
     switch (event->type) {
-#ifdef GLES
         case SDL_FINGERDOWN: {
             ePointer_s action = pointer_finger(E_POINTER_DOWN,
-                                              event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
+                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_FINGERMOTION: {
             ePointer_s action = pointer_finger(E_POINTER_MOVE,
-                                              event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
+                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
         case SDL_FINGERUP: {
             ePointer_s action = pointer_finger(E_POINTER_UP,
-                                              event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
+                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
-#else
+    }
+}
+
+static void input_handle_pointer_mouse(SDL_Event *event) {
+    switch (event->type) {
         case SDL_MOUSEBUTTONDOWN: {
-            if(event->button.button<=0 || event->button.button>3)
+            if (event->button.button <= 0 || event->button.button > 3)
                 break;
             ePointer_s action = pointer_mouse(
                     E_POINTER_DOWN,
-                    1-event->button.button);
+                    1 - event->button.button);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
@@ -95,16 +98,15 @@ static void input_handle_pointer(SDL_Event *event) {
         }
             break;
         case SDL_MOUSEBUTTONUP: {
-            if(event->button.button<=0 || event->button.button>3)
+            if (event->button.button <= 0 || event->button.button > 3)
                 break;
             ePointer_s action = pointer_mouse(
                     E_POINTER_UP,
-                    1-event->button.button);
+                    1 - event->button.button);
             for (int i = 0; i < L.reg_pointer_e_size; i++)
                 L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
         }
             break;
-#endif
     }
 }
 
@@ -145,7 +147,6 @@ static void input_handle_keys(SDL_Event *event) {
 }
 
 
-#ifdef GLES
 static void input_handle_sensors(SDL_Event *event) {
     SDL_Sensor *sensor = SDL_SensorFromInstanceID(event->sensor.which);
     if (!sensor
@@ -153,21 +154,21 @@ static void input_handle_sensors(SDL_Event *event) {
         SDL_Log("Couldn't get sensor for sensor event\n");
         return;
     }
-    
+
     const float *data = event->sensor.data;
     memcpy(e_input.accel.v, data, sizeof(e_input.accel));
-    
+
     //SDL_Log("Gyro update: %.2f, %.2f, %.2f\n", data[0], data[1], data[2]);
-      
+
 }
-#endif
 
 void e_input_init() {
+    e_input.is_touch = SDL_GetNumTouchDevices() > 0;
+    SDL_Log("Has touch input: %i", e_input.is_touch);
 
-#ifdef GLES
     int num_sensors = SDL_NumSensors();
     bool accel_opened = false;
-    for(int i=0; i<num_sensors; i++) {
+    for (int i = 0; i < num_sensors; i++) {
         if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_ACCEL) {
             SDL_Sensor *sensor = SDL_SensorOpen(i);
             if (sensor) {
@@ -178,13 +179,15 @@ void e_input_init() {
     }
 
     e_input.accel_active = accel_opened;
-    if(accel_opened)
+    if (accel_opened)
         SDL_Log("Opened acceleration sensor");
-#endif
 }
 
 void e_input_update() {
     if (e_gui.ctx) nk_input_begin(e_gui.ctx);
+
+    void (*input_handle_pointer)(SDL_Event *event) = e_input.is_touch?
+            input_handle_pointer_touch : input_handle_pointer_mouse;
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -209,11 +212,9 @@ void e_input_update() {
             case SDL_KEYUP:
                 input_handle_keys(&event);
                 break;
-#ifdef GLES
-                case SDL_SENSORUPDATE:
-                    input_handle_sensors(&event);
-                    break;
-#endif
+            case SDL_SENSORUPDATE:
+                input_handle_sensors(&event);
+                break;
         }
     }
 
@@ -228,20 +229,20 @@ void e_input_register_pointer_event(ePointerEventFn event, void *user_data) {
 
 void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister) {
     int idx = -1;
-    for(int i=0; i<L.reg_pointer_e_size; i++) {
-        if(L.reg_pointer_e[i].cb == event_to_unregister) {
+    for (int i = 0; i < L.reg_pointer_e_size; i++) {
+        if (L.reg_pointer_e[i].cb == event_to_unregister) {
             idx = i;
             break;
         }
     }
-    if(idx == -1) {
+    if (idx == -1) {
         SDL_Log("e_input_unregister_pointer_event failed, event not registered");
         return;
     }
 
     // move to close hole
-    for(int i=idx; i < L.reg_pointer_e_size-1; i++) {
-        L.reg_pointer_e[i] = L.reg_pointer_e[i+1];
+    for (int i = idx; i < L.reg_pointer_e_size - 1; i++) {
+        L.reg_pointer_e[i] = L.reg_pointer_e[i + 1];
     }
     L.reg_pointer_e_size--;
 }
@@ -253,20 +254,20 @@ void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
 
 void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
     int idx = -1;
-    for(int i=0; i<L.reg_wheel_e_size; i++) {
-        if(L.reg_wheel_e[i].cb == event_to_unregister) {
+    for (int i = 0; i < L.reg_wheel_e_size; i++) {
+        if (L.reg_wheel_e[i].cb == event_to_unregister) {
             idx = i;
             break;
         }
     }
-    if(idx == -1) {
+    if (idx == -1) {
         SDL_Log("e_input_unregister_wheel_event failed, event not registered");
         return;
     }
 
     // move to close hole
-    for(int i=idx; i < L.reg_wheel_e_size-1; i++) {
-        L.reg_wheel_e[i] = L.reg_wheel_e[i+1];
+    for (int i = idx; i < L.reg_wheel_e_size - 1; i++) {
+        L.reg_wheel_e[i] = L.reg_wheel_e[i + 1];
     }
     L.reg_wheel_e_size--;
 }

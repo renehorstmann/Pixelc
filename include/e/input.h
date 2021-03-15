@@ -22,6 +22,7 @@ typedef struct {
 struct eInputGloabals_s {
     eInputKeys keys;
 
+    bool is_touch;
     // acceleration sensor (mobile)
     bool accel_active;
     vec3 accel;

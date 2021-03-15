@@ -11,7 +11,7 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #include "nuklear/nuklear.h"
-#ifdef GLES
+#ifdef USING_GLES
 #include "nuklear/nuklear_sdl_gles2.h"
 #else
 #include "nuklear/nuklear_sdl_gl3.h"
