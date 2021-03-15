@@ -13,7 +13,7 @@ static struct {
 
     vec2 move0;
 
-#if GLES
+#if USING_TOUCH
     float size0;
     vec2 touch[2];
     bvec2 touching;
@@ -37,7 +37,7 @@ static float clampf(float f, float min, float max) {
 	return f < min ? min : f > max ? max : f;
 }
 
-#if GLES
+#if USING_TOUCH
 static void zoom_camera(float new_distance) {
     float factor = new_distance / L.distance0;
     factor = clampf(factor, 0.3, 3);
@@ -67,7 +67,7 @@ void canvas_camera_control_set_home() {
 }
 
 bool canvas_camera_control_pointer_event(ePointer_s pointer) {
-#ifdef GLES
+#ifdef USING_TOUCH
     if (pointer.id < 0 || pointer.id > 1)
         return false;
 
