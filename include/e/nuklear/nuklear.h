@@ -833,7 +833,7 @@ NK_API void nk_input_key(struct nk_context*, enum nk_keys, int down);
 */
 NK_API void nk_input_button(struct nk_context*, enum nk_buttons, int x, int y, int down);
 /*/// #### nk_input_scroll
-/// Copies the last mouse scroll value to nuklear. Is generally
+/// Copies the last_click mouse scroll value to nuklear. Is generally
 /// a scroll value. So does not have to come from mouse and could also originate
 /// TODO finish this sentence
 ///
@@ -1046,7 +1046,7 @@ NK_API void nk_input_end(struct nk_context*);
 /// //
 /// // setup context
 /// struct nk_context ctx;
-/// void *last = calloc(1,64*1024);
+/// void *last_click = calloc(1,64*1024);
 /// void *buf = calloc(1,64*1024);
 /// nk_init_fixed(&ctx, buf, 64*1024);
 /// //
@@ -1055,8 +1055,8 @@ NK_API void nk_input_end(struct nk_context*);
 ///     // [...input...]
 ///     // [...ui...]
 ///     void *cmds = nk_buffer_memory(&ctx.memory);
-///     if (memcmp(cmds, last, ctx.memory.allocated)) {
-///         memcpy(last,cmds,ctx.memory.allocated);
+///     if (memcmp(cmds, last_click, ctx.memory.allocated)) {
+///         memcpy(last_click,cmds,ctx.memory.allocated);
 ///         const struct nk_command *cmd = 0;
 ///         nk_foreach(cmd, &ctx) {
 ///             switch (cmd->type) {
@@ -1267,7 +1267,7 @@ NK_API const struct nk_draw_command* nk__draw_begin(const struct nk_context*, co
 /// __ctx__     | Must point to an previously initialized `nk_context` struct at the end of a frame
 /// __buf__     | Must point to an previously by `nk_convert` filled out vertex draw command buffer
 ///
-/// Returns vertex draw command pointer pointing to the end of the last vertex draw command inside the vertex draw command buffer
+/// Returns vertex draw command pointer pointing to the end of the last_click vertex draw command inside the vertex draw command buffer
 */
 NK_API const struct nk_draw_command* nk__draw_end(const struct nk_context*, const struct nk_buffer*);
 /*/// #### nk__draw_next
@@ -1283,7 +1283,7 @@ NK_API const struct nk_draw_command* nk__draw_end(const struct nk_context*, cons
 /// __buf__     | Must point to an previously by `nk_convert` filled out vertex draw command buffer
 /// __ctx__     | Must point to an previously initialized `nk_context` struct at the end of a frame
 ///
-/// Returns vertex draw command pointer pointing to the end of the last vertex draw command inside the vertex draw command buffer
+/// Returns vertex draw command pointer pointing to the end of the last_click vertex draw command inside the vertex draw command buffer
 */
 NK_API const struct nk_draw_command* nk__draw_next(const struct nk_draw_command*, const struct nk_buffer*, const struct nk_context*);
 /*/// #### nk_draw_foreach
@@ -2094,7 +2094,7 @@ NK_API void nk_window_show_if(struct nk_context*, const char *name, enum nk_show
 ///     directly setting per column pixel width or widget window ratio but not
 ///     both. Furthermore it is a immediate mode API so each value is directly
 ///     pushed before calling a widget. Therefore the layout is not automatically
-///     repeating like the last two layouting functions.
+///     repeating like the last_click two layouting functions.
 ///
 ///     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
 ///     if (nk_begin_xxx(...) {
@@ -3947,7 +3947,7 @@ struct nk_baked_font {
     nk_rune glyph_count;
     /* number of glyphs of this font inside the glyph baking array output */
     const nk_rune *ranges;
-    /* font codepoint ranges as pairs of (from/to) and 0 as last element */
+    /* font codepoint ranges as pairs of (from/to) and 0 as last_click element */
 };
 
 struct nk_font_config {
@@ -3963,7 +3963,7 @@ struct nk_font_config {
     unsigned char ttf_data_owned_by_atlas;
     /* used inside font atlas: default to: 0*/
     unsigned char merge_mode;
-    /* merges this font into the last font */
+    /* merges this font into the last_click font */
     unsigned char pixel_snap;
     /* align every character to pixel boundary (if true set oversample (1,1)) */
     unsigned char oversample_v, oversample_h;
@@ -6751,7 +6751,7 @@ nk_strmatch_fuzzy_text(const char *str, int str_len,
         ++str_iter;
     }
 
-    /* apply score for last match */
+    /* apply score for last_click match */
     if (best_letter)
         score += best_letter_score;
 
@@ -19064,7 +19064,7 @@ nk_free_page_element(struct nk_context *ctx, struct nk_page_element *elem)
         nk_link_page_element_into_freelist(ctx, elem);
         return;
     }
-    /* if possible remove last element from back of fixed memory buffer */
+    /* if possible remove last_click element from back of fixed memory buffer */
     {void *elem_end = (void*)(elem + 1);
     void *buffer_end = (nk_byte*)ctx->memory.memory.ptr + ctx->memory.size;
     if (elem_end == buffer_end)
@@ -19502,7 +19502,7 @@ nk_panel_end(struct nk_context *ctx)
     scrollbar_size = style->window.scrollbar_size;
     panel_padding = nk_panel_get_padding(style, layout->type);
 
-    /* update the current cursor Y-position to point over the last added widget */
+    /* update the current cursor Y-position to point over the last_click added widget */
     layout->at_y += layout->row.height;
 
     /* dynamic panels */
@@ -25401,7 +25401,7 @@ nk_textedit_locate_coord(struct nk_text_edit *edit, float x, float y,
         base_y += r.baseline_y_delta;
     }
 
-    /* below all text, return 'after' last character */
+    /* below all text, return 'after' last_click character */
     if (i >= n)
         return n;
 
@@ -25426,8 +25426,8 @@ nk_textedit_locate_coord(struct nk_text_edit *edit, float x, float y,
         /* shouldn't happen, but if it does, fall through to end-of-line case */
     }
 
-    /* if the last character is a newline, return that.
-     * otherwise return 'after' the last character */
+    /* if the last_click character is a newline, return that.
+     * otherwise return 'after' the last_click character */
     if (nk_str_rune_at(&edit->string, i+r.num_chars-1) == '\n')
         return i+r.num_chars-1;
     else return i+r.num_chars;
@@ -25467,7 +25467,7 @@ nk_textedit_find_charpos(struct nk_text_find *find, struct nk_text_edit *state,
 
     nk_zero_struct(r);
     if (n == z) {
-        /* if it's at the end, then find the last line -- simpler than trying to
+        /* if it's at the end, then find the last_click line -- simpler than trying to
         explicitly handle this case in the regular code */
         nk_textedit_layout_row(&r, state, 0, row_height, font);
         if (single_line) {
@@ -25575,7 +25575,7 @@ nk_textedit_move_to_first(struct nk_text_edit *state)
 NK_INTERN void
 nk_textedit_move_to_last(struct nk_text_edit *state)
 {
-    /* move cursor to last character of selection */
+    /* move cursor to last_click character of selection */
     if (NK_TEXT_HAS_SELECTION(state)) {
         nk_textedit_sortselection(state);
         nk_textedit_clamp(state);
@@ -26157,7 +26157,7 @@ nk_textedit_undo(struct nk_text_edit *state)
                 - there's enough room to store the characters
                 - characters stored for *redoing* don't leave room for redo
                 - characters stored for *undoing* don't leave room for redo
-            if the last is true, we have to bail */
+            if the last_click is true, we have to bail */
         if (s->undo_char_point + u.delete_length >= NK_TEXTEDIT_UNDOCHARCOUNT) {
             /* the undo records take up too much character space; there's no space
             * to store the redo characters */
@@ -26475,7 +26475,7 @@ nk_edit_draw_text(struct nk_command_buffer *out,
         continue;
     }
     if (line_width > 0) {
-        /* draw last line */
+        /* draw last_click line */
         struct nk_rect label;
         label.y = pos_y + line_offset;
         label.h = row_height;
@@ -27793,7 +27793,7 @@ nk_chart_push_line(struct nk_context *ctx, struct nk_window *win,
         return ret;
     }
 
-    /* draw a line between the last data point and the new one */
+    /* draw a line between the last_click data point and the new one */
     color = g->slots[slot].color;
     cur.x = g->x + (float)(step * (float)g->slots[slot].index);
     cur.y = (g->y + g->h) - (ratio * (float)g->h);
@@ -29187,7 +29187,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 /// - 2017/09/14 (2.00.0) - BREAKING CHANGE: Modifing window position and size funtions now
 ///                        require the name of the window and must happen outside the window
 ///                        building process (between function call nk_begin and nk_end).
-/// - 2017/09/11 (1.40.9) - Fixed window background flag if background window is declared last.
+/// - 2017/09/11 (1.40.9) - Fixed window background flag if background window is declared last_click.
 /// - 2017/08/27 (1.40.8) - Fixed `nk_item_is_any_active` for hidden windows.
 /// - 2017/08/27 (1.40.7) - Fixed window background flag.
 /// - 2017/07/07 (1.40.6) - Fixed missing clipping rect check for hovering/clicked
@@ -29200,7 +29200,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 ///                        window instead of directly in table.
 /// - 2017/06/30 (1.40.2) - Removed unneeded semicolon in C++ NK_ALIGNOF macro.
 /// - 2017/06/30 (1.40.1) - Fixed drawing lines smaller or equal zero.
-/// - 2017/06/08 (1.40.0) - Removed the breaking part of last commit. Auto layout now only
+/// - 2017/06/08 (1.40.0) - Removed the breaking part of last_click commit. Auto layout now only
 ///                        comes in effect if you pass in zero was row height argument.
 /// - 2017/06/08 (1.40.0) - BREAKING CHANGE: while not directly API breaking it will change
 ///                        how layouting works. From now there will be an internal minimum
@@ -29248,7 +29248,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 /// - 2016/11/10 (1.28.0) - Added additional `nk_button` versions which allows to directly
 ///                        pass in a style struct to change buttons visual.
 /// - 2016/11/10 (1.27.0) - Added additional `nk_tree` versions to support external state
-///                        storage. Just like last the `nk_group` commit the main
+///                        storage. Just like last_click the `nk_group` commit the main
 ///                        advantage is that you optionally can minimize nuklears runtime
 ///                        memory consumption or handle hash collisions.
 /// - 2016/11/09 (1.26.0) - Added additional `nk_group` version to support external scrollbar
@@ -29292,7 +29292,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 ///                        In addition the height parameter was changed into vec2
 ///                        for width and height to have more control over the popup size.
 /// - 2016/09/13 (1.20.3) - Cleaned up and extended type selection.
-/// - 2016/09/13 (1.20.2) - Fixed slider behavior hopefully for the last time. This time
+/// - 2016/09/13 (1.20.2) - Fixed slider behavior hopefully for the last_click time. This time
 ///                        all calculation are correct so no more hackery.
 /// - 2016/09/13 (1.20.1) - Internal change to divide window/panel flags into panel flags and types.
 ///                        Suprisinly spend years in C and still happened to confuse types

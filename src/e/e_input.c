@@ -3,6 +3,7 @@
 #include "e/window.h"
 #include "e/gui.h"
 #include "e/input.h"
+#include "e/definitions.h"
 
 struct eInputGloabals_s e_input;
 
@@ -23,6 +24,12 @@ static struct {
 
     RegWheel reg_wheel_e[E_MAX_WHEEL_EVENTS];
     int reg_wheel_e_size;
+
+#ifdef __EMSCRIPTEN__
+    ePointer_s emscripten_pointer_stack[E_EMSCRIPTEN_POINTER_STACK_SIZE];
+    int emscripten_pointer_stack_size;
+#endif
+
 } L;
 
 static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
@@ -53,73 +60,75 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, i
     return res;
 }
 
+#ifdef __EMSCRIPTEN__
+static ePointer_s pointer_emscripten_touch(enum ePointerAction action, float x, float y, int finger_id) {
+    ePointer_s res;
+    res.action = action;
+    res.id = finger_id;
+
+    res.pos.x = (2.0f * x) / e_window.size.x - 1.0f;
+    res.pos.y = 1.0f - (2.0f * y) / e_window.size.y;
+    res.pos.z = 0;
+    res.pos.w = 1;
+
+    return res;
+}
+#endif
+
+static void emit_pointer_events(ePointer_s action) {
+    for (int i = 0; i < L.reg_pointer_e_size; i++)
+        L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
+}
+
+static void emit_wheel_events(bool up) {
+    for(int i=0; i<L.reg_wheel_e_size; i++)
+        L.reg_wheel_e[i].cb(up, L.reg_wheel_e[i].ud);
+}
+
 static void input_handle_pointer_touch(SDL_Event *event) {
     switch (event->type) {
-        case SDL_FINGERDOWN: {
-            ePointer_s action = pointer_finger(E_POINTER_DOWN,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
-            for (int i = 0; i < L.reg_pointer_e_size; i++)
-                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
-        }
+        case SDL_FINGERDOWN:
+            emit_pointer_events(pointer_finger(E_POINTER_DOWN,
+                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
             break;
-        case SDL_FINGERMOTION: {
-            ePointer_s action = pointer_finger(E_POINTER_MOVE,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
-            for (int i = 0; i < L.reg_pointer_e_size; i++)
-                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
-        }
+        case SDL_FINGERMOTION:
+            emit_pointer_events(pointer_finger(E_POINTER_MOVE,
+                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
             break;
-        case SDL_FINGERUP: {
-            ePointer_s action = pointer_finger(E_POINTER_UP,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId);
-            for (int i = 0; i < L.reg_pointer_e_size; i++)
-                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
-        }
+        case SDL_FINGERUP:
+            emit_pointer_events(pointer_finger(E_POINTER_UP,
+                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
             break;
     }
 }
 
 static void input_handle_pointer_mouse(SDL_Event *event) {
     switch (event->type) {
-        case SDL_MOUSEBUTTONDOWN: {
+        case SDL_MOUSEBUTTONDOWN:
             if (event->button.button <= 0 || event->button.button > 3)
                 break;
-            ePointer_s action = pointer_mouse(
+            emit_pointer_events(pointer_mouse(
                     E_POINTER_DOWN,
-                    1 - event->button.button);
-            for (int i = 0; i < L.reg_pointer_e_size; i++)
-                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
-        }
+                    1 - event->button.button));
             break;
-        case SDL_MOUSEMOTION: {
-            ePointer_s action = pointer_mouse(E_POINTER_MOVE, 0);
-            for (int i = 0; i < L.reg_pointer_e_size; i++)
-                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
-        }
+        case SDL_MOUSEMOTION:
+            emit_pointer_events(pointer_mouse(E_POINTER_MOVE, 0));
             break;
-        case SDL_MOUSEBUTTONUP: {
+        case SDL_MOUSEBUTTONUP:
             if (event->button.button <= 0 || event->button.button > 3)
                 break;
-            ePointer_s action = pointer_mouse(
+            emit_pointer_events(pointer_mouse(
                     E_POINTER_UP,
-                    1 - event->button.button);
-            for (int i = 0; i < L.reg_pointer_e_size; i++)
-                L.reg_pointer_e[i].cb(action, L.reg_pointer_e[i].ud);
-        }
+                    1 - event->button.button));
             break;
     }
 }
 
 static void input_handle_wheel(SDL_Event *event) {
-    if (event->wheel.y > 0) {
-        for (int i = 0; i < L.reg_wheel_e_size; i++)
-            L.reg_wheel_e[i].cb(true, L.reg_pointer_e[i].ud);
-    } else if (event->wheel.y < 0) {
-        for (int i = 0; i < L.reg_wheel_e_size; i++)
-            L.reg_wheel_e[i].cb(false, L.reg_pointer_e[i].ud);
-    }
-
     // it could be possible that y==0, (e. g. x!=0)
+    if(event->wheel.y == 0)
+        return;
+    emit_wheel_events(event->wheel.y > 0);
 }
 
 static void input_handle_keys(SDL_Event *event) {
@@ -146,7 +155,7 @@ static void input_handle_keys(SDL_Event *event) {
     }
 }
 
-
+#ifdef USING_GYRO
 static void input_handle_sensors(SDL_Event *event) {
     SDL_Sensor *sensor = SDL_SensorFromInstanceID(event->sensor.which);
     if (!sensor
@@ -158,14 +167,41 @@ static void input_handle_sensors(SDL_Event *event) {
     const float *data = event->sensor.data;
     memcpy(e_input.accel.v, data, sizeof(e_input.accel));
 
-    //SDL_Log("Gyro update: %.2f, %.2f, %.2f\n", data[0], data[1], data[2]);
-
+    //printf("Gyro update: %.2f, %.2f, %.2f\n", data[0], data[1], data[2]);
 }
+#endif
+
+#ifdef __EMSCRIPTEN__
+EM_BOOL touch_callback_func(int type, const EmscriptenTouchEvent *event, void *ud) {
+    if(L.emscripten_pointer_stack_size >= E_EMSCRIPTEN_POINTER_STACK_SIZE)
+        return true;
+
+    enum ePointerAction action;
+    switch(type) {
+        case EMSCRIPTEN_EVENT_TOUCHSTART:
+            action = E_POINTER_DOWN;
+            break;
+        case EMSCRIPTEN_EVENT_TOUCHMOVE:
+            action = E_POINTER_MOVE;
+            break;
+        default:
+            action = E_POINTER_UP;
+    }
+    for(int i=0; i<event->numTouches; i++) {
+        float x = event->touches[i].targetX;
+        float y = event->touches[i].targetY;
+        int id = event->touches[i].identifier;
+        L.emscripten_pointer_stack[L.emscripten_pointer_stack_size++] = pointer_emscripten_touch(action, x, y, id);
+    }
+    return true;
+}
+#endif
 
 void e_input_init() {
     e_input.is_touch = SDL_GetNumTouchDevices() > 0;
     SDL_Log("Has touch input: %i", e_input.is_touch);
 
+#ifdef USING_GYRO
     int num_sensors = SDL_NumSensors();
     bool accel_opened = false;
     for (int i = 0; i < num_sensors; i++) {
@@ -181,13 +217,33 @@ void e_input_init() {
     e_input.accel_active = accel_opened;
     if (accel_opened)
         SDL_Log("Opened acceleration sensor");
+#endif
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_touchstart_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, 1, touch_callback_func);
+    emscripten_set_touchend_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, 1, touch_callback_func);
+    emscripten_set_touchmove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, 1, touch_callback_func);
+    emscripten_set_touchcancel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, 1, touch_callback_func);
+#endif
 }
+
+
+void ignore_pointer(SDL_Event *event) {}
 
 void e_input_update() {
     if (e_gui.ctx) nk_input_begin(e_gui.ctx);
 
     void (*input_handle_pointer)(SDL_Event *event) = e_input.is_touch?
             input_handle_pointer_touch : input_handle_pointer_mouse;
+
+
+#ifdef __EMSCRIPTEN__
+    // ignore mouse / finger events, if touches are available
+    if(L.emscripten_pointer_stack_size > 0) {
+        e_input.is_touch = true;
+        input_handle_pointer = ignore_pointer;
+    }
+#endif
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -212,13 +268,22 @@ void e_input_update() {
             case SDL_KEYUP:
                 input_handle_keys(&event);
                 break;
+#ifdef USING_GYRO
             case SDL_SENSORUPDATE:
                 input_handle_sensors(&event);
                 break;
+#endif
         }
     }
 
     if (e_gui.ctx) nk_input_end(e_gui.ctx);
+
+#ifdef __EMSCRIPTEN__
+    for(int i=0; i<L.emscripten_pointer_stack_size; i++) {
+        emit_pointer_events(L.emscripten_pointer_stack[i]);
+    }
+    L.emscripten_pointer_stack_size = 0;
+#endif
 }
 
 
