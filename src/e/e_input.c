@@ -188,10 +188,12 @@ EM_BOOL touch_callback_func(int type, const EmscriptenTouchEvent *event, void *u
             action = E_POINTER_UP;
     }
     for(int i=0; i<event->numTouches; i++) {
-        float x = event->touches[i].targetX;
-        float y = event->touches[i].targetY;
-        int id = event->touches[i].identifier;
-        L.emscripten_pointer_stack[L.emscripten_pointer_stack_size++] = pointer_emscripten_touch(action, x, y, id);
+        if(event->touches[i].isChanged) {
+            float x = event->touches[i].targetX;
+            float y = event->touches[i].targetY;
+            int id = event->touches[i].identifier;
+            L.emscripten_pointer_stack[L.emscripten_pointer_stack_size++] = pointer_emscripten_touch(action, x, y, id);
+        }
     }
     return true;
 }
@@ -234,7 +236,7 @@ void e_input_update() {
     if (e_gui.ctx) nk_input_begin(e_gui.ctx);
 
     void (*input_handle_pointer)(SDL_Event *event) = e_input.is_touch?
-            input_handle_pointer_touch : input_handle_pointer_mouse;
+                                                     input_handle_pointer_touch : input_handle_pointer_mouse;
 
 
 #ifdef __EMSCRIPTEN__
@@ -269,7 +271,7 @@ void e_input_update() {
                 input_handle_keys(&event);
                 break;
 #ifdef USING_GYRO
-            case SDL_SENSORUPDATE:
+                case SDL_SENSORUPDATE:
                 input_handle_sensors(&event);
                 break;
 #endif
