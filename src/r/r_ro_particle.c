@@ -49,9 +49,8 @@ void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_
     const int loc_axis_angle = 10;
     const int loc_color = 11;
     const int loc_color_speed = 12;
-    const int loc_uv_step = 13;
-    const int loc_uv_time = 14;
-    const int loc_start_time = 15;
+    const int loc_uv_step_and_time = 13;
+    const int loc_start_time = 14;
 
     self->tex = tex_sink;
     self->owns_tex = true;
@@ -129,19 +128,12 @@ void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_
                                   (void *) offsetof(rParticleRect_s, color_speed));
             glVertexAttribDivisor(loc_color_speed, 1);
 
-            // uv_step
-            glEnableVertexAttribArray(loc_uv_step);
-            glVertexAttribPointer(loc_uv_step, 2, GL_FLOAT, GL_FALSE,
+            // uv_step_and_time
+            glEnableVertexAttribArray(loc_uv_step_and_time);
+            glVertexAttribPointer(loc_uv_step_and_time, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(rParticleRect_s),
                                   (void *) offsetof(rParticleRect_s, uv_step));
-            glVertexAttribDivisor(loc_uv_step, 1);
-
-            // uv_time
-            glEnableVertexAttribArray(loc_uv_time);
-            glVertexAttribPointer(loc_uv_time, 1, GL_FLOAT, GL_FALSE,
-                                  sizeof(rParticleRect_s),
-                                  (void *) offsetof(rParticleRect_s, uv_time));
-            glVertexAttribDivisor(loc_uv_time, 1);
+            glVertexAttribDivisor(loc_uv_step_and_time, 1);
 
             // start_time
             glEnableVertexAttribArray(loc_start_time);

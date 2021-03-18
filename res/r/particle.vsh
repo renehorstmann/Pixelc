@@ -11,10 +11,11 @@ layout(location = 10) in vec4 in_axis_angle;
 layout(location = 11) in vec4 in_color;
 layout(location = 12) in vec4 in_color_speed;
 
-layout(location = 13) in vec2 in_uv_step;
-layout(location = 14) in float in_uv_time;
+layout(location = 13) in vec3 in_uv_step_and_time;
 
-layout(location = 15) in float start_time;
+layout(location = 14) in float start_time;
+
+// on some Browsers (Chrome on Desktop?!?) location = 15 is not valid, even if GL_MAX_VERTEX_ATTRIBS == 16
 
 out vec2 v_tex_coord;
 out vec4 v_color;
@@ -73,7 +74,7 @@ void main() {
     pos += in_acc * (dt * dt);
     gl_Position = vp * pos;
 
-    vec2 uv_step = in_uv_step * floor(dt / in_uv_time);
+    vec2 uv_step = in_uv_step_and_time.xy * floor(dt / in_uv_step_and_time.z);
     v_tex_coord = (in_uv * tex_coords[gl_VertexID]).xy + uv_step;
 
     v_color = in_color + (in_color_speed * dt);

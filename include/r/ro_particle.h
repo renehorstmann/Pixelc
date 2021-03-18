@@ -18,6 +18,11 @@ typedef struct {
     float start_time;
 } rParticleRect_s;
 
+_Static_assert(offsetof(rParticleRect_s, uv_time)
+               - offsetof(rParticleRect_s, uv_step)
+               == 2 * sizeof(float),
+               "uv_time must not be padded");
+
 // Particle system
 typedef struct {
     rParticleRect_s *rects;
@@ -42,11 +47,11 @@ void r_ro_particle_set_texture(rRoParticle *self, GLuint tex_sink);
 
 
 static void r_ro_particle_update(rRoParticle *self) {
-	r_ro_particle_update_sub(self, 0, self->num);
+    r_ro_particle_update_sub(self, 0, self->num);
 }
 
 static void r_ro_particle_render(rRoParticle *self, float time) {
-	r_ro_particle_render_sub(self, time, self->num);
+    r_ro_particle_render_sub(self, time, self->num);
 }
 
 #endif //R_RO_PARTICLE_H
