@@ -54,12 +54,6 @@ void e_window_init(const char *name) {
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    // 8 bits per color
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-
-
     // create window
     e_window.window = SDL_CreateWindow(name,
                                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -72,7 +66,11 @@ void e_window_init(const char *name) {
     }
 
     // Not necessary, but recommended to create a gl context:
-    SDL_GL_CreateContext(e_window.window);
+    e_window.gl_context = SDL_GL_CreateContext(e_window.window);
+    if(!e_window.gl_context) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_CreateContext failed: %s", SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
     SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
 
 #ifdef USING_GLEW

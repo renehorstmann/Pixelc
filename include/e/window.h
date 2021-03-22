@@ -6,6 +6,7 @@
 
 struct eWindowGlobals_s {
 	SDL_Window *window;
+	SDL_GLContext gl_context;
     ivec2 size;
 };
 extern struct eWindowGlobals_s e_window; 
