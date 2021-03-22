@@ -28,7 +28,7 @@ static char *file_read(const char *filename) {
 }
 
 
-GLuint r_compile_shader(GLint type, const char *src) {
+GLuint r_shader_compile(GLint type, const char *src) {
     GLint shader = glCreateShader(type);
     glShaderSource(shader, 1, &src, NULL);
     glCompileShader(shader);
@@ -51,13 +51,13 @@ GLuint r_compile_shader(GLint type, const char *src) {
 }
 
 
-GLuint r_compile_glsl(rShaderSource_s *sources, int n) {
+GLuint r_shader_compile_glsl(rShaderSource_s *sources, int n) {
     GLuint program = 0;
     GLuint shaders[n];
 
     // Compile shaders
     for (int i = 0; i < n; i++) {
-        shaders[i] = r_compile_shader(sources[i].type, sources[i].src);
+        shaders[i] = r_shader_compile(sources[i].type, sources[i].src);
         if (shaders[i] == 0) {
             n = i;  // delete previous compiled shaders
             goto CLEAN_UP;
@@ -93,7 +93,7 @@ GLuint r_compile_glsl(rShaderSource_s *sources, int n) {
 }
 
 
-GLuint r_compile_shader_from_file(const char *file) {
+GLuint r_shader_compile_from_file(const char *file) {
     GLint type;
     const char *shader_begin;
     {
@@ -121,23 +121,22 @@ GLuint r_compile_shader_from_file(const char *file) {
     strcpy(shader, shader_begin);
     strcat(shader, src);
 
-
-    GLint out = r_compile_shader(type, shader);
+    GLint out = r_shader_compile(type, shader);
     free(src);
     free(shader);
     return out;
 }
 
-GLuint r_compile_glsl_from_files(char **files) {
+GLuint r_shader_compile_glsl_from_files(char **files) {
     int n = -1;
-    while(files[++n]);
+    while (files[++n]);
 
     GLuint program = 0;
     GLuint shaders[n];
 
     // Compile shaders
     for (int i = 0; i < n; i++) {
-        shaders[i] = r_compile_shader_from_file(files[i]);
+        shaders[i] = r_shader_compile_from_file(files[i]);
         if (shaders[i] == 0) {
             n = i;  // delete previous compiled shaders
             goto CLEAN_UP;
@@ -173,4 +172,20 @@ GLuint r_compile_glsl_from_files(char **files) {
 
 
     return program;
+}
+
+void r_shader_validate(GLuint program) {
+    glValidateProgram(program);
+
+    GLint status;
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
+    if (status == GL_FALSE) {
+        int log_len;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_len);
+
+        char *buffer = malloc(log_len + 1);
+        glGetProgramInfoLog(program, log_len, NULL, buffer);
+        SDL_Log("Program validate failure: %s", buffer);
+        free(buffer);
+    }
 }

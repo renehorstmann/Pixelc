@@ -6,7 +6,7 @@
 #include "background.h"
 
 static struct {
-   rRoSingle ro;
+    rRoSingle ro;
 } L;
 
 void background_init(Color_s a, Color_s b) {

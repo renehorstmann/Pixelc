@@ -11,7 +11,7 @@ GLuint r_texture_init(int width, int height, const void *buffer) {
     // GL_REPEAT is already default...
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
+
     r_texture_filter_nearest(tex);
     return tex;
 }
@@ -33,7 +33,7 @@ GLuint r_texture_init_file(const char *file, ivec2 *opt_out_size) {
     }
 
     GLuint tex = r_texture_init_img(img);
-    if(opt_out_size)
+    if (opt_out_size)
         *opt_out_size = (ivec2) {{img->w, img->h}};
 
     SDL_FreeSurface(img);

@@ -52,12 +52,15 @@ float camera_real_pixel_per_pixel() {
 float camera_left() {
     return L.left;
 }
+
 float camera_right() {
     return L.right;
 }
+
 float camera_bottom() {
     return L.bottom;
 }
+
 float camera_top() {
     return L.top;
 }

@@ -10,7 +10,7 @@
 typedef ucvec4 Color_s;
 
 static bool color_equals(Color_s a, Color_s b) {
-	return ucvec4_cmp(a, b);
+    return ucvec4_cmp(a, b);
 }
 
 static vec4 color_to_vec4(Color_s color) {
@@ -19,14 +19,14 @@ static vec4 color_to_vec4(Color_s color) {
 
 static Color_s color_from_hex(const char *hex_string) {
     Color_s c = {0};
-    if(*hex_string == '#')
+    if (*hex_string == '#')
         hex_string++;
 
     // rgb
-    if(strlen(hex_string) == 6) {
-        for(int i=0; i<3; i++) {
+    if (strlen(hex_string) == 6) {
+        for (int i = 0; i < 3; i++) {
             char buf[3] = {hex_string[0], hex_string[1], 0};
-            hex_string+=2;
+            hex_string += 2;
             c.v[i] = strtol(buf, NULL, 16);
         }
         c.a = 255;
@@ -34,10 +34,10 @@ static Color_s color_from_hex(const char *hex_string) {
     }
 
     // rgba
-    if(strlen(hex_string) == 8) {
-        for(int i=0; i<4; i++) {
+    if (strlen(hex_string) == 8) {
+        for (int i = 0; i < 4; i++) {
             char buf[3] = {hex_string[0], hex_string[1], 0};
-            hex_string+=2;
+            hex_string += 2;
             c.v[i] = strtol(buf, NULL, 16);
         }
         return c;

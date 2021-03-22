@@ -18,7 +18,7 @@ static int pixel_idx(int k, int c, int r) {
 GLuint brush_shape_create_kernel_texture(Color_s bg, Color_s fg) {
     int size = TEX_COLS * TEX_ROWS;
     Color_s *img = New(Color_s, size);
-    for(int i=0; i<size; i++)
+    for (int i = 0; i < size; i++)
         img[i] = bg;
 
     for (int k = 0; k < BRUSH_NUM_SHAPES; k++) {

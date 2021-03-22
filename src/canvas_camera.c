@@ -23,7 +23,7 @@ void canvas_camera_init() {
     canvas_camera.matrices.p_inv = mat4_eye();
     canvas_camera.matrices.vp = mat4_eye();
     canvas_camera.matrices.v_p_inv = mat4_eye();
-   
+
     canvas_camera_update();
 }
 
@@ -61,12 +61,15 @@ float canvas_camera_real_pixel_per_pixel() {
 float canvas_camera_left() {
     return L.left;
 }
+
 float canvas_camera_right() {
     return L.right;
 }
+
 float canvas_camera_bottom() {
     return L.bottom;
 }
+
 float canvas_camera_top() {
     return L.top;
 }
@@ -76,7 +79,7 @@ void canvas_camera_set_pos(float x, float y) {
 }
 
 void canvas_camera_set_size(float size) {
-	u_pose_set_size(&canvas_camera.matrices.v, size, size);
+    u_pose_set_size(&canvas_camera.matrices.v, size, size);
 }
 
 void canvas_camera_set_angle(float alpha) {

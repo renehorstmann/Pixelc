@@ -4,7 +4,9 @@
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef USING_GLEW
+
 #include <GL/glew.h>
+
 #endif
 
 #include <SDL.h>

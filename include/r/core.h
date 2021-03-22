@@ -4,7 +4,9 @@
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef USING_GLEW
+
 #include <GL/glew.h>
+
 #endif
 
 #include <SDL.h>
@@ -29,7 +31,7 @@ static const vec4 R_COLOR_TRANSPARENT = {{0, 0, 0, 0}};
 static const vec4 R_COLOR_BLACK = {{0, 0, 0, 1}};
 static const vec4 R_COLOR_WHITE = {{1, 1, 1, 1}};
 static const vec4 R_COLOR_RED = {{1, 0, 0, 1}};
-static const vec4 R_COLOR_GREEN= {{0, 1, 0, 1}};
+static const vec4 R_COLOR_GREEN = {{0, 1, 0, 1}};
 static const vec4 R_COLOR_BLUE = {{0, 0, 1, 1}};
 static const vec4 R_COLOR_YELLOW = {{1, 1, 0, 1}};
 static const vec4 R_COLOR_CYAN = {{0, 1, 1, 1}};

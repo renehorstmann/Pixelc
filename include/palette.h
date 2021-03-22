@@ -23,4 +23,5 @@ int palette_get_color();
 void palette_set_color(int index);
 
 void palette_set_colors(const Color_s *palette, int size);
+
 #endif //PIXELC_PALETTE_H

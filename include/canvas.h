@@ -20,6 +20,7 @@ void canvas_update(float dtime);
 void canvas_render();
 
 mat4 canvas_pose();
+
 Image *canvas_image();
 
 ivec2 canvas_get_cr(vec4 pointer_pos);

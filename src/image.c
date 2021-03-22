@@ -5,7 +5,7 @@
 
 
 Image *image_new_empty(int layers, int cols, int rows) {
-    assume(layers<=IMAGE_MAX_LAYERS, "too many layers");
+    assume(layers <= IMAGE_MAX_LAYERS, "too many layers");
     Image *self = raising_malloc(1, sizeof(Image) + sizeof(Color_s) * layers * rows * cols, SIGABRT);
     self->layers = layers;
     self->rows = rows;
@@ -14,7 +14,7 @@ Image *image_new_empty(int layers, int cols, int rows) {
 }
 
 Image *image_new_zeros(int layers, int cols, int rows) {
-    assume(layers<=IMAGE_MAX_LAYERS, "too many layers");
+    assume(layers <= IMAGE_MAX_LAYERS, "too many layers");
     Image *self = raising_calloc(1, sizeof(Image) + sizeof(Color_s) * layers * rows * cols, SIGABRT);
     self->layers = layers;
     self->rows = rows;
@@ -33,9 +33,9 @@ void image_delete(Image *self) {
 }
 
 bool image_copy(Image *self, const Image *from) {
-    if(self->layers == from->layers
-       && self->rows == from->rows 
-       && self->cols == from->cols) {
+    if (self->layers == from->layers
+        && self->rows == from->rows
+        && self->cols == from->cols) {
         size_t size = image_data_size(self);
         memcpy(self->data, from->data, size);
         return true;
@@ -45,43 +45,43 @@ bool image_copy(Image *self, const Image *from) {
 }
 
 bool image_equals(const Image *self, const Image *from) {
-	if(image_data_size(self) != image_data_size(from))
-	    return false;
-	    
-	return memcmp(self, from, image_full_size(self)) == 0;
+    if (image_data_size(self) != image_data_size(from))
+        return false;
+
+    return memcmp(self, from, image_full_size(self)) == 0;
 }
 
 
 void image_rotate(Image *self, bool right) {
-	Image *tmp = image_new_clone(self);
-	self->cols = tmp->rows;
-	self->rows = tmp->cols;
-	for(int l=0; l<self->layers; l++) {
-		for(int r=0; r<self->rows; r++) {
-			for(int c=0; c<self->rows; c++) {
-			    int mc = right? r : tmp->cols - 1 - r;
-			    int mr = right? tmp->rows - 1 - c : c;
-			    *image_pixel(self, l, c, r) = *image_pixel(tmp, l, mc, mr);
-		    }
-		}
-	}
-	
-	image_delete(tmp);
+    Image *tmp = image_new_clone(self);
+    self->cols = tmp->rows;
+    self->rows = tmp->cols;
+    for (int l = 0; l < self->layers; l++) {
+        for (int r = 0; r < self->rows; r++) {
+            for (int c = 0; c < self->rows; c++) {
+                int mc = right ? r : tmp->cols - 1 - r;
+                int mr = right ? tmp->rows - 1 - c : c;
+                *image_pixel(self, l, c, r) = *image_pixel(tmp, l, mc, mr);
+            }
+        }
+    }
+
+    image_delete(tmp);
 }
 
 void image_mirror(Image *self, bool vertical) {
-	Image *tmp = image_new_clone(self);
-	
-	for(int l=0; l<self->layers; l++) {
-		for(int r=0; r<self->rows; r++) {
-			for(int c=0; c<self->rows; c++) {
-			    int mc = vertical? self->cols - 1 - c : c;
-			    int mr = vertical? r : self->rows - 1 - r;
-			    *image_pixel(self, l, c, r) = *image_pixel(tmp, l, mc, mr);
-		    }
-		}
-	}
-	
-	image_delete(tmp);
+    Image *tmp = image_new_clone(self);
+
+    for (int l = 0; l < self->layers; l++) {
+        for (int r = 0; r < self->rows; r++) {
+            for (int c = 0; c < self->rows; c++) {
+                int mc = vertical ? self->cols - 1 - c : c;
+                int mr = vertical ? r : self->rows - 1 - r;
+                *image_pixel(self, l, c, r) = *image_pixel(tmp, l, mc, mr);
+            }
+        }
+    }
+
+    image_delete(tmp);
 }
 

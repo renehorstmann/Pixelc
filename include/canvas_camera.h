@@ -35,8 +35,11 @@ void canvas_camera_update();
 float canvas_camera_real_pixel_per_pixel();
 
 float canvas_camera_left();
+
 float canvas_camera_right();
+
 float canvas_camera_bottom();
+
 float canvas_camera_top();
 
 static float canvas_camera_width() {

@@ -28,7 +28,7 @@ void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink) 
     self->num = num;
     self->vp = vp;
 
-    self->program = r_compile_glsl_from_files((char *[]) {
+    self->program = r_shader_compile_glsl_from_files((char *[]) {
             "res/r/batch.vsh",
             "res/r/batch.fsh",
             NULL});
@@ -141,6 +141,7 @@ void r_ro_batch_render_sub(rRoBatch *self, int num) {
 
     {
         glBindVertexArray(self->vao);
+        r_shader_validate(self->program);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }

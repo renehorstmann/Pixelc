@@ -16,7 +16,7 @@ static struct {
 
 static void loop() {
     SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
-    
+
     Uint32 time = SDL_GetTicks();
     float dtime = (time - L.last_time) / 1000.0f;
     L.last_time = time;
@@ -56,9 +56,9 @@ void e_window_init(const char *name) {
 
     // create window
     e_window.window = SDL_CreateWindow(name,
-                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                640, 480,
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+                                       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                       640, 480,
+                                       SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     if (!e_window.window) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
@@ -67,7 +67,7 @@ void e_window_init(const char *name) {
 
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.window);
-    if(!e_window.gl_context) {
+    if (!e_window.gl_context) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_CreateContext failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }

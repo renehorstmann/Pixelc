@@ -13,6 +13,7 @@ bool brush_mode_free(ePointer_s pointer);
 bool brush_mode_free_line(ePointer_s pointer);
 
 bool brush_mode_fill(ePointer_s pointer, bool mode8);
+
 bool brush_mode_replace(ePointer_s pointer);
 
 #endif //PIXELC_BRUSH_MODE_H

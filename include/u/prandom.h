@@ -19,6 +19,7 @@ uint32_t u_prand();
 
 #define MATHC_RANDOM_FUNCTION u_prand
 #define MATHC_RANDOM_FUNCTION_MAX uPRAND_MAX
+
 #include "mathc/utils/random.h"
 
 #endif //U_PRANDOM_H

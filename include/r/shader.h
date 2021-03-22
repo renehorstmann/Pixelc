@@ -3,17 +3,19 @@
 
 #include "core.h"
 
-GLuint r_compile_shader(GLint type, const char *src);
+GLuint r_shader_compile(GLint type, const char *src);
 
 typedef struct {
     GLint type;
     const char *src;
 } rShaderSource_s;
 
-GLuint r_compile_glsl(rShaderSource_s *sources, int n);
+GLuint r_shader_compile_glsl(rShaderSource_s *sources, int n);
 
-GLuint r_compile_shader_from_file(const char *file);
+GLuint r_shader_compile_from_file(const char *file);
 
-GLuint r_compile_glsl_from_files(char **files);
+GLuint r_shader_compile_glsl_from_files(char **files);
+
+void r_shader_validate(GLuint program);
 
 #endif //R_SHADER_H

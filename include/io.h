@@ -5,8 +5,8 @@
 #include "image.h"
 
 struct IoGlobals_s {
-	const char *default_image_file;
-	const char *default_import_file;
+    const char *default_image_file;
+    const char *default_import_file;
 };
 extern struct IoGlobals_s io;
 

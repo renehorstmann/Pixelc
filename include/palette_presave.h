@@ -249,7 +249,6 @@ static void palette_presave_endesga64() {
 }
 
 
-
 static void palette_presave_nes() {
     Color_s palette[56];
     int size = 56;

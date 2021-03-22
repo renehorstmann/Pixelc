@@ -13,6 +13,7 @@ void selection_kill();
 bool selection_active();
 
 ivec2 selection_pos();
+
 ivec2 selection_size();
 
 void selection_move(int left, int top);

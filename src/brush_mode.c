@@ -21,7 +21,7 @@ static bool lineto(ivec2 from, ivec2 to) {
 
     bool changed = false;
     if (dx == 0) {
-        for(int i=0; i<=dy; i++)
+        for (int i = 0; i <= dy; i++)
             changed |= brush_draw(from.x, from.y + i * sign_y);
         return changed;
     }
@@ -79,7 +79,7 @@ bool brush_mode_free_line(ePointer_s pointer) {
         return false;
 
     // just 1 pixel length
-    if(ivec2_norm_inf(ivec2_sub_vec(cr, L.last)) <= 1)
+    if (ivec2_norm_inf(ivec2_sub_vec(cr, L.last)) <= 1)
         return brush_draw(cr.x, cr.y);
 
     bool changed = lineto(L.last, cr);

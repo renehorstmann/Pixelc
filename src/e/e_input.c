@@ -60,7 +60,7 @@ static void emit_pointer_events(ePointer_s action) {
 }
 
 static void emit_wheel_events(bool up) {
-    for(int i=0; i<L.reg_wheel_e_size; i++)
+    for (int i = 0; i < L.reg_wheel_e_size; i++)
         L.reg_wheel_e[i].cb(up, L.reg_wheel_e[i].ud);
 }
 
@@ -105,7 +105,7 @@ static void input_handle_pointer_mouse(SDL_Event *event) {
 
 static void input_handle_wheel(SDL_Event *event) {
     // it could be possible that y==0, (e. g. x!=0)
-    if(event->wheel.y == 0)
+    if (event->wheel.y == 0)
         return;
     emit_wheel_events(event->wheel.y > 0);
 }
@@ -146,7 +146,7 @@ static void input_handle_sensors(SDL_Event *event) {
     const float *data = event->sensor.data;
     memcpy(e_input.accel.v, data, sizeof(e_input.accel));
 
-    //printf("Gyro update: %.2f, %.2f, %.2f\n", data[0], data[1], data[2]);
+    // SDL_Log("Gyro update: %.2f, %.2f, %.2f", data[0], data[1], data[2]);
 }
 #endif
 
@@ -179,8 +179,8 @@ void e_input_update() {
 
     if (e_gui.ctx) nk_input_begin(e_gui.ctx);
 
-    void (*input_handle_pointer)(SDL_Event *event) = e_input.is_touch?
-            input_handle_pointer_touch : input_handle_pointer_mouse;
+    void (*input_handle_pointer)(SDL_Event *event) = e_input.is_touch ?
+                                                     input_handle_pointer_touch : input_handle_pointer_mouse;
 
 
     SDL_Event event;
@@ -207,9 +207,9 @@ void e_input_update() {
                 input_handle_keys(&event);
                 break;
 #ifdef USING_GYRO
-            case SDL_SENSORUPDATE:
-                input_handle_sensors(&event);
-                break;
+                case SDL_SENSORUPDATE:
+                    input_handle_sensors(&event);
+                    break;
 #endif
         }
     }

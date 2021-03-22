@@ -34,7 +34,7 @@ static void move_camera(vec2 current_pos) {
 }
 
 static float clampf(float f, float min, float max) {
-	return f < min ? min : f > max ? max : f;
+    return f < min ? min : f > max ? max : f;
 }
 
 #if USING_TOUCH
@@ -60,8 +60,8 @@ void canvas_camera_control_init() {
 }
 
 void canvas_camera_control_set_home() {
-	memset(&L, 0, sizeof(L));
-	L.size = 1;
+    memset(&L, 0, sizeof(L));
+    L.size = 1;
     canvas_camera_set_pos(L.pos.x, L.pos.y);
     canvas_camera_set_size(L.size);
 }
@@ -108,22 +108,22 @@ bool canvas_camera_control_pointer_event(ePointer_s pointer) {
     return L.touched;
 #else
     L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
-    if(L.moving) {
+    if (L.moving) {
         move_camera(L.pointer_pos);
-        if(pointer.action == E_POINTER_DOWN) {
+        if (pointer.action == E_POINTER_DOWN) {
             L.moving = false;
             return true;
         }
-    } else if(pointer.action == E_POINTER_DOWN
-        && pointer.id <0) { // middle + right
+    } else if (pointer.action == E_POINTER_DOWN
+               && pointer.id < 0) { // middle + right
         L.pointer_pos = pointer.pos.xy;
         L.pos0 = L.pos;
         L.move0 = pointer.pos.xy;
         L.moving = true;
-        
+
         brush_abort_current_draw();
     }
-    
+
     return L.moving;
 #endif
 }

@@ -6,6 +6,7 @@
 #define SAVESTATE_MAX_IDS 64
 
 typedef void (*savestate_save_fn)(void **data, size_t *size);
+
 typedef void (*savestate_load_fn)(const void *data, size_t size);
 
 void savestate_init();

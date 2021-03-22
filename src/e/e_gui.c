@@ -46,9 +46,8 @@ void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, f
 
     struct nk_context *ctx = e_gui.ctx;
     if (nk_begin(ctx, title, window_rect(300, 100),
-                 NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
-                 NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
-    {
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
         nk_layout_row_static(ctx, 30, 120, 2);
         nk_slider_float(ctx, min, attribute, max, step);
         nk_labelf(ctx, NK_TEXT_LEFT, "%f", *attribute);
@@ -62,10 +61,11 @@ void e_gui_test() {
     struct nk_context *ctx = e_gui.ctx;
     static struct nk_colorf bg;
     if (nk_begin(ctx, "Demo", window_rect(300, 600),
-                 NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
-                 NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
-    {
-        enum {EASY, HARD};
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        enum {
+            EASY, HARD
+        };
         static int op = EASY;
         static int property = 20;
 
@@ -81,14 +81,14 @@ void e_gui_test() {
         nk_layout_row_dynamic(ctx, 20, 1);
         nk_label(ctx, "background:", NK_TEXT_LEFT);
         nk_layout_row_dynamic(ctx, 25, 1);
-        if (nk_combo_begin_color(ctx, nk_rgb_cf(bg), nk_vec2(nk_widget_width(ctx),400))) {
+        if (nk_combo_begin_color(ctx, nk_rgb_cf(bg), nk_vec2(nk_widget_width(ctx), 400))) {
             nk_layout_row_dynamic(ctx, 120, 1);
             bg = nk_color_picker(ctx, bg, NK_RGBA);
             nk_layout_row_dynamic(ctx, 25, 1);
-            bg.r = nk_propertyf(ctx, "#R:", 0, bg.r, 1.0f, 0.01f,0.005f);
-            bg.g = nk_propertyf(ctx, "#G:", 0, bg.g, 1.0f, 0.01f,0.005f);
-            bg.b = nk_propertyf(ctx, "#B:", 0, bg.b, 1.0f, 0.01f,0.005f);
-            bg.a = nk_propertyf(ctx, "#A:", 0, bg.a, 1.0f, 0.01f,0.005f);
+            bg.r = nk_propertyf(ctx, "#R:", 0, bg.r, 1.0f, 0.01f, 0.005f);
+            bg.g = nk_propertyf(ctx, "#G:", 0, bg.g, 1.0f, 0.01f, 0.005f);
+            bg.b = nk_propertyf(ctx, "#B:", 0, bg.b, 1.0f, 0.01f, 0.005f);
+            bg.a = nk_propertyf(ctx, "#A:", 0, bg.a, 1.0f, 0.01f, 0.005f);
             nk_combo_end(ctx);
         }
     }

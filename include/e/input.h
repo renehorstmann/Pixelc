@@ -31,7 +31,6 @@ struct eInputGloabals_s {
 extern struct eInputGloabals_s e_input;
 
 
-
 enum ePointerAction {
     E_POINTER_DOWN, E_POINTER_MOVE, E_POINTER_UP,
     E_POINTER_NUM_ACTIONS

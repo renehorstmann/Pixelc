@@ -58,7 +58,8 @@ static mat4 setup_palette_color_pose(int r, int c) {
 void palette_init() {
     r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_init_file("res/color_drop.png", NULL));
 
-    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl, r_texture_init_file("res/palette_background.png", NULL));
+    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl,
+                    r_texture_init_file("res/palette_background.png", NULL));
 
     r_ro_single_init(&L.select_ro, camera.gl, r_texture_init_file("res/palette_select.png", NULL));
 
@@ -158,8 +159,8 @@ bool palette_pointer_event(ePointer_s pointer) {
 }
 
 float palette_get_hud_size() {
-	int cols = palette_cols();
-	int rows = 1 + L.palette_size / cols;
+    int cols = palette_cols();
+    int rows = 1 + L.palette_size / cols;
     return rows * COLOR_DROP_SIZE;
 }
 

@@ -29,10 +29,11 @@ void r_ro_batch_set_texture(rRoBatch *self, GLuint tex_sink);
 
 
 static void r_ro_batch_update(rRoBatch *self) {
-	r_ro_batch_update_sub(self, 0, self->num);
+    r_ro_batch_update_sub(self, 0, self->num);
 }
+
 static void r_ro_batch_render(rRoBatch *self) {
-	r_ro_batch_render_sub(self, self->num);
+    r_ro_batch_render_sub(self, self->num);
 }
 
 

@@ -5,15 +5,14 @@
 #include "core.h"
 
 struct eWindowGlobals_s {
-	SDL_Window *window;
-	SDL_GLContext gl_context;
+    SDL_Window *window;
+    SDL_GLContext gl_context;
     ivec2 size;
 };
-extern struct eWindowGlobals_s e_window; 
+extern struct eWindowGlobals_s e_window;
 
 
 typedef void (*eWindowMainLoopFn)(float delta_time);
-
 
 
 void e_window_init(const char *name);

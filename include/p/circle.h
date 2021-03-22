@@ -9,14 +9,14 @@
 
 
 typedef struct {
-	float x, y, r;
+    float x, y, r;
 } pCircle_s;
 
 
 // Circle circle collision
 static bool p_circle_oo(pCircle_s a, pCircle_s b) {
-	float d_sqr = powf(b.x-a.x, 2) + powf(b.y-a.y, 2);
-	return d_sqr < powf(a.r+b.r, 2);
+    float d_sqr = powf(b.x - a.x, 2) + powf(b.y - a.y, 2);
+    return d_sqr < powf(a.r + b.r, 2);
 }
 
 // Circle circle group collision

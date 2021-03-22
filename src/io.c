@@ -3,8 +3,8 @@
 #include "io.h"
 
 struct IoGlobals_s io = {
-	"sprite.png",
-	"import.png"
+        "sprite.png",
+        "import.png"
 };
 
 
@@ -32,7 +32,7 @@ static SDL_Surface *load_buffer(void *data, int width, int height) {
 
 
 Image *io_load_image(const char *file, int layers) {
-    assume(layers>0, "A single layer needed");
+    assume(layers > 0, "A single layer needed");
     Image *image = NULL;
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
@@ -45,12 +45,12 @@ Image *io_load_image(const char *file, int layers) {
         goto CLEAN_UP;
     }
 
-    if(img->h % layers != 0) {
+    if (img->h % layers != 0) {
         SDL_Log("io_load_image failed, height %% layers != 0");
         goto CLEAN_UP;
     }
 
-    image = image_new_empty(layers, img->w, img->h/layers);
+    image = image_new_empty(layers, img->w, img->h / layers);
     memcpy(image->data, img->pixels, sizeof(Color_s) * img->w * img->h);
 
     CLEAN_UP:
@@ -60,10 +60,10 @@ Image *io_load_image(const char *file, int layers) {
 
 
 bool io_save_image(const char *file, const Image *image) {
-    SDL_Surface *img = load_buffer((void *)image->data, image->cols, image->rows * image->layers);
+    SDL_Surface *img = load_buffer((void *) image->data, image->cols, image->rows * image->layers);
     int ret = IMG_SavePNG(img, file);
     SDL_FreeSurface(img);
-    if(ret) {
+    if (ret) {
         SDL_Log("io_save_layer (%s) failed: %s", file, IMG_GetError());
         return false;
     }
