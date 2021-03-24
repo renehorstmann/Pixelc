@@ -58,12 +58,23 @@ static float u_pose_get_y(mat4 p) {
     return p.m31;
 }
 
+static vec2 u_pose_get_xy(mat4 p) {
+    return (vec2) {{p.m30, p.m31}};
+}
+
 static float u_pose_get_w(mat4 p) {
     return sqrtf(powf(p.m00, 2) + powf(p.m01, 2));
 }
 
 static float u_pose_get_h(mat4 p) {
     return sqrtf(powf(p.m10, 2) + powf(p.m11, 2));
+}
+
+static vec2 u_pose_get_wh(mat4 p) {
+    return (vec2) {{
+        u_pose_get_w(p),
+        u_pose_get_h(p)
+    }};
 }
 
 static float u_pose_get_angle(mat4 p) {
@@ -203,5 +214,23 @@ static bool u_pose_aa_contains(mat4 p, vec2 pos) {
     return pos.x >= l && pos.x <= r && pos.y <= t && pos.y >= b;
 }
 
+static bool u_pose_aa_intersects_line(mat4 p, vec2 a, vec2 b) {
+    vec2 wh = u_pose_get_wh(p);
+    float size = wh.v0 < wh.v1 ? wh.v0: wh.v1;
+    
+    vec2 diff = {{b.x-a.x, b.y-a.y}};
+    float dist = sqrtf(diff.x*diff.x + diff.y*diff.y);
+    
+    int checks = ceilf(dist / size);
+    checks = checks <=0 ? 1 : checks; // min 1
+    
+    for(int i=0; i<checks; i++) {
+        vec2 pos = {{a.x + diff.x / checks, a.y + diff.y / checks}};
+        
+        if(u_pose_aa_contains(p, pos))
+            return true;
+    }
+    return false;
+}
 
 #endif //U_POSE_H
