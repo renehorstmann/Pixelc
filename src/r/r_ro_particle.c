@@ -201,7 +201,7 @@ void r_ro_particle_render_sub(rRoParticle *self, float time, int num) {
 
     {
         glBindVertexArray(self->vao);
-        r_shader_validate(self->program);
+        // r_shader_validate(self->program); // debug test
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }

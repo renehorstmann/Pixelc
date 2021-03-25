@@ -56,7 +56,7 @@ void r_ro_single_render(rRoSingle *self) {
 
     {
         glBindVertexArray(self->vao);
-        r_shader_validate(self->program);
+        // r_shader_validate(self->program); // debug test
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
     }
