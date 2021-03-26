@@ -21,19 +21,19 @@
 //
 
 // canvas size
-//#define COLS 32
-//#define ROWS 64
-//#define LAYERS 2
+//#define COLS 64
+//#define ROWS 32
+//#define LAYERS 1
 
 // Tilec
-#define COLS 16*8
-#define ROWS 16*8
-#define LAYERS 2
+//#define COLS 16*8
+//#define ROWS 16*8
+//#define LAYERS 2
 
 // JumpHare
-//#define COLS 32*4
-//#define ROWS 32*4
-//#define LAYERS 1
+#define COLS 32*4
+#define ROWS 32*5
+#define LAYERS 1
 
 
 // animation + tiles
@@ -42,8 +42,8 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
-#define PLAY_FRAMES 1
-#define PLAY_FPS 3.0
+#define PLAY_FRAMES 2
+#define PLAY_FPS 2.0
 
 // uncomment the used palette:
 // #define PALETTE grayscale
@@ -53,9 +53,9 @@
 // #define PALETTE slso8
 // #define PALETTE gameboy
 // #define PALETTE endesga32
- #define PALETTE endesga64
+// #define PALETTE endesga64
 // #define PALETTE nes
-// #define PALETTE aap64
+ #define PALETTE aap64
 
 
 #define BG_COLOR_A "#aaaacc"
