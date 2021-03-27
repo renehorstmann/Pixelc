@@ -44,7 +44,7 @@ static Color_s *image_pixel(Image *self, int layer, int c, int r) {
 }
 
 static Color_s *image_pixel_index(Image *self, int layer, int index) {
-    return image_pixel(self, layer, 0, index);
+    return image_pixel(self, layer, index, 0);
 }
 
 static Color_s *image_layer(Image *self, int layer) {
