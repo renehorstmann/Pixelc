@@ -9,7 +9,7 @@ GLuint r_ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
     SDL_Surface *img = TTF_RenderText_Blended(font, text,
                                               (SDL_Color) {color.v2 * 255, color.v1 * 255, color.v0 * 255,
                                                            color.v3 * 255});
-    GLuint tex = r_texture_init_img(img);
+    GLuint tex = r_texture_new_img(img);
     if (opt_out_w)
         *opt_out_w = img->w;
     if (opt_out_h)

@@ -6,11 +6,13 @@
 #include "core.h"
 #include "mathc/types/int.h"
 
-GLuint r_texture_init(int width, int height, const void *buffer);
+GLuint r_texture_new(int width, int height, const void *buffer);
 
-GLuint r_texture_init_img(SDL_Surface *img);
+GLuint r_texture_new_img(SDL_Surface *img);
 
-GLuint r_texture_init_file(const char *file, ivec2 *opt_out_size);
+GLuint r_texture_new_file(const char *file, ivec2 *opt_out_size);
+
+GLuint r_texture_new_white_pixel();
 
 void r_texture_update(GLuint tex, int width, int height, const void *buffer);
 

@@ -1,7 +1,7 @@
 #include <SDL_image.h>
 #include "r/texture.h"
 
-GLuint r_texture_init(int width, int height, const void *buffer) {
+GLuint r_texture_new(int width, int height, const void *buffer) {
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -16,28 +16,32 @@ GLuint r_texture_init(int width, int height, const void *buffer) {
     return tex;
 }
 
-GLuint r_texture_init_img(SDL_Surface *img) {
+GLuint r_texture_new_img(SDL_Surface *img) {
     SDL_PixelFormat *f = img->format;
     if (f->BitsPerPixel != 32 || f->Amask == 0) {
         SDL_Log("Load texture failed, 8bpp and alpha needed");
         return 0;
     }
-    return r_texture_init(img->w, img->h, img->pixels);
+    return r_texture_new(img->w, img->h, img->pixels);
 }
 
-GLuint r_texture_init_file(const char *file, ivec2 *opt_out_size) {
+GLuint r_texture_new_file(const char *file, ivec2 *opt_out_size) {
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
         SDL_Log("Load image (%s) failed: %s", file, IMG_GetError());
         return 0;
     }
 
-    GLuint tex = r_texture_init_img(img);
+    GLuint tex = r_texture_new_img(img);
     if (opt_out_size)
         *opt_out_size = (ivec2) {{img->w, img->h}};
 
     SDL_FreeSurface(img);
     return tex;
+}
+
+GLuint r_texture_new_white_pixel() {
+    return r_texture_new(1, 1, (uint8_t[]) {255, 255, 255});
 }
 
 void r_texture_update(GLuint tex, int width, int height, const void *buffer) {

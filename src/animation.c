@@ -52,7 +52,7 @@ void animation_init(int multi_cols, int multi_rows, float size, int frames, floa
     Image *img = canvas_image();
 
     for (int i = 0; i < img->layers; i++) {
-        GLuint tex = r_texture_init(img->cols, img->rows, image_layer(img, i));
+        GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, i));
         r_ro_batch_init(&L.ro[i], L.mcols * L.mrows, camera.gl, tex);
 
         for (int j = 0; j < L.ro[i].num; j++) {

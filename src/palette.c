@@ -56,12 +56,12 @@ static mat4 setup_palette_color_pose(int r, int c) {
 }
 
 void palette_init() {
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_init_file("res/color_drop.png", NULL));
+    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
 
     r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl,
-                    r_texture_init_file("res/palette_background.png", NULL));
+                    r_texture_new_file("res/palette_background.png", NULL));
 
-    r_ro_single_init(&L.select_ro, camera.gl, r_texture_init_file("res/palette_select.png", NULL));
+    r_ro_single_init(&L.select_ro, camera.gl, r_texture_new_file("res/palette_select.png", NULL));
 
     // default palette:
     {

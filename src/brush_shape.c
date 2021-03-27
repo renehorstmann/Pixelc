@@ -31,7 +31,7 @@ GLuint brush_shape_create_kernel_texture(Color_s bg, Color_s fg) {
             }
         }
     }
-    GLuint tex = r_texture_init(TEX_COLS, TEX_ROWS, img);
+    GLuint tex = r_texture_new(TEX_COLS, TEX_ROWS, img);
     free(img);
     return tex;
 }
