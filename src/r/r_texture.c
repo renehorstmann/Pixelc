@@ -41,7 +41,7 @@ GLuint r_texture_new_file(const char *file, ivec2 *opt_out_size) {
 }
 
 GLuint r_texture_new_white_pixel() {
-    return r_texture_new(1, 1, (uint8_t[]) {255, 255, 255});
+    return r_texture_new(1, 1, (uint8_t[]) {255, 255, 255, 255});
 }
 
 void r_texture_update(GLuint tex, int width, int height, const void *buffer) {
