@@ -4,6 +4,7 @@ struct rRenderGolabals_s r_render;
 
 void r_render_init(SDL_Window *window) {
     r_render.window = window;
+    r_render.clear_color = (vec4) {{0, 0, 0, 1}};
 
     SDL_Log("OpenGL version: %s", glGetString(GL_VERSION));
 
@@ -21,7 +22,7 @@ void r_render_begin_frame(int cols, int rows) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_SCISSOR_TEST);
-    glClearColor(0, 0, 0, 1);
+    glClearColor(r_render.clear_color.r, r_render.clear_color.g, r_render.clear_color.b, r_render.clear_color.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 

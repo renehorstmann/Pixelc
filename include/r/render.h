@@ -1,9 +1,11 @@
 #ifndef R_RENDER_H
 #define R_RENDER_H
 
+#include "mathc/types/float.h"
 #include "core.h"
 
 struct rRenderGolabals_s {
+    vec4 clear_color;
     SDL_Window *window;
 };
 extern struct rRenderGolabals_s r_render;
