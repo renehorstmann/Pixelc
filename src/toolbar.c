@@ -190,15 +190,15 @@ void toolbar_update(float dtime) {
 
     // selection buttons:
     if(toolbar.show_selection_ok)
-        L.selection_copy.rect.pose = pose16(20, 43);
+        L.selection_copy.rect.pose = pose16(10, 43);
     else 
         L.selection_copy.rect.pose = pose16(-8, 43);
     L.selection_cut.rect.pose = pose16(8, 43);
-    L.selection_rotate_left.rect.pose = pose16(-48, 43);
-    L.selection_rotate_right.rect.pose = pose16(-32, 43);
-    L.selection_mirror_horizontal.rect.pose = pose16(-16, 43);
-    L.selection_mirror_vertical.rect.pose = pose16(0, 43);
-    L.selection_ok.rect.pose = pose16(36, 43);
+    L.selection_rotate_left.rect.pose = pose16(-58, 43);
+    L.selection_rotate_right.rect.pose = pose16(-42, 43);
+    L.selection_mirror_horizontal.rect.pose = pose16(-26, 43);
+    L.selection_mirror_vertical.rect.pose = pose16(-10, 43);
+    L.selection_ok.rect.pose = pose16(26, 43);
 
     // layer:
     L.layer_prev.rect.pose = pose16(50, 43);
