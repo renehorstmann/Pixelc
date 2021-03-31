@@ -66,6 +66,7 @@ static struct {
     rRoSingle layer_next;
     rRoText layer_num;
 
+    bool prev_show_selection_ok;
 } L;
 
 static rRoSingle *tool_append(float x, float y, const char *btn_file) {
@@ -188,13 +189,16 @@ void toolbar_update(float dtime) {
     L.color_drop.rect.color = color_to_vec4(brush.secondary_color);
 
     // selection buttons:
-    L.selection_copy.rect.pose = pose16(-8, 43);
+    if(toolbar.show_selection_ok)
+        L.selection_copy.rect.pose = pose16(20, 43);
+    else 
+        L.selection_copy.rect.pose = pose16(-8, 43);
     L.selection_cut.rect.pose = pose16(8, 43);
     L.selection_rotate_left.rect.pose = pose16(-48, 43);
     L.selection_rotate_right.rect.pose = pose16(-32, 43);
     L.selection_mirror_horizontal.rect.pose = pose16(-16, 43);
     L.selection_mirror_vertical.rect.pose = pose16(0, 43);
-    L.selection_ok.rect.pose = pose16(20, 43);
+    L.selection_ok.rect.pose = pose16(36, 43);
 
     // layer:
     L.layer_prev.rect.pose = pose16(50, 43);
@@ -231,6 +235,11 @@ void toolbar_update(float dtime) {
     } else
         L.shape_plus_time = 0;
 
+
+    // unpress cpy button if selection ok is toggled
+    if(!L.prev_show_selection_ok && toolbar.show_selection_ok)
+        button_set_pressed(&L.selection_copy, false);
+    L.prev_show_selection_ok = toolbar.show_selection_ok;
 }
 
 void toolbar_render() {
@@ -255,6 +264,7 @@ void toolbar_render() {
         r_ro_single_render(&L.selection_rotate_right);
         r_ro_single_render(&L.selection_mirror_horizontal);
         r_ro_single_render(&L.selection_mirror_vertical);
+        r_ro_single_render(&L.selection_copy);
         r_ro_single_render(&L.selection_ok);
     }
 
@@ -422,6 +432,10 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         if (changed) {
             canvas_redo_image();
             selection_paste(canvas_image(), canvas.current_layer);
+        }
+        
+        if (button_clicked(&L.selection_copy, pointer)) {
+            canvas_save();
         }
 
         if (button_clicked(&L.selection_ok, pointer)) {
