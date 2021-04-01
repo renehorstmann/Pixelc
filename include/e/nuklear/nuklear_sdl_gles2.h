@@ -16,8 +16,10 @@
 #define NK_SDL_GLES2_H_
 
 // added to enable scaling
-#ifndef NK_SCALE
-#define NK_SCALE 1.0f
+#ifdef NUKLEAR_SCALE
+#define NK_SCALE NUKLEAR_SCALE
+#else
+#define NK_SCALE 1.0
 #endif
 
 

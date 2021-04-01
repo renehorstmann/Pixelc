@@ -40,11 +40,13 @@ void e_window_init(const char *name) {
         exit(EXIT_FAILURE);
     }
 
+#ifdef USING_TTF
     // initialize TTF
     if (TTF_Init() == -1) {
         SDL_Log("TTF_Init failed: %s", TTF_GetError());
         exit(EXIT_FAILURE);
     }
+#endif
 
     // setup OpenGL usage
     SDL_Log("OpenGL minimal version: %d.%d", E_GL_MAJOR_VERSION, E_GL_MINOR_VERSION);

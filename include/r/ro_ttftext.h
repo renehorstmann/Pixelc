@@ -1,3 +1,4 @@
+#ifdef USING_TTF
 #ifndef R_RO_TTFTEXT_H
 #define R_RO_TTFTEXT_H
 
@@ -31,3 +32,4 @@ void r_ro_ttftext_set_size(rRoTtfText *self, float h);
 void r_ro_ttftext_set_text(rRoTtfText *self, vec4 color, const char *text);
 
 #endif //R_RO_TTFTEXT_H
+#endif //USING_TTF

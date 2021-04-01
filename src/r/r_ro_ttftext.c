@@ -1,3 +1,4 @@
+#ifdef USING_TTF
 #include "r/texture.h"
 #include "r/ro_ttftext.h"
 
@@ -10,6 +11,7 @@ GLuint r_ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
                                               (SDL_Color) {color.v2 * 255, color.v1 * 255, color.v0 * 255,
                                                            color.v3 * 255});
     GLuint tex = r_texture_new_img(img);
+    r_texture_filter_linear(tex);
     if (opt_out_w)
         *opt_out_w = img->w;
     if (opt_out_h)
@@ -72,5 +74,6 @@ void r_ro_ttftext_set_text(rRoTtfText *self, vec4 color, const char *text) {
     self->ratio = (float) w / h;
     r_ro_ttftext_set_size(self, u_pose_get_h(self->ro.rect.pose));
 }
-
-
+#else //USING_TTF
+typedef int avoid_iso_c_empty_translation_unit_warning_;
+#endif

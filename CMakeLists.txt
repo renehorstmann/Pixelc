@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 project(Pixelc C)
 
 # Optional definitions set:
-# USING_GLES        for OpenGLES3.0 instead of OpenGL3.3
-# USING_GLEW        if GLEW is available
-# IS_ANDROID_OS     for Android
+# USING_GLES            for OpenGLES3.0 instead of OpenGL3.3
+# USING_GLEW            if GLEW is available
+# -not used- USING_GYRO            if gyro sensor is available
+# -not used- USING_TTF             to use r_ro_ttftext
+# NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
 
 set(CMAKE_C_STANDARD 11)
 
@@ -35,8 +37,8 @@ if (GL_LIB)
 elseif (GLES_LIB)
     message("GLES found: Mobile mode")
     add_definitions(-DUSING_GLES)
-    add_definitions(-DUSING_TOUCH)
-    add_definitions(-DIS_ANDROID_OS)
+    # -not used- add_definitions(-DUSING_GYRO)
+    add_definitions(-DNUKLEAR_SCALE=3.0)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
     target_link_libraries(pixelc ${GLES_LIB})
 else ()
@@ -51,20 +53,21 @@ if(GLEW_LIB)
 endif()
 
 # SDL
+# -not used- add_definitions(-DUSING_TTF)
 find_package(SDL2 REQUIRED)
 if (GL_LIB)
     find_library(SDL2_IMAGE_LIBRARIES SDL2_image)
-    find_library(SDL2_TTF_LIBRARIES SDL2_ttf)
+    #find_library(SDL2_TTF_LIBRARIES SDL2_ttf)
 else ()
     find_package(SDL2_image REQUIRED)
-    find_package(SDL2_ttf REQUIRED)
+    #find_package(SDL2_ttf REQUIRED)
 endif ()
 include_directories(${SDL2_INCLUDE_DIRS})
 message("include dir:" ${SDL2_INCLUDE_DIRS})
 target_link_libraries(pixelc m
         ${SDL2_LIBRARIES}
         ${SDL2_IMAGE_LIBRARIES}
-        ${SDL2_TTF_LIBRARIES}
+        #${SDL2_TTF_LIBRARIES}
         )
 
 # res
