@@ -46,7 +46,7 @@
 #define PLAY_FPS 6.0
 
 // uncomment the used palette:
- #define PALETTE grayscale
+// #define PALETTE grayscale
 // #define PALETTE grayscale_alpha
 // #define PALETTE pixilmatt
 // #define PALETTE slso8
@@ -54,7 +54,7 @@
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-// #define PALETTE aap64
+ #define PALETTE aap64
 
 
 #define BG_COLOR_A "#aaaacc"
