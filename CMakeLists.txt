@@ -7,6 +7,7 @@ project(Pixelc C)
 # -not used- USING_GYRO            if gyro sensor is available
 # -not used- USING_TTF             to use r_ro_ttftext
 # NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
+# USING_TOUCH           for canvas camera control
 
 set(CMAKE_C_STANDARD 11)
 
@@ -40,6 +41,7 @@ elseif (GLES_LIB)
     # -not used- add_definitions(-DUSING_GYRO)
     add_definitions(-DNUKLEAR_SCALE=3.0)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
+    add_definitions(-DUSING_TOUCH)
     target_link_libraries(pixelc ${GLES_LIB})
 else ()
     message(FATAL_ERROR "Neither GL nor GLESv3 found, exiting CMake")
