@@ -21,19 +21,25 @@
 //
 
 // canvas size
-#define COLS 256
-#define ROWS 256
-#define LAYERS 6
+//*
+//#define COLS 256
+//#define ROWS 256
+//#define LAYERS 6
+//*/
 
 // Tilec
-//#define COLS 16*8
-//#define ROWS 16*8
-//#define LAYERS 2
+//*
+#define COLS 16*8
+#define ROWS 16*8
+#define LAYERS 2
+//*/
 
 // JumpHare
-//#define COLS 32*4
-//#define ROWS 32*5
-//#define LAYERS 1
+/*
+#define COLS 32*4
+#define ROWS 32*5
+#define LAYERS 1
+//*/
 
 
 // animation + tiles
