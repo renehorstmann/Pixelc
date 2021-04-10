@@ -1,12 +1,12 @@
 #include <SDL_image.h>
 #include "r/texture.h"
 
-GLuint r_texture_new(int width, int height, const void *buffer) {
+GLuint r_texture_new(int cols, int rows, const void *buffer) {
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cols, rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
     // GL_REPEAT is already default...
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -40,13 +40,17 @@ GLuint r_texture_new_file(const char *file, ivec2 *opt_out_size) {
     return tex;
 }
 
+GLuint r_texture_new_empty(int cols, int rows) {
+    return r_texture_new(cols, rows, NULL);
+}
+
 GLuint r_texture_new_white_pixel() {
     return r_texture_new(1, 1, (uint8_t[]) {255, 255, 255, 255});
 }
 
-void r_texture_update(GLuint tex, int width, int height, const void *buffer) {
+void r_texture_update(GLuint tex, int cols, int rows, const void *buffer) {
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, cols, rows, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 }
 
 void r_texture_filter_linear(GLuint tex) {
