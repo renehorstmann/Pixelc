@@ -397,4 +397,35 @@ static void palette_presave_aap64() {
     palette_set_colors(palette, size);
 }
 
+static void palette_presave_refrection_values() {
+    Color_s palette[] = {
+        {{0}},
+        {{128, 128}},
+        {{128+10, 128}},
+        {{128-10, 128}},
+        {{128, 128+10}},
+        {{128, 128-10}},
+        {{128+10, 128+10}},
+        {{128+10, 128-10}},
+        {{128-10, 128+10}},
+        {{128-10, 128-10}},
+        {{128+20, 128}},
+        {{128-20, 128}},
+        {{128, 128+20}},
+        {{128, 128-20}},
+        {{128+20, 128+20}},
+        {{128+20, 128-20}},
+        {{128-20, 128+20}},
+        {{128-20, 128-20}},
+    };
+    
+    int size = sizeof(palette)/sizeof(Color_s);
+    
+    for(int i=1; i<size; i++) {
+        palette[i].a = 255;
+    }
+
+    palette_set_colors(palette, size);
+}
+
 #endif //PIXELC_PALETTE_PRESAVE_H

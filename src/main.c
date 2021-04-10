@@ -22,9 +22,9 @@
 
 // canvas size
 //*
-#define COLS 32*4
-#define ROWS 48*2
-#define LAYERS 1
+#define COLS 16
+#define ROWS 32
+#define LAYERS 2
 //*/
 
 // Tilec
@@ -48,7 +48,7 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
-#define PLAY_FRAMES 4
+#define PLAY_FRAMES 1
 #define PLAY_FPS 6.0
 
 // uncomment the used palette:
@@ -60,7 +60,9 @@
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
- #define PALETTE aap64
+// #define PALETTE aap64
+ 
+#define PALETTE refrection_values
 
 
 #define BG_COLOR_A "#aaaacc"
