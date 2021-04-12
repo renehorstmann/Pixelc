@@ -60,7 +60,7 @@
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-#define PALETTE aap64
+ #define PALETTE aap64
  
 //#define PALETTE refrection_values
 
