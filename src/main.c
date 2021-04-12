@@ -60,9 +60,9 @@
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-//#define PALETTE aap64
+#define PALETTE aap64
  
-#define PALETTE refrection_values
+//#define PALETTE refrection_values
 
 
 #define BG_COLOR_A "#aaaacc"
@@ -73,7 +73,7 @@
 
 
 // uncomment to change the file locations:
-// #define IMAGE_FILE "res/button_play.png"
+// #define IMAGE_FILE "../JumpHare/res/ice_block.png"
 // #define IMPORT_FILE "res/color_drop.png"
 
 //

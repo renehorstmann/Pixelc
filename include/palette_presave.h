@@ -398,11 +398,19 @@ static void palette_presave_aap64() {
 }
 
 static void palette_presave_refrection_values() {
+    // red = x in pixel, 128 is 0
+    // green = y
+    // blue = stretch value. xs+xy*16 [0-16). 
+    //    12+12*16 is normal
+    //    4+12*16 is x mirror
+    // alpha = alpha
     Color_s palette[] = {
         {{0}},
-        {{128+8, 128+16, 0, 96}},
-        {{128+32, 128+16, 0, 128}},
-        {{128-48, 128-8, 0, 64}},
+        {{128+8, 128+64, 16+4*16, 96}},
+        {{128+32, 128+16, 14+12*16, 128}},
+        {{128-48, 128-8, 16+12*16, 64}},
+        {.a=255},
+        {{128-32, 128, 4+12*16, 200}},
     };
     
     int size = sizeof(palette)/sizeof(Color_s);
