@@ -20,6 +20,13 @@ void r_render_init(SDL_Window *window) {
         //exit(EXIT_FAILURE);
     }
     
+    int max_texture_units;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+    if (max_texture_units < 3) {
+        SDL_LogWarn(SDL_LOG_CATEGORY_RENDER, "OpenGL failed: only has %d/3 framebuffer texture units", max_texture_units);
+        //exit(EXIT_FAILURE);
+    }
+    
     // startup "empty" texture
     r_render.framebuffer_tex = r_texture_new_white_pixel();
     r_render.framebuffer_tex_size = (ivec2) {1, 1};

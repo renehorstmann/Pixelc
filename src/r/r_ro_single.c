@@ -25,7 +25,7 @@ void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink) {
         glBindVertexArray(self->vao);
 
         // texture (using only unit 0)
-        glUniform1i(glGetUniformLocation(self->program, "texs"), 0);
+        glUniform1i(glGetUniformLocation(self->program, "tex"), 0);
 
         glBindVertexArray(0);
     }
