@@ -3,7 +3,7 @@
 #include "r/ro_single.h"
 
 
-void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink) {
+void ro_single_init(RoSingle *self, const float *vp, GLuint tex_sink) {
     self->rect.pose = mat4_eye();
     self->rect.uv = mat4_eye();
     self->rect.color = vec4_set(1);
@@ -31,16 +31,16 @@ void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink) {
     }
 }
 
-void r_ro_single_kill(rRoSingle *self) {
+void ro_single_kill(RoSingle *self) {
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     if (self->owns_tex)
         glDeleteTextures(1, &self->tex);
-    *self = (rRoSingle) {0};
+    *self = (RoSingle) {0};
 }
 
 
-void r_ro_single_render(rRoSingle *self) {
+void ro_single_render(RoSingle *self) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "pose"), 1, GL_FALSE, &self->rect.pose.m00);
@@ -64,7 +64,7 @@ void r_ro_single_render(rRoSingle *self) {
     glUseProgram(0);
 }
 
-void r_ro_single_set_texture(rRoSingle *self, GLuint tex_sink) {
+void ro_single_set_texture(RoSingle *self, GLuint tex_sink) {
     if (self->owns_tex)
         glDeleteTextures(1, &self->tex);
     self->tex = tex_sink;

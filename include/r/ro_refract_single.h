@@ -6,14 +6,16 @@
 #include "rect.h"
 
 
-// Renders a single rect in a draw call
-// Enables refraction and reflection
+// Renders a single rect in a draw call, with refraction and reflection
+//
 // Uses 3 textures in total
 // 1: default texture
 // 2: refraction map
 //    r: 128+offset for x refraction
 //    g: 128+offset for y
-//    b: not used
+//    b: x_stretch_value + y_stretch_value * 16
+//          normal: 12+12*16    (8+4)
+//          mirror x: 4+12*16   (8-4)
 //    a: refraction alpha
 // 3: framebuffer texture, to grab pixels for the refraction
 //    defaults to r_render.framebuffer_tex
@@ -33,19 +35,19 @@ typedef struct {
     const GLuint *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
     bool owns_tex_main;
     bool owns_tex_refraction;
-} rRoRefractSingle;
+} RoRefractSingle;
 
-void r_ro_refract_single_init(rRoRefractSingle *self,
+void ro_refract_single_init(RoRefractSingle *self,
         const float *vp, const float *scale_ptr,
         GLuint tex_main_sink, GLuint tex_refraction_sink);
 
-void r_ro_refract_single_kill(rRoRefractSingle *self);
+void ro_refract_single_kill(RoRefractSingle *self);
 
-void r_ro_refract_single_render(rRoRefractSingle *self);
+void ro_refract_single_render(RoRefractSingle *self);
 
-void r_ro_refract_single_set_texture_main(rRoRefractSingle *self, GLuint tex_main_sink);
+void ro_refract_single_set_texture_main(RoRefractSingle *self, GLuint tex_main_sink);
 
-void r_ro_refract_single_set_texture_refraction(rRoRefractSingle *self, GLuint tex_refraction_sink);
+void ro_refract_single_set_texture_refraction(RoRefractSingle *self, GLuint tex_refraction_sink);
 
 
 #endif //R_RO_REFRACT_SINGLE_H

@@ -6,30 +6,30 @@
 #include "mathc/types/float.h"
 #include "ro_single.h"
 
-struct rRoTtfTextGlobals_s {
+struct RoTtfTextGlobals_s {
     TTF_Font *default_font;
 };
-extern struct rRoTtfTextGlobals_s r_ro_ttftext;
+extern struct RoTtfTextGlobals_s ro_ttftext;
 
-GLuint r_ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h);
+GLuint ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h);
 
 
 // Renders ttf text
 typedef struct {
-    rRoSingle ro;
+    RoSingle ro;
     TTF_Font *font;
     float ratio;    // width / height
-} rRoTtfText;
+} RoTtfText;
 
-void r_ro_ttftext_init(rRoTtfText *self, const float *vp, vec4 color, const char *text);
+void ro_ttftext_init(RoTtfText *self, const float *vp, vec4 color, const char *text);
 
-void r_ro_ttftext_kill(rRoTtfText *self);
+void ro_ttftext_kill(RoTtfText *self);
 
-void r_ro_ttftext_render(rRoTtfText *self);
+void ro_ttftext_render(RoTtfText *self);
 
-void r_ro_ttftext_set_size(rRoTtfText *self, float h);
+void ro_ttftext_set_size(RoTtfText *self, float h);
 
-void r_ro_ttftext_set_text(rRoTtfText *self, vec4 color, const char *text);
+void ro_ttftext_set_text(RoTtfText *self, vec4 color, const char *text);
 
 #endif //R_RO_TTFTEXT_H
 #endif //USING_TTF

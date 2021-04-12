@@ -15,25 +15,25 @@ typedef struct {
     GLuint vbo;
     GLuint tex;
     bool owns_tex;
-} rRoBatch;
+} RoBatch;
 
-void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink);
+void ro_batch_init(RoBatch *self, int num, const float *vp, GLuint tex_sink);
 
-void r_ro_batch_kill(rRoBatch *self);
+void ro_batch_kill(RoBatch *self);
 
-void r_ro_batch_update_sub(rRoBatch *self, int offset, int size);
+void ro_batch_update_sub(RoBatch *self, int offset, int size);
 
-void r_ro_batch_render_sub(rRoBatch *self, int num);
+void ro_batch_render_sub(RoBatch *self, int num);
 
-void r_ro_batch_set_texture(rRoBatch *self, GLuint tex_sink);
+void ro_batch_set_texture(RoBatch *self, GLuint tex_sink);
 
 
-static void r_ro_batch_update(rRoBatch *self) {
-    r_ro_batch_update_sub(self, 0, self->num);
+static void ro_batch_update(RoBatch *self) {
+    ro_batch_update_sub(self, 0, self->num);
 }
 
-static void r_ro_batch_render(rRoBatch *self) {
-    r_ro_batch_render_sub(self, self->num);
+static void ro_batch_render(RoBatch *self) {
+    ro_batch_render_sub(self, self->num);
 }
 
 

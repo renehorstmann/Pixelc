@@ -23,7 +23,7 @@
 struct ToolbarGlobals_s toolbar;
 
 typedef struct {
-    rRoSingle btn;
+    RoSingle btn;
     float x, y;
 } Tool;
 
@@ -32,44 +32,44 @@ static struct {
     Tool tools[TOOL_MAX];
     int tools_size;
 
-    rRoSingle *undo;
-    rRoSingle *clear;
-    rRoSingle *import;
-    rRoSingle *selection;
-    rRoSingle *grid;
+    RoSingle *undo;
+    RoSingle *clear;
+    RoSingle *import;
+    RoSingle *selection;
+    RoSingle *grid;
     bool grid_status;
 
-    rRoSingle *camera;
-    rRoSingle *animation;
-    rRoSingle *shade;
+    RoSingle *camera;
+    RoSingle *animation;
+    RoSingle *shade;
 
-    rRoSingle *modes[MODES];
+    RoSingle *modes[MODES];
 
-    rRoSingle *shape_minus;
-    rRoSingle *shape_plus;
+    RoSingle *shape_minus;
+    RoSingle *shape_plus;
 
     //non tools:
-    rRoSingle shape;
+    RoSingle shape;
     float shape_minus_time, shape_plus_time;
 
-    rRoSingle color_bg, color_drop;
+    RoSingle color_bg, color_drop;
 
-    rRoSingle selection_copy;
-    rRoSingle selection_cut;
-    rRoSingle selection_rotate_left;
-    rRoSingle selection_rotate_right;
-    rRoSingle selection_mirror_horizontal;
-    rRoSingle selection_mirror_vertical;
-    rRoSingle selection_ok;
+    RoSingle selection_copy;
+    RoSingle selection_cut;
+    RoSingle selection_rotate_left;
+    RoSingle selection_rotate_right;
+    RoSingle selection_mirror_horizontal;
+    RoSingle selection_mirror_vertical;
+    RoSingle selection_ok;
 
-    rRoSingle layer_prev;
-    rRoSingle layer_next;
-    rRoText layer_num;
+    RoSingle layer_prev;
+    RoSingle layer_next;
+    RoText layer_num;
 
     bool prev_show_selection_ok;
 } L;
 
-static rRoSingle *tool_append(float x, float y, const char *btn_file) {
+static RoSingle *tool_append(float x, float y, const char *btn_file) {
     assert(L.tools_size < TOOL_MAX);
     Tool *self = &L.tools[L.tools_size++];
 
@@ -89,7 +89,7 @@ static bool pos_in_toolbar(vec2 pos) {
     return pos.x <= camera_left() + size;
 }
 
-static void unpress(rRoSingle **btns, int n, int ignore) {
+static void unpress(RoSingle **btns, int n, int ignore) {
     for (int i = 0; i < n; i++) {
         if (i == ignore)
             continue;
@@ -142,12 +142,12 @@ void toolbar_init() {
 
 
     // shape kernel:
-    r_ro_single_init(&L.shape, camera.gl, brush_shape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
+    ro_single_init(&L.shape, camera.gl, brush_shape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
 
     // secondar color:
-    r_ro_single_init(&L.color_bg, camera.gl, r_texture_new_file("res/toolbar_color_bg.png", NULL));
+    ro_single_init(&L.color_bg, camera.gl, r_texture_new_file("res/toolbar_color_bg.png", NULL));
 
-    r_ro_single_init(&L.color_drop, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
+    ro_single_init(&L.color_drop, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
 
 
     // selection buttons:
@@ -170,7 +170,7 @@ void toolbar_init() {
 
     button_init(&L.layer_next, r_texture_new_file("res/button_next.png", NULL));
 
-    r_ro_text_init_font55(&L.layer_num, 3, camera.gl);
+    ro_text_init_font55(&L.layer_num, 3, camera.gl);
 
 }
 
@@ -206,7 +206,7 @@ void toolbar_update(float dtime) {
     {
         char buf[8];
         sprintf(buf, "%d", canvas.current_layer);
-        vec2 size = r_ro_text_set_text(&L.layer_num, buf);
+        vec2 size = ro_text_set_text(&L.layer_num, buf);
         float x, y;
         if (camera_is_portrait_mode()) {
             x = 65 - size.x / 2;
@@ -244,34 +244,34 @@ void toolbar_update(float dtime) {
 
 void toolbar_render() {
     for (int i = 0; i < L.tools_size; i++) {
-        r_ro_single_render(&L.tools[i].btn);
+        ro_single_render(&L.tools[i].btn);
     }
 
     // shape kernel;
-    r_ro_single_render(&L.shape);
+    ro_single_render(&L.shape);
 
     // secondary color:
-    r_ro_single_render(&L.color_bg);
-    r_ro_single_render(&L.color_drop);
+    ro_single_render(&L.color_bg);
+    ro_single_render(&L.color_drop);
 
     // selection buttons:
     if (toolbar.show_selection_copy_cut) {
-        r_ro_single_render(&L.selection_copy);
-        r_ro_single_render(&L.selection_cut);
+        ro_single_render(&L.selection_copy);
+        ro_single_render(&L.selection_cut);
     }
     if (toolbar.show_selection_ok) {
-        r_ro_single_render(&L.selection_rotate_left);
-        r_ro_single_render(&L.selection_rotate_right);
-        r_ro_single_render(&L.selection_mirror_horizontal);
-        r_ro_single_render(&L.selection_mirror_vertical);
-        r_ro_single_render(&L.selection_copy);
-        r_ro_single_render(&L.selection_ok);
+        ro_single_render(&L.selection_rotate_left);
+        ro_single_render(&L.selection_rotate_right);
+        ro_single_render(&L.selection_mirror_horizontal);
+        ro_single_render(&L.selection_mirror_vertical);
+        ro_single_render(&L.selection_copy);
+        ro_single_render(&L.selection_ok);
     }
 
     if (canvas_image()->layers > 1) {
-        r_ro_single_render(&L.layer_prev);
-        r_ro_single_render(&L.layer_next);
-        r_ro_text_render(&L.layer_num);
+        ro_single_render(&L.layer_prev);
+        ro_single_render(&L.layer_next);
+        ro_text_render(&L.layer_num);
     }
 }
 

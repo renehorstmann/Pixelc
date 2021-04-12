@@ -7,7 +7,7 @@
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 
-void r_ro_refract_single_init(rRoRefractSingle *self,
+void ro_refract_single_init(RoRefractSingle *self,
         const float *vp, const float *scale_ptr,
         GLuint tex_main_sink, GLuint tex_refraction_sink){
     self->rect.pose = mat4_eye();
@@ -47,18 +47,18 @@ void r_ro_refract_single_init(rRoRefractSingle *self,
     }
 }
 
-void r_ro_refract_single_kill(rRoRefractSingle *self) {
+void ro_refract_single_kill(RoRefractSingle *self) {
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     if (self->owns_tex_main)
         glDeleteTextures(1, &self->tex_main);
     if (self->owns_tex_refraction)
         glDeleteTextures(1, &self->tex_refraction);
-    *self = (rRoRefractSingle) {0};
+    *self = (RoRefractSingle) {0};
 }
 
 
-void r_ro_refract_single_render(rRoRefractSingle *self) {
+void ro_refract_single_render(RoRefractSingle *self) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "pose"), 1, GL_FALSE, &self->rect.pose.m00);
@@ -93,13 +93,13 @@ void r_ro_refract_single_render(rRoRefractSingle *self) {
     glUseProgram(0);
 }
 
-void r_ro_refract_single_set_texture_main(rRoRefractSingle *self, GLuint tex_main_sink) {
+void ro_refract_single_set_texture_main(RoRefractSingle *self, GLuint tex_main_sink) {
     if (self->owns_tex_main)
         glDeleteTextures(1, &self->tex_main);
     self->tex_main = tex_main_sink;
 }
 
-void r_ro_refract_single_set_texture_refraction(rRoRefractSingle *self, GLuint tex_refraction_sink){
+void ro_refract_single_set_texture_refraction(RoRefractSingle *self, GLuint tex_refraction_sink){
     if (self->owns_tex_refraction)
         glDeleteTextures(1, &self->tex_refraction);
     self->tex_refraction = tex_refraction_sink;

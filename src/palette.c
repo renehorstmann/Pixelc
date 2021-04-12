@@ -15,9 +15,9 @@
 static struct {
     Color_s palette[PALETTE_MAX];
     int palette_size;
-    rRoBatch palette_ro;
-    rRoSingle select_ro;
-    rRoBatch background_ro;
+    RoBatch palette_ro;
+    RoSingle select_ro;
+    RoBatch background_ro;
     int last_selected;
     float last_camera_width, last_camera_height;
 } L;
@@ -56,12 +56,12 @@ static mat4 setup_palette_color_pose(int r, int c) {
 }
 
 void palette_init() {
-    r_ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
+    ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
 
-    r_ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl,
+    ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl,
                     r_texture_new_file("res/palette_background.png", NULL));
 
-    r_ro_single_init(&L.select_ro, camera.gl, r_texture_new_file("res/palette_select.png", NULL));
+    ro_single_init(&L.select_ro, camera.gl, r_texture_new_file("res/palette_select.png", NULL));
 
     // default palette:
     {
@@ -130,14 +130,14 @@ void palette_update(float dtime) {
 
     L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
 
-    r_ro_batch_update(&L.palette_ro);
-    r_ro_batch_update(&L.background_ro);
+    ro_batch_update(&L.palette_ro);
+    ro_batch_update(&L.background_ro);
 }
 
 void palette_render() {
-    r_ro_batch_render(&L.background_ro);
-    r_ro_batch_render(&L.palette_ro);
-    r_ro_single_render(&L.select_ro);
+    ro_batch_render(&L.background_ro);
+    ro_batch_render(&L.palette_ro);
+    ro_single_render(&L.select_ro);
 }
 
 

@@ -17,25 +17,25 @@ typedef struct {
     GLuint vbo;
     GLuint tex;
     bool owns_tex;
-} rRoParticle;
+} RoParticle;
 
-void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_sink);
+void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sink);
 
-void r_ro_particle_kill(rRoParticle *self);
+void ro_particle_kill(RoParticle *self);
 
-void r_ro_particle_update_sub(rRoParticle *self, int offset, int size);
+void ro_particle_update_sub(RoParticle *self, int offset, int size);
 
-void r_ro_particle_render_sub(rRoParticle *self, float time, int num);
+void ro_particle_render_sub(RoParticle *self, float time, int num);
 
-void r_ro_particle_set_texture(rRoParticle *self, GLuint tex_sink);
+void ro_particle_set_texture(RoParticle *self, GLuint tex_sink);
 
 
-static void r_ro_particle_update(rRoParticle *self) {
-    r_ro_particle_update_sub(self, 0, self->num);
+static void ro_particle_update(RoParticle *self) {
+    ro_particle_update_sub(self, 0, self->num);
 }
 
-static void r_ro_particle_render(rRoParticle *self, float time) {
-    r_ro_particle_render_sub(self, time, self->num);
+static void ro_particle_render(RoParticle *self, float time) {
+    ro_particle_render_sub(self, time, self->num);
 }
 
 #endif //R_RO_PARTICLE_H

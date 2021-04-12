@@ -25,39 +25,39 @@ static mat4 u_pose_new_hidden() {
 
 
 
-static void hide(rRoText *self, int from) {
+static void hide(RoText *self, int from) {
     for (int i = from; i < self->ro.num; i++) {
         self->ro.rects[i].pose = u_pose_new_hidden();
     }
 }
 
-static mat4 pose(rRoText *self, int c, int r) {
+static mat4 pose(RoText *self, int c, int r) {
     return u_pose_new_aa(c * self->offset.x, -r * self->offset.y, self->size.x, self->size.y);
 }
 
 
-void r_ro_text_init(rRoText *self, int max, r_ro_text_uv_fn uv_fn, const float *vp, GLuint tex_sink) {
+void ro_text_init(RoText *self, int max, ro_text_uv_fn uv_fn, const float *vp, GLuint tex_sink) {
     self->uv_fn = uv_fn;
     self->pose = mat4_eye();
     self->size = (vec2) {{5, 5}};
     self->offset = (vec2) {{6, 6}};
     self->vp = vp;
     self->mvp = mat4_eye();
-    r_ro_batch_init(&self->ro, max, &self->mvp.m00, tex_sink);
+    ro_batch_init(&self->ro, max, &self->mvp.m00, tex_sink);
     hide(self, 0);
-    r_ro_batch_update(&self->ro);
+    ro_batch_update(&self->ro);
 }
 
-void r_ro_text_kill(rRoText *self) {
-    r_ro_batch_kill(&self->ro);
+void ro_text_kill(RoText *self) {
+    ro_batch_kill(&self->ro);
 }
 
-void r_ro_text_render(rRoText *self) {
+void ro_text_render(RoText *self) {
     self->mvp = mat4_mul_mat(Mat4(self->vp), self->pose);
-    r_ro_batch_render(&self->ro);
+    ro_batch_render(&self->ro);
 }
 
-vec2 r_ro_text_set_text(rRoText *self, const char *text) {
+vec2 ro_text_set_text(RoText *self, const char *text) {
     int i = 0;
     int col = 0;
     int row = 0;
@@ -76,7 +76,7 @@ vec2 r_ro_text_set_text(rRoText *self, const char *text) {
         i++;
     }
     hide(self, i);
-    r_ro_batch_update(&self->ro);
+    ro_batch_update(&self->ro);
 
     if (cols == 0)
         return vec2_set(0);
@@ -87,7 +87,7 @@ vec2 r_ro_text_set_text(rRoText *self, const char *text) {
                    }};
 }
 
-vec2 r_ro_text_get_size(rRoText *self, const char *text) {
+vec2 ro_text_get_size(RoText *self, const char *text) {
     int cols = 0;
     int rows = 0;
     int c = 0;
@@ -143,6 +143,6 @@ static bool font55_uv_cb(mat4 *uv, char c) {
     return nl;
 }
 
-void r_ro_text_init_font55(rRoText *self, int max, const float *vp) {
-    r_ro_text_init(self, max, font55_uv_cb, vp, r_texture_new_file("res/r/font55.png", NULL));
+void ro_text_init_font55(RoText *self, int max, const float *vp) {
+    ro_text_init(self, max, font55_uv_cb, vp, r_texture_new_file("res/r/font55.png", NULL));
 }

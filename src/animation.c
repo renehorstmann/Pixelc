@@ -12,8 +12,8 @@ struct AnimationGlobals_s animation;
 
 
 static struct {
-    rRoText horsimann;
-    rRoBatch ro[IMAGE_MAX_LAYERS];
+    RoText horsimann;
+    RoBatch ro[IMAGE_MAX_LAYERS];
     int mcols, mrows;
     float size;
     int frames;
@@ -53,19 +53,19 @@ void animation_init(int multi_cols, int multi_rows, float size, int frames, floa
 
     for (int i = 0; i < img->layers; i++) {
         GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, i));
-        r_ro_batch_init(&L.ro[i], L.mcols * L.mrows, camera.gl, tex);
+        ro_batch_init(&L.ro[i], L.mcols * L.mrows, camera.gl, tex);
 
         for (int j = 0; j < L.ro[i].num; j++) {
             u_pose_set_w(&L.ro[i].rects[j].uv, 1.0 / frames);
         }
     }
 
-    r_ro_text_init_font55(&L.horsimann, 9, camera.gl);
+    ro_text_init_font55(&L.horsimann, 9, camera.gl);
     vec4 color = {{0.25, 0.25, 0.25, 1}};
     for (int i = 0; i < L.horsimann.ro.num; i++) {
         L.horsimann.ro.rects[i].color = color;
     }
-    r_ro_text_set_text(&L.horsimann, "horsimann");
+    ro_text_set_text(&L.horsimann, "horsimann");
 
 }
 
@@ -99,18 +99,18 @@ void animation_update(float dtime) {
     Image *img = canvas_image();
     for (int i = 0; i <= canvas.current_layer; i++) {
         r_texture_update(L.ro[i].tex, img->cols, img->rows, image_layer(img, i));
-        r_ro_batch_update(&L.ro[i]);
+        ro_batch_update(&L.ro[i]);
     }
 }
 
 void animation_render() {
     if (!animation.show) {
-        r_ro_text_render(&L.horsimann);
+        ro_text_render(&L.horsimann);
         return;
     }
 
     for (int i = 0; i <= canvas.current_layer; i++) {
-        r_ro_batch_render(&L.ro[i]);
+        ro_batch_render(&L.ro[i]);
     }
 }
 

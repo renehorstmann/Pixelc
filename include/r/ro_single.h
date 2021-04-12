@@ -13,15 +13,15 @@ typedef struct {
     GLuint vao;
     GLuint tex;
     bool owns_tex;
-} rRoSingle;
+} RoSingle;
 
-void r_ro_single_init(rRoSingle *self, const float *vp, GLuint tex_sink);
+void ro_single_init(RoSingle *self, const float *vp, GLuint tex_sink);
 
-void r_ro_single_kill(rRoSingle *self);
+void ro_single_kill(RoSingle *self);
 
-void r_ro_single_render(rRoSingle *self);
+void ro_single_render(RoSingle *self);
 
-void r_ro_single_set_texture(rRoSingle *self, GLuint tex_sink);
+void ro_single_set_texture(RoSingle *self, GLuint tex_sink);
 
 
 #endif //R_RO_SINGLE_H

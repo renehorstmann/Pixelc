@@ -1,7 +1,10 @@
 #include "mathc/float.h"
 #include "utilc/alloc.h"
 #include "r/r.h"
-#include "r/ro_batch.h"
+#include "r/ro_refract_batch.h"
+
+
+static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 
 static void init_rects(rRect_s *instances, int num) {
@@ -21,31 +24,43 @@ static int clamp_range(int i, int begin, int end) {
     return i;
 }
 
-void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink) {
+void ro_refract_batch_init(RoRefractBatch *self, int num,
+        const float *vp, const float *scale_ptr,
+        GLuint tex_main_sink, GLuint tex_refraction_sink) {
     self->rects = New(rRect_s, num);
     init_rects(self->rects, num);
 
     self->num = num;
     self->vp = vp;
+    self->scale = scale_ptr;
+    self->view_aabb = &VIEW_AABB_FULLSCREEN.v0;
 
     self->program = r_shader_compile_glsl_from_files((char *[]) {
-            "res/r/batch.vsh",
-            "res/r/batch.fsh",
+            "res/r/refract_batch.vsh",
+            "res/r/refract_batch.fsh",
             NULL});
     const int loc_pose = 0;
     const int loc_uv = 4;
     const int loc_color = 8;
 
-    self->tex = tex_sink;
-    self->owns_tex = true;
+    self->tex_main = tex_main_sink;
+    self->tex_refraction = tex_refraction_sink;
+    self->owns_tex_main = true;
+    self->owns_tex_refraction = true;
+    
+    self->tex_framebuffer_ptr = &r_render.framebuffer_tex;
 
     // vao scope
     {
         glGenVertexArrays(1, &self->vao);
         glBindVertexArray(self->vao);
 
-        // texture (using only unit 0)
-        glUniform1i(glGetUniformLocation(self->program, "tex"), 0);
+         // textures
+        glUniform1i(glGetUniformLocation(self->program, "tex_main"), 0);
+        
+        glUniform1i(glGetUniformLocation(self->program, "tex_refraction"), 1);
+        
+        glUniform1i(glGetUniformLocation(self->program, "tex_framebuffer"), 2);
 
         // vbo
         {
@@ -90,17 +105,19 @@ void r_ro_batch_init(rRoBatch *self, int num, const float *vp, GLuint tex_sink) 
     }
 }
 
-void r_ro_batch_kill(rRoBatch *self) {
+void ro_refract_batch_kill(RoRefractBatch *self) {
     free(self->rects);
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     glDeleteBuffers(1, &self->vbo);
-    if (self->owns_tex)
-        glDeleteTextures(1, &self->tex);
-    *self = (rRoBatch) {0};
+    if (self->owns_tex_main)
+        glDeleteTextures(1, &self->tex_main);
+    if (self->owns_tex_refraction)
+        glDeleteTextures(1, &self->tex_refraction);
+    *self = (RoRefractBatch) {0};
 }
 
-void r_ro_batch_update_sub(rRoBatch *self, int offset, int size) {
+void ro_refract_batch_update_sub(RoRefractBatch *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
     offset = clamp_range(offset, 0, self->num);
@@ -130,14 +147,25 @@ void r_ro_batch_update_sub(rRoBatch *self, int offset, int size) {
 }
 
 
-void r_ro_batch_render_sub(rRoBatch *self, int num) {
+void ro_refract_batch_render_sub(RoRefractBatch *self, int num) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
                        1, GL_FALSE, self->vp);
 
+    // fragment shader
+    glUniform1f(glGetUniformLocation(self->program, "scale"), *self->scale);
+    
+    glUniform4fv(glGetUniformLocation(self->program, "view_aabb"), 1, self->view_aabb);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self->tex);
+    glBindTexture(GL_TEXTURE_2D, self->tex_main);
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, self->tex_refraction);
+    
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, *self->tex_framebuffer_ptr);
 
     {
         glBindVertexArray(self->vao);
@@ -149,9 +177,14 @@ void r_ro_batch_render_sub(rRoBatch *self, int num) {
     glUseProgram(0);
 }
 
-void r_ro_batch_set_texture(rRoBatch *self, GLuint tex_sink) {
-    if (self->owns_tex)
-        glDeleteTextures(1, &self->tex);
-    self->tex = tex_sink;
+void ro_refract_batch_set_texture_main(RoRefractBatch *self, GLuint tex_main_sink) {
+    if (self->owns_tex_main)
+        glDeleteTextures(1, &self->tex_main);
+    self->tex_main = tex_main_sink;
 }
 
+void ro_refract_batch_set_texture_refraction(RoRefractBatch *self, GLuint tex_refraction_sink){
+    if (self->owns_tex_refraction)
+        glDeleteTextures(1, &self->tex_refraction);
+    self->tex_refraction = tex_refraction_sink;
+}

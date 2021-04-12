@@ -31,7 +31,7 @@ static int clamp_range(int i, int begin, int end) {
 }
 
 
-void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_sink) {
+void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sink) {
     self->rects = New(rParticleRect_s, num);
     init_rects(self->rects, num);
 
@@ -149,17 +149,17 @@ void r_ro_particle_init(rRoParticle *self, int num, const float *vp, GLuint tex_
     }
 }
 
-void r_ro_particle_kill(rRoParticle *self) {
+void ro_particle_kill(RoParticle *self) {
     free(self->rects);
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     glDeleteBuffers(1, &self->vbo);
     if (self->owns_tex)
         glDeleteTextures(1, &self->tex);
-    *self = (rRoParticle) {0};
+    *self = (RoParticle) {0};
 }
 
-void r_ro_particle_update_sub(rRoParticle *self, int offset, int size) {
+void ro_particle_update_sub(RoParticle *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
     offset = clamp_range(offset, 0, self->num);
@@ -188,7 +188,7 @@ void r_ro_particle_update_sub(rRoParticle *self, int offset, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void r_ro_particle_render_sub(rRoParticle *self, float time, int num) {
+void ro_particle_render_sub(RoParticle *self, float time, int num) {
     glUseProgram(self->program);
 
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
@@ -209,7 +209,7 @@ void r_ro_particle_render_sub(rRoParticle *self, float time, int num) {
     glUseProgram(0);
 }
 
-void r_ro_particle_set_texture(rRoParticle *self, GLuint tex_sink) {
+void ro_particle_set_texture(RoParticle *self, GLuint tex_sink) {
     if (self->owns_tex)
         glDeleteTextures(1, &self->tex);
     self->tex = tex_sink;

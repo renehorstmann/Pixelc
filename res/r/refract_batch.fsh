@@ -26,23 +26,41 @@ float space_distance(vec2 pos, vec4 space) {
 
 
 void main() {
-    
-    vec2 size = vec2(textureSize(tex_framebuffer, 0));
-    
+    vec2 tex_refraction_size = vec2(textureSize(tex_refraction, 0));
+    vec2 tex_framebuffer_size = vec2(textureSize(tex_framebuffer, 0));
+
     vec4 refract = texture(tex_refraction, v_tex_coord);
-    
-    vec2 offset = (refract.xy - 0.5f) * 256.0f * scale;
-    
+
+    // refract.z = stretch_val_x + stretch_val_y*16
+    // stretch_val == 12.0f -> normal (8+4)
+    // stretch_val == 4.0f -> mirror  (8-4)
+    vec2 stretch = vec2(
+    mod(refract.z*255.0f,16.0f)-8.0f,
+    floor(refract.z*255.0f/16.0f)-8.0f
+    );
+    stretch.x = stretch.x / 4.0f - 1.0f;
+    stretch.y = 1.0f - stretch.y / 4.0f;
+
+    // framebuffer offset in real pixel coords
+    vec2 offset = (refract.xy - 0.5f) * 255.0f;
+    offset = offset + stretch * (v_tex_coord - 0.5f) * tex_refraction_size;
+    offset = offset * scale;  // intern pixel -> real pixel
+
+
+    // grab coords for framebuffer
     vec2 r_coord;
-    r_coord.x = (gl_FragCoord.x + offset.x) / size.x;
-    r_coord.y = 1.0f - (gl_FragCoord.y + offset.y) / size.y;
-    
-    float alpha = mix(refract.a, 0.0f, 
-            max(0.0f, 1.0f-5.0f*space_distance(r_coord, view_aabb)));
-    
+    r_coord.x = (gl_FragCoord.x + offset.x) / tex_framebuffer_size.x;
+    r_coord.y = 1.0f - (gl_FragCoord.y + offset.y) / tex_framebuffer_size.y;
+
+    // if the coords are near the view space, or out of it, mix alpha to 0
+    float alpha = mix(refract.a, 0.0f,
+    max(0.0f, 1.0f-5.0f*space_distance(r_coord, view_aabb)));
+
+    // blend main and refraction
     vec4 color = texture(tex_main, v_tex_coord);
     color.rgb = mix(color.rgb,
-            texture(tex_framebuffer, r_coord).rgb, alpha);
-           
+    texture(tex_framebuffer, r_coord).rgb, alpha);
+
+    // add global color
     out_frag_color = color * v_color;
 }

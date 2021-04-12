@@ -26,12 +26,12 @@ static struct {
 
     Image *image;
     Image *last_image;
-    rRoSingle render_objects[IMAGE_MAX_LAYERS];
+    RoSingle render_objects[IMAGE_MAX_LAYERS];
 
-    rRoSingle bg;
-    rRoSingle grid;
+    RoSingle bg;
+    RoSingle grid;
 
-    rRoBatch selection_border;
+    RoBatch selection_border;
 
     int save_id;
 } L;
@@ -40,7 +40,7 @@ static struct {
 static void init_render_objects() {
     for (int i = 0; i < L.image->layers; i++) {
         GLuint tex = r_texture_new(L.image->cols, L.image->rows, image_layer(L.image, i));
-        r_ro_single_init(&L.render_objects[i], canvas_camera.gl, tex);
+        ro_single_init(&L.render_objects[i], canvas_camera.gl, tex);
     }
 }
 
@@ -94,7 +94,7 @@ static void setup_selection() {
     }
 
     UPDATE:
-    r_ro_batch_update(&L.selection_border);
+    ro_batch_update(&L.selection_border);
 }
 
 
@@ -126,12 +126,12 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
 
     init_render_objects();
 
-    r_ro_single_init(&L.grid, canvas_camera.gl,
+    ro_single_init(&L.grid, canvas_camera.gl,
                      r_texture_new_file("res/canvas_grid.png", NULL));
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
-    r_ro_batch_init(&L.selection_border, 2 * (rows + cols) * SELECTION_BORDER_FACTOR, canvas_camera.gl,
+    ro_batch_init(&L.selection_border, 2 * (rows + cols) * SELECTION_BORDER_FACTOR, canvas_camera.gl,
                     r_texture_new_file("res/selection_border.png", NULL));
     for (int i = 0; i < L.selection_border.num; i++) {
         L.selection_border.rects[i].color = color_to_vec4(color_from_hex("#357985"));
@@ -142,7 +142,7 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     buf[0] = buf[3] = color_from_hex("#999999");
     buf[1] = buf[2] = color_from_hex("#777777");
     GLuint bg_tex = r_texture_new(2, 2, buf);
-    r_ro_single_init(&L.bg, canvas_camera.gl, bg_tex);
+    ro_single_init(&L.bg, canvas_camera.gl, bg_tex);
     {
         float w = (float) cols / (2 * grid_cols);
         float h = (float) rows / (2 * grid_rows);
@@ -189,19 +189,19 @@ void canvas_update(float dtime) {
 }
 
 void canvas_render() {
-    r_ro_single_render(&L.bg);
+    ro_single_render(&L.bg);
 
     for (int i = 0; i <= canvas.current_layer; i++) {
         float alpha = (i + 1.0) / (canvas.current_layer + 1.0);
         L.render_objects[i].rect.color.w = alpha * canvas.alpha;
-        r_ro_single_render(&L.render_objects[i]);
+        ro_single_render(&L.render_objects[i]);
     }
 
     if (canvas.show_grid)
-        r_ro_single_render(&L.grid);
+        ro_single_render(&L.grid);
 
     if (selection_active())
-        r_ro_batch_render(&L.selection_border);
+        ro_batch_render(&L.selection_border);
 }
 
 
