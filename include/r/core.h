@@ -1,6 +1,10 @@
 #ifndef R_CORE_H
 #define R_CORE_H
 
+//
+// as e/core.h, this file includes headers of sdl and opengl and has some color constants
+//
+
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef USING_GLEW
@@ -16,15 +20,6 @@
 #endif
 
 #include "mathc/types/float.h"
-
-
-#define rglerrclear while(glGetError()!=GL_NO_ERROR);
-#define rglerr \
-{ \
-    GLenum err; \
-    while((err = glGetError()) != GL_NO_ERROR) \
-        SDL_Log("glerror: 0x%04x", err); \
-}
 
 
 static const vec4 R_COLOR_TRANSPARENT = {{0, 0, 0, 0}};

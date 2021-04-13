@@ -1,6 +1,10 @@
 #ifndef E_INPUT_H
 #define E_INPUT_H
 
+//
+// handles input like keys, mouse, touchscreen, gyro
+//
+
 #include <stdbool.h>
 #include "mathc/types/float.h"
 #include "core.h"
@@ -20,7 +24,7 @@ typedef struct {
     bool enter, space;
 } eInputKeys;
 
-struct eInputGloabals_s {
+struct eInputGlobals_s {
     eInputKeys keys;
 
     bool is_touch;
@@ -28,7 +32,7 @@ struct eInputGloabals_s {
     bool accel_active;
     vec3 accel;
 };
-extern struct eInputGloabals_s e_input;
+extern struct eInputGlobals_s e_input;
 
 
 enum ePointerAction {

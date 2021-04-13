@@ -1,6 +1,10 @@
 #ifndef E_GUI_H
 #define E_GUI_H
 
+//
+// debug gui, nuklear based
+//
+
 
 // setup nuklear
 #define NK_INCLUDE_FIXED_TYPES

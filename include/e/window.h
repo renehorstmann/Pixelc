@@ -1,6 +1,10 @@
 #ifndef E_WINDOW_H
 #define E_WINDOW_H
 
+//
+// creates an manages an sdl window
+//
+
 #include "mathc/types/int.h"
 #include "core.h"
 

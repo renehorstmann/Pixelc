@@ -1,6 +1,10 @@
 #ifndef R_TEXTURE_H
 #define R_TEXTURE_H
 
+//
+// load and setup textures
+//
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "core.h"

@@ -1,9 +1,11 @@
 #ifndef U_PRANDOM_H
 #define U_PRANDOM_H
 
-#include <stdint.h>
+//
+// Pseudo random with mathc_random support
+//
 
-// Pseudo random
+#include <stdint.h>
 
 static const uint32_t uPRAND_MAX = 0xefffffff;
 

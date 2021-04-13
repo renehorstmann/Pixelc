@@ -1,6 +1,10 @@
 #ifndef E_DEFINITIONS_H
 #define E_DEFINITIONS_H
 
+//
+// some additional definitions to core.h
+//
+
 #include "core.h"
 
 #ifdef __EMSCRIPTEN__

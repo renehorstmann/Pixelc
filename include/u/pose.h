@@ -1,10 +1,9 @@
 #ifndef U_POSE_H
 #define U_POSE_H
 
-#include <stdbool.h>
-#include <math.h>
-#include <float.h>  // FLT_MAX
-#include "mathc/mat/mat4.h"
+//
+// setup 3D mat4 poses in 2D space
+//
 
 // Pose matrix:
 // Xx Yx Zx Tx
@@ -21,6 +20,12 @@
 // 0  0  0  1
 
 // u_pose_aa_* are axis aligned (angle=0)
+
+
+#include <stdbool.h>
+#include <math.h>
+#include <float.h>  // FLT_MAX
+#include "mathc/mat/mat4.h"
 
 static mat4 u_pose_new(float x, float y, float w, float h) {
     // mat4 has column major order

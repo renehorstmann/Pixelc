@@ -1,6 +1,10 @@
 #ifndef R_SHADER_H
 #define R_SHADER_H
 
+//
+// create and compile shader programs
+//
+
 #include "core.h"
 
 GLuint r_shader_compile(GLint type, const char *src);

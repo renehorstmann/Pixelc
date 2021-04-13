@@ -1,6 +1,10 @@
 #ifndef E_CORE_H
 #define E_CORE_H
 
+//
+// this file just includes SDL and OpenGL headers
+//
+
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef USING_GLEW

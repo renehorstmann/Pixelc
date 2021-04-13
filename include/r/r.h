@@ -1,6 +1,10 @@
 #ifndef R_R_H
 #define R_R_H
 
+//
+// imports all of r(ender)
+//
+
 #include "core.h"
 #include "render.h"
 #include "texture.h"

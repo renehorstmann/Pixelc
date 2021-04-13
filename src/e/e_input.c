@@ -4,7 +4,7 @@
 #include "e/gui.h"
 #include "e/input.h"
 
-struct eInputGloabals_s e_input;
+struct eInputGlobals_s e_input;
 
 
 typedef struct {

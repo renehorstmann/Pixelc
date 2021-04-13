@@ -2,6 +2,10 @@
 #ifndef R_RO_TTFTEXT_H
 #define R_RO_TTFTEXT_H
 
+//
+// renders text, prerendered by SDL_TTF, only available if USING_TTF is set
+//
+
 #include "SDL_ttf.h"
 #include "mathc/types/float.h"
 #include "ro_single.h"
