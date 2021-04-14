@@ -36,7 +36,7 @@
 
 // JumpHare
 /*
-#define COLS 32*4
+#define COLS 32*8
 #define ROWS 32*5
 #define LAYERS 1
 //*/
@@ -49,7 +49,7 @@
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
 #define PLAY_FRAMES 1
-#define PLAY_FPS 6.0
+#define PLAY_FPS 12.0
 
 // uncomment the used palette:
 // #define PALETTE grayscale
