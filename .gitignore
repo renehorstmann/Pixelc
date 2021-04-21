@@ -139,7 +139,6 @@ fabric.properties
 *.log
 *.make
 *.bin
-gyronaut
 Makefile
 Makefile2
 link.txt
@@ -152,6 +151,7 @@ progress.marks
 depend.internal
 cmake.check_cache
 C.includecache
+CMakeFiles
 
 ## Pixelc specific
 pixelc
