@@ -281,14 +281,17 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
 
     if (button_clicked(L.undo, pointer)) {
+        log_info("toolbar: undo");
         savestate_undo();
     }
 
     if (button_clicked(L.clear, pointer)) {
+        log_info("toolbar: clear");
         canvas_clear();
     }
 
     if (button_clicked(L.import, pointer)) {
+        log_info("toolbar: import");
         brush_set_selection_active(false, true);
         if (toolbar.show_selection_ok) {
             canvas_redo_image();
@@ -311,6 +314,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (button_toggled(L.selection, pointer)) {
+        log_info("toolbar: selection");
         bool pressed = button_is_pressed(L.selection);
         brush_set_selection_active(pressed, true);
         button_set_pressed(&L.selection_copy, false);
@@ -324,6 +328,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (button_toggled(L.grid, pointer)) {
+        log_info("toolbar: grid");
         bool pressed = button_is_pressed(L.grid);
         canvas.show_grid = pressed;
 
@@ -334,20 +339,24 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (button_clicked(L.camera, pointer)) {
+        log_info("toolbar: camera");
         canvascamctrl_set_home();
     }
 
     if (button_toggled(L.animation, pointer)) {
+        log_info("toolbar: animation");
         animation.show = button_is_pressed(L.animation);
     }
 
     if (button_toggled(L.shade, pointer)) {
+        log_info("toolbar: shade");
         brush.shading_active = button_is_pressed(L.shade);
     }
 
 
     for (int i = 0; i < MODES; i++) {
         if (button_pressed(L.modes[i], pointer)) {
+            log_info("toolbar: mode %i", i);
             unpress(L.modes, MODES, i);
 
             if (i == 0)
@@ -368,12 +377,14 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (button_clicked(L.shape_minus, pointer)) {
+        log_info("toolbar: shape_minus");
         brush.shape--;
         if (brush.shape < 0)
             brush.shape = 0;
     }
 
     if (button_clicked(L.shape_plus, pointer)) {
+        log_info("toolbar: shape_plus");
         brush.shape++;
         if (brush.shape >= BRUSH_NUM_SHAPES)
             brush.shape = BRUSH_NUM_SHAPES - 1;
@@ -383,6 +394,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     // secondary color:
     if (pointer.action == E_POINTER_DOWN && u_pose_aa_contains(L.color_drop.rect.pose, pointer.pos.xy)) {
+        log_info("toolbar: secondary_color");
         brush.secondary_color = brush.current_color;
     }
 
@@ -390,6 +402,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     // selection buttons:
     if (toolbar.show_selection_copy_cut) {
         if (button_toggled(&L.selection_copy, pointer)) {
+            log_info("toolbar: selection_copy");
             bool pressed = button_is_pressed(&L.selection_copy);
 
             if (pressed) {
@@ -399,6 +412,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         }
 
         if (button_toggled(&L.selection_cut, pointer)) {
+            log_info("toolbar: selection_cut");
             bool pressed = button_is_pressed(&L.selection_cut);
 
             if (pressed) {
@@ -411,19 +425,23 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     if (toolbar.show_selection_ok) {
         bool changed = false;
         if (button_clicked(&L.selection_rotate_left, pointer)) {
+            log_info("toolbar: selection_rotate_left");
             selection_rotate(false);
             changed = true;
         }
         if (button_clicked(&L.selection_rotate_right, pointer)) {
+            log_info("toolbar: selection_rotate_right");
             selection_rotate(true);
             changed = true;
         }
 
         if (button_clicked(&L.selection_mirror_horizontal, pointer)) {
+            log_info("toolbar: selection_mirror_horizontal");
             selection_mirror(false);
             changed = true;
         }
         if (button_clicked(&L.selection_mirror_vertical, pointer)) {
+            log_info("toolbar: selection_mirror_vertical");
             selection_mirror(true);
             changed = true;
         }
@@ -434,10 +452,12 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         }
         
         if (button_clicked(&L.selection_copy, pointer)) {
+            log_info("toolbar: selection_copy");
             canvas_save();
         }
 
         if (button_clicked(&L.selection_ok, pointer)) {
+            log_info("toolbar: selection_ok");
             canvas_save();
             brush_set_selection_active(false, true);
             toolbar.show_selection_ok = false;
@@ -448,9 +468,11 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
     if (canvas_image()->layers > 1) {
         if (button_clicked(&L.layer_prev, pointer)) {
+            log_info("toolbar: layer_prev");
             canvas.current_layer = sca_max(0, canvas.current_layer - 1);
         }
         if (button_clicked(&L.layer_next, pointer)) {
+            log_info("toolbar: layer_next");
             canvas.current_layer = sca_min(canvas_image()->layers - 1, canvas.current_layer + 1);
         }
     }

@@ -70,7 +70,7 @@ void savestate_undo() {
     // kill last state
     State *state = &L.states[L.state_size - 1];
     for (int i = 0; i < state->id_size; i++) {
-        free(state->data[i]);
+        rhc_free(state->data[i]);
     }
     *state = (State) {0};
 

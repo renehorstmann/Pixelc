@@ -20,7 +20,6 @@ static struct {
 
 static void setup_selection(ePointer_s pointer) {
     uImage *img = canvas_image();
-    int layer = canvas.current_layer;
 
     if (selection_active() && pointer.action == E_POINTER_UP) {
         L.selection_set = true;

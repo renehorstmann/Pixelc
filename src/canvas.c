@@ -99,11 +99,13 @@ static void setup_selection() {
 
 
 static void save_state(void **data, size_t *size) {
+    log_info("canvas: save_state");
     *data = L.image;
     *size = u_image_full_size(L.image);
 }
 
 static void load_state(const void *data, size_t size) {
+    log_info("canvas: load_state");
     // todo: check new layers, rows, cols
     u_image_delete(L.image);
     L.image = u_image_new_clone(data);
@@ -225,6 +227,7 @@ ivec2 canvas_get_cr(vec4 pointer_pos) {
 }
 
 void canvas_clear() {
+    log_info("canvas: clear");
     for (int r = 0; r < L.image->rows; r++) {
         for (int c = 0; c < L.image->cols; c++) {
             if (!selection_contains(c, r))
@@ -237,6 +240,7 @@ void canvas_clear() {
 }
 
 void canvas_save() {
+    log_info("canvas: save");
     if (!u_image_equals(L.image, L.last_image)) {
         u_image_copy(L.last_image, L.image);
         savestate_save();
@@ -245,6 +249,7 @@ void canvas_save() {
 }
 
 void canvas_redo_image() {
+    log_info("canvas: redo_image");
     u_image_copy(L.image, L.last_image);
 }
 
