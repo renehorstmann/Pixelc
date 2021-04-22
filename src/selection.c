@@ -16,16 +16,20 @@ static bool valid_to_copy(const uImage *img, int layer) {
 }
 
 void selection_init(int left, int top, int cols, int rows) {
+    log_info("selection: init");
     u_image_delete(L.opt_img);
     L.left = left;
     L.top = top;
     L.cols = cols;
     L.rows = rows;
+    log_trace("selection: init end");
 }
 
 void selection_kill() {
+    log_info("selection: kill");
     L.left = L.top = L.rows = L.cols = 0;
     u_image_delete(L.opt_img);
+    log_trace("selection: kill end");
 }
 
 bool selection_active() {

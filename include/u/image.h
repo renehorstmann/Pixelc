@@ -15,7 +15,7 @@ typedef struct {
 static bool u_image_valid(const uImage *self) {
     return self != NULL
             && self->cols > 0 && self->rows > 0
-            && self->layers > 0;
+            && self->layers > 0 ;
 }
 
 static uImage *u_image_new_invalid() {
