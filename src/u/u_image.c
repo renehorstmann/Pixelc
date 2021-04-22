@@ -97,11 +97,12 @@ uImage *u_image_new_file_a(int layers, const char *file, Allocator_s a) {
     image = u_image_new_empty_a(img->w, img->h / layers, layers, a);
     log_trace("u_image_new_file_a: cpy? %i", u_image_valid(image));
     if(u_image_valid(image))
-        memcpy(image->data, img->pixels, sizeof(uColor_s) * img->w * img->h);
+        memcpy(image->data, img->pixels, u_image_data_size(image));
 
     CLEAN_UP:
     log_trace("u_image_new_file_a: CLEAN_UP");
     SDL_FreeSurface(img);
+    log_trace("u_image_new_file_a end");
     return image;
 }
 
