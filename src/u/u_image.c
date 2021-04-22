@@ -26,54 +26,43 @@ static SDL_Surface *load_buffer(void *data, int cols, int rows) {
 }
 
 
-
-uImage *u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
+uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
     size_t data_size = cols * rows * layers * sizeof(uColor_s);
-    
-    if(data_size <= 0) {
+
+    if (data_size <= 0) {
         rhc_error = "image new failed";
         log_error("u_image_new_empty_a failed: wrong data size: %zu", data_size);
         return u_image_new_invalid();
     }
-    
-    uImage *self = a.malloc(a, sizeof(uImage) + data_size);
-    self->cols = cols;
-    self->rows = rows;
-    self->layers = layers;
-    self->allocator = a;
+
+    uImage self =
+            {a.malloc(a, data_size),
+             cols, rows, layers,
+             a};
+    if (!u_image_valid(self))
+        return u_image_new_invalid_a(a);
     return self;
 }
 
-uImage *u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
-    size_t data_size = cols * rows * layers * sizeof(uColor_s);
-    
-    if(data_size <= 0) {
-        rhc_error = "image new failed";
-        log_error("u_image_new_zeros_a failed: wrong data size: %zu", data_size);
+uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
+    uImage self = u_image_new_empty_a(cols, rows, layers, a);
+    if (!u_image_valid(self))
+        return self;
+    memset(self.data, 0, u_image_data_size(self));
+    return self;
+}
+
+uImage u_image_new_clone_a(uImage from, Allocator_s a) {
+    uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers, a);
+    if (!u_image_valid(self))
         return u_image_new_invalid();
-    }
-    
-    uImage *self = a.malloc(a, sizeof(uImage) + data_size);
-    memset(&self->data[0], 0, data_size);
-    self->cols = cols;
-    self->rows = rows;
-    self->layers = layers;
-    self->allocator = a;
+    memcpy(self.data, from.data, u_image_data_size(from));
     return self;
 }
 
-uImage *u_image_new_clone_a(const uImage *from, Allocator_s a) {
-    uImage *self = u_image_new_empty_a(from->cols, from->rows, from->layers, a);
-    if(!u_image_valid(self))
-        return u_image_new_invalid();
-    memcpy(self->data, from->data, u_image_data_size(from));
-    return self;
-}
-
-uImage *u_image_new_file_a(int layers, const char *file, Allocator_s a) {
-    log_trace("u_image_new_file_a");
+uImage u_image_new_file_a(int layers, const char *file, Allocator_s a) {
     assume(layers > 0, "A single layer needed");
-    uImage *image = NULL;
+    uImage self = u_image_new_invalid_a(a);
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
         rhc_error = "load image file failed";
@@ -93,32 +82,29 @@ uImage *u_image_new_file_a(int layers, const char *file, Allocator_s a) {
         goto CLEAN_UP;
     }
 
-    log_trace("u_image_new_file_a: new empty");
-    image = u_image_new_empty_a(img->w, img->h / layers, layers, a);
-    log_trace("u_image_new_file_a: cpy? %i", u_image_valid(image));
-    if(u_image_valid(image))
-        memcpy(image->data, img->pixels, u_image_data_size(image));
+    self = u_image_new_empty_a(img->w, img->h / layers, layers, a);
+    if (u_image_valid(self))
+        memcpy(self.data, img->pixels, u_image_data_size(self));
 
     CLEAN_UP:
-    log_trace("u_image_new_file_a: CLEAN_UP");
     SDL_FreeSurface(img);
-    log_trace("u_image_new_file_a end");
-    return image;
+    return self;
 }
 
-void u_image_delete(uImage *self) {
-    if(u_image_valid(self))
-        self->allocator.free(self->allocator, self);
+void u_image_kill(uImage *self) {
+    if (u_image_valid(*self))
+        self->allocator.free(self->allocator, self->data);
+    *self = u_image_new_invalid_a(self->allocator);
 }
 
-bool u_image_save_file(const uImage *self, const char *file) {
-    if(!u_image_valid(self)) {
+bool u_image_save_file(uImage self, const char *file) {
+    if (!u_image_valid(self)) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file failed: invalid (%s)", file);
         return false;
     }
-    SDL_Surface *img = load_buffer((void *) self->data, self->cols, self->rows * self->layers);
-    if(!img) {
+    SDL_Surface *img = load_buffer((void *) self.data, self.cols, self.rows * self.layers);
+    if (!img) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file failed: sdl buffer failed: %s", SDL_GetError());
         return false;
@@ -133,71 +119,73 @@ bool u_image_save_file(const uImage *self, const char *file) {
     return true;
 }
 
-bool u_image_copy(uImage *self, const uImage *from) {
-    if(!u_image_valid(self) || !u_image_valid(from)
-            || self->cols != from->cols
-            || self->rows != from->rows
-            || self->layers != from->layers
+bool u_image_copy(uImage self, uImage from) {
+    if (!u_image_valid(self) || !u_image_valid(from)
+        || self.cols != from.cols
+        || self.rows != from.rows
+        || self.layers != from.layers
             ) {
         rhc_error = "image copy failed";
         log_error("u_image_copy failed: invalid or different size");
         return false;
     }
-    
+
     size_t size = u_image_data_size(self);
-    memcpy(self->data, from->data, size);
+    memcpy(self.data, from.data, size);
     return true;
 }
 
-bool u_image_equals(const uImage *self, const uImage *from) {
+bool u_image_equals(uImage self, uImage from) {
     if (!u_image_valid(self) || !u_image_valid(from)
-            || u_image_data_size(self) != u_image_data_size(from))
+        || self.cols != from.cols
+        || self.rows != from.rows
+        || self.layers != from.layers)
         return false;
 
-    return memcmp(self, from, u_image_full_size(self)) == 0;
+    return memcmp(self.data, from.data, u_image_data_size(self)) == 0;
 }
 
 
 void u_image_rotate(uImage *self, bool right) {
-    if(!u_image_valid(self))
-        return;
-        
-    uImage *tmp = u_image_new_clone_a(self, self->allocator);
-    if(!u_image_valid(tmp))
+    if (!u_image_valid(*self))
         return;
 
-    self->cols = tmp->rows;
-    self->rows = tmp->cols;
+    uImage tmp = u_image_new_clone_a(*self, self->allocator);
+    if (!u_image_valid(tmp))
+        return;
+
+    self->cols = tmp.rows;
+    self->rows = tmp.cols;
     for (int l = 0; l < self->layers; l++) {
         for (int r = 0; r < self->rows; r++) {
             for (int c = 0; c < self->rows; c++) {
-                int mc = right ? r : tmp->cols - 1 - r;
-                int mr = right ? tmp->rows - 1 - c : c;
-                *u_image_pixel(self, c, r, l) = *u_image_pixel(tmp, mc, mr, l);
+                int mc = right ? r : tmp.cols - 1 - r;
+                int mr = right ? tmp.rows - 1 - c : c;
+                *u_image_pixel(*self, c, r, l) = *u_image_pixel(tmp, mc, mr, l);
             }
         }
     }
 
-    u_image_delete(tmp);
+    u_image_kill(&tmp);
 }
 
-void u_image_mirror(uImage *self, bool vertical) {
-    if(!u_image_valid(self))
-        return;
-    
-    uImage *tmp = u_image_new_clone(self);
-    if(!u_image_valid(tmp))
+void u_image_mirror(uImage self, bool vertical) {
+    if (!u_image_valid(self))
         return;
 
-    for (int l = 0; l < self->layers; l++) {
-        for (int r = 0; r < self->rows; r++) {
-            for (int c = 0; c < self->rows; c++) {
-                int mc = vertical ? self->cols - 1 - c : c;
-                int mr = vertical ? r : self->rows - 1 - r;
+    uImage tmp = u_image_new_clone(self);
+    if (!u_image_valid(tmp))
+        return;
+
+    for (int l = 0; l < self.layers; l++) {
+        for (int r = 0; r < self.rows; r++) {
+            for (int c = 0; c < self.rows; c++) {
+                int mc = vertical ? self.cols - 1 - c : c;
+                int mr = vertical ? r : self.rows - 1 - r;
                 *u_image_pixel(self, c, r, l) = *u_image_pixel(tmp, mc, mr, l);
             }
         }
     }
 
-    u_image_delete(tmp);
+    u_image_kill(&tmp);
 }

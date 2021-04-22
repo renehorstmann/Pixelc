@@ -7,10 +7,10 @@
 #include "brushshape.h"
 
 rTexture brushshape_create_kernel_texture(uColor_s bg, uColor_s fg) {
-    uImage *img = u_image_new_empty(BRUSH_KERNEL_TEXTURE_SIZE, BRUSH_KERNEL_TEXTURE_SIZE, BRUSH_NUM_SHAPES);
+    uImage img = u_image_new_empty(BRUSH_KERNEL_TEXTURE_SIZE, BRUSH_KERNEL_TEXTURE_SIZE, BRUSH_NUM_SHAPES);
 
-    for(int l=0; l<img->layers; l++) {
-        for(int i=0; i<img->rows*img->cols; i++) {
+    for(int l=0; l<img.layers; l++) {
+        for(int i=0; i<img.rows*img.cols; i++) {
             *u_image_pixel_index(img, i, l) = bg;
         }
     }
@@ -27,8 +27,8 @@ rTexture brushshape_create_kernel_texture(uColor_s bg, uColor_s fg) {
     }
     rTexture tex = r_texture_new(BRUSH_KERNEL_TEXTURE_SIZE,
                                  BRUSH_KERNEL_TEXTURE_SIZE * BRUSH_NUM_SHAPES,
-                                 1, BRUSH_NUM_SHAPES, img->data);
-    u_image_delete(img);
+                                 1, BRUSH_NUM_SHAPES, img.data);
+    u_image_kill(&img);
     return tex;
 }
 

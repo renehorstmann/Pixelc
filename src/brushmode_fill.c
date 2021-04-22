@@ -13,7 +13,7 @@ bool brushmode_fill(ePointer_s pointer, bool mode8) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
     int layer = canvas.current_layer;
 
     ivec2 cr = canvas_get_cr(pointer.pos);
@@ -69,7 +69,7 @@ bool brushmode_replace(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
     int layer = canvas.current_layer;
 
     ivec2 cr = canvas_get_cr(pointer.pos);
@@ -83,8 +83,8 @@ bool brushmode_replace(ePointer_s pointer) {
     bool shading_was_active = brush.shading_active;
     brush.shading_active = true;
 
-    for (int r = 0; r < img->rows; r++) {
-        for (int c = 0; c < img->cols; c++) {
+    for (int r = 0; r < img.rows; r++) {
+        for (int c = 0; c < img.cols; c++) {
             brush_draw_pixel(c, r);
         }
     }

@@ -16,6 +16,11 @@
 
 #define SELECTION_BORDER_FACTOR 4
 
+typedef struct {
+    int cols, rows, layers;
+    uColor_s data[];
+} SaveImage;
+
 struct CanvasGlobals_s canvas = {
         .default_image_file = "sprite.png",
         .default_import_file = "import.png"
@@ -24,8 +29,8 @@ struct CanvasGlobals_s canvas = {
 static struct {
     mat4 pose;
 
-    uImage *image;
-    uImage *last_image;
+    uImage image;
+    uImage prev_image;
     RoSingle render_objects[CANVAS_MAX_LAYERS];
 
     RoSingle bg;
@@ -38,15 +43,15 @@ static struct {
 
 
 static void init_render_objects() {
-    for (int i = 0; i < L.image->layers; i++) {
-        rTexture tex = r_texture_new(L.image->cols, L.image->rows, 1, 1, u_image_layer(L.image, i));
+    for (int i = 0; i < L.image.layers; i++) {
+        rTexture tex = r_texture_new(L.image.cols, L.image.rows, 1, 1, u_image_layer(L.image, i));
         L.render_objects[i] = ro_single_new(canvascam.gl, tex);
     }
 }
 
 static mat4 pixel_pose(int x, int y) {
     float w = u_pose_get_w(L.pose);
-    float size = w / L.image->cols;
+    float size = w / L.image.cols;
 
 
     float pos_x = u_pose_aa_get_left(L.pose) + (x + 0.5) * size;
@@ -98,19 +103,27 @@ static void setup_selection() {
 }
 
 
-static void save_state(void **data, size_t *size) {
+static void save_state() {
     log_info("canvas: save_state");
-    *data = L.image;
-    *size = u_image_full_size(L.image);
+    size_t img_size = sizeof(SaveImage) + u_image_data_size(L.image);
+    SaveImage *img = rhc_malloc_raising(img_size);
+    img->cols = L.image.cols;
+    img->rows = L.image.rows;
+    img->layers = L.image.layers;
+    memcpy(img->data, L.image.data, u_image_data_size(L.image));
+    savestate_save_data(img, img_size);
+    rhc_free(img);
 }
 
 static void load_state(const void *data, size_t size) {
     log_info("canvas: load_state");
     // todo: check new layers, rows, cols
-    u_image_delete(L.image);
-    L.image = u_image_new_clone(data);
-    u_image_copy(L.last_image, L.image);
-    assert(u_image_full_size(L.image) == size);
+    u_image_kill(&L.image);
+    const SaveImage *img = data;
+    L.image = u_image_new_empty(img->cols, img->rows, img->layers);
+    assume(sizeof(SaveImage) + u_image_data_size(L.image) == size, "invalid data + size pair");
+    memcpy(L.image.data, img->data, u_image_data_size(L.image));
+    u_image_copy(L.prev_image, L.image);
     u_image_save_file(canvas_image(), canvas.default_image_file);
 }
 
@@ -151,23 +164,23 @@ void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
 
-    uImage *img = u_image_new_file(layers, canvas.default_image_file);
-    if (img) {
+    uImage img = u_image_new_file(layers, canvas.default_image_file);
+    if (u_image_valid(img)) {
         u_image_copy(L.image, img);
-        u_image_delete(img);
+        u_image_kill(&img);
     }
 
-    L.last_image = u_image_new_clone(L.image);
+    L.prev_image = u_image_new_clone(L.image);
 }
 
 void canvas_update(float dtime) {
     float w, h;
-    if (L.image->rows < L.image->cols) {
+    if (L.image.rows < L.image.cols) {
         w = 160;
-        h = 160.0f * L.image->rows / L.image->cols;
+        h = 160.0f * L.image.rows / L.image.cols;
     } else {
         h = 160;
-        w = 160.0f * L.image->cols / L.image->rows;
+        w = 160.0f * L.image.cols / L.image.rows;
     }
 
     float x = 0, y = 0;
@@ -177,7 +190,7 @@ void canvas_update(float dtime) {
 
     u_pose_set(&L.pose, x, y, w, h, 0);
 
-    for (int i = 0; i < L.image->layers; i++) {
+    for (int i = 0; i < L.image.layers; i++) {
         r_texture_set(L.render_objects[i].tex, u_image_layer(L.image, i));
 
         // set pose
@@ -211,7 +224,7 @@ mat4 canvas_pose() {
     return L.pose;
 }
 
-uImage *canvas_image() {
+uImage canvas_image() {
     return L.image;
 }
 
@@ -221,15 +234,15 @@ ivec2 canvas_get_cr(vec4 pointer_pos) {
     vec4 pose_pos = mat4_mul_vec(pose_inv, pointer_pos);
 
     ivec2 cr;
-    cr.x = (pose_pos.x + 0.5) * canvas_image()->cols;
-    cr.y = (0.5 - pose_pos.y) * canvas_image()->rows;
+    cr.x = (pose_pos.x + 0.5) * L.image.cols;
+    cr.y = (0.5 - pose_pos.y) * L.image.rows;
     return cr;
 }
 
 void canvas_clear() {
     log_info("canvas: clear");
-    for (int r = 0; r < L.image->rows; r++) {
-        for (int c = 0; c < L.image->cols; c++) {
+    for (int r = 0; r < L.image.rows; r++) {
+        for (int c = 0; c < L.image.cols; c++) {
             if (!selection_contains(c, r))
                 continue;
 
@@ -241,8 +254,8 @@ void canvas_clear() {
 
 void canvas_save() {
     log_info("canvas: save");
-    if (!u_image_equals(L.image, L.last_image)) {
-        u_image_copy(L.last_image, L.image);
+    if (!u_image_equals(L.image, L.prev_image)) {
+        u_image_copy(L.prev_image, L.image);
         savestate_save();
         u_image_save_file(canvas_image(), canvas.default_image_file);
     }
@@ -250,6 +263,6 @@ void canvas_save() {
 
 void canvas_redo_image() {
     log_info("canvas: redo_image");
-    u_image_copy(L.image, L.last_image);
+    u_image_copy(L.image, L.prev_image);
 }
 

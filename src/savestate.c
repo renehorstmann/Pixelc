@@ -18,6 +18,7 @@ static struct {
     savestate_save_fn save_fns[SAVESTATE_MAX_IDS];
     savestate_load_fn load_fns[SAVESTATE_MAX_IDS];
     int id_size;
+    int current_id;
 } L;
 
 
@@ -35,6 +36,20 @@ int savestate_register(savestate_save_fn save_fn, savestate_load_fn load_fn) {
     return id;
 }
 
+void savestate_save_data(const void *data, size_t size) {
+    if(L.current_id <0 || L.state_size <= 0) {
+        log_error("savestate: save_data failed");
+        return;
+    }
+    State *state = &L.states[L.state_size - 1];
+    if (size > 0) {
+        state->data[L.current_id] = rhc_malloc_raising(size);
+        memcpy(state->data[L.current_id], data, size);
+        state->size[L.current_id] = size;
+    } else
+        state->size[L.current_id] = 0;
+}
+
 void savestate_save() {
     log_info("savestate_save: %d", L.state_size);
 
@@ -47,15 +62,8 @@ void savestate_save() {
     state->id_size = L.id_size;
 
     for (int i = 0; i < L.id_size; i++) {
-        void *data;
-        size_t size;
-        L.save_fns[i](&data, &size);
-        if (size > 0) {
-            state->data[i] = rhc_malloc_raising(size);
-            memcpy(state->data[i], data, size);
-            state->size[i] = size;
-        } else
-            state->size[i] = 0;
+        L.current_id = i;
+        L.save_fns[i]();
     }
 }
 

@@ -19,7 +19,7 @@ static struct {
 
 
 static void setup_selection(ePointer_s pointer) {
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
 
     if (selection_active() && pointer.action == E_POINTER_UP) {
         L.selection_set = true;
@@ -48,7 +48,7 @@ static void setup_selection(ePointer_s pointer) {
 }
 
 static void move_selection(ePointer_s pointer) {
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
     int layer = canvas.current_layer;
 
     if (pointer.action == E_POINTER_UP) {
@@ -148,7 +148,7 @@ void brush_pointer_event(ePointer_s pointer) {
 }
 
 bool brush_draw_pixel(int c, int r) {
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
     int layer = canvas.current_layer;
     if (!u_image_contains(img, c, r))
         return false;

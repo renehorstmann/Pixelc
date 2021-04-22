@@ -25,7 +25,7 @@ void canvas_render();
 
 mat4 canvas_pose();
 
-uImage *canvas_image();
+uImage canvas_image();
 
 ivec2 canvas_get_cr(vec4 pointer_pos);
 

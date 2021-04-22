@@ -81,7 +81,7 @@ static RoSingle *tool_append(float x, float y, const char *btn_file) {
 static bool pos_in_toolbar(vec2 pos) {
     float size = toolbar.show_selection_copy_cut
                  || toolbar.show_selection_ok
-                 || canvas_image()->layers > 1 ?
+                 || canvas_image().layers > 1 ?
                  53 : 34;
     if (camera_is_portrait_mode())
         return pos.y >= camera_top() - size;
@@ -267,7 +267,7 @@ void toolbar_render() {
         ro_single_render(&L.selection_ok);
     }
 
-    if (canvas_image()->layers > 1) {
+    if (canvas_image().layers > 1) {
         ro_single_render(&L.layer_prev);
         ro_single_render(&L.layer_next);
         ro_text_render(&L.layer_num);
@@ -298,19 +298,16 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         }
         toolbar.show_selection_copy_cut = false;
 
-        log_trace("toolbar: import load file");
-        uImage *img = u_image_new_file(1, canvas.default_import_file);
-        log_trace("toolbar: import loaded file: %i", img != NULL);
-        button_set_pressed(L.selection, img != NULL);
-        toolbar.show_selection_ok = img != NULL;
+        uImage img = u_image_new_file(1, canvas.default_import_file);
+        button_set_pressed(L.selection, u_image_valid(img));
+        toolbar.show_selection_ok = u_image_valid(img);
 
 
-        log_trace("toolbar: import set selection? %i", img!=NULL);
         if (u_image_valid(img)) {
-            selection_init(0, 0, img->cols, img->rows);
+            selection_init(0, 0, img.cols, img.rows);
             selection_copy(img, 0);
             selection_paste(canvas_image(), canvas.current_layer);
-            u_image_delete(img);
+            u_image_kill(&img);
             brush.selection_mode = BRUSH_SELECTION_PASTE;
             brush_set_selection_active(true, false);
         }
@@ -470,14 +467,14 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
 
-    if (canvas_image()->layers > 1) {
+    if (canvas_image().layers > 1) {
         if (button_clicked(&L.layer_prev, pointer)) {
             log_info("toolbar: layer_prev");
             canvas.current_layer = sca_max(0, canvas.current_layer - 1);
         }
         if (button_clicked(&L.layer_next, pointer)) {
             log_info("toolbar: layer_next");
-            canvas.current_layer = sca_min(canvas_image()->layers - 1, canvas.current_layer + 1);
+            canvas.current_layer = sca_min(canvas_image().layers - 1, canvas.current_layer + 1);
         }
     }
 

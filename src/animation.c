@@ -22,10 +22,10 @@ static struct {
 } L;
 
 static void set_pose(int c, int r) {
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
 
-    float w = L.size * img->cols / L.frames;
-    float h = L.size * img->rows;
+    float w = L.size * img.cols / L.frames;
+    float h = L.size * img.rows;
 
     float x, y;
     if (camera_is_portrait_mode()) {
@@ -49,10 +49,10 @@ void animation_init(int multi_cols, int multi_rows, float size, int frames, floa
     L.frames = frames;
     L.fps = fps;
 
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
 
-    for (int i = 0; i < img->layers; i++) {
-        rTexture tex = r_texture_new(img->cols, img->rows, frames, 1, u_image_layer(img, i));
+    for (int i = 0; i < img.layers; i++) {
+        rTexture tex = r_texture_new(img.cols, img.rows, frames, 1, u_image_layer(img, i));
         L.ro[i] = ro_batch_new(L.mcols * L.mrows, camera.gl, tex);
     }
 
@@ -88,7 +88,7 @@ void animation_update(float dtime) {
         }
     }
 
-    uImage *img = canvas_image();
+    uImage img = canvas_image();
     for (int i = 0; i <= canvas.current_layer; i++) {
         r_texture_set(L.ro[i].tex, u_image_layer(img, i));
         ro_batch_update(&L.ro[i]);
