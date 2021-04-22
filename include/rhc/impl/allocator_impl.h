@@ -11,7 +11,7 @@
 #endif
 
 void *rhc_malloc(size_t size) {
-    #ifdef OPTION_SDL
+#ifdef OPTION_SDL
     void *data = SDL_malloc(size);
 #else
     void *data = malloc(size);
@@ -25,7 +25,7 @@ void *rhc_malloc(size_t size) {
 
 
 void *rhc_realloc(void *memory, size_t size) {
-    #ifdef OPTION_SDL
+#ifdef OPTION_SDL
     void *data = SDL_realloc(memory, size);
 #else
     void *data = realloc(memory, size);
@@ -40,7 +40,7 @@ void *rhc_realloc(void *memory, size_t size) {
 
 
 void rhc_free(void *memory) {
-    #ifdef OPTION_SDL
+#ifdef OPTION_SDL
     SDL_free(memory);
 #else
     free(memory);
@@ -49,7 +49,7 @@ void rhc_free(void *memory) {
 
 
 void *rhc_malloc_raising(size_t size) {
-    #ifdef OPTION_SDL
+#ifdef OPTION_SDL
     void *data = SDL_malloc(size);
 #else
     void *data = malloc(size);
@@ -60,7 +60,7 @@ void *rhc_malloc_raising(size_t size) {
 
 
 void *rhc_realloc_raising(void *memory, size_t size) {
-    #ifdef OPTION_SDL
+#ifdef OPTION_SDL
     void *data = SDL_realloc(memory, size);
 #else
     void *data = realloc(memory, size);

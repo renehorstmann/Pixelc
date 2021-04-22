@@ -94,7 +94,7 @@ typedef struct {
 
 // bool foo_valid(Foo self)
 static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
-    return self.map != NULL && self.size > 0 && allocator_valid(self.allocator);
+    return self.map != NULL && self.size >= 1 && allocator_valid(self.allocator);
 }
 
 // Foo foo_new_a(size_t approx_size, Allocator_s a)

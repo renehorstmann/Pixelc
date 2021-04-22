@@ -59,7 +59,7 @@ typedef struct {
 
 // bool foo_valid(Foo self)
 static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
-    return self.array != NULL && self.size >= 0 && self.capacity >= 0 && allocator_valid(self.allocator);
+    return self.array != NULL && allocator_valid(self.allocator);
 }
 
 
