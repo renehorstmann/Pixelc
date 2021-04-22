@@ -1,4 +1,4 @@
-#include "utilc/assume.h"
+#include "rhc/error.h"
 #include "p/circle.h"
 
 pIndices_s p_circle_og(pCircle_s a, const pCircle_s *b, int n) {

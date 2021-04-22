@@ -5,6 +5,8 @@
 // imports all of u(tils)
 //
 
+#include "color.h"
+#include "image.h"
 #include "pose.h"
 #include "prandom.h"
 

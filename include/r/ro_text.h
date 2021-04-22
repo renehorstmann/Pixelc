@@ -9,11 +9,11 @@
 #include "ro_batch.h"
 
 // return true for a newline
-typedef bool (*ro_text_uv_fn)(mat4 *uv, char c);
+typedef bool (*ro_text_sprite_fn)(vec2 *sprite, char c);
 
 typedef struct {
     RoBatch ro;             // internal batch to render
-    ro_text_uv_fn uv_fn;    // conversion function of character to uv mapping
+    ro_text_sprite_fn sprite_fn;    // conversion function of character to sprite mapping
     mat4 pose;              // pose (top left) for the text
     vec2 size;              // character size
     vec2 offset;            // offset to next character
@@ -21,10 +21,14 @@ typedef struct {
     mat4 mvp;               // internal mvp as vp for the batch
 } RoText;
 
-void ro_text_init(RoText *self, int max, ro_text_uv_fn uv_fn, const float *vp, GLuint tex_sink);
+RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTexture tex_sink, Allocator_s alloc);
+
+static RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTexture tex_sink) {
+    return ro_text_new_a(max, sprite_fn, vp, tex_sink, allocator_new_default());
+}
 
 // inits text with the r/font55.png sprite sheet
-void ro_text_init_font55(RoText *self, int max, const float *vp);
+RoText ro_text_new_font55(int max, const float *vp);
 
 void ro_text_kill(RoText *self);
 
@@ -35,6 +39,8 @@ vec2 ro_text_set_text(RoText *self, const char *text);
 
 // returns the size, without setting the text
 vec2 ro_text_get_size(RoText *self, const char *text);
+
+void ro_text_set_color(RoText *self, vec4 color);
 
 
 #endif //R_RO_TEXT_H

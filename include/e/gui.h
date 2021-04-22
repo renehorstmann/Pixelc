@@ -17,7 +17,7 @@
 
 #include "nuklear/nuklear.h"
 
-#ifdef USING_GLES
+#ifdef OPTION_GLES
 #include "nuklear/nuklear_sdl_gles2.h"
 #else
 

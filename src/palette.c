@@ -1,10 +1,9 @@
-#include <stdbool.h>
 #include <float.h>  // FLT_MAX
 #include <assert.h>
 #include "e/input.h"
 #include "r/r.h"
 #include "u/pose.h"
-#include "utilc/alloc.h"
+#include "rhc/allocator.h"
 #include "camera.h"
 #include "brush.h"
 #include "palette.h"
@@ -13,7 +12,7 @@
 #define MAX_ROWS 10
 
 static struct {
-    Color_s palette[PALETTE_MAX];
+    uColor_s palette[PALETTE_MAX];
     int palette_size;
     RoBatch palette_ro;
     RoSingle select_ro;
@@ -56,16 +55,16 @@ static mat4 setup_palette_color_pose(int r, int c) {
 }
 
 void palette_init() {
-    ro_batch_init(&L.palette_ro, PALETTE_MAX, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
+    L.palette_ro = ro_batch_new(PALETTE_MAX, camera.gl, r_texture_new_file(1, 1, "res/color_drop.png"));
 
-    ro_batch_init(&L.background_ro, PALETTE_MAX + MAX_ROWS, camera.gl,
-                    r_texture_new_file("res/palette_background.png", NULL));
+    L.background_ro = ro_batch_new(PALETTE_MAX + MAX_ROWS, camera.gl,
+                    r_texture_new_file(2, 2, "res/palette_background.png"));
 
-    ro_single_init(&L.select_ro, camera.gl, r_texture_new_file("res/palette_select.png", NULL));
+    L.select_ro = ro_single_new(camera.gl, r_texture_new_file(1, 1, "res/palette_select.png"));
 
     // default palette:
     {
-        Color_s palette[4] = {
+        uColor_s palette[4] = {
                 {0,   0,   0,   0},
                 {0,   0,   0,   255},
                 {128, 128, 128, 255},
@@ -95,18 +94,18 @@ void palette_update(float dtime) {
         // color
         vec4 col;
         if (i < L.palette_size)
-            col = color_to_vec4(L.palette[i]);
+            col = u_color_to_vec4(L.palette[i]);
         else
             col = R_COLOR_TRANSPARENT;
 
         L.palette_ro.rects[i].color = col;
 
 
-        // background uv
+        // background sprite
         {
-            float u = i < L.palette_size ? 0 : 0.5;
-            float v = r < last_row ? 0.5 : 0;
-            u_pose_set(&L.background_ro.rects[i].uv, u, v, 0.5, 0.5, 0);
+            float u = i < L.palette_size ? 0 : 1;
+            float v = r < last_row ? 1 : 0;
+            L.background_ro.rects[i].sprite = (vec2) {{u, v}};
         }
     }
 
@@ -164,9 +163,9 @@ float palette_get_hud_size() {
     return rows * COLOR_DROP_SIZE;
 }
 
-void palette_set_colors(const Color_s *palette, int size) {
+void palette_set_colors(const uColor_s *palette, int size) {
     assert(size < PALETTE_MAX);
-    memcpy(L.palette, palette, sizeof(Color_s) * size);
+    memcpy(L.palette, palette, sizeof(uColor_s) * size);
     L.palette_size = size;
     palette_set_color(0);
 }

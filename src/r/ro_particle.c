@@ -1,26 +1,10 @@
 #include <float.h> // FLT_MAX
 #include "mathc/float.h"
-#include "utilc/alloc.h"
-#include "utilc/assume.h"
-#include "r/r.h"
+#include "rhc/error.h"
+#include "r/render.h"
+#include "r/program.h"
 #include "r/ro_particle.h"
 
-
-static void init_rects(rParticleRect_s *instances, int num) {
-    for (int i = 0; i < num; i++) {
-        rParticleRect_s *r = &instances[i];
-        r->pose = mat4_eye();
-        r->uv = mat4_eye();
-        r->speed = vec4_set(0);
-        r->acc = vec4_set(0);
-        r->axis_angle = (vec4) {0, 0, 1, 0};
-        r->color = vec4_set(1);
-        r->color_speed = vec4_set(0);
-        r->uv_step = vec2_set(0);
-        r->uv_time = FLT_MAX;
-        r->start_time = 0;
-    }
-}
 
 static int clamp_range(int i, int begin, int end) {
     if (i < begin)
@@ -31,48 +15,52 @@ static int clamp_range(int i, int begin, int end) {
 }
 
 
-void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sink) {
-    self->rects = New(rParticleRect_s, num);
-    init_rects(self->rects, num);
+RoParticle ro_particle_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc) {
+    r_render_error_check("ro_particle_newBEGIN");
+    RoParticle self;
+    self.allocator = alloc;
+    
+    assume(num>0, "particle needs atleast 1 particlerect");
+    self.rects = alloc.malloc(alloc, num * sizeof(rParticleRect_s));
+    assume(self.rects, "allocation failed");
+    for(int i=0; i<num; i++) {
+        self.rects[i] = r_particlerect_new();
+    }
 
-    self->num = num;
-    self->vp = vp;
+    self.num = num;
+    self.vp = vp;
 
-    self->program = r_shader_compile_glsl_from_files((char *[]) {
-            "res/r/particle.vsh",
-            "res/r/particle.fsh",
-            NULL});
+    self.program = r_program_new_file("res/r/particle.glsl");
     const int loc_pose = 0;
     const int loc_uv = 4;
-    const int loc_speed = 8;
-    const int loc_acc = 9;
-    const int loc_axis_angle = 10;
-    const int loc_color = 11;
-    const int loc_color_speed = 12;
-    const int loc_uv_step_and_time = 13;
+    const int loc_color = 8;
+    const int loc_sprite_and_sprite_speed = 9;
+    
+    const int loc_speed = 10;
+    const int loc_acc = 11;
+    const int loc_axis_angle = 12;
+    const int loc_color_speed = 13;
+    
     const int loc_start_time = 14;
 
-    self->tex = tex_sink;
-    self->owns_tex = true;
+    self.tex = tex_sink;
+    self.owns_tex = true;
 
     // vao scope
     {
-        glGenVertexArrays(1, &self->vao);
-        glBindVertexArray(self->vao);
-
-        // texture (using only unit 0)
-        glUniform1i(glGetUniformLocation(self->program, "tex"), 0);
+        glGenVertexArrays(1, &self.vao);
+        glBindVertexArray(self.vao);
 
         // vbo
         {
-            glGenBuffers(1, &self->vbo);
-            glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
+            glGenBuffers(1, &self.vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, self.vbo);
             glBufferData(GL_ARRAY_BUFFER,
                          num * sizeof(rParticleRect_s),
-                         self->rects,
+                         self.rects,
                          GL_STREAM_DRAW);
 
-            glBindVertexArray(self->vao);
+            glBindVertexArray(self.vao);
 
             // pose
             for (int c = 0; c < 4; c++) {
@@ -92,6 +80,21 @@ void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sin
                                       (void *) (offsetof(rParticleRect_s, uv) + c * sizeof(vec4)));
                 glVertexAttribDivisor(loc, 1);
             }
+            
+
+            // color
+            glEnableVertexAttribArray(loc_color);
+            glVertexAttribPointer(loc_color, 4, GL_FLOAT, GL_FALSE,
+                                  sizeof(rParticleRect_s),
+                                  (void *) offsetof(rParticleRect_s, color));
+            glVertexAttribDivisor(loc_color, 1);
+            
+            // sprite_and_sprite_speed
+            glEnableVertexAttribArray(loc_sprite_and_sprite_speed);
+            glVertexAttribPointer(loc_sprite_and_sprite_speed, 4, GL_FLOAT, GL_FALSE,
+                                  sizeof(rParticleRect_s),
+                                  (void *) offsetof(rParticleRect_s, sprite));
+            glVertexAttribDivisor(loc_sprite_and_sprite_speed, 1);
 
             // speed
             glEnableVertexAttribArray(loc_speed);
@@ -114,26 +117,12 @@ void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sin
                                   (void *) offsetof(rParticleRect_s, axis_angle));
             glVertexAttribDivisor(loc_axis_angle, 1);
 
-            // color
-            glEnableVertexAttribArray(loc_color);
-            glVertexAttribPointer(loc_color, 4, GL_FLOAT, GL_FALSE,
-                                  sizeof(rParticleRect_s),
-                                  (void *) offsetof(rParticleRect_s, color));
-            glVertexAttribDivisor(loc_color, 1);
-
             // color_speed
             glEnableVertexAttribArray(loc_color_speed);
             glVertexAttribPointer(loc_color_speed, 4, GL_FLOAT, GL_FALSE,
                                   sizeof(rParticleRect_s),
                                   (void *) offsetof(rParticleRect_s, color_speed));
             glVertexAttribDivisor(loc_color_speed, 1);
-
-            // uv_step_and_time
-            glEnableVertexAttribArray(loc_uv_step_and_time);
-            glVertexAttribPointer(loc_uv_step_and_time, 3, GL_FLOAT, GL_FALSE,
-                                  sizeof(rParticleRect_s),
-                                  (void *) offsetof(rParticleRect_s, uv_step));
-            glVertexAttribDivisor(loc_uv_step_and_time, 1);
 
             // start_time
             glEnableVertexAttribArray(loc_start_time);
@@ -142,24 +131,31 @@ void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sin
                                   (void *) offsetof(rParticleRect_s, start_time));
             glVertexAttribDivisor(loc_start_time, 1);
 
+
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
 
         glBindVertexArray(0);
     }
+    
+    r_render_error_check("ro_particle_new");
+    return self;
 }
 
+
+
 void ro_particle_kill(RoParticle *self) {
-    free(self->rects);
+    self->allocator.free(self->allocator, self->rects);
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     glDeleteBuffers(1, &self->vbo);
     if (self->owns_tex)
-        glDeleteTextures(1, &self->tex);
+        r_texture_kill(&self->tex);
     *self = (RoParticle) {0};
 }
 
 void ro_particle_update_sub(RoParticle *self, int offset, int size) {
+    r_render_error_check("ro_particle_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
     offset = clamp_range(offset, 0, self->num);
@@ -186,31 +182,39 @@ void ro_particle_update_sub(RoParticle *self, int offset, int size) {
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    r_render_error_check("ro_particle_update");
 }
 
 void ro_particle_render_sub(RoParticle *self, float time, int num) {
+    r_render_error_check("ro_particle_renderBEGIN");
     glUseProgram(self->program);
 
+    // base
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
                        1, GL_FALSE, self->vp);
 
+    vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
+    glUniform2fv(glGetUniformLocation(self->program, "sprites"), 1, &sprites.v0);
+    
     glUniform1f(glGetUniformLocation(self->program, "time"), time);
 
+    glUniform1i(glGetUniformLocation(self->program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self->tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex.tex);
 
     {
         glBindVertexArray(self->vao);
-        // r_shader_validate(self->program); // debug test
+        // r_program_validate(self->program); // debug test
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }
 
     glUseProgram(0);
+    r_render_error_check("ro_particle_render");
 }
 
-void ro_particle_set_texture(RoParticle *self, GLuint tex_sink) {
+void ro_particle_set_texture(RoParticle *self, rTexture tex_sink) {
     if (self->owns_tex)
-        glDeleteTextures(1, &self->tex);
+        r_texture_kill(&self->tex);
     self->tex = tex_sink;
 }

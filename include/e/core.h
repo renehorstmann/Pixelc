@@ -7,7 +7,7 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#ifdef USING_GLEW
+#ifdef OPTION_GLEW
 
 #include <GL/glew.h>
 
@@ -15,7 +15,7 @@
 
 #include <SDL.h>
 
-#ifndef USING_GLEW
+#ifndef OPTION_GLEW
 #include <SDL_opengl.h>
 #endif
 

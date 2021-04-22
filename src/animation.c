@@ -13,7 +13,7 @@ struct AnimationGlobals_s animation;
 
 static struct {
     RoText horsimann;
-    RoBatch ro[IMAGE_MAX_LAYERS];
+    RoBatch ro[CANVAS_MAX_LAYERS];
     int mcols, mrows;
     float size;
     int frames;
@@ -22,7 +22,7 @@ static struct {
 } L;
 
 static void set_pose(int c, int r) {
-    Image *img = canvas_image();
+    uImage *img = canvas_image();
 
     float w = L.size * img->cols / L.frames;
     float h = L.size * img->rows;
@@ -49,24 +49,16 @@ void animation_init(int multi_cols, int multi_rows, float size, int frames, floa
     L.frames = frames;
     L.fps = fps;
 
-    Image *img = canvas_image();
+    uImage *img = canvas_image();
 
     for (int i = 0; i < img->layers; i++) {
-        GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, i));
-        ro_batch_init(&L.ro[i], L.mcols * L.mrows, camera.gl, tex);
-
-        for (int j = 0; j < L.ro[i].num; j++) {
-            u_pose_set_w(&L.ro[i].rects[j].uv, 1.0 / frames);
-        }
+        rTexture tex = r_texture_new(img->cols, img->rows, frames, 1, u_image_layer(img, i));
+        L.ro[i] = ro_batch_new(L.mcols * L.mrows, camera.gl, tex);
     }
 
-    ro_text_init_font55(&L.horsimann, 9, camera.gl);
-    vec4 color = {{0.25, 0.25, 0.25, 1}};
-    for (int i = 0; i < L.horsimann.ro.num; i++) {
-        L.horsimann.ro.rects[i].color = color;
-    }
+    L.horsimann = ro_text_new_font55(9, camera.gl);
+    ro_text_set_color(&L.horsimann, (vec4) {{0.25, 0.25, 0.25, 1}});
     ro_text_set_text(&L.horsimann, "horsimann");
-
 }
 
 void animation_update(float dtime) {
@@ -89,16 +81,16 @@ void animation_update(float dtime) {
     }
 
     L.time = fmodf(L.time + dtime, L.frames / L.fps);
-    float u = floorf(L.time * L.fps) / L.frames;
+    float frame = floorf(L.time * L.fps);
     for (int i = 0; i <= canvas.current_layer; i++) {
         for (int j = 0; j < L.ro[i].num; j++) {
-            u_pose_set_x(&L.ro[i].rects[j].uv, u);
+            L.ro[i].rects[j].sprite.x = frame;
         }
     }
 
-    Image *img = canvas_image();
+    uImage *img = canvas_image();
     for (int i = 0; i <= canvas.current_layer; i++) {
-        r_texture_update(L.ro[i].tex, img->cols, img->rows, image_layer(img, i));
+        r_texture_set(L.ro[i].tex, u_image_layer(img, i));
         ro_batch_update(&L.ro[i]);
     }
 }

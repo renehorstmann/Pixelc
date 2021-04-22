@@ -1,9 +1,9 @@
 #ifndef PIXELC_BACKGROUND_H
 #define PIXELC_BACKGROUND_H
 
-#include "color.h"
+#include "u/color.h"
 
-void background_init(Color_s a, Color_s b);
+void background_init(uColor_s a, uColor_s b);
 
 void background_update(float dtime);
 

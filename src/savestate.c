@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "utilc/alloc.h"
+#include "rhc/allocator.h"
 #include "canvas.h"
 #include "palette.h"
 #include "brush.h"
@@ -36,10 +36,10 @@ int savestate_register(savestate_save_fn save_fn, savestate_load_fn load_fn) {
 }
 
 void savestate_save() {
-    SDL_Log("savestate_save: %d", L.state_size);
+    log_info("savestate_save: %d", L.state_size);
 
     L.state_size++;
-    L.states = ReNew(State, L.states, L.state_size);
+    L.states = rhc_realloc_raising(L.states, L.state_size * sizeof(State));
 
     State *state = &L.states[L.state_size - 1];
     *state = (State) {0};
@@ -51,7 +51,7 @@ void savestate_save() {
         size_t size;
         L.save_fns[i](&data, &size);
         if (size > 0) {
-            state->data[i] = raising_malloc(size, 1, SIGABRT);
+            state->data[i] = rhc_malloc_raising(size);
             memcpy(state->data[i], data, size);
             state->size[i] = size;
         } else
@@ -60,10 +60,10 @@ void savestate_save() {
 }
 
 void savestate_undo() {
-    SDL_Log("savestate_undo: %d", L.state_size - 1);
+    log_info("savestate_undo: %d", L.state_size - 1);
 
     if (L.state_size <= 1) {
-        SDL_Log("savestate_undo failed");
+        log_error("savestate_undo failed");
         return;
     }
 
@@ -88,7 +88,7 @@ void savestate_redo_id(int savestate_id) {
     if (L.state_size <= 0
         || savestate_id >= L.id_size
         || savestate_id >= L.states[L.state_size - 1].id_size) {
-        SDL_Log("savestate_redo failed");
+        log_error("savestate_redo failed");
         return;
     }
     State *state = &L.states[L.state_size - 1];

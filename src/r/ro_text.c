@@ -1,5 +1,6 @@
-#include <float.h>
+#include <float.h>    // FLT_MAX
 #include "mathc/float.h"
+#include "rhc/allocator.h"
 #include "r/ro_text.h"
 #include "r/texture.h"
 
@@ -36,16 +37,19 @@ static mat4 pose(RoText *self, int c, int r) {
 }
 
 
-void ro_text_init(RoText *self, int max, ro_text_uv_fn uv_fn, const float *vp, GLuint tex_sink) {
-    self->uv_fn = uv_fn;
-    self->pose = mat4_eye();
-    self->size = (vec2) {{5, 5}};
-    self->offset = (vec2) {{6, 6}};
-    self->vp = vp;
-    self->mvp = mat4_eye();
-    ro_batch_init(&self->ro, max, &self->mvp.m00, tex_sink);
-    hide(self, 0);
-    ro_batch_update(&self->ro);
+RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTexture tex_sink, Allocator_s alloc) {
+    RoText self;
+    self.sprite_fn = sprite_fn;
+    self.pose = mat4_eye();
+    self.size = (vec2) {{5, 5}};
+    self.offset = (vec2) {{6, 6}};
+    self.vp = vp;
+    self.mvp = mat4_eye();
+    // batch.vp will be set each time before rendering
+    self.ro = ro_batch_new_a(max, NULL, tex_sink, alloc);
+    hide(&self, 0);
+    ro_batch_update(&self.ro);
+    return self;
 }
 
 void ro_text_kill(RoText *self) {
@@ -54,6 +58,7 @@ void ro_text_kill(RoText *self) {
 
 void ro_text_render(RoText *self) {
     self->mvp = mat4_mul_mat(Mat4(self->vp), self->pose);
+    self->ro.vp = &self->mvp.m00;
     ro_batch_render(&self->ro);
 }
 
@@ -63,7 +68,7 @@ vec2 ro_text_set_text(RoText *self, const char *text) {
     int row = 0;
     int cols = 0;
     while (*text && i < self->ro.num) {
-        bool newline = self->uv_fn(&self->ro.rects[i].uv, *text);
+        bool newline = self->sprite_fn(&self->ro.rects[i].sprite, *text);
         self->ro.rects[i].pose = pose(self, col, row);
 
         col++;
@@ -92,9 +97,9 @@ vec2 ro_text_get_size(RoText *self, const char *text) {
     int rows = 0;
     int c = 0;
     int i = 0;
-    mat4 uv = mat4_eye();
+    vec2 sprite = {{0}};
     while (*text && i < self->ro.num) {
-        if (self->uv_fn(&uv, *text++)) {
+        if (self->sprite_fn(&sprite, *text++)) {
             rows++;
             c = 0;
         } else {
@@ -113,14 +118,17 @@ vec2 ro_text_get_size(RoText *self, const char *text) {
                    }};
 }
 
+void ro_text_set_color(RoText *self, vec4 color) {
+    for(int i=0; i<self->ro.num; i++) {
+        self->ro.rects[i].color = color;
+    }
+    ro_batch_update(&self->ro);
+}
 
-static bool font55_uv_cb(mat4 *uv, char c) {
-    static const int cols = 64;
-    static const int rows = 64;
-    static const int size_x = 5;
-    static const int size_y = 5;
 
-    int columns = cols / size_x;
+static bool font55_sprite_cb(vec2 *sprite, char c) {
+    const int columns = 12;
+    const int rows = 5;
 
     bool nl = false;
     if (c == '\n') {
@@ -134,15 +142,15 @@ static bool font55_uv_cb(mat4 *uv, char c) {
     c -= ' ';
     int col = c % columns;
     int row = c / columns;
-
-    float w = (float) size_x / cols;
-    float h = (float) size_y / rows;
-
-    *uv = u_pose_new(col * w, row * h, w, h);
+    
+    sprite->x = col;
+    sprite->y = row;
 
     return nl;
 }
 
-void ro_text_init_font55(RoText *self, int max, const float *vp) {
-    ro_text_init(self, max, font55_uv_cb, vp, r_texture_new_file("res/r/font55.png", NULL));
+RoText ro_text_new_font55(int max, const float *vp) {
+    const int columns = 12;
+    const int rows = 5;
+    return ro_text_new(max, font55_sprite_cb, vp, r_texture_new_file(columns, rows, "res/r/font55.png"));
 }

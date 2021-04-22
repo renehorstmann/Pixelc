@@ -1,9 +1,8 @@
 #ifndef PIXELC_SELECTION_H
 #define PIXELC_SELECTION_H
 
-#include <stdbool.h>
+#include "u/image.h"
 #include "mathc/types/int.h"
-#include "image.h"
 
 
 void selection_init(int left, int top, int cols, int rows);
@@ -20,11 +19,11 @@ void selection_move(int left, int top);
 
 bool selection_contains(int c, int r);
 
-void selection_copy(const Image *from, int layer);
+void selection_copy(const uImage *from, int layer);
 
-void selection_cut(Image *from, int layer, Color_s replace);
+void selection_cut(uImage *from, int layer, uColor_s replace);
 
-void selection_paste(Image *to, int layer);
+void selection_paste(uImage *to, int layer);
 
 void selection_rotate(bool right);
 

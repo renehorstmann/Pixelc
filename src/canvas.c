@@ -4,13 +4,10 @@
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "utilc/alloc.h"
-#include "utilc/assume.h"
+#include "u/image.h"
 #include "mathc/mat/float.h"
 
-#include "image.h"
-#include "canvas_camera.h"
-#include "io.h"
+#include "canvascam.h"
 #include "palette.h"
 #include "toolbar.h"
 #include "selection.h"
@@ -19,14 +16,17 @@
 
 #define SELECTION_BORDER_FACTOR 4
 
-struct CanvasGlobals_s canvas;
+struct CanvasGlobals_s canvas = {
+        .default_image_file = "sprite.png",
+        .default_import_file = "import.png"
+};
 
 static struct {
     mat4 pose;
 
-    Image *image;
-    Image *last_image;
-    RoSingle render_objects[IMAGE_MAX_LAYERS];
+    uImage *image;
+    uImage *last_image;
+    RoSingle render_objects[CANVAS_MAX_LAYERS];
 
     RoSingle bg;
     RoSingle grid;
@@ -39,8 +39,8 @@ static struct {
 
 static void init_render_objects() {
     for (int i = 0; i < L.image->layers; i++) {
-        GLuint tex = r_texture_new(L.image->cols, L.image->rows, image_layer(L.image, i));
-        ro_single_init(&L.render_objects[i], canvas_camera.gl, tex);
+        rTexture tex = r_texture_new(L.image->cols, L.image->rows, 1, 1, u_image_layer(L.image, i));
+        L.render_objects[i] = ro_single_new(canvascam.gl, tex);
     }
 }
 
@@ -68,23 +68,23 @@ static void setup_selection() {
     int idx = 0;
     for (int i = 0; i < h; i++) {
         L.selection_border.rects[idx].pose = pixel_pose(x - 1, y + i);
-        u_pose_set(&L.selection_border.rects[idx].uv, 0, 0, 0.5, 0.5, 0);
+        L.selection_border.rects[idx].sprite = (vec2) {0, 0};
         idx++;
         if (idx >= max) goto UPDATE;
 
         L.selection_border.rects[idx].pose = pixel_pose(x + w, y + i);
-        u_pose_set(&L.selection_border.rects[idx].uv, 0, 0.5, 0.5, 0.5, 0);
+        L.selection_border.rects[idx].sprite = (vec2) {0, 1};
         idx++;
         if (idx >= max) goto UPDATE;
     }
     for (int i = 0; i < w; i++) {
         L.selection_border.rects[idx].pose = pixel_pose(x + i, y - 1);
-        u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0, 0.5, 0.5, 0);
+        L.selection_border.rects[idx].sprite = (vec2) {1, 0};
         idx++;
         if (idx >= max) goto UPDATE;
 
         L.selection_border.rects[idx].pose = pixel_pose(x + i, y + h);
-        u_pose_set(&L.selection_border.rects[idx].uv, 0.5, 0.5, 0.5, 0.5, 0);
+        L.selection_border.rects[idx].sprite = (vec2) {1, 1};
         idx++;
         if (idx >= max) goto UPDATE;
     }
@@ -100,62 +100,62 @@ static void setup_selection() {
 
 static void save_state(void **data, size_t *size) {
     *data = L.image;
-    *size = image_full_size(L.image);
+    *size = u_image_full_size(L.image);
 }
 
 static void load_state(const void *data, size_t size) {
     // todo: check new layers, rows, cols
-    image_delete(L.image);
-    L.image = image_new_clone(data);
-    image_copy(L.last_image, L.image);
-    assert(image_full_size(L.image) == size);
-    io_save_image(io.default_image_file, canvas_image());
+    u_image_delete(L.image);
+    L.image = u_image_new_clone(data);
+    u_image_copy(L.last_image, L.image);
+    assert(u_image_full_size(L.image) == size);
+    u_image_save_file(canvas_image(), canvas.default_image_file);
 }
 
 
 void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows) {
-    assume(layers <= IMAGE_MAX_LAYERS, "too many layers");
+    assume(layers <= CANVAS_MAX_LAYERS, "too many layers");
     canvas.alpha = 1.0;
 
     L.save_id = savestate_register(save_state, load_state);
 
     L.pose = mat4_eye();
 
-    L.image = image_new_zeros(layers, cols, rows);
+    L.image = u_image_new_zeros(cols, rows, layers);
     canvas.current_layer = 0;
 
     init_render_objects();
 
-    ro_single_init(&L.grid, canvas_camera.gl,
-                     r_texture_new_file("res/canvas_grid.png", NULL));
+    L.grid = ro_single_new(canvascam.gl,
+                     r_texture_new_file(1, 1, "res/canvas_grid.png"));
     u_pose_set_size(&L.grid.rect.uv, cols, rows);
 
 
-    ro_batch_init(&L.selection_border, 2 * (rows + cols) * SELECTION_BORDER_FACTOR, canvas_camera.gl,
-                    r_texture_new_file("res/selection_border.png", NULL));
+    L.selection_border = ro_batch_new(2 * (rows + cols) * SELECTION_BORDER_FACTOR, canvascam.gl,
+                    r_texture_new_file(2, 2, "res/selection_border.png"));
     for (int i = 0; i < L.selection_border.num; i++) {
-        L.selection_border.rects[i].color = color_to_vec4(color_from_hex("#357985"));
+        L.selection_border.rects[i].color = u_color_to_vec4(u_color_from_hex("#357985"));
     }
 
 
-    Color_s buf[4];
-    buf[0] = buf[3] = color_from_hex("#999999");
-    buf[1] = buf[2] = color_from_hex("#777777");
-    GLuint bg_tex = r_texture_new(2, 2, buf);
-    ro_single_init(&L.bg, canvas_camera.gl, bg_tex);
+    uColor_s buf[4];
+    buf[0] = buf[3] = u_color_from_hex("#999999");
+    buf[1] = buf[2] = u_color_from_hex("#777777");
+    rTexture bg_tex = r_texture_new(2, 2, 1, 1, buf);
+    L.bg = ro_single_new(canvascam.gl, bg_tex);
     {
         float w = (float) cols / (2 * grid_cols);
         float h = (float) rows / (2 * grid_rows);
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
 
-    Image *img = io_load_image(io.default_image_file, layers);
+    uImage *img = u_image_new_file(layers, canvas.default_image_file);
     if (img) {
-        image_copy(L.image, img);
-        image_delete(img);
+        u_image_copy(L.image, img);
+        u_image_delete(img);
     }
 
-    L.last_image = image_new_clone(L.image);
+    L.last_image = u_image_new_clone(L.image);
 }
 
 void canvas_update(float dtime) {
@@ -169,14 +169,14 @@ void canvas_update(float dtime) {
     }
 
     float x = 0, y = 0;
-    if (canvas_camera_is_portrait_mode()) {
+    if (canvascam_is_portrait_mode()) {
         y = 30;
     }
 
     u_pose_set(&L.pose, x, y, w, h, 0);
 
     for (int i = 0; i < L.image->layers; i++) {
-        r_texture_update(L.render_objects[i].tex, L.image->cols, L.image->rows, image_layer(L.image, i));
+        r_texture_set(L.render_objects[i].tex, u_image_layer(L.image, i));
 
         // set pose
         L.render_objects[i].rect.pose = L.pose;
@@ -209,7 +209,7 @@ mat4 canvas_pose() {
     return L.pose;
 }
 
-Image *canvas_image() {
+uImage *canvas_image() {
     return L.image;
 }
 
@@ -230,21 +230,21 @@ void canvas_clear() {
             if (!selection_contains(c, r))
                 continue;
 
-            *image_pixel(L.image, canvas.current_layer, c, r) = COLOR_TRANSPARENT;
+            *u_image_pixel(L.image, c, r, canvas.current_layer) = COLOR_TRANSPARENT;
         }
     }
     canvas_save();
 }
 
 void canvas_save() {
-    if (!image_equals(L.image, L.last_image)) {
-        image_copy(L.last_image, L.image);
+    if (!u_image_equals(L.image, L.last_image)) {
+        u_image_copy(L.last_image, L.image);
         savestate_save();
-        io_save_image(io.default_image_file, canvas_image());
+        u_image_save_file(canvas_image(), canvas.default_image_file);
     }
 }
 
 void canvas_redo_image() {
-    image_copy(L.image, L.last_image);
+    u_image_copy(L.image, L.last_image);
 }
 

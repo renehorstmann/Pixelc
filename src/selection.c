@@ -1,13 +1,14 @@
-#include "utilc/alloc.h"
+#include "rhc/error.h"
+#include "rhc/log.h"
 #include "selection.h"
 
 static struct {
     int left, top;
     int cols, rows;
-    Color_s *opt_data;
+    uImage *opt_img;
 } L;
 
-static bool valid_to_copy(const Image *img, int layer) {
+static bool valid_to_copy(const uImage *img, int layer) {
     return L.left >= 0 && L.top >= 0
            && L.cols > 0 && L.rows > 0
            && L.left + L.cols <= img->cols
@@ -15,7 +16,7 @@ static bool valid_to_copy(const Image *img, int layer) {
 }
 
 void selection_init(int left, int top, int cols, int rows) {
-    Free0(L.opt_data);
+    u_image_delete(L.opt_img);
     L.left = left;
     L.top = top;
     L.cols = cols;
@@ -24,7 +25,7 @@ void selection_init(int left, int top, int cols, int rows) {
 
 void selection_kill() {
     L.left = L.top = L.rows = L.cols = 0;
-    Free0(L.opt_data);
+    u_image_delete(L.opt_img);
 }
 
 bool selection_active() {
@@ -51,39 +52,39 @@ bool selection_contains(int c, int r) {
                && r >= L.top && r < L.top + L.rows);
 }
 
-void selection_copy(const Image *from, int layer) {
+void selection_copy(const uImage *from, int layer) {
     if (!valid_to_copy(from, layer)) {
-        SDL_Log("selection_copy failed");
+        log_error("selection_copy failed");
         return;
     }
-    L.opt_data = ReNew(Color_s, L.opt_data, L.cols * L.rows);
+    L.opt_img = u_image_new_empty(L.cols, L.rows, 1);
 
     for (int r = 0; r < L.rows; r++) {
         for (int c = 0; c < L.cols; c++) {
-            L.opt_data[r * L.cols + c] =
-                    *image_pixel((Image *) from, layer,
-                                 c + L.left, r + L.top);
+            *u_image_pixel(L.opt_img, c, r, 0) =
+                    *u_image_pixel((uImage *) from,
+                                 c + L.left, r + L.top, layer);
         }
     }
 }
 
-void selection_cut(Image *from, int layer, Color_s replace) {
+void selection_cut(uImage *from, int layer, uColor_s replace) {
     if (!valid_to_copy(from, layer)) {
-        SDL_Log("selection_cut failed");
+        log_error("selection_cut failed");
         return;
     }
     selection_copy(from, layer);
 
     for (int r = 0; r < L.rows; r++) {
         for (int c = 0; c < L.cols; c++) {
-            *image_pixel(from, layer, c + L.left, r + L.top) = replace;
+            *u_image_pixel(from, c + L.left, r + L.top, layer) = replace;
         }
     }
 }
 
-void selection_paste(Image *to, int layer) {
-    if (!L.opt_data || L.cols <= 0 || L.rows <= 0) {
-        SDL_Log("selection_paste failed");
+void selection_paste(uImage *to, int layer) {
+    if (!u_image_valid(L.opt_img)) {
+        log_error("selection_paste failed");
         return;
     }
     for (int r = 0; r < L.rows; r++) {
@@ -95,20 +96,19 @@ void selection_paste(Image *to, int layer) {
             if (to_c < 0 || to_c >= to->cols)
                 continue;
 
-            *image_pixel(to, layer, to_c, to_r) =
-                    L.opt_data[r * L.cols + c];
+            *u_image_pixel(to, to_c, to_r, layer) =
+                    *u_image_pixel(L.opt_img, c, r, 0);
         }
     }
 }
 
 void selection_rotate(bool right) {
-    if (!L.opt_data || L.cols <= 0 || L.rows <= 0) {
-        SDL_Log("selection_rotate failed");
+    if (!u_image_valid(L.opt_img)) {
+        log_error("selection_rotate failed");
         return;
     }
 
-    Color_s *tmp = New(Color_s, L.cols * L.rows);
-    memcpy(tmp, L.opt_data, sizeof(Color_s) * L.cols * L.rows);
+    uImage *tmp = u_image_new_clone(L.opt_img);
 
     int cols = L.rows;
     int rows = L.cols;
@@ -117,32 +117,31 @@ void selection_rotate(bool right) {
         for (int c = 0; c < cols; c++) {
             int mc = right ? r : rows - 1 - r;
             int mr = right ? cols - 1 - c : c;
-            L.opt_data[r * cols + c] = tmp[mr * L.cols + mc];
+            *u_image_pixel(L.opt_img, c, r, 0) = *u_image_pixel(tmp, mc, mr, 0);
         }
     }
 
-    free(tmp);
+    u_image_delete(tmp);
 
     L.cols = cols;
     L.rows = rows;
 }
 
 void selection_mirror(bool vertical) {
-    if (!L.opt_data || L.cols <= 0 || L.rows <= 0) {
-        SDL_Log("selection_mirror failed");
+    if (!u_image_valid(L.opt_img)) {
+        log_error("selection_mirror failed");
         return;
     }
 
-    Color_s *tmp = New(Color_s, L.cols * L.rows);
-    memcpy(tmp, L.opt_data, sizeof(Color_s) * L.cols * L.rows);
+    uImage *tmp = u_image_new_clone(L.opt_img);
 
     for (int r = 0; r < L.rows; r++) {
         for (int c = 0; c < L.cols; c++) {
             int mc = vertical ? L.cols - 1 - c : c;
             int mr = vertical ? r : L.rows - 1 - r;
-            L.opt_data[r * L.cols + c] = tmp[mr * L.cols + mc];
+            *u_image_pixel(L.opt_img, c, r, 0) = *u_image_pixel(tmp, mc, mr, 0);
         }
     }
 
-    free(tmp);
+    u_image_delete(tmp);
 }

@@ -1,17 +1,8 @@
 #include "mathc/float.h"
-#include "utilc/alloc.h"
-#include "r/r.h"
+#include "r/render.h"
+#include "r/program.h"
 #include "r/ro_batch.h"
 
-
-static void init_rects(rRect_s *instances, int num) {
-    for (int i = 0; i < num; i++) {
-        rRect_s *r = &instances[i];
-        r->pose = mat4_eye();
-        r->uv = mat4_eye();
-        r->color = vec4_set(1);
-    }
-}
 
 static int clamp_range(int i, int begin, int end) {
     if (i < begin)
@@ -21,42 +12,45 @@ static int clamp_range(int i, int begin, int end) {
     return i;
 }
 
-void ro_batch_init(RoBatch *self, int num, const float *vp, GLuint tex_sink) {
-    self->rects = New(rRect_s, num);
-    init_rects(self->rects, num);
+RoBatch ro_batch_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc) {
+    r_render_error_check("ro_batch_newBEGIN");
+    RoBatch self;
+    self.allocator = alloc;
+    
+    assume(num>0, "batch needs atleast 1 rect");
+    self.rects = alloc.malloc(alloc, num * sizeof(rRect_s));
+    assume(self.rects, "allocation failed");
+    for(int i=0; i<num; i++) {
+        self.rects[i] = r_rect_new();
+    }
 
-    self->num = num;
-    self->vp = vp;
+    self.num = num;
+    self.vp = vp;
 
-    self->program = r_shader_compile_glsl_from_files((char *[]) {
-            "res/r/batch.vsh",
-            "res/r/batch.fsh",
-            NULL});
+    self.program = r_program_new_file("res/r/batch.glsl");
     const int loc_pose = 0;
     const int loc_uv = 4;
     const int loc_color = 8;
+    const int loc_sprite = 9;
 
-    self->tex = tex_sink;
-    self->owns_tex = true;
+    self.tex = tex_sink;
+    self.owns_tex = true;
 
     // vao scope
     {
-        glGenVertexArrays(1, &self->vao);
-        glBindVertexArray(self->vao);
-
-        // texture (using only unit 0)
-        glUniform1i(glGetUniformLocation(self->program, "tex"), 0);
+        glGenVertexArrays(1, &self.vao);
+        glBindVertexArray(self.vao);
 
         // vbo
         {
-            glGenBuffers(1, &self->vbo);
-            glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
+            glGenBuffers(1, &self.vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, self.vbo);
             glBufferData(GL_ARRAY_BUFFER,
                          num * sizeof(rRect_s),
-                         self->rects,
+                         self.rects,
                          GL_STREAM_DRAW);
 
-            glBindVertexArray(self->vao);
+            glBindVertexArray(self.vao);
 
             // pose
             for (int c = 0; c < 4; c++) {
@@ -82,25 +76,38 @@ void ro_batch_init(RoBatch *self, int num, const float *vp, GLuint tex_sink) {
                                   sizeof(rRect_s),
                                   (void *) offsetof(rRect_s, color));
             glVertexAttribDivisor(loc_color, 1);
+            
+            // sprite
+            glEnableVertexAttribArray(loc_sprite);
+            glVertexAttribPointer(loc_sprite, 2, GL_FLOAT, GL_FALSE,
+                                  sizeof(rRect_s),
+                                  (void *) offsetof(rRect_s, sprite));
+            glVertexAttribDivisor(loc_sprite, 1);
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
 
         glBindVertexArray(0);
     }
+    
+    r_render_error_check("ro_batch_new");
+    return self;
 }
 
+
+
 void ro_batch_kill(RoBatch *self) {
-    free(self->rects);
+    self->allocator.free(self->allocator, self->rects);
     glDeleteProgram(self->program);
     glDeleteVertexArrays(1, &self->vao);
     glDeleteBuffers(1, &self->vbo);
     if (self->owns_tex)
-        glDeleteTextures(1, &self->tex);
+        r_texture_kill(&self->tex);
     *self = (RoBatch) {0};
 }
 
 void ro_batch_update_sub(RoBatch *self, int offset, int size) {
+    r_render_error_check("ro_batch_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
     offset = clamp_range(offset, 0, self->num);
@@ -127,31 +134,39 @@ void ro_batch_update_sub(RoBatch *self, int offset, int size) {
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    r_render_error_check("ro_batch_update");
 }
 
 
 void ro_batch_render_sub(RoBatch *self, int num) {
+    r_render_error_check("ro_batch_renderBEGIN");
     glUseProgram(self->program);
 
+    // base
     glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
                        1, GL_FALSE, self->vp);
+                       
+    vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
+    glUniform2fv(glGetUniformLocation(self->program, "sprites"), 1, &sprites.v0);
 
+    glUniform1i(glGetUniformLocation(self->program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, self->tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex.tex);
 
     {
         glBindVertexArray(self->vao);
-        // r_shader_validate(self->program); // debug test
+        // r_program_validate(self->program); // debug test
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }
 
     glUseProgram(0);
+    r_render_error_check("ro_batch_render");
 }
 
-void ro_batch_set_texture(RoBatch *self, GLuint tex_sink) {
+void ro_batch_set_texture(RoBatch *self, rTexture tex_sink) {
     if (self->owns_tex)
-        glDeleteTextures(1, &self->tex);
+        r_texture_kill(&self->tex);
     self->tex = tex_sink;
 }
 

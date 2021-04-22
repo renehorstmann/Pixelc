@@ -3,18 +3,17 @@
 #include "u/u.h"
 
 #include "camera.h"
-#include "canvas_camera.h"
+#include "canvascam.h"
 #include "background.h"
 #include "canvas.h"
 #include "animation.h"
 #include "brush.h"
-#include "canvas_camera_control.h"
+#include "canvascamctrl.h"
 #include "palette.h"
-#include "palette_presave.h"
+#include "palettepresave.h"
 #include "toolbar.h"
 #include "input.h"
 #include "savestate.h"
-#include "io.h"
 
 //
 // options
@@ -81,22 +80,22 @@
 //
 
 
-// macro to call palette_presave_PALETTE()
+// macro to call palettepresave_PALETTE()
 #define Cat(a, b) a ## b
-#define PalettePresave(pal) Cat(palette_presave_, pal)
+#define PalettePresave(pal) Cat(palettepresave_, pal)
 
 
 static void main_loop(float delta_time);
 
 
 int main(int argc, char **argv) {
-    SDL_Log("Pixelc");
+    log_info("Pixelc");
 
 #ifdef IMAGE_FILE
-    io.default_image_file = IMAGE_FILE;
+    canvas.default_image_file = IMAGE_FILE;
 #endif
 #ifdef IMPORT_FILE
-    io.default_import_file = IMPORT_FILE;
+    canvas.default_import_file = IMPORT_FILE;
 #endif
 
     // init e (environment)
@@ -109,18 +108,18 @@ int main(int argc, char **argv) {
 
     // init systems
     camera_init();
-    canvas_camera_init();
-    background_init(color_from_hex(BG_COLOR_A), color_from_hex(BG_COLOR_B));
+    canvascam_init();
+    background_init(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
     canvas_init(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
     animation_init(PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     brush_init();
-    canvas_camera_control_init();
+    canvascamctrl_init();
     palette_init();
     toolbar_init();
     input_init();
     savestate_init();
 
-    // calls "palette_presave_PALETTE();"
+    // calls "palettepresave_PALETTE();"
     PalettePresave(PALETTE)();
 
     // save start frame
@@ -141,7 +140,7 @@ static void main_loop(float delta_time) {
 
     // simulate
     camera_update();
-    canvas_camera_update();
+    canvascam_update();
     background_update(delta_time);
     canvas_update(delta_time);
     animation_update(delta_time);
@@ -161,9 +160,6 @@ static void main_loop(float delta_time) {
 
     // swap buffers
     r_render_end_frame();
-
-    // check for opengl errors:
-    r_render_error_check();
 }
 
 

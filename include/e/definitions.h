@@ -21,7 +21,7 @@ static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_EVERYTHING;
 
 
 // GLES and WebGL use GLES3.0
-#ifdef USING_GLES
+#ifdef OPTION_GLES
 static const int E_GL_MAJOR_VERSION = 3;
 static const int E_GL_MINOR_VERSION = 0;
 static const int E_GL_PROFILE = SDL_GL_CONTEXT_PROFILE_ES;

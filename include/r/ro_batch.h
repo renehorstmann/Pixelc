@@ -5,9 +5,10 @@
 // class to render multiple rects with a single draw call
 //
 
-#include <stdbool.h>
+#include "rhc/allocator.h"
 #include "core.h"
 #include "rect.h"
+#include "texture.h"
 
 typedef struct {
     rRect_s *rects;
@@ -16,11 +17,18 @@ typedef struct {
     GLuint program;     // shader
     GLuint vao;         // internal vertex array object
     GLuint vbo;         // internal vertex buffer object
-    GLuint tex;         // used texture
+    rTexture tex;       // used texture
     bool owns_tex;      // if true, the texture will be deleted by this class
+    
+    Allocator_s allocator;
 } RoBatch;
 
-void ro_batch_init(RoBatch *self, int num, const float *vp, GLuint tex_sink);
+RoBatch ro_batch_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc);
+
+static RoBatch ro_batch_new(int num, const float *vp, rTexture tex_sink) {
+    return ro_batch_new_a(num, vp, tex_sink, allocator_new_default());
+}
+
 
 void ro_batch_kill(RoBatch *self);
 
@@ -31,7 +39,7 @@ void ro_batch_update_sub(RoBatch *self, int offset, int size);
 void ro_batch_render_sub(RoBatch *self, int num);
 
 // resets the texture, if .owns_tex is true, it will delete the old texture
-void ro_batch_set_texture(RoBatch *self, GLuint tex_sink);
+void ro_batch_set_texture(RoBatch *self, rTexture tex_sink);
 
 
 static void ro_batch_update(RoBatch *self) {

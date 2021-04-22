@@ -1,20 +1,20 @@
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "u/color.h"
 #include "camera.h"
-#include "color.h"
 #include "background.h"
 
 static struct {
     RoSingle ro;
 } L;
 
-void background_init(Color_s a, Color_s b) {
-    Color_s buf[4];
+void background_init(uColor_s a, uColor_s b) {
+    uColor_s buf[4];
     buf[0] = buf[3] = a;
     buf[1] = buf[2] = b;
 
-    ro_single_init(&L.ro, camera.gl, r_texture_new(2, 2, buf));
+    L.ro = ro_single_new(camera.gl, r_texture_new(2, 2, 1, 1, buf));
 }
 
 void background_update(float dtime) {

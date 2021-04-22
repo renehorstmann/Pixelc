@@ -5,10 +5,11 @@
 // particle system
 //
 
-#include <stdbool.h>
 #include "mathc/types/float.h"
+#include "rhc/allocator.h"
 #include "core.h"
 #include "rect.h"
+#include "texture.h"
 
 typedef struct {
     rParticleRect_s *rects;
@@ -17,11 +18,18 @@ typedef struct {
     GLuint program;     // shader
     GLuint vao;         // internal vertex array object
     GLuint vbo;         // internal vertex buffer object
-    GLuint tex;         // used texture
+    rTexture tex;         // used texture
     bool owns_tex;      // if true, the texture will be deleted by this class
+    
+    Allocator_s allocator;
 } RoParticle;
 
-void ro_particle_init(RoParticle *self, int num, const float *vp, GLuint tex_sink);
+
+RoParticle ro_particle_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc);
+
+static RoParticle ro_particle_new(int num, const float *vp, rTexture tex_sink) {
+    return ro_particle_new_a(num, vp, tex_sink, allocator_new_default());
+}
 
 void ro_particle_kill(RoParticle *self);
 
@@ -32,7 +40,7 @@ void ro_particle_update_sub(RoParticle *self, int offset, int size);
 void ro_particle_render_sub(RoParticle *self, float time, int num);
 
 // resets the texture, if .owns_tex is true, it will delete the old texture
-void ro_particle_set_texture(RoParticle *self, GLuint tex_sink);
+void ro_particle_set_texture(RoParticle *self, rTexture tex_sink);
 
 static void ro_particle_update(RoParticle *self) {
     ro_particle_update_sub(self, 0, self->num);

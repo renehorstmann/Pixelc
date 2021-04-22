@@ -3,18 +3,16 @@
 #include "button.h"
 
 
-void button_init(RoSingle *self, GLuint tex_sink) {
-    ro_single_init(self, camera.gl, tex_sink);
-
-    u_pose_set_size(&self->rect.uv, 0.5, 1);
+void button_init(RoSingle *self, rTexture tex_sink) {
+    *self = ro_single_new(camera.gl, tex_sink);
 }
 
 bool button_is_pressed(RoSingle *self) {
-    return u_pose_get_x(self->rect.uv) > 0.25;
+    return self->rect.sprite.x > 0.5;
 }
 
 void button_set_pressed(RoSingle *self, bool pressed) {
-    u_pose_set_x(&self->rect.uv, pressed ? 0.5 : 0);
+    self->rect.sprite.x = pressed ? 1 : 0;
 }
 
 

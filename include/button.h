@@ -5,7 +5,7 @@
 #include "e/input.h"
 #include "r/ro_single.h"
 
-void button_init(RoSingle *self, GLuint tex_sink);
+void button_init(RoSingle *self, rTexture tex_sink);
 
 bool button_is_pressed(RoSingle *self);
 

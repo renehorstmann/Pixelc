@@ -2,7 +2,7 @@
 #define PIXELC_BRUSH_H
 
 #include "e/input.h"
-#include "color.h"
+#include "u/color.h"
 
 enum brushmodes {
     BRUSH_MODE_FREE,
@@ -24,8 +24,8 @@ enum selectionmode {
 };
 
 struct BrushGlobals_s {
-    Color_s current_color;
-    Color_s secondary_color;
+    uColor_s current_color;
+    uColor_s secondary_color;
     enum brushmodes mode;
     int shape;
     bool shading_active;

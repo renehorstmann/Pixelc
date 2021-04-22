@@ -1,9 +1,8 @@
 #ifndef PIXELC_PALETTE_H
 #define PIXELC_PALETTE_H
 
-#include <stdbool.h>
 #include "e/input.h"
-#include "color.h"
+#include "u/color.h"
 
 #define PALETTE_MAX 80
 
@@ -22,6 +21,6 @@ int palette_get_color();
 
 void palette_set_color(int index);
 
-void palette_set_colors(const Color_s *palette, int size);
+void palette_set_colors(const uColor_s *palette, int size);
 
 #endif //PIXELC_PALETTE_H

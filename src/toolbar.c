@@ -6,13 +6,12 @@
 #include "button.h"
 #include "camera.h"
 #include "brush.h"
-#include "brush_shape.h"
+#include "brushshape.h"
 #include "canvas.h"
-#include "canvas_camera_control.h"
+#include "canvascamctrl.h"
 #include "animation.h"
 #include "selection.h"
 #include "savestate.h"
-#include "io.h"
 #include "toolbar.h"
 
 #define MODES 7
@@ -73,7 +72,7 @@ static RoSingle *tool_append(float x, float y, const char *btn_file) {
     assert(L.tools_size < TOOL_MAX);
     Tool *self = &L.tools[L.tools_size++];
 
-    button_init(&self->btn, r_texture_new_file(btn_file, NULL));
+    button_init(&self->btn, r_texture_new_file(2, 1, btn_file));
     self->x = x;
     self->y = y;
     return &self->btn;
@@ -142,35 +141,35 @@ void toolbar_init() {
 
 
     // shape kernel:
-    ro_single_init(&L.shape, camera.gl, brush_shape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
+    L.shape = ro_single_new(camera.gl, brushshape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
 
     // secondar color:
-    ro_single_init(&L.color_bg, camera.gl, r_texture_new_file("res/toolbar_color_bg.png", NULL));
+    L.color_bg = ro_single_new(camera.gl, r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));
 
-    ro_single_init(&L.color_drop, camera.gl, r_texture_new_file("res/color_drop.png", NULL));
+    L.color_drop = ro_single_new(camera.gl, r_texture_new_file(1, 1, "res/color_drop.png"));
 
 
     // selection buttons:
-    button_init(&L.selection_copy, r_texture_new_file("res/button_copy.png", NULL));
+    button_init(&L.selection_copy, r_texture_new_file(2, 1, "res/button_copy.png"));
 
-    button_init(&L.selection_cut, r_texture_new_file("res/button_cut.png", NULL));
+    button_init(&L.selection_cut, r_texture_new_file(2, 1, "res/button_cut.png"));
 
-    button_init(&L.selection_rotate_left, r_texture_new_file("res/button_rotate_left.png", NULL));
+    button_init(&L.selection_rotate_left, r_texture_new_file(2, 1, "res/button_rotate_left.png"));
 
-    button_init(&L.selection_rotate_right, r_texture_new_file("res/button_rotate_right.png", NULL));
+    button_init(&L.selection_rotate_right, r_texture_new_file(2, 1, "res/button_rotate_right.png"));
 
-    button_init(&L.selection_mirror_horizontal, r_texture_new_file("res/button_horizontal.png", NULL));
+    button_init(&L.selection_mirror_horizontal, r_texture_new_file(2, 1, "res/button_horizontal.png"));
 
-    button_init(&L.selection_mirror_vertical, r_texture_new_file("res/button_vertical.png", NULL));
+    button_init(&L.selection_mirror_vertical, r_texture_new_file(2, 1, "res/button_vertical.png"));
 
-    button_init(&L.selection_ok, r_texture_new_file("res/button_ok.png", NULL));
+    button_init(&L.selection_ok, r_texture_new_file(2, 1, "res/button_ok.png"));
 
     // layer:
-    button_init(&L.layer_prev, r_texture_new_file("res/button_prev.png", NULL));
+    button_init(&L.layer_prev, r_texture_new_file(2, 1, "res/button_prev.png"));
 
-    button_init(&L.layer_next, r_texture_new_file("res/button_next.png", NULL));
+    button_init(&L.layer_next, r_texture_new_file(2, 1, "res/button_next.png"));
 
-    ro_text_init_font55(&L.layer_num, 3, camera.gl);
+    L.layer_num = ro_text_new_font55(3, camera.gl);
 
 }
 
@@ -182,11 +181,11 @@ void toolbar_update(float dtime) {
 
     // shape kernel:
     L.shape.rect.pose = pose16(-22, 10);  // should be 16x16
-    L.shape.rect.uv = brush_shape_kernel_texture_uv(brush.shape);
+    L.shape.rect.sprite.y = brush.shape;
 
     // secondary color:    
     L.color_bg.rect.pose = L.color_drop.rect.pose = pose16(64, 9);
-    L.color_drop.rect.color = color_to_vec4(brush.secondary_color);
+    L.color_drop.rect.color = u_color_to_vec4(brush.secondary_color);
 
     // selection buttons:
     if(toolbar.show_selection_ok)
@@ -296,7 +295,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         }
         toolbar.show_selection_copy_cut = false;
 
-        Image *img = io_load_image(io.default_import_file, 1);
+        uImage *img = u_image_new_file(1, canvas.default_import_file);
         button_set_pressed(L.selection, img != NULL);
         toolbar.show_selection_ok = img != NULL;
 
@@ -305,7 +304,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             selection_init(0, 0, img->cols, img->rows);
             selection_copy(img, 0);
             selection_paste(canvas_image(), canvas.current_layer);
-            image_delete(img);
+            u_image_delete(img);
             brush.selection_mode = BRUSH_SELECTION_PASTE;
             brush_set_selection_active(true, false);
         }
@@ -335,7 +334,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
     }
 
     if (button_clicked(L.camera, pointer)) {
-        canvas_camera_control_set_home();
+        canvascamctrl_set_home();
     }
 
     if (button_toggled(L.animation, pointer)) {
