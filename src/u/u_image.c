@@ -64,6 +64,8 @@ uImage *u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
 
 uImage *u_image_new_clone_a(const uImage *from, Allocator_s a) {
     uImage *self = u_image_new_empty_a(from->cols, from->rows, from->layers, a);
+    if(!u_image_valid(self))
+        return u_image_new_invalid();
     memcpy(self->data, from->data, u_image_data_size(from));
     return self;
 }
@@ -91,7 +93,8 @@ uImage *u_image_new_file_a(int layers, const char *file, Allocator_s a) {
     }
 
     image = u_image_new_empty_a(img->w, img->h / layers, layers, a);
-    memcpy(image->data, img->pixels, sizeof(uColor_s) * img->w * img->h);
+    if(u_image_valid(image))
+        memcpy(image->data, img->pixels, sizeof(uColor_s) * img->w * img->h);
 
     CLEAN_UP:
     SDL_FreeSurface(img);
@@ -110,6 +113,11 @@ bool u_image_save_file(const uImage *self, const char *file) {
         return false;
     }
     SDL_Surface *img = load_buffer((void *) self->data, self->cols, self->rows * self->layers);
+    if(!img) {
+        rhc_error = "image save file failed";
+        log_error("u_image_save_file failed: sdl buffer failed: %s", SDL_GetError());
+        return false;
+    }
     int ret = IMG_SavePNG(img, file);
     SDL_FreeSurface(img);
     if (ret) {
@@ -150,6 +158,9 @@ void u_image_rotate(uImage *self, bool right) {
         return;
         
     uImage *tmp = u_image_new_clone_a(self, self->allocator);
+    if(!u_image_valid(tmp))
+        return;
+
     self->cols = tmp->rows;
     self->rows = tmp->cols;
     for (int l = 0; l < self->layers; l++) {
@@ -170,6 +181,8 @@ void u_image_mirror(uImage *self, bool vertical) {
         return;
     
     uImage *tmp = u_image_new_clone(self);
+    if(!u_image_valid(tmp))
+        return;
 
     for (int l = 0; l < self->layers; l++) {
         for (int r = 0; r < self->rows; r++) {

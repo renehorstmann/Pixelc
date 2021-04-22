@@ -62,6 +62,10 @@ void selection_copy(const uImage *from, int layer) {
         log_error("selection_copy failed");
         return;
     }
+
+    // invalid safe
+    u_image_delete(L.opt_img);
+
     L.opt_img = u_image_new_empty(L.cols, L.rows, 1);
 
     for (int r = 0; r < L.rows; r++) {
@@ -116,23 +120,9 @@ void selection_rotate(bool right) {
         return;
     }
 
-    uImage *tmp = u_image_new_clone(L.opt_img);
-
-    int cols = L.rows;
-    int rows = L.cols;
-
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < cols; c++) {
-            int mc = right ? r : rows - 1 - r;
-            int mr = right ? cols - 1 - c : c;
-            *u_image_pixel(L.opt_img, c, r, 0) = *u_image_pixel(tmp, mc, mr, 0);
-        }
-    }
-
-    u_image_delete(tmp);
-
-    L.cols = cols;
-    L.rows = rows;
+    u_image_rotate(L.opt_img, right);
+    L.cols = L.opt_img->cols;
+    L.rows = L.opt_img->rows;
 }
 
 void selection_mirror(bool vertical) {
@@ -142,15 +132,5 @@ void selection_mirror(bool vertical) {
         return;
     }
 
-    uImage *tmp = u_image_new_clone(L.opt_img);
-
-    for (int r = 0; r < L.rows; r++) {
-        for (int c = 0; c < L.cols; c++) {
-            int mc = vertical ? L.cols - 1 - c : c;
-            int mr = vertical ? r : L.rows - 1 - r;
-            *u_image_pixel(L.opt_img, c, r, 0) = *u_image_pixel(tmp, mc, mr, 0);
-        }
-    }
-
-    u_image_delete(tmp);
+    u_image_mirror(L.opt_img, vertical);
 }

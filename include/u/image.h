@@ -61,6 +61,10 @@ bool u_image_copy(uImage *self, const uImage *from);
 
 bool u_image_equals(const uImage *self, const uImage *from);
 
+void u_image_rotate(uImage *self, bool right);
+
+void u_image_mirror(uImage *self, bool vertical);
+
 static size_t u_image_data_size(const uImage *self) {
     if(!u_image_valid(self))
         return 0;
