@@ -120,6 +120,18 @@ void r_texture_set(rTexture self, const void *buffer) {
     r_render_error_check("r_texture_setBEGIN");
     if(!r_texture_valid(self) || !buffer)
         return;
+
+    // reorder vertical
+    void *tmp_buffer = NULL;
+    if(self.sprites.x > 1) {
+        int image_cols = self.sprite_size.x * self.sprites.x;
+        int image_rows = self.sprite_size.y * self.sprites.y;
+        tmp_buffer = rhc_malloc_raising(4 * image_cols * image_rows);
+
+        reorder(tmp_buffer, buffer, self.sprite_size, self.sprites);
+        buffer = tmp_buffer;
+    }
+
     glBindTexture(GL_TEXTURE_2D_ARRAY, self.tex);
     glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 
             0, 0, 0, 
@@ -127,6 +139,9 @@ void r_texture_set(rTexture self, const void *buffer) {
             self.sprite_size.y, 
             self.sprites.x * self.sprites.y,
             GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+    // NULL safe free
+    rhc_free(tmp_buffer);
     r_render_error_check("r_texture_set");
 }
 
