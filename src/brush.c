@@ -91,8 +91,8 @@ static void move_selection(ePointer_s pointer) {
 }
 
 void brush_init() {
-    brush.current_color = COLOR_TRANSPARENT;
-    brush.secondary_color = COLOR_TRANSPARENT;
+    brush.current_color = U_COLOR_TRANSPARENT;
+    brush.secondary_color = U_COLOR_TRANSPARENT;
     brush.mode = BRUSH_MODE_FREE;
     brush.shape = 0;
     brush.shading_active = false;

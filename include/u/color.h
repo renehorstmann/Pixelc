@@ -55,12 +55,12 @@ static uColor_s u_color_from_hex(const char *hex_string) {
     return c;
 }
 
-static const uColor_s COLOR_TRANSPARENT = {0, 0, 0, 0};
-static const uColor_s COLOR_BLACK = {0, 0, 0, 255};
-static const uColor_s COLOR_WHITE = {255, 255, 255, 255};
-static const uColor_s COLOR_RED = {255, 0, 0, 255};
-static const uColor_s COLOR_GREEN = {0, 255, 0, 255};
-static const uColor_s COLOR_BLUE = {0, 0, 255, 255};
+static const uColor_s U_COLOR_TRANSPARENT = {0, 0, 0, 0};
+static const uColor_s U_COLOR_BLACK = {0, 0, 0, 255};
+static const uColor_s U_COLOR_WHITE = {255, 255, 255, 255};
+static const uColor_s U_COLOR_RED = {255, 0, 0, 255};
+static const uColor_s U_COLOR_GREEN = {0, 255, 0, 255};
+static const uColor_s U_COLOR_BLUE = {0, 0, 255, 255};
 
 
 #endif //U_COLOR_H

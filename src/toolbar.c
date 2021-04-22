@@ -141,7 +141,7 @@ void toolbar_init() {
 
 
     // shape kernel:
-    L.shape = ro_single_new(camera.gl, brushshape_create_kernel_texture(COLOR_TRANSPARENT, COLOR_WHITE));
+    L.shape = ro_single_new(camera.gl, brushshape_create_kernel_texture(U_COLOR_TRANSPARENT, U_COLOR_WHITE));
 
     // secondar color:
     L.color_bg = ro_single_new(camera.gl, r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));

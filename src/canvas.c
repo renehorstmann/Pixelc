@@ -246,7 +246,7 @@ void canvas_clear() {
             if (!selection_contains(c, r))
                 continue;
 
-            *u_image_pixel(L.image, c, r, canvas.current_layer) = COLOR_TRANSPARENT;
+            *u_image_pixel(L.image, c, r, canvas.current_layer) = U_COLOR_TRANSPARENT;
         }
     }
     canvas_save();
