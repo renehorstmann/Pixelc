@@ -300,12 +300,13 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
         log_trace("toolbar: import load file");
         uImage *img = u_image_new_file(1, canvas.default_import_file);
+        log_trace("toolbar: import loaded file: %i", img != NULL);
         button_set_pressed(L.selection, img != NULL);
         toolbar.show_selection_ok = img != NULL;
 
 
         log_trace("toolbar: import set selection? %i", img!=NULL);
-        if (img) {
+        if (u_image_valid(img)) {
             selection_init(0, 0, img->cols, img->rows);
             selection_copy(img, 0);
             selection_paste(canvas_image(), canvas.current_layer);

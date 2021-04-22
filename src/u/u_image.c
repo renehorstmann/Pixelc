@@ -71,6 +71,7 @@ uImage *u_image_new_clone_a(const uImage *from, Allocator_s a) {
 }
 
 uImage *u_image_new_file_a(int layers, const char *file, Allocator_s a) {
+    log_trace("u_image_new_file_a");
     assume(layers > 0, "A single layer needed");
     uImage *image = NULL;
     SDL_Surface *img = IMG_Load(file);
@@ -92,11 +93,14 @@ uImage *u_image_new_file_a(int layers, const char *file, Allocator_s a) {
         goto CLEAN_UP;
     }
 
+    log_trace("u_image_new_file_a: new empty");
     image = u_image_new_empty_a(img->w, img->h / layers, layers, a);
+    log_trace("u_image_new_file_a: cpy? %i", u_image_valid(image));
     if(u_image_valid(image))
         memcpy(image->data, img->pixels, sizeof(uColor_s) * img->w * img->h);
 
     CLEAN_UP:
+    log_trace("u_image_new_file_a: CLEAN_UP");
     SDL_FreeSurface(img);
     return image;
 }
