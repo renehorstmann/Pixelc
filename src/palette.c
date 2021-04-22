@@ -122,8 +122,9 @@ void palette_update(float dtime) {
 
         // background uv
         {
-            float v = r < last_row ? 0.5 : 0;
-            u_pose_set(&L.background_ro.rects[idx].uv, 0.5, v, 0.5, 0.5, 0);
+            float u = 1;
+            float v = r < last_row ? 1 : 0;
+            L.background_ro.rects[idx].sprite = (vec2) {{u, v}};
         }
     }
 
