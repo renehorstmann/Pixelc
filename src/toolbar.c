@@ -72,7 +72,7 @@ static RoSingle *tool_append(float x, float y, const char *btn_file) {
     assert(L.tools_size < TOOL_MAX);
     Tool *self = &L.tools[L.tools_size++];
 
-    button_init(&self->btn, r_texture_new_file(2, 1, btn_file));
+    self->btn = ro_single_new(camera.gl, r_texture_new_file(2, 1, btn_file));
     self->x = x;
     self->y = y;
     return &self->btn;
@@ -150,24 +150,24 @@ void toolbar_init() {
 
 
     // selection buttons:
-    button_init(&L.selection_copy, r_texture_new_file(2, 1, "res/button_copy.png"));
+    L.selection_copy = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_copy.png"));
 
-    button_init(&L.selection_cut, r_texture_new_file(2, 1, "res/button_cut.png"));
+    L.selection_cut = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_cut.png"));
 
-    button_init(&L.selection_rotate_left, r_texture_new_file(2, 1, "res/button_rotate_left.png"));
+    L.selection_rotate_left = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_rotate_left.png"));
 
-    button_init(&L.selection_rotate_right, r_texture_new_file(2, 1, "res/button_rotate_right.png"));
+    L.selection_rotate_right = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_rotate_right.png"));
 
-    button_init(&L.selection_mirror_horizontal, r_texture_new_file(2, 1, "res/button_horizontal.png"));
+    L.selection_mirror_horizontal = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_horizontal.png"));
 
-    button_init(&L.selection_mirror_vertical, r_texture_new_file(2, 1, "res/button_vertical.png"));
+    L.selection_mirror_vertical = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_vertical.png"));
 
-    button_init(&L.selection_ok, r_texture_new_file(2, 1, "res/button_ok.png"));
+    L.selection_ok = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_ok.png"));
 
     // layer:
-    button_init(&L.layer_prev, r_texture_new_file(2, 1, "res/button_prev.png"));
+    L.layer_prev = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_prev.png"));
 
-    button_init(&L.layer_next, r_texture_new_file(2, 1, "res/button_next.png"));
+    L.layer_next = ro_single_new(camera.gl, r_texture_new_file(2, 1, "res/button_next.png"));
 
     L.layer_num = ro_text_new_font55(3, camera.gl);
 

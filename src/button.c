@@ -3,10 +3,6 @@
 #include "button.h"
 
 
-void button_init(RoSingle *self, rTexture tex_sink) {
-    *self = ro_single_new(camera.gl, tex_sink);
-}
-
 bool button_is_pressed(RoSingle *self) {
     return self->rect.sprite.x > 0.5;
 }
