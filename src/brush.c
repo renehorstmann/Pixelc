@@ -176,6 +176,7 @@ bool brush_draw(int c, int r) {
 }
 
 void brush_abort_current_draw() {
+    log_info("brush: abort_current_draw");
     if (L.change) {
         canvas_redo_image();
         brushmode_reset(); // sets drawing to false
@@ -184,6 +185,7 @@ void brush_abort_current_draw() {
 }
 
 void brush_set_selection_active(bool active, bool reset) {
+    log_info("brush: set_selection_active : %i %i", active, reset);
     L.selection_active = active;
     if (reset) {
         L.selection_set = false;

@@ -53,6 +53,7 @@ bool selection_contains(int c, int r) {
 }
 
 void selection_copy(const uImage *from, int layer) {
+    log_info("selection: copy");
     if (!valid_to_copy(from, layer)) {
         log_error("selection_copy failed");
         return;
@@ -69,6 +70,7 @@ void selection_copy(const uImage *from, int layer) {
 }
 
 void selection_cut(uImage *from, int layer, uColor_s replace) {
+    log_info("selection: cut");
     if (!valid_to_copy(from, layer)) {
         log_error("selection_cut failed");
         return;
@@ -83,6 +85,7 @@ void selection_cut(uImage *from, int layer, uColor_s replace) {
 }
 
 void selection_paste(uImage *to, int layer) {
+    log_info("selection: paste");
     if (!u_image_valid(L.opt_img)) {
         log_error("selection_paste failed");
         return;
@@ -103,6 +106,7 @@ void selection_paste(uImage *to, int layer) {
 }
 
 void selection_rotate(bool right) {
+    log_info("selection: right (r=%i)", right);
     if (!u_image_valid(L.opt_img)) {
         log_error("selection_rotate failed");
         return;
@@ -128,6 +132,7 @@ void selection_rotate(bool right) {
 }
 
 void selection_mirror(bool vertical) {
+    log_info("selection: mirror (v=%i)", vertical);
     if (!u_image_valid(L.opt_img)) {
         log_error("selection_mirror failed");
         return;

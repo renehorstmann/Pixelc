@@ -298,11 +298,13 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         }
         toolbar.show_selection_copy_cut = false;
 
+        log_trace("toolbar: import load file");
         uImage *img = u_image_new_file(1, canvas.default_import_file);
         button_set_pressed(L.selection, img != NULL);
         toolbar.show_selection_ok = img != NULL;
 
 
+        log_trace("toolbar: import set selection? %i", img!=NULL);
         if (img) {
             selection_init(0, 0, img->cols, img->rows);
             selection_copy(img, 0);
@@ -311,6 +313,7 @@ bool toolbar_pointer_event(ePointer_s pointer) {
             brush.selection_mode = BRUSH_SELECTION_PASTE;
             brush_set_selection_active(true, false);
         }
+        log_trace("toolbar: import finished");
     }
 
     if (button_toggled(L.selection, pointer)) {
