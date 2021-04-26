@@ -7,11 +7,6 @@
 
 #include "core.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
-#endif
-
 
 #ifdef __EMSCRIPTEN__
 static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_VIDEO;

@@ -12,7 +12,6 @@
 
 #define E_MAX_POINTER_EVENTS 32
 #define E_MAX_WHEEL_EVENTS 32
-#define E_EMSCRIPTEN_POINTER_STACK_SIZE 1024
 
 // ePointer_s::id for middle and right button clicks
 #define E_POINTER_BUTTON_MIDDLE -1

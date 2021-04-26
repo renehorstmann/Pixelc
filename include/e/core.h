@@ -19,4 +19,11 @@
 #include <SDL_opengl.h>
 #endif
 
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+// #include <emscripten/html5.h>
+#endif
+
+
 #endif //E_CORE_H
