@@ -8,6 +8,13 @@
 // rhc implementation source file, only once in a project
 #include "rhc/rhc_impl.h"
 
+#ifdef OPTION_GLES
+#define FULLSCREEN
+#endif
+
+#ifdef __EMSCRIPTEN__
+#undef FULLSCREEN
+#endif
 
 #define MAX_DELTA_TIME 5.0 // seconds
 
@@ -131,7 +138,7 @@ void e_window_init(const char *name) {
     }
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     
-#ifdef OPTION_GLES
+#ifdef FULLSCREEN
     SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
 #endif
 

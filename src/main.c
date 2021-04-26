@@ -21,9 +21,9 @@
 
 // canvas size
 //*
-#define COLS 64
-#define ROWS 32
-#define LAYERS 1
+#define COLS 16
+#define ROWS 16
+#define LAYERS 2
 //*/
 
 // Tilec
@@ -47,7 +47,7 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
-#define PLAY_FRAMES 2
+#define PLAY_FRAMES 1
 #define PLAY_FPS 2.0
 
 // uncomment the used palette:
@@ -72,7 +72,7 @@
 
 
 // uncomment to change the file locations:
-// #define IMAGE_FILE "../JumpHare/res/ice_block.png"
+// #define IMAGE_FILE "../JumpHare/res/hare.png"
 // #define IMPORT_FILE "res/color_drop.png"
 
 //
