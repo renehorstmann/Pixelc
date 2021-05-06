@@ -103,7 +103,6 @@ static void setup_selection() {
     ro_batch_update(&L.selection_border);
 }
 
-#include "mathc/uchar.h"
 static void save_state() {
     log_info("canvas: save_state");
     
@@ -120,8 +119,6 @@ static void save_state() {
     u_image_copy(*img, L.image);
     savestate_save_data(img, img_size);
     
-    ucvec4_println(*img->data);
-    
     // costum uImage
     rhc_free(img);
 }
@@ -133,7 +130,7 @@ static void load_state(const void *data, size_t size) {
     
     u_image_kill(&L.image);
     uImage *img = (uImage *) data;
-    ucvec4_println(*img->data);
+    img->data = (uColor_s *) ((char*) data + sizeof(uImage));
     L.image = u_image_new_clone(*img);
     u_image_save_file(canvas_image(), canvas.default_image_file);
 }

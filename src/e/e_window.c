@@ -244,7 +244,7 @@ void e_window_handle_window_event(const SDL_Event *event) {
         return;
     }
     if(event->type == SDL_WINDOWEVENT) {
-        log_window_event(event);
+//        log_window_event(event);
         switch (event->window.event) {
 //        case SDL_WINDOWEVENT_SHOWN:
 //        case SDL_WINDOWEVENT_RESTORED:
@@ -265,55 +265,55 @@ static void log_window_event(const SDL_Event *event) {
     if (event->type == SDL_WINDOWEVENT){
         switch (event->window.event) {
         case SDL_WINDOWEVENT_SHOWN:
-            log_info("Window %d shown", event->window.windowID);
+            log_trace("Window %d shown", event->window.windowID);
             break;       
         case SDL_WINDOWEVENT_HIDDEN:
-            log_info("Window %d hidden", event->window.windowID);
+            log_trace("Window %d hidden", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            log_info("Window %d exposed", event->window.windowID);
+            log_trace("Window %d exposed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MOVED:
-            log_info("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_trace("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            log_info("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_trace("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
-            log_info("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_trace("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            log_info("Window %d minimized", event->window.windowID);
+            log_trace("Window %d minimized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            log_info("Window %d maximized", event->window.windowID);
+            log_trace("Window %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            log_info("Window %d restored", event->window.windowID);
+            log_trace("Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            log_info("Mouse entered window %d", event->window.windowID);
+            log_trace("Mouse entered window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            log_info("Mouse left window %d", event->window.windowID);
+            log_trace("Mouse left window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            log_info("Window %d gained keyboard focus", event->window.windowID);
+            log_trace("Window %d gained keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            log_info("Window %d lost keyboard focus", event->window.windowID);
+            log_trace("Window %d lost keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            log_info("Window %d closed", event->window.windowID);
+            log_trace("Window %d closed", event->window.windowID);
             break;
 #if SDL_VERSION_ATLEAST(2, 0, 5) 
-            case SDL_WINDOWEVENT_TAKE_FOCUS : log_info("Window %d is offered a focus", event->window.windowID);
+            case SDL_WINDOWEVENT_TAKE_FOCUS : log_trace("Window %d is offered a focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIT_TEST:
-            log_info("Window %d has a special hit test", event->window.windowID);
+            log_trace("Window %d has a special hit test", event->window.windowID);
             break;
 #endif 
-            default : log_info("Window %d got unknown event %d", event->window.windowID, event->window.event);
+            default : log_trace("Window %d got unknown event %d", event->window.windowID, event->window.event);
             break;
         }
     }

@@ -35,13 +35,12 @@ static int palette_cols() {
 
 static bool pos_in_palette(vec2 pos) {
     int cols = palette_cols();
+    int rows = 1 + L.palette_size / cols;
+    int size = rows * COLOR_DROP_SIZE;
     if (camera_is_portrait_mode()) {
-        int rows = 1 + L.palette_size / cols;
-        return pos.y <= camera_bottom() + rows * COLOR_DROP_SIZE;
-    } else {
-        int rows = 1 + L.palette_size / cols;
-        return pos.x >= camera_right() - rows * COLOR_DROP_SIZE;
+        return pos.y <= camera_bottom() + size;
     }
+    return pos.x >= camera_right() - size;
 }
 
 
@@ -159,7 +158,7 @@ bool palette_pointer_event(ePointer_s pointer) {
         return true;
 
     for (int i = 0; i < L.palette_size; i++) {
-        if (u_pose_aa_contains(L.palette_ro.rects[i].pose, pointer.pos.xy)) {
+        if (u_pose_contains(L.palette_ro.rects[i].pose, pointer.pos)) {
             palette_set_color(i);
             return true;
         }
