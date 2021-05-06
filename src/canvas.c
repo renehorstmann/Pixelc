@@ -129,8 +129,11 @@ static void load_state(const void *data, size_t size) {
     assume(sizeof(uImage) + u_image_data_size(L.image) == size, "invalid data + size pair");
     
     u_image_kill(&L.image);
+    
+    // costum uImage with data concatenated
     uImage *img = (uImage *) data;
     img->data = (uColor_s *) ((char*) data + sizeof(uImage));
+    
     L.image = u_image_new_clone(*img);
     u_image_save_file(canvas_image(), canvas.default_image_file);
 }
