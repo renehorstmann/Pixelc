@@ -3,6 +3,11 @@
 #include "rhc/log.h"
 #include "u/image.h"
 
+
+//
+// private
+//
+
 static SDL_Surface *load_buffer(void *data, int cols, int rows) {
     // Set up the pixel format color masks for RGB(A) byte arrays.
     Uint32 rmask, gmask, bmask, amask;
@@ -25,6 +30,10 @@ static SDL_Surface *load_buffer(void *data, int cols, int rows) {
     return surf;
 }
 
+
+//
+// public
+//
 
 uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
     size_t data_size = cols * rows * layers * sizeof(uColor_s);

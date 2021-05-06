@@ -20,6 +20,16 @@
 // 0  0  0  1
 
 // u_pose_aa_* are axis aligned (angle=0)
+// w  0  0  x
+// 0  h  0  y
+// 0  0  1  (z)
+// 0  0  0  1
+
+// an rect is defined as vec4:
+// center_x
+// center_y
+// width
+// height
 
 
 #include <stdbool.h>
@@ -35,6 +45,11 @@ static mat4 u_pose_new(float x, float y, float w, float h) {
                            0, 0, 1, 0,
                            x, y, 0, 1
                    }};
+}
+
+// x, y, w, h
+static mat4 u_pose_new_rect(vec4 rect) {
+    return u_pose_new(rect.x, rect.y, rect.v2, rect.v3);
 }
 
 static mat4 u_pose_new_angle(float x, float y, float w, float h, float angle_rad) {
@@ -67,14 +82,21 @@ static vec2 u_pose_get_xy(mat4 p) {
     return (vec2) {{p.m30, p.m31}};
 }
 
+static float u_pose_get_angle(mat4 p) {
+    return atan2f(p.m01, p.m00);
+}
+
+// returns abs(w)
 static float u_pose_get_w(mat4 p) {
     return sqrtf(powf(p.m00, 2) + powf(p.m01, 2));
 }
 
+// returns abs(h)
 static float u_pose_get_h(mat4 p) {
     return sqrtf(powf(p.m10, 2) + powf(p.m11, 2));
 }
 
+// returns abs(w), abs(h)
 static vec2 u_pose_get_wh(mat4 p) {
     return (vec2) {{
         u_pose_get_w(p),
@@ -82,25 +104,38 @@ static vec2 u_pose_get_wh(mat4 p) {
     }};
 }
 
-static float u_pose_get_angle(mat4 p) {
-    return atan2f(p.m01, p.m00);
+static float u_pose_aa_get_w(mat4 p) {
+    return p.m00;
+}
+
+static float u_pose_aa_get_h(mat4 p) {
+    return p.m11;
+}
+
+static vec2 u_pose_aa_get_wh(mat4 p) {
+    return (vec2) {{p.m00, p.m11}};
+}
+
+static vec4 u_pose_aa_get_rect(mat4 p) {
+    return (vec4) {{p.m30, p.m31, p.m00, p.m11}};
 }
 
 static float u_pose_aa_get_left(mat4 p) {
-    return p.m30 - u_pose_get_w(p) / 2;
+    return p.m30 - p.m00 / 2;
 }
 
 static float u_pose_aa_get_right(mat4 p) {
-    return p.m30 + u_pose_get_w(p) / 2;
+    return p.m30 + p.m00 / 2;
 }
 
 static float u_pose_aa_get_top(mat4 p) {
-    return p.m31 + u_pose_get_h(p) / 2;
+    return p.m31 + p.m11 / 2;
 }
 
 static float u_pose_aa_get_bottom(mat4 p) {
-    return p.m31 - u_pose_get_h(p) / 2;
+    return p.m31 - p.m11 / 2;
 }
+
 
 
 static void u_pose_set_x(mat4 *p, float x) {
@@ -180,19 +215,19 @@ static void u_pose_shift(mat4 *p, float x, float y, float angle_rad) {
 
 
 static void u_pose_aa_set_left(mat4 *p, float l) {
-    p->m30 = l + u_pose_get_w(*p) / 2;
+    p->m30 = l + p->m00 / 2;
 }
 
 static void u_pose_aa_set_right(mat4 *p, float r) {
-    p->m30 = r - u_pose_get_w(*p) / 2;
+    p->m30 = r - p->m00 / 2;
 }
 
 static void u_pose_aa_set_top(mat4 *p, float t) {
-    p->m31 = t - u_pose_get_h(*p) / 2;
+    p->m31 = t - p->m11 / 2;
 }
 
 static void u_pose_aa_set_bottom(mat4 *p, float b) {
-    p->m31 = b + u_pose_get_h(*p) / 2;
+    p->m31 = b + p->m11 / 2;
 }
 
 static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {

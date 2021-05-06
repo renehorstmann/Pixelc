@@ -9,6 +9,11 @@
 
 _Static_assert(sizeof(ucvec4) == 4, "wtf");
 
+
+//
+// private
+//
+
 // grid to vertical
 static void reorder(ucvec4 *dst, const ucvec4 *src, ivec2 sprite_size, ivec2 sprites) {
    
@@ -27,6 +32,11 @@ static void reorder(ucvec4 *dst, const ucvec4 *src, ivec2 sprite_size, ivec2 spr
     }   
 }
 
+
+
+//
+// public
+//
 
 rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer) {
     r_render_error_check("r_texture_newBEGIN");

@@ -21,6 +21,11 @@ rTexture ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
 }
 
 
+
+//
+// private
+//
+
 // from u/pose
 static float u_pose_get_w(mat4 p) {
     return sqrtf(powf(p.m00, 2) + powf(p.m01, 2));
@@ -48,6 +53,11 @@ static void u_pose_set_size(mat4 *p, float w, float h) {
 }
 // end of u/pose copy
 
+
+
+//
+// public
+//
 
 RoTtfText ro_ttftext_new(const float *vp, vec4 color, const char *text) {
     RoTtfText self;

@@ -9,6 +9,12 @@
 #include "mathc/types/int.h"
 #include "core.h"
 
+enum e_window_screen_modes {
+    E_WINDOW_MODE_WINDOW,
+    E_WINDOW_MODE_MAXIMIZED,
+    E_WINDOW_MODE_FULLSCREEN,
+    E_WINDOW_NUM_MODES
+};
 
 #define E_WINDOW_MAX_PAUSE_EVENTS 32
 
@@ -31,6 +37,9 @@ void e_window_kill();
 
 // starts the main loop (emscripten needs a main loop function)
 void e_window_main_loop(e_window_main_loop_fn main_loop);
+
+// to set fullscreen, etc.
+void e_window_set_screen_mode(enum e_window_screen_modes mode);
 
 void e_window_register_pause_callback(e_window_pause_callback_fn event, void *user_data);
 

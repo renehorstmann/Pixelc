@@ -8,13 +8,6 @@
 // rhc implementation source file, only once in a project
 #include "rhc/rhc_impl.h"
 
-#ifdef OPTION_GLES
-#define FULLSCREEN
-#endif
-
-#ifdef __EMSCRIPTEN__
-#undef FULLSCREEN
-#endif
 
 #define MAX_DELTA_TIME 5.0 // seconds
 
@@ -23,6 +16,12 @@ void e_window_handle_window_event(const SDL_Event *event);
 
 
 struct eWindowGlobals_s e_window;
+
+
+
+//
+// private 
+//
 
 typedef struct {
     e_window_pause_callback_fn cb;
@@ -88,6 +87,10 @@ static void resume() {
 
 
 
+//
+// public
+//
+
 void e_window_init(const char *name) {
 #ifdef NDEBUG
     rhc_log_set_min_level(RHC_LOG_WARN);
@@ -138,9 +141,6 @@ void e_window_init(const char *name) {
     }
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     
-#ifdef FULLSCREEN
-    SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
-#endif
 
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.window);
@@ -195,6 +195,20 @@ void e_window_main_loop(e_window_main_loop_fn main_loop) {
     log_info("e_window_kill: killed");
 }
 
+void e_window_set_screen_mode(enum e_window_screen_modes mode) {
+    Uint32 sdl_mode = 0;
+    
+    // emscripten is always fullscreen
+#ifndef __EMSCRIPTEN__
+    log_info("e_window_set_screen_mode: %i", mode);
+    if(mode == E_WINDOW_MODE_MAXIMIZED) {
+        sdl_mode = SDL_WINDOW_FULLSCREEN_DESKTOP;
+    } else if(mode == E_WINDOW_MODE_FULLSCREEN) {
+        sdl_mode = SDL_WINDOW_FULLSCREEN;
+    }
+#endif
+    SDL_SetWindowFullscreen(e_window.window, sdl_mode);
+}
 
 
 void e_window_register_pause_callback(e_window_pause_callback_fn event, void *user_data) {

@@ -4,9 +4,19 @@
 
 struct rRenderGolabals_s r_render;
 
+
+//
+// private
+//
+
 static struct {
    GLuint framebuffer_tex_fbo;
 } L;
+
+
+//
+// public
+//
 
 void r_render_init(SDL_Window *window) {
     r_render_error_check("r_render_initBEGIN");

@@ -1,18 +1,10 @@
 #include <float.h> // FLT_MAX
 #include "mathc/float.h"
+#include "mathc/sca/int.h"
 #include "rhc/error.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/ro_particle.h"
-
-
-static int clamp_range(int i, int begin, int end) {
-    if (i < begin)
-        i = begin;
-    if (i >= end)
-        i = end - 1;
-    return i;
-}
 
 
 RoParticle ro_particle_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc) {
@@ -158,8 +150,8 @@ void ro_particle_update_sub(RoParticle *self, int offset, int size) {
     r_render_error_check("ro_particle_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
-    offset = clamp_range(offset, 0, self->num);
-    size = clamp_range(size, 1, self->num + 1);
+    offset = isca_clamp(offset, 0, self->num-1);
+    size = isca_clamp(size, 1, self->num);
 
     if (offset + size > self->num) {
         int to_end = self->num - offset;

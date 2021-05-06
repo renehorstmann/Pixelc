@@ -4,6 +4,10 @@
 #include "r/ro_text.h"
 #include "r/texture.h"
 
+//
+// private
+//
+
 // from u/pose
 static mat4 u_pose_new(float x, float y, float w, float h) {
     // mat4 has column major order
@@ -36,6 +40,11 @@ static mat4 pose(RoText *self, int c, int r) {
     return u_pose_new_aa(c * self->offset.x, -r * self->offset.y, self->size.x, self->size.y);
 }
 
+
+
+//
+// public
+//
 
 RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTexture tex_sink, Allocator_s alloc) {
     RoText self;
@@ -126,6 +135,11 @@ void ro_text_set_color(RoText *self, vec4 color) {
 }
 
 
+
+//
+// private
+//
+
 static bool font55_sprite_cb(vec2 *sprite, char c) {
     const int columns = 12;
     const int rows = 5;
@@ -148,6 +162,11 @@ static bool font55_sprite_cb(vec2 *sprite, char c) {
 
     return nl;
 }
+
+
+//
+// public
+//
 
 RoText ro_text_new_font55(int max, const float *vp) {
     const int columns = 12;

@@ -11,6 +11,10 @@
 
 struct eGuiGlobals_s e_gui;
 
+//
+// private
+//
+
 static struct {
     int auto_offset;
 } L;
@@ -21,6 +25,11 @@ static struct nk_rect window_rect(float w, float h) {
     L.auto_offset++;
     return nk_rect(50 + col * 100, 50 + row * 200, w, h);
 }
+
+
+//
+// public
+//
 
 void e_gui_init() {
     e_gui.ctx = nk_sdl_init(e_window.window);

@@ -10,6 +10,11 @@ void e_window_handle_window_event(const SDL_Event *event);
 
 struct eInputGlobals_s e_input;
 
+
+//
+// private
+//
+
 typedef struct {
     ePointerEventFn cb;
     void *ud;
@@ -173,6 +178,11 @@ void e_input_init() {
 #endif
 }
 
+
+
+//
+// public
+//
 
 
 void e_input_update() {

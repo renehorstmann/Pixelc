@@ -1,28 +1,11 @@
 #include "mathc/float.h"
+#include "mathc/sca/int.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/ro_batchrefract.h"
 
-
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
-
-static void init_rects(rRect_s *instances, int num) {
-    for (int i = 0; i < num; i++) {
-        rRect_s *r = &instances[i];
-        r->pose = mat4_eye();
-        r->uv = mat4_eye();
-        r->color = vec4_set(1);
-    }
-}
-
-static int clamp_range(int i, int begin, int end) {
-    if (i < begin)
-        i = begin;
-    if (i >= end)
-        i = end - 1;
-    return i;
-}
 
 RoBatchRefract ro_batchrefract_new_a(int num,
         const float *vp, const float *scale_ptr,
@@ -133,8 +116,8 @@ void ro_batchrefract_update_sub(RoBatchRefract *self, int offset, int size) {
     r_render_error_check("ro_batchrefract_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
-    offset = clamp_range(offset, 0, self->num);
-    size = clamp_range(size, 1, self->num + 1);
+    offset = isca_clamp(offset, 0, self->num-1);
+    size = isca_clamp(size, 1, self->num);
 
     if (offset + size > self->num) {
         int to_end = self->num - offset;

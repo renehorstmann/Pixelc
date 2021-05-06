@@ -1,16 +1,10 @@
 #include "mathc/float.h"
+#include "mathc/sca/int.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/ro_batch.h"
 
 
-static int clamp_range(int i, int begin, int end) {
-    if (i < begin)
-        i = begin;
-    if (i >= end)
-        i = end - 1;
-    return i;
-}
 
 RoBatch ro_batch_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc) {
     r_render_error_check("ro_batch_newBEGIN");
@@ -110,8 +104,8 @@ void ro_batch_update_sub(RoBatch *self, int offset, int size) {
     r_render_error_check("ro_batch_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
 
-    offset = clamp_range(offset, 0, self->num);
-    size = clamp_range(size, 1, self->num + 1);
+    offset = isca_clamp(offset, 0, self->num-1);
+    size = isca_clamp(size, 1, self->num);
 
     if (offset + size > self->num) {
         int to_end = self->num - offset;
