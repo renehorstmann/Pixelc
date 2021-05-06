@@ -10,6 +10,10 @@
 #include "input.h"
 
 
+//
+// private
+//
+
 static void pointer_event(ePointer_s pointer, void *user_data) {
 
     // hud pointer.pos in hud coords
@@ -36,6 +40,11 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     if (go)
         brush_pointer_event(c_pointer);
 }
+
+
+//
+// public
+//
 
 void input_init() {
     e_input_register_pointer_event(pointer_event, NULL);

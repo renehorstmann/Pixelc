@@ -5,6 +5,10 @@
 #include "canvascamctrl.h"
 
 
+//
+// private
+//
+
 static struct {
     vec2 pos;
     float size;
@@ -53,6 +57,12 @@ static void wheel_event(bool up, void *user_data) {
         L.size *= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
     canvascam_set_size(L.size);
 }
+
+
+//
+// public
+//
+
 
 void canvascamctrl_init() {
     L.size = 1;

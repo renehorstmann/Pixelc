@@ -5,9 +5,19 @@
 #include "camera.h"
 #include "background.h"
 
+
+//
+// private
+//
+
 static struct {
     RoSingle ro;
 } L;
+
+
+//
+// public
+//
 
 void background_init(uColor_s a, uColor_s b) {
     uColor_s buf[4];

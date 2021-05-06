@@ -5,6 +5,11 @@
 #include "brush.h"
 #include "savestate.h"
 
+
+//
+// private
+//
+
 typedef struct {
     void *data[SAVESTATE_MAX_IDS];
     size_t size[SAVESTATE_MAX_IDS];
@@ -21,6 +26,11 @@ static struct {
     int current_id;
 } L;
 
+
+
+//
+// public
+//
 
 void savestate_init() {
 

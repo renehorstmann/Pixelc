@@ -10,6 +10,9 @@
 
 struct AnimationGlobals_s animation;
 
+//
+// private
+//
 
 static struct {
     RoText horsimann;
@@ -41,6 +44,12 @@ static void set_pose(int c, int r) {
         L.ro[i].rects[r * L.mcols + c].pose = pose;
     }
 }
+
+
+//
+// public
+//
+
 
 void animation_init(int multi_cols, int multi_rows, float size, int frames, float fps) {
     L.mcols = multi_cols;

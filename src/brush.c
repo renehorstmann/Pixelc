@@ -9,6 +9,11 @@
 
 struct BrushGlobals_s brush;
 
+
+//
+// private
+//
+
 static struct {
     bool change;
     bool selection_active;
@@ -89,6 +94,12 @@ static void move_selection(ePointer_s pointer) {
     canvas_redo_image();
     selection_paste(img, layer);
 }
+
+
+
+//
+// public
+//
 
 void brush_init() {
     brush.current_color = U_COLOR_TRANSPARENT;

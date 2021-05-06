@@ -11,6 +11,11 @@
 #define COLOR_DROP_SIZE 16.0f
 #define MAX_ROWS 10
 
+
+//
+// private
+//
+
 static struct {
     uColor_s palette[PALETTE_MAX];
     int palette_size;
@@ -53,6 +58,11 @@ static mat4 setup_palette_color_pose(int r, int c) {
     }
     return pose;
 }
+
+
+//
+// public
+//
 
 void palette_init() {
     L.palette_ro = ro_batch_new(PALETTE_MAX, camera.gl, r_texture_new_file(1, 1, "res/color_drop.png"));

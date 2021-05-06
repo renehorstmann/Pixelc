@@ -2,6 +2,11 @@
 #include "rhc/log.h"
 #include "selection.h"
 
+
+//
+// private
+//
+
 static struct {
     int left, top;
     int cols, rows;
@@ -14,6 +19,11 @@ static bool valid_to_copy(uImage img, int layer) {
            && L.left + L.cols <= img.cols
            && L.top + L.rows <= img.rows;
 }
+
+
+//
+// public
+//
 
 void selection_init(int left, int top, int cols, int rows) {
     log_info("selection: init");

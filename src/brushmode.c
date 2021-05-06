@@ -3,6 +3,11 @@
 #include "canvas.h"
 #include "brushmode.h"
 
+
+//
+// private
+//
+
 static struct {
     bool is_drawing;
     ivec2 last;
@@ -38,6 +43,11 @@ static bool lineto(ivec2 from, ivec2 to) {
     return changed;
 }
 
+
+
+//
+// public
+//
 
 void brushmode_reset() {
     L.is_drawing = false;

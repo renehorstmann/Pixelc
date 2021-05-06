@@ -21,6 +21,11 @@
 
 struct ToolbarGlobals_s toolbar;
 
+
+//
+// private 
+//
+
 typedef struct {
     RoSingle btn;
     float x, y;
@@ -111,6 +116,10 @@ static mat4 pose16(float col, float row) {
     return pose_wh(col, row, 16, 16);
 }
 
+
+//
+// public
+//
 
 void toolbar_init() {
     L.undo = tool_append(-80, 26, "res/button_undo.png");

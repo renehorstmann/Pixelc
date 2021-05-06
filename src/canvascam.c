@@ -8,11 +8,20 @@
 
 struct CanvasCameraGlobals_s canvascam;
 
+
+//
+// private
+//
+
 static struct {
     float real_pixel_per_pixel;
     float left, right, bottom, top;
 } L;
 
+
+//
+// public
+//
 
 void canvascam_init() {
     assert(CANVAS_CAMERA_SIZE % 2 == 0 && "CANVAS_CAMERA_SIZE must be even");
