@@ -44,5 +44,13 @@ Allocator_s allocator_new_default();
 // uses rhc_malloc_raising, rhc_realloc_raising, rhc_free
 Allocator_s allocator_new_raising();
 
+// does nothing, but is valid
+// malloc, realloc will return NULL
+Allocator_s allocator_new_empty();
+
+// will always raise a signal, but is valid
+// if the signal is catched and ignored, NULL is returned
+Allocator_s allocator_new_empty_raising();
+
 
 #endif //RHC_ALLOCATOR_H
