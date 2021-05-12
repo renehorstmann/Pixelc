@@ -14,10 +14,13 @@
 typedef struct {
     rRect_s rect;
     const float *vp;    // mat4 camera view perspective
-    GLuint program;     // shader
-    GLuint vao;         // internal vertex array object
-    rTexture tex;       // used texture
     bool owns_tex;      // if true, the texture will be deleted by this class
+
+    struct {
+        GLuint program;     // shader
+        GLuint vao;         // internal vertex array object
+        rTexture tex;       // used texture
+    } L;
 } RoSingle;
 
 RoSingle ro_single_new(const float *vp, rTexture tex_sink);

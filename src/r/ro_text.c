@@ -53,7 +53,7 @@ RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTex
     self.size = (vec2) {{5, 5}};
     self.offset = (vec2) {{6, 6}};
     self.vp = vp;
-    self.mvp = mat4_eye();
+    self.L.mvp = mat4_eye();
     // batch.vp will be set each time before rendering
     self.ro = ro_batch_new_a(max, NULL, tex_sink, alloc);
     hide(&self, 0);
@@ -66,8 +66,8 @@ void ro_text_kill(RoText *self) {
 }
 
 void ro_text_render(RoText *self) {
-    self->mvp = mat4_mul_mat(Mat4(self->vp), self->pose);
-    self->ro.vp = &self->mvp.m00;
+    self->L.mvp = mat4_mul_mat(Mat4(self->vp), self->pose);
+    self->ro.vp = &self->L.mvp.m00;
     ro_batch_render(&self->ro);
 }
 

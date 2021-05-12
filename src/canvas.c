@@ -207,7 +207,7 @@ void canvas_update(float dtime) {
     u_pose_set(&L.pose, x, y, w, h, 0);
 
     for (int i = 0; i < L.image.layers; i++) {
-        r_texture_set(L.render_objects[i].tex, u_image_layer(L.image, i));
+        r_texture_set(L.render_objects[i].L.tex, u_image_layer(L.image, i));
 
         // set pose
         L.render_objects[i].rect.pose = L.pose;

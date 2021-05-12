@@ -15,13 +15,15 @@ typedef struct {
     rParticleRect_s *rects;
     int num;
     const float *vp;    // mat4 camera view perspective
-    GLuint program;     // shader
-    GLuint vao;         // internal vertex array object
-    GLuint vbo;         // internal vertex buffer object
-    rTexture tex;         // used texture
     bool owns_tex;      // if true, the texture will be deleted by this class
-    
-    Allocator_s allocator;
+
+    struct {
+        GLuint program;     // shader
+        GLuint vao;         // internal vertex array object
+        GLuint vbo;         // internal vertex buffer object
+        rTexture tex;       // used texture
+        Allocator_s allocator;
+    } L;
 } RoParticle;
 
 

@@ -18,7 +18,10 @@ typedef struct {
     vec2 size;              // character size
     vec2 offset;            // offset to next character
     const float *vp;        // mat4 camera view perspective
-    mat4 mvp;               // internal mvp as vp for the batch
+
+    struct {
+        mat4 mvp;               // internal mvp as vp for the batch
+    } L;
 } RoText;
 
 RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTexture tex_sink, Allocator_s alloc);

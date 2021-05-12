@@ -62,13 +62,18 @@ void rhc_log_base_(enum rhc_log_level level, const char *file, int line, const c
     if (level < rhc_log_L.level || rhc_log_L.quiet) {
         return;
     }
+    va_list args;
 
+#ifdef RHC_LOG_DO_NOT_PRINT_TIME_FILE
+    va_start(args, format);
+    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, rhc_log_sdl_priority(level), format, args);
+    va_end(args);
+#else
     /* Get current time */
     time_t t = time(NULL);
     struct tm *lt = localtime(&t);
 
 
-    va_list args;
     char buf[16];
     buf[strftime(buf, sizeof(buf), "%H:%M:%S", lt)] = '\0';
 
@@ -77,6 +82,7 @@ void rhc_log_base_(enum rhc_log_level level, const char *file, int line, const c
     va_start(args, format);
     SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, rhc_log_sdl_priority(level), msg_format, args);
     va_end(args);
+#endif
 }
 
 #else
@@ -85,13 +91,28 @@ void rhc_log_base_(enum rhc_log_level level, const char *file, int line, const c
     if (level < rhc_log_L.level || rhc_log_L.quiet) {
         return;
     }
+    va_list args;
 
+#ifdef RHC_LOG_DO_NOT_PRINT_TIME_FILE
+#ifdef RHC_LOG_DO_NOT_USE_COLOR
+    va_start(args, format);
+    vfprintf(RHC_LOG_DEFAULT_FILE, format, args);
+    va_end(args);
+#else
+    fprintf(RHC_LOG_DEFAULT_FILE, "%s%-5s\x1b[0m\x1b[90m:\x1b[0m ",
+            rhc_log_src_level_colors_[level], rhc_log_src_level_names_[level]);
+    va_start(args, format);
+    vfprintf(RHC_LOG_DEFAULT_FILE, format, args);
+    va_end(args);
+#endif
+    fprintf(RHC_LOG_DEFAULT_FILE, "\n");
+    fflush(RHC_LOG_DEFAULT_FILE);
+#else
     /* Get current time */
     time_t t = time(NULL);
     struct tm *lt = localtime(&t);
 
     /* Log to RHC_DEFAULT_FILE (stdout) */
-    va_list args;
     char buf[16];
     buf[strftime(buf, sizeof(buf), "%H:%M:%S", lt)] = '\0';
 
@@ -108,6 +129,7 @@ void rhc_log_base_(enum rhc_log_level level, const char *file, int line, const c
     va_end(args);
     fprintf(RHC_LOG_DEFAULT_FILE, "\n");
     fflush(RHC_LOG_DEFAULT_FILE);
+#endif
 }
 #endif
 

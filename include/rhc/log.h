@@ -15,6 +15,9 @@
 // use the following definition to stop using colors (not in sdl...)
 // #define RHC_LOG_DO_NOT_USE_COLOR
 
+// use the following definition to stop printing time and file info
+// #define RHC_LOG_DO_NOT_PRINT_TIME_FILE
+
 
 enum rhc_log_level {
     RHC_LOG_TRACE, RHC_LOG_DEBUG, RHC_LOG_INFO, RHC_LOG_WARN, RHC_LOG_ERROR, RHC_LOG_WTF, RHC_LOG_NUM_LEVELS

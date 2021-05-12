@@ -99,7 +99,7 @@ void animation_update(float dtime) {
 
     uImage img = canvas_image();
     for (int i = 0; i <= canvas.current_layer; i++) {
-        r_texture_set(L.ro[i].tex, u_image_layer(img, i));
+        r_texture_set(L.ro[i].L.tex, u_image_layer(img, i));
         ro_batch_update(&L.ro[i]);
     }
 }

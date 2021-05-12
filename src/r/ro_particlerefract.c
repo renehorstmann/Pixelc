@@ -15,7 +15,7 @@ RoParticleRefract ro_particlerefract_new_a(int num,
                               rTexture tex_main_sink, rTexture tex_refraction_sink, Allocator_s alloc) {
     r_render_error_check("ro_particlerefract_newBEGIN");
     RoParticleRefract self;
-    self.allocator = alloc;
+    self.L.allocator = alloc;
     
     assume(num>0, "particle needs atleast 1 particlerect");
     self.rects = alloc.malloc(alloc, num * sizeof(rParticleRect_s));
@@ -29,7 +29,7 @@ RoParticleRefract ro_particlerefract_new_a(int num,
     self.scale = scale_ptr;
     self.view_aabb = &VIEW_AABB_FULLSCREEN.v0;
 
-    self.program = r_program_new_file("res/r/particlerefract.glsl");
+    self.L.program = r_program_new_file("res/r/particlerefract.glsl");
     const int loc_pose = 0;
     const int loc_uv = 4;
     const int loc_color = 8;
@@ -42,8 +42,8 @@ RoParticleRefract ro_particlerefract_new_a(int num,
     
     const int loc_start_time = 14;
 
-    self.tex_main = tex_main_sink;
-    self.tex_refraction = tex_refraction_sink;
+    self.L.tex_main = tex_main_sink;
+    self.L.tex_refraction = tex_refraction_sink;
     self.owns_tex_main = true;
     self.owns_tex_refraction = true;
     
@@ -52,19 +52,19 @@ RoParticleRefract ro_particlerefract_new_a(int num,
 
     // vao scope
     {
-        glGenVertexArrays(1, &self.vao);
-        glBindVertexArray(self.vao);
+        glGenVertexArrays(1, &self.L.vao);
+        glBindVertexArray(self.L.vao);
 
         // vbo
         {
-            glGenBuffers(1, &self.vbo);
-            glBindBuffer(GL_ARRAY_BUFFER, self.vbo);
+            glGenBuffers(1, &self.L.vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, self.L.vbo);
             glBufferData(GL_ARRAY_BUFFER,
                          num * sizeof(rParticleRect_s),
                          self.rects,
                          GL_STREAM_DRAW);
 
-            glBindVertexArray(self.vao);
+            glBindVertexArray(self.L.vao);
 
             // pose
             for (int c = 0; c < 4; c++) {
@@ -148,20 +148,20 @@ RoParticleRefract ro_particlerefract_new_a(int num,
 
 
 void ro_particlerefract_kill(RoParticleRefract *self) {
-    self->allocator.free(self->allocator, self->rects);
-    glDeleteProgram(self->program);
-    glDeleteVertexArrays(1, &self->vao);
-    glDeleteBuffers(1, &self->vbo);
+    self->L.allocator.free(self->L.allocator, self->rects);
+    glDeleteProgram(self->L.program);
+    glDeleteVertexArrays(1, &self->L.vao);
+    glDeleteBuffers(1, &self->L.vbo);
     if (self->owns_tex_main)
-        r_texture_kill(&self->tex_main);
+        r_texture_kill(&self->L.tex_main);
     if (self->owns_tex_refraction)
-        r_texture_kill(&self->tex_refraction);
+        r_texture_kill(&self->L.tex_refraction);
     *self = (RoParticleRefract) {0};
 }
 
 void ro_particlerefract_update_sub(RoParticleRefract *self, int offset, int size) {
     r_render_error_check("ro_particlerefract_updateBEGIN");
-    glBindBuffer(GL_ARRAY_BUFFER, self->vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
     offset = isca_clamp(offset, 0, self->num-1);
     size = isca_clamp(size, 1, self->num);
@@ -192,37 +192,37 @@ void ro_particlerefract_update_sub(RoParticleRefract *self, int offset, int size
 
 void ro_particlerefract_render_sub(RoParticleRefract *self, float time, int num) {
     r_render_error_check("ro_particlerefract_renderBEGIN");
-    glUseProgram(self->program);
+    glUseProgram(self->L.program);
 
     // base
-    glUniformMatrix4fv(glGetUniformLocation(self->program, "vp"),
+    glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"),
                        1, GL_FALSE, self->vp);
 
-    vec2 sprites = vec2_cast_from_int(&self->tex_main.sprites.v0);
-    glUniform2fv(glGetUniformLocation(self->program, "sprites"), 1, &sprites.v0);
+    vec2 sprites = vec2_cast_from_int(&self->L.tex_main.sprites.v0);
+    glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 
-    glUniform1f(glGetUniformLocation(self->program, "time"), time);
+    glUniform1f(glGetUniformLocation(self->L.program, "time"), time);
 
     // fragment shader
-    glUniform1f(glGetUniformLocation(self->program, "scale"), *self->scale);
+    glUniform1f(glGetUniformLocation(self->L.program, "scale"), *self->scale);
     
-    glUniform4fv(glGetUniformLocation(self->program, "view_aabb"), 1, self->view_aabb);
+    glUniform4fv(glGetUniformLocation(self->L.program, "view_aabb"), 1, self->view_aabb);
 
-    glUniform1i(glGetUniformLocation(self->program, "tex_main"), 0);
+    glUniform1i(glGetUniformLocation(self->L.program, "tex_main"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_main.tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex_main.tex);
     
-    glUniform1i(glGetUniformLocation(self->program, "tex_refraction"), 1);
+    glUniform1i(glGetUniformLocation(self->L.program, "tex_refraction"), 1);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_refraction.tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex_refraction.tex);
     
-    glUniform1i(glGetUniformLocation(self->program, "tex_framebuffer"), 2);
+    glUniform1i(glGetUniformLocation(self->L.program, "tex_framebuffer"), 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, self->tex_framebuffer_ptr->tex);
 
     {
-        glBindVertexArray(self->vao);
-        // r_program_validate(self->program); // debug test
+        glBindVertexArray(self->L.vao);
+        // r_program_validate(self->L.program); // debug test
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num);
         glBindVertexArray(0);
     }
@@ -233,12 +233,12 @@ void ro_particlerefract_render_sub(RoParticleRefract *self, float time, int num)
 
 void ro_particlerefract_set_texture_main(RoParticleRefract *self, rTexture tex_main_sink) {
     if (self->owns_tex_main)
-        r_texture_kill(&self->tex_main);
-    self->tex_main = tex_main_sink;
+        r_texture_kill(&self->L.tex_main);
+    self->L.tex_main = tex_main_sink;
 }
 
 void ro_particlerefract_set_texture_refraction(RoParticleRefract *self, rTexture tex_refraction_sink){
     if (self->owns_tex_refraction)
-        r_texture_kill(&self->tex_refraction);
-    self->tex_refraction = tex_refraction_sink;
+        r_texture_kill(&self->L.tex_refraction);
+    self->L.tex_refraction = tex_refraction_sink;
 }

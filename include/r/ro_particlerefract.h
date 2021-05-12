@@ -36,33 +36,35 @@ typedef struct {
     const float *vp;                    // mat4
     const float *scale;                 // float
     const float *view_aabb;             // vec4
-    GLuint program;                     // shader
-    GLuint vao;                         // internal vertex array object
-    GLuint vbo;                         // internal vertex buffer object
-    rTexture tex_main;                  // used main texture
-    rTexture tex_refraction;              // used refraction texture
-    const rTexture2D *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
     bool owns_tex_main;                 // if true, the textures will be deleted by this class
     bool owns_tex_refraction;
-    
-    Allocator_s allocator;
+    const rTexture2D *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
+
+    struct {
+        GLuint program;                     // shader
+        GLuint vao;                         // internal vertex array object
+        GLuint vbo;                         // internal vertex buffer object
+        rTexture tex_main;                  // used main texture
+        rTexture tex_refraction;            // used refraction texture
+        Allocator_s allocator;
+    } L;
 } RoParticleRefract;
 
 RoParticleRefract ro_particlerefract_new_a(int num,
-        const float *vp, const float *scale_ptr,
-        rTexture tex_main_sink, 
-        rTexture tex_refraction_sink, 
-        Allocator_s alloc);                              
+                                           const float *vp, const float *scale_ptr,
+                                           rTexture tex_main_sink,
+                                           rTexture tex_refraction_sink,
+                                           Allocator_s alloc);
 
 static RoParticleRefract ro_particlerefract_new(int num,
-        const float *vp, const float *scale_ptr,
-        rTexture tex_main_sink, 
-        rTexture tex_refraction_sink) {
+                                                const float *vp, const float *scale_ptr,
+                                                rTexture tex_main_sink,
+                                                rTexture tex_refraction_sink) {
     return ro_particlerefract_new_a(num, vp, scale_ptr,
-            tex_main_sink, tex_refraction_sink,
-            allocator_new_default());
+                                    tex_main_sink, tex_refraction_sink,
+                                    allocator_new_default());
 }
- 
+
 
 void ro_particlerefract_kill(RoParticleRefract *self);
 
