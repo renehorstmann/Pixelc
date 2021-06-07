@@ -12,12 +12,13 @@
 #endif
 #endif
 
+#include <stdint.h>
 #include <math.h>
 #include <assert.h>
 
 
 /** dst = r==c ? 1 : 0 (identity) */
-static void cmatN_eye(char *dst_mat, int n) {
+static void cmatN_eye(int8_t *dst_mat, int n) {
     for (int r = 0; r < n; r++) {
         for (int c = 0; c < n; c++)
             dst_mat[r * n + c] = r == c ? 1 : 0;
@@ -25,49 +26,49 @@ static void cmatN_eye(char *dst_mat, int n) {
 }
 
 /** dst = mat[row][:] */
-static void cmatN_get_row(char *dst_vec, const char *mat, int row, int n) {
+static void cmatN_get_row(int8_t *dst_vec, const int8_t *mat, int row, int n) {
     assert(row >= 0 && row < n);
     for (int c = 0; c < n; c++)
         dst_vec[c] = mat[c * n + row];
 }
 
 /** dst = mat[:][col] */
-static void cmatN_get_col(char *dst_vec, const char *mat, int col, int n) {
+static void cmatN_get_col(int8_t *dst_vec, const int8_t *mat, int col, int n) {
     assert(col >= 0 && col < n);
     for (int r = 0; r < n; r++)
         dst_vec[r] = mat[col * n + r];
 }
 
 /** dst[row][:] = vec */
-static void cmatN_set_row(char *dst_mat, const char *vec, int row, int n) {
+static void cmatN_set_row(int8_t *dst_mat, const int8_t *vec, int row, int n) {
     assert(row >= 0 && row < n);
     for (int c = 0; c < n; c++)
         dst_mat[c * n + row] = vec[c];
 }
 
 /** dst[:][col] = vec */
-static void cmatN_set_col(char *dst_mat, const char *vec, int col, int n) {
+static void cmatN_set_col(int8_t *dst_mat, const int8_t *vec, int col, int n) {
     assert(col >= 0 && col < n);
     for (int r = 0; r < n; r++)
         dst_mat[col * n + r] = vec[r];
 }
 
 /** dst[row][:] = scalar */
-static void cmatN_set_row_sca(char *dst_mat, char scalar, int row, int n) {
+static void cmatN_set_row_sca(int8_t *dst_mat, int8_t scalar, int row, int n) {
     assert(row >= 0 && row < n);
     for (int c = 0; c < n; c++)
         dst_mat[c * n + row] = scalar;
 }
 
 /** dst[:][col] = scalar */
-static void cmatN_set_col_sca(char *dst_mat, char scalar, int col, int n) {
+static void cmatN_set_col_sca(int8_t *dst_mat, int8_t scalar, int col, int n) {
     assert(col >= 0 && col < n);
     for (int r = 0; r < n; r++)
         dst_mat[col * n + r] = scalar;
 }
 
 /** returns sum of diagonal form upper left to lower right */
-static int cmatN_trace(const char *mat, int n) {
+static int cmatN_trace(const int8_t *mat, int n) {
     int sum = 0;
     for(int i=0; i<n; i++)
         sum += mat[i*n + i];
@@ -75,7 +76,7 @@ static int cmatN_trace(const char *mat, int n) {
 }
 
 /** dst = mat^t  (restrict data) */
-static void cmatN_transpose_no_alias(char *restrict dst_mat, const char *restrict mat, int n) {
+static void cmatN_transpose_no_alias(int8_t *restrict dst_mat, const int8_t *restrict mat, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst_mat[c * n + r] = mat[r * n + c];
@@ -84,12 +85,12 @@ static void cmatN_transpose_no_alias(char *restrict dst_mat, const char *restric
 }
 
 /** dst = mat^t */
-static void cmatN_transpose(char *dst_mat, const char *mat, int n) {
+static void cmatN_transpose(int8_t *dst_mat, const int8_t *mat, int n) {
 #ifdef MATHC_MAX_SIZE
     assert(n <= MATHC_MAX_SIZE);
-    char tmp[MATHC_MAX_SIZE * MATHC_MAX_SIZE];
+    int8_t tmp[MATHC_MAX_SIZE * MATHC_MAX_SIZE];
 #else
-    char tmp[n * n];
+    int8_t tmp[n * n];
 #endif
     cmatN_transpose_no_alias(tmp, mat, n);
     for (int i = 0; i < n * n; i++)
@@ -97,8 +98,8 @@ static void cmatN_transpose(char *dst_mat, const char *mat, int n) {
 }
 
 /** dst = a @ b  (restrict data) */
-static void cmatN_mul_mat_no_alias(char *restrict dst_mat, const char *restrict mat_a,
-                                  const char *restrict mat_b, int n) {
+static void cmatN_mul_mat_no_alias(int8_t *restrict dst_mat, const int8_t *restrict mat_a,
+                                  const int8_t *restrict mat_b, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst_mat[c * n + r] = 0;
@@ -109,12 +110,12 @@ static void cmatN_mul_mat_no_alias(char *restrict dst_mat, const char *restrict 
 }
 
 /** dst = a @ b */
-static void cmatN_mul_mat(char *dst_mat, const char *mat_a, const char *mat_b, int n) {
+static void cmatN_mul_mat(int8_t *dst_mat, const int8_t *mat_a, const int8_t *mat_b, int n) {
 #ifdef MATHC_MAX_SIZE
     assert(n <= MATHC_MAX_SIZE);
-    char tmp[MATHC_MAX_SIZE * MATHC_MAX_SIZE];
+    int8_t tmp[MATHC_MAX_SIZE * MATHC_MAX_SIZE];
 #else
-    char tmp[n * n];
+    int8_t tmp[n * n];
 #endif
     cmatN_mul_mat_no_alias(tmp, mat_a, mat_b, n);
     for (int i = 0; i < n * n; i++)
@@ -122,8 +123,8 @@ static void cmatN_mul_mat(char *dst_mat, const char *mat_a, const char *mat_b, i
 }
 
 /** dst = a @ b  (restrict data) */
-static void cmatN_mul_vec_no_alias(char *restrict dst_vec, const char *restrict mat_a,
-                                  const char *restrict vec_b, int n) {
+static void cmatN_mul_vec_no_alias(int8_t *restrict dst_vec, const int8_t *restrict mat_a,
+                                  const int8_t *restrict vec_b, int n) {
     for (int r = 0; r < n; r++) {
         dst_vec[r] = 0;
         for (int c = 0; c < n; c++) {
@@ -133,12 +134,12 @@ static void cmatN_mul_vec_no_alias(char *restrict dst_vec, const char *restrict 
 }
 
 /** dst = a @ b */
-static void cmatN_mul_vec(char *dst_vec, const char *mat_a, const char *vec_b, int n) {
+static void cmatN_mul_vec(int8_t *dst_vec, const int8_t *mat_a, const int8_t *vec_b, int n) {
 #ifdef MATHC_MAX_SIZE
     assert(n <= MATHC_MAX_SIZE);
-    char tmp[MATHC_MAX_SIZE];
+    int8_t tmp[MATHC_MAX_SIZE];
 #else
-    char tmp[n];
+    int8_t tmp[n];
 #endif
     cmatN_mul_vec_no_alias(tmp, mat_a, vec_b, n);
     for (int i = 0; i < n; i++)
@@ -146,8 +147,8 @@ static void cmatN_mul_vec(char *dst_vec, const char *mat_a, const char *vec_b, i
 }
 
 /** dst = a @ b  (restrict data) */
-static void cvecN_mul_mat_no_alias(char *restrict dst_vec, const char *restrict vec_a,
-                                  const char *restrict mat_b, int n) {
+static void cvecN_mul_mat_no_alias(int8_t *restrict dst_vec, const int8_t *restrict vec_a,
+                                  const int8_t *restrict mat_b, int n) {
     for (int c = 0; c < n; c++) {
         dst_vec[c] = 0;
         for (int r = 0; r < n; r++) {
@@ -157,12 +158,12 @@ static void cvecN_mul_mat_no_alias(char *restrict dst_vec, const char *restrict 
 }
 
 /** dst = a @ b */
-static void cvecN_mul_mat(char *dst_vec, const char *vec_a, const char *mat_b, int n) {
+static void cvecN_mul_mat(int8_t *dst_vec, const int8_t *vec_a, const int8_t *mat_b, int n) {
 #ifdef MATHC_MAX_SIZE
     assert(n <= MATHC_MAX_SIZE);
-    char tmp[MATHC_MAX_SIZE];
+    int8_t tmp[MATHC_MAX_SIZE];
 #else
-    char tmp[n];
+    int8_t tmp[n];
 #endif
     cvecN_mul_mat_no_alias(tmp, vec_a, mat_b, n);
     for (int i = 0; i < n; i++)
@@ -170,7 +171,7 @@ static void cvecN_mul_mat(char *dst_vec, const char *vec_a, const char *mat_b, i
 }
 
 /** block<block_n*block_n> = mat<n*n>[col:col+block_n, row:row+block_n] */
-static void cmatN_get_block(char * restrict dst_block, const char * restrict mat, int row, int col, char block_n, int n) {
+static void cmatN_get_block(int8_t * restrict dst_block, const int8_t * restrict mat, int row, int col, int8_t block_n, int n) {
     assert(row >= 0 && row + block_n <= n);
     assert(col >= 0 && col + block_n <= n);
     for(int c=0; c<block_n; c++) {
@@ -181,7 +182,7 @@ static void cmatN_get_block(char * restrict dst_block, const char * restrict mat
 }
 
 /** dst<n*n>[col:col+block_n, row:row+block_n] = block<block_n*block_n> */
-static void cmatN_set_block(char * restrict dst_mat, const char * restrict block, int row, int col, char block_n, int n) {
+static void cmatN_set_block(int8_t * restrict dst_mat, const int8_t * restrict block, int row, int col, int8_t block_n, int n) {
     assert(row >= 0 && row + block_n <= n);
     assert(col >= 0 && col + block_n <= n);
     for(int c=0; c<block_n; c++) {

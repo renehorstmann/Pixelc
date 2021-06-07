@@ -6,122 +6,125 @@
 #endif
 
 
+#include <stdint.h>
+
+
 typedef union {
-    char v[2];
+    int8_t v[2];
     struct {
-        char v0, v1;
+        int8_t v0, v1;
     };
     struct {
-        char x, y;
+        int8_t x, y;
     };
     struct {
-        char r, g;
+        int8_t r, g;
     };
 } cvec2;
-static_assert(sizeof(cvec2) == sizeof(char) * 2, "[Mathc] wrong expected size");
+static_assert(sizeof(cvec2) == sizeof(int8_t) * 2, "[Mathc] wrong expected size");
 
-/** casts a char * to a dereferenced cvec2 */
+/** casts a int8_t * to a dereferenced cvec2 */
 #define CVec2(vec) (*(cvec2 *) (vec))
 
-/** casts a char * to a dereferenced const cvec2 */
+/** casts a int8_t * to a dereferenced const cvec2 */
 #define ConstCVec2(vec) (*(const cvec2 *) (vec))
 
 
 typedef union {
-    char v[4];
-    char m[2][2];
+    int8_t v[4];
+    int8_t m[2][2];
     cvec2 col[2];
     struct {
-        char v0, v1;
-        char v2, v3;
+        int8_t v0, v1;
+        int8_t v2, v3;
     };
     struct {
-        char m00, m01;
-        char m10, m11;
+        int8_t m00, m01;
+        int8_t m10, m11;
     };
 } cmat2;
-static_assert(sizeof(cmat2) == sizeof(char) * 4, "[Mathc] wrong expected size");
+static_assert(sizeof(cmat2) == sizeof(int8_t) * 4, "[Mathc] wrong expected size");
 
-/** casts a char * to a dereferenced cmat2 */
+/** casts a int8_t * to a dereferenced cmat2 */
 #define CMat2(mat) (*(cmat2 *) (mat))
 
-/** casts a char * to a dereferenced const cmat2 */
+/** casts a int8_t * to a dereferenced const cmat2 */
 #define ConstCMat2(mat) (*(const cmat2 *) (mat))
 
 typedef union {
-    char v[3];
+    int8_t v[3];
     struct {
-        char v0, v1, v2;
+        int8_t v0, v1, v2;
     };
     cvec2 xy;
     struct {
-        char x;
+        int8_t x;
         union {
             struct {
-                char y, z;
+                int8_t y, z;
             };
             cvec2 yz;
         };
     };
     cvec2 rg;
     struct {
-        char r;
+        int8_t r;
         union {
             struct {
-                char g, b;
+                int8_t g, b;
             };
             cvec2 gb;
         };
     };
 } cvec3;
-static_assert(sizeof(cvec3) == sizeof(char) * 3, "[Mathc] wrong expected size");
+static_assert(sizeof(cvec3) == sizeof(int8_t) * 3, "[Mathc] wrong expected size");
 
-/** casts a char * to a dereferenced cvec3 */
+/** casts a int8_t * to a dereferenced cvec3 */
 #define CVec3(vec) (*(cvec3 *) (vec))
 
-/** casts a char * to a dereferenced const cvec3 */
+/** casts a int8_t * to a dereferenced const cvec3 */
 #define ConstCVec3(vec) (*(const cvec3 *) (vec))
 
 
 typedef union {
-    char v[9];
-    char m[3][3];
+    int8_t v[9];
+    int8_t m[3][3];
     cvec3 col[3];
     struct {
-        char v0, v1, v2;
-        char v3, v4, v5;
-        char v6, v7, v8;
+        int8_t v0, v1, v2;
+        int8_t v3, v4, v5;
+        int8_t v6, v7, v8;
     };
     struct {
-        char m00, m01, m02;
-        char m10, m11, m12;
-        char m20, m21, m22;
+        int8_t m00, m01, m02;
+        int8_t m10, m11, m12;
+        int8_t m20, m21, m22;
     };
 } cmat3;
-static_assert(sizeof(cmat3) == sizeof(char) * 9, "[Mathc] wrong expected size");
+static_assert(sizeof(cmat3) == sizeof(int8_t) * 9, "[Mathc] wrong expected size");
 
-/** casts a char * to a dereferenced cmat3 */
+/** casts a int8_t * to a dereferenced cmat3 */
 #define CMat3(mat) (*(cmat3 *) (mat))
 
-/** casts a char * to a dereferenced const cmat3 */
+/** casts a int8_t * to a dereferenced const cmat3 */
 #define ConstCMat3(mat) (*(const cmat3 *) (mat))
 
 
 typedef union {
-    char v[4];
+    int8_t v[4];
     struct {
-        char v0, v1, v2, v3;
+        int8_t v0, v1, v2, v3;
     };
     cvec2 xy;
     cvec3 xyz;
     struct {
-        char x;
+        int8_t x;
         union {
             struct {
-                char y;
+                int8_t y;
                 union {
                     struct {
-                        char z, w;
+                        int8_t z, w;
                     };
                     cvec2 zw;
                 };
@@ -133,13 +136,13 @@ typedef union {
     cvec2 rg;
     cvec3 rgb;
     struct {
-        char r;
+        int8_t r;
         union {
             struct {
-                char g;
+                int8_t g;
                 union {
                     struct {
-                        char b, a;
+                        int8_t b, a;
                     };
                     cvec2 ba;
                 };
@@ -149,38 +152,38 @@ typedef union {
         };
     };
 } cvec4;
-static_assert(sizeof(cvec4) == sizeof(char) * 4, "[Mathc] wrong expected size");
+static_assert(sizeof(cvec4) == sizeof(int8_t) * 4, "[Mathc] wrong expected size");
 
-/** casts a char * to a dereferenced cvec4 */
+/** casts a int8_t * to a dereferenced cvec4 */
 #define CVec4(vec) (*(cvec4 *) (vec))
 
-/** casts a char * to a dereferenced const cvec4 */
+/** casts a int8_t * to a dereferenced const cvec4 */
 #define ConstCVec4(vec) (*(const cvec4 *) (vec))
 
 
 typedef union {
-    char v[16];
-    char m[4][4];
+    int8_t v[16];
+    int8_t m[4][4];
     cvec4 col[4];
     struct {
-        char v0, v1, v2, v3;
-        char v4, v5, v6, v7;
-        char v8, v9, v10, v11;
-        char v12, v13, v14, v15;
+        int8_t v0, v1, v2, v3;
+        int8_t v4, v5, v6, v7;
+        int8_t v8, v9, v10, v11;
+        int8_t v12, v13, v14, v15;
     };
     struct {
-        char m00, m01, m02, m03;
-        char m10, m11, m12, m13;
-        char m20, m21, m22, m23;
-        char m30, m31, m32, m33;
+        int8_t m00, m01, m02, m03;
+        int8_t m10, m11, m12, m13;
+        int8_t m20, m21, m22, m23;
+        int8_t m30, m31, m32, m33;
     };
 } cmat4;
-static_assert(sizeof(cmat4) == sizeof(char) * 16, "[Mathc] wrong expected size");
+static_assert(sizeof(cmat4) == sizeof(int8_t) * 16, "[Mathc] wrong expected size");
 
-/** casts a char * to a dereferenced cmat4 */
+/** casts a int8_t * to a dereferenced cmat4 */
 #define CMat4(mat) (*(cmat4 *) (mat))
 
-/** casts a char * to a dereferenced const cmat4 */
+/** casts a int8_t * to a dereferenced const cmat4 */
 #define ConstCMat4(mat) (*(const cmat4 *) (mat))
 
 
