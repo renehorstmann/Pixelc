@@ -61,7 +61,7 @@ static uvec4 uvec4_cast_from_int(const int *v) {
 }
 
 /** dst = (uvec4) v */
-static uvec4 uvec4_cast_from_char(const char *v) {
+static uvec4 uvec4_cast_from_char(const signed char *v) {
     uvec4 res;
     uvecN_cast_into(res.v, v, 4);
     return res;

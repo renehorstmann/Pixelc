@@ -48,7 +48,7 @@ static dvec4 dvec4_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (dvec4) v */
-static dvec4 dvec4_cast_from_char(const char *v) {
+static dvec4 dvec4_cast_from_char(const signed char *v) {
     dvec4 res;
     dvecN_cast_into(res.v, v, 4);
     return res;

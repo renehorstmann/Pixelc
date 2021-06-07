@@ -35,7 +35,7 @@ static mat2 mat2_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (mat2) v */
-static mat2 mat2_cast_from_char(const char *v) {
+static mat2 mat2_cast_from_char(const signed char *v) {
     mat2 res;
     vecN_cast_into(res.v, v, 2*2);
     return res;

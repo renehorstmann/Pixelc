@@ -35,7 +35,7 @@ static mat3 mat3_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (mat3) v */
-static mat3 mat3_cast_from_char(const char *v) {
+static mat3 mat3_cast_from_char(const signed char *v) {
     mat3 res;
     vecN_cast_into(res.v, v, 3*3);
     return res;

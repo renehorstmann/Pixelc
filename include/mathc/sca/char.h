@@ -2,66 +2,65 @@
 #define MATHC_SCA_CHAR_H
 
 #include <stdlib.h>  // abs
-#include <stdint.h>
 #include <math.h>
 
 /** dst = pow(x, y) */
-static int8_t csca_pow(int8_t x, int8_t y) {
+static signed char csca_pow(signed char x, signed char y) {
     return pow(x, y);
 }
 
 /** dst = exp(x) */
-static int8_t csca_exp(int8_t x) {
+static signed char csca_exp(signed char x) {
     return exp(x);
 }
 
 /** dst = log(x) */
-static int8_t csca_log(int8_t x) {
+static signed char csca_log(signed char x) {
     return log(x);
 }
 
 /** dst = exp2(x) */
-static int8_t csca_exp2(int8_t x) {
+static signed char csca_exp2(signed char x) {
     return exp2(x);
 }
 
 /** dst = log2(x) */
-static int8_t csca_log2(int8_t x) {
+static signed char csca_log2(signed char x) {
     return log2(x);
 }
 
 /** dst = sqrt(x) */
-static int8_t csca_sqrt(int8_t x) {
+static signed char csca_sqrt(signed char x) {
     return sqrt(x);
 }
 
 /** dst = abs(x) */
-static int8_t csca_abs(int8_t x) {
+static signed char csca_abs(signed char x) {
     return abs(x);
 }
 
 /** dst = a < b ? a : b */
-static int8_t csca_min(int8_t a, int8_t b) {
+static signed char csca_min(signed char a, signed char b) {
     return a < b ? a : b;
 }
 
 /** dst = a > b ? a : b */
-static int8_t csca_max(int8_t a, int8_t b) {
+static signed char csca_max(signed char a, signed char b) {
     return a > b ? a : b;
 }
 
 /** dst = x < min ? min : (x > max ? max : x) */
-static int8_t csca_clamp(int8_t x, int8_t min, int8_t max) {
+static signed char csca_clamp(signed char x, signed char min, signed char max) {
     return x < min ? min : (x > max ? max : x);
 }
 
 /** dst = a * (1-t) + b * t */
-static int8_t csca_mix(int8_t a, int8_t b, float t) {
+static signed char csca_mix(signed char a, signed char b, float t) {
     return a * (1.0-t) + b * t;
 }
 
 /** dst = x < edge ? 0 : 1 */
-static int8_t csca_step(int8_t x, int8_t edge) {
+static signed char csca_step(signed char x, signed char edge) {
     return x < edge ? 0: 1;
 }
 

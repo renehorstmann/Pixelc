@@ -42,7 +42,7 @@ static cmat2 cmat2_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (cmat2) v */
-static cmat2 cmat2_cast_from_uint8_t(const uint8_t *v) {
+static cmat2 cmat2_cast_from_uchar(const unsigned char *v) {
     cmat2 res;
     cvecN_cast_into(res.v, v, 2*2);
     return res;
@@ -61,7 +61,7 @@ static cvec2 cmat2_get_row(cmat2 mat, int row) {
     return res;
 }
 /** dst = mat[row][:] */
-static cvec2 cmat2_get_row_v(const int8_t *mat, int row) {
+static cvec2 cmat2_get_row_v(const signed char *mat, int row) {
     return cmat2_get_row(CMat2(mat), row);
 }
 
@@ -73,7 +73,7 @@ static cvec2 cmat2_get_col(cmat2 mat, int col) {
     return res;
 }
 /** dst = mat[:][col] */
-static cvec2 cmat2_get_col_v(const int8_t *mat, int col) {
+static cvec2 cmat2_get_col_v(const signed char *mat, int col) {
     return cmat2_get_col(CMat2(mat), col);
 }
 
@@ -84,7 +84,7 @@ static cmat2 cmat2_set_row(cmat2 mat, cvec2 vec, int row) {
     return mat;
 }
 /** dst = mat; dst[row][:] = vec */
-static cmat2 cmat2_set_row_v(const int8_t *mat, const int8_t *vec, int row) {
+static cmat2 cmat2_set_row_v(const signed char *mat, const signed char *vec, int row) {
     return cmat2_set_row(CMat2(mat), CVec2(vec), row);
 }
 
@@ -94,7 +94,7 @@ static cmat2 cmat2_set_this_row(cmat2 *mat, cvec2 vec, int row) {
     return *mat;
 }
 /** mat[row][:] = vec; dst = mat */
-static cmat2 cmat2_set_this_row_v(int8_t *mat, const int8_t *vec, int row) {
+static cmat2 cmat2_set_this_row_v(signed char *mat, const signed char *vec, int row) {
     return cmat2_set_this_row((cmat2*) mat, CVec2(vec), row);
 }
 
@@ -104,7 +104,7 @@ static cmat2 cmat2_set_col(cmat2 mat, cvec2 vec, int col) {
     return mat;
 }
 /** dst = mat; dst[:][col] = vec */
-static cmat2 cmat2_set_col_v(const int8_t *mat, const int8_t *vec, int col) {
+static cmat2 cmat2_set_col_v(const signed char *mat, const signed char *vec, int col) {
     return cmat2_set_col(CMat2(mat), CVec2(vec), col);
 }
 
@@ -114,49 +114,49 @@ static cmat2 cmat2_set_this_col(cmat2 *mat, cvec2 vec, int col) {
     return *mat;
 }
 /** mat[:][col] = vec; dst = mat */
-static cmat2 cmat2_set_this_col_v(int8_t *mat, const int8_t *vec, int col) {
+static cmat2 cmat2_set_this_col_v(signed char *mat, const signed char *vec, int col) {
     return cmat2_set_this_col((cmat2*) mat, CVec2(vec), col);
 }
 
 
 /** dst = mat; dst[row][:] = scalar */
-static cmat2 cmat2_set_row_sca(cmat2 mat, int8_t scalar, int row) {
+static cmat2 cmat2_set_row_sca(cmat2 mat, signed char scalar, int row) {
     cmatN_set_row_sca(mat.v, scalar, row, 2);
     return mat;
 }
 /** dst = mat; dst[row][:] = scalar */
-static cmat2 cmat2_set_row_sca_v(const int8_t *mat, int8_t scalar, int row) {
+static cmat2 cmat2_set_row_sca_v(const signed char *mat, signed char scalar, int row) {
     return cmat2_set_row_sca(CMat2(mat), scalar, row);
 }
 
 /** mat[row][:] = scalar; dst = mat */
-static cmat2 cmat2_set_this_row_sca(cmat2 *mat, int8_t scalar, int row) {
+static cmat2 cmat2_set_this_row_sca(cmat2 *mat, signed char scalar, int row) {
     cmatN_set_row_sca(mat->v, scalar, row, 2);
     return *mat;
 }
 /** mat[row][:] = scalar; dst = mat */
-static cmat2 cmat2_set_this_row_sca_v(int8_t *mat, int8_t scalar, int row) {
+static cmat2 cmat2_set_this_row_sca_v(signed char *mat, signed char scalar, int row) {
     return cmat2_set_this_row_sca((cmat2*) mat, scalar, row);
 }
 
 
 /** dst = mat; dst[:][col] = scalar */
-static cmat2 cmat2_set_col_sca(cmat2 mat, int8_t scalar, int col) {
+static cmat2 cmat2_set_col_sca(cmat2 mat, signed char scalar, int col) {
     cmatN_set_col_sca(mat.v, scalar, col, 2);
     return mat;
 }
 /** dst = mat; dst[:][col] = scalar */
-static cmat2 cmat2_set_col_sca_v(const int8_t *mat, int8_t scalar, int col) {
+static cmat2 cmat2_set_col_sca_v(const signed char *mat, signed char scalar, int col) {
     return cmat2_set_col_sca(CMat2(mat), scalar, col);
 }
 
 /** mat[:][col] = scalar; dst = mat */
-static cmat2 cmat2_set_this_col_sca(cmat2 *mat, int8_t scalar, int col) {
+static cmat2 cmat2_set_this_col_sca(cmat2 *mat, signed char scalar, int col) {
     cmatN_set_col_sca(mat->v, scalar, col, 2);
     return *mat;
 }
 /** mat[:][col] = scalar; dst = mat */
-static cmat2 cmat2_set_this_col_sca_v(int8_t *mat, int8_t scalar, int col) {
+static cmat2 cmat2_set_this_col_sca_v(signed char *mat, signed char scalar, int col) {
     return cmat2_set_this_col_sca((cmat2*) mat, scalar, col);
 }
 
@@ -166,7 +166,7 @@ static int cmat2_trace(cmat2 mat) {
     return cmatN_trace(mat.v, 2);
 }
 /** returns sum of diagonal form upper left to lower right */
-static int cmat2_trace_v(const int8_t *mat) {
+static int cmat2_trace_v(const signed char *mat) {
     return cmat2_trace(CMat2(mat));
 }
 
@@ -178,7 +178,7 @@ static cmat2 cmat2_transpose(cmat2 mat) {
     return res;
 }
 /** dst = mat^t */
-static cmat2 cmat2_transpose_v(const int8_t *mat) {
+static cmat2 cmat2_transpose_v(const signed char *mat) {
     return cmat2_transpose(CMat2(mat));
 }
 
@@ -190,7 +190,7 @@ static cmat2 cmat2_mul_mat(cmat2 mat_a, cmat2 mat_b) {
     return res;
 }
 /** dst = a @ b */
-static cmat2 cmat2_mul_mat_v(const int8_t *mat_a, const int8_t *mat_b) {
+static cmat2 cmat2_mul_mat_v(const signed char *mat_a, const signed char *mat_b) {
     return cmat2_mul_mat(CMat2(mat_a), CMat2(mat_b));
 }
 
@@ -202,7 +202,7 @@ static cvec2 cmat2_mul_vec(cmat2 mat_a, cvec2 vec_b) {
     return res;
 }
 /** dst = a @ b */
-static cvec2 cmat2_mul_vec_v(const int8_t *mat_a, const int8_t *vec_b) {
+static cvec2 cmat2_mul_vec_v(const signed char *mat_a, const signed char *vec_b) {
     return cmat2_mul_vec(CMat2(mat_a), CVec2(vec_b));
 }
 
@@ -214,7 +214,7 @@ static cvec2 cvec2_mul_mat(cvec2 vec_a, cmat2 mat_b) {
     return res;
 }
 /** dst = a @ b */
-static cvec2 cvec2_mul_mat_v(const int8_t *vec_a, const int8_t *mat_b) {
+static cvec2 cvec2_mul_mat_v(const signed char *vec_a, const signed char *mat_b) {
     return cvec2_mul_mat(CVec2(vec_a), CMat2(mat_b));
 }
 
@@ -225,7 +225,7 @@ static int cmat2_det(cmat2 mat) {
     return mat.m[0][0] * mat.m[1][1] - mat.m[1][0] * mat.m[0][1];
 }
 /** returns = determinant mat */
-static int cmat2_det_v(const int8_t *mat) {
+static int cmat2_det_v(const signed char *mat) {
     return cmat2_det(CMat2(mat));
 }
 
@@ -238,14 +238,14 @@ static cmat2 cmat2_inv(cmat2 mat) {
     float inv_det = 1.0f / (a * d - b * c);
 
     cmat2 res;
-    res.m[0][0] = (int8_t) (d * inv_det);
-    res.m[0][1] = (int8_t) (-b * inv_det);
-    res.m[1][0] = (int8_t) (-c * inv_det);
-    res.m[1][1] = (int8_t) (a * inv_det);
+    res.m[0][0] = (signed char) (d * inv_det);
+    res.m[0][1] = (signed char) (-b * inv_det);
+    res.m[1][0] = (signed char) (-c * inv_det);
+    res.m[1][1] = (signed char) (a * inv_det);
     return res;
 }
 /** dst = inverted mat */
-static cmat2 cmat2_inv_v(const int8_t *mat) {
+static cmat2 cmat2_inv_v(const signed char *mat) {
     return cmat2_inv(CMat2(mat));
 }
 

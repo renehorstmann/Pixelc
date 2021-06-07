@@ -35,7 +35,7 @@ static dmat2 dmat2_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (dmat2) v */
-static dmat2 dmat2_cast_from_char(const char *v) {
+static dmat2 dmat2_cast_from_char(const signed char *v) {
     dmat2 res;
     dvecN_cast_into(res.v, v, 2*2);
     return res;

@@ -56,7 +56,7 @@ static uvec3 uvec3_cast_from_int(const int *v) {
 }
 
 /** dst = (uvec3) v */
-static uvec3 uvec3_cast_from_char(const char *v) {
+static uvec3 uvec3_cast_from_char(const signed char *v) {
     uvec3 res;
     uvecN_cast_into(res.v, v, 3);
     return res;

@@ -34,6 +34,20 @@ static umat4 umat4_cast_from_int(const int *v) {
     return res;
 }
 
+/** dst = (umat4) v */
+static umat4 umat4_cast_from_char(const signed char *v) {
+    umat4 res;
+    uvecN_cast_into(res.v, v, 4*4);
+    return res;
+}
+
+/** dst = (umat4) v */
+static umat4 umat4_cast_from_uchar(const unsigned char *v) {
+    umat4 res;
+    uvecN_cast_into(res.v, v, 4*4);
+    return res;
+}
+
 /** mat_a == mat_b */
 static bool umat4_cmp(umat4 a, umat4 b) {
     return uvecN_cmp(a.v, b.v, 4*4);

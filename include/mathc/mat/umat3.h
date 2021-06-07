@@ -34,6 +34,20 @@ static umat3 umat3_cast_from_int(const int *v) {
     return res;
 }
 
+/** dst = (umat3) v */
+static umat3 umat3_cast_from_char(const signed char *v) {
+    umat3 res;
+    uvecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
+/** dst = (umat3) v */
+static umat3 umat3_cast_from_uchar(const unsigned char *v) {
+    umat3 res;
+    uvecN_cast_into(res.v, v, 3*3);
+    return res;
+}
+
 /** mat_a == mat_b */
 static bool umat3_cmp(umat3 a, umat3 b) {
     return uvecN_cmp(a.v, b.v, 3*3);

@@ -35,7 +35,7 @@ static imat4 imat4_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (imat4) v */
-static imat4 imat4_cast_from_char(const char *v) {
+static imat4 imat4_cast_from_char(const signed char *v) {
     imat4 res;
     ivecN_cast_into(res.v, v, 4*4);
     return res;

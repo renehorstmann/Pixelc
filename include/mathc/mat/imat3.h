@@ -35,7 +35,7 @@ static imat3 imat3_cast_from_unsigned(const unsigned *v) {
 }
 
 /** dst = (imat3) v */
-static imat3 imat3_cast_from_char(const char *v) {
+static imat3 imat3_cast_from_char(const signed char *v) {
     imat3 res;
     ivecN_cast_into(res.v, v, 3*3);
     return res;
