@@ -3,6 +3,7 @@
 
 #include <stdlib.h>  // strto*
 #include <stdint.h>  // int*_t
+#include <assert.h>
 #include "str.h"
 
 // helper functions:
@@ -12,8 +13,9 @@ static bool rhc_str__helper_system_is_binary_little_endian_() {
     return *(char *) &n == 1;
 }
 static void rhc_str__helper_swap_endian_(void *buf, int n) {
+    assert(n <= 256 && "rhc_str__helper_swap_endian_: max 256 bits");
+    char tmp[256];
     char *buf_data = (char *) buf;
-    char tmp[n];
     for (int i = 0; i < n; i++)
         tmp[i] = buf_data[n - i - 1];
     memcpy(buf_data, tmp, n);
