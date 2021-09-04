@@ -15,6 +15,10 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
+- selection mirror, rotate is buggy
+- selection should grow to the border, if pointer is out of the canvas
+- selection adjust
+  - left top, width height (+- 1 with buttons)
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?
