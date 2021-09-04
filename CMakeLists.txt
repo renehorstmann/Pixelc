@@ -7,6 +7,7 @@ project(pixelc C)
 # OPTION_SDL            is set to let rhc code use SDL function
 # OPTION_TTF            to use ro_ttftext
 # OPTION_GYRO           if gyro sensor is available
+# OPTION_TOUCH          to use touch movement
 # -not used- OPTION_GL_ERROR       if set, functions use r_render_check_error (heavy op, if summed up)
 #
 # NDEBUG                is used at pixelc points, too
@@ -115,6 +116,7 @@ if (PLATFORM_MOBILE)
     add_definitions(-DOPTION_GLES)
     add_definitions(-DOPTION_SDL)
     add_definitions(-DOPTION_GYRO)
+    add_definitions(-DOPTION_TOUCH)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
     add_definitions(-DNUKLEAR_SCALE=3.0)
     add_definitions(-DRHC_LOG_DO_NOT_PRINT_TIME_FILE)
