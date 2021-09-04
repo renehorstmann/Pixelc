@@ -161,7 +161,7 @@ bool brush_draw_pixel(Brush *self, int c, int r) {
     if (!u_image_contains(img, c, r))
         return false;
 
-    if (!selection_contains(self->selection, c, r))
+    if (self->selection && !selection_contains(self->selection, c, r))
         return false;
 
     uColor_s *pixel = u_image_pixel(img, c, r, layer);

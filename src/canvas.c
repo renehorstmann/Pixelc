@@ -238,7 +238,7 @@ void canvas_clear(Canvas *self) {
     log_info("canvas: clear");
     for (int r = 0; r < self->RO.image.rows; r++) {
         for (int c = 0; c < self->RO.image.cols; c++) {
-            if (!selection_contains(self->brush_ref->selection, c, r))
+            if (self->brush_ref->selection && !selection_contains(self->brush_ref->selection, c, r))
                 continue;
 
             *u_image_pixel(self->RO.image, c, r, self->current_layer) = U_COLOR_TRANSPARENT;

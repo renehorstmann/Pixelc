@@ -21,8 +21,8 @@
 
 // canvas size
 //*
-#define COLS 32*4
-#define ROWS 32*2
+#define COLS 16
+#define ROWS 16
 #define LAYERS 1
 //*/
 
@@ -171,7 +171,7 @@ static void main_loop(float delta_time) {
     r_render_begin_frame(L.render, window_size.x, window_size.y);
 
     const mat4 *camera_mat = &L.camera->matrices.p;
-    const mat4 *canvascam_mat = &L.canvascam->matrices.p;
+    const mat4 *canvascam_mat = &L.canvascam->matrices.vp;
 
     background_render(L.background, camera_mat);
     animation_render(L.animation, camera_mat);
