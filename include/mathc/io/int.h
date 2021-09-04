@@ -59,7 +59,9 @@ static void imat2_println_f(imat2 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -128,7 +130,9 @@ static void imat3_println_f(imat3 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -196,7 +200,9 @@ static void imat4_println_f(imat4 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 

@@ -1,16 +1,16 @@
 #include "mathc/float.h"
 #include "r/render.h"
 #include "r/program.h"
+#include "r/rect.h"
+#include "r/texture.h"
 #include "r/ro_single.h"
 
 
-RoSingle ro_single_new(const float *vp, rTexture tex_sink) {
+RoSingle ro_single_new(rTexture tex_sink) {
     r_render_error_check("ro_single_newBEGIN");
     RoSingle self;
     
     self.rect = r_rect_new();
-
-    self.vp = vp;
 
     self.L.program = r_program_new_file("res/r/single.glsl");
     
@@ -32,7 +32,7 @@ void ro_single_kill(RoSingle *self) {
 }
 
 
-void ro_single_render(RoSingle *self) {
+void ro_single_render(RoSingle *self, const mat4 *camera_mat) {
     r_render_error_check("ro_single_renderBEGIN");
     glUseProgram(self->L.program);
 
@@ -46,7 +46,7 @@ void ro_single_render(RoSingle *self) {
     glUniform2fv(glGetUniformLocation(self->L.program, "sprite"), 1, &self->rect.sprite.v0);
 
     // base
-    glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"), 1, GL_FALSE, self->vp);
+    glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"), 1, GL_FALSE, &camera_mat->m00);
     
     vec2 sprites = vec2_cast_from_int(&self->L.tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);

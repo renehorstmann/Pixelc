@@ -2,7 +2,8 @@
 #define PIXELC_CAMERA_H
 
 /*
- * PixelPerfect camera for hud elements (and background)
+ * PixelPerfect camera with view matrix.
+ * To control the camera position and size
  */
 
 #include <stdbool.h>
@@ -11,43 +12,34 @@
 
 #define CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
 
-struct CameraMatrices_s {
-    mat4 p;
-    mat4 p_inv;
-};
+typedef struct {
+    mat4 p;         // projection of the camera (perspective / orthogonal)
+    mat4 p_inv;     // inv(p)
+} CameraMatrices_s;
 
-struct CameraGlobals_s {
-    struct CameraMatrices_s matrices;
-    const float *gl;
-};
-extern struct CameraGlobals_s camera;
+typedef struct {
+    CameraMatrices_s matrices;
 
+    struct {
+        float real_pixel_per_pixel;
+        float left, right, bottom, top;
+    } RO;   // read only
+} Camera_s;
 
-void camera_init();
+Camera_s *camera_new();
 
-void camera_update();
+void camera_update(Camera_s *self, int wnd_width, int wnd_height);
 
-float camera_real_pixel_per_pixel();
-
-float camera_left();
-
-float camera_right();
-
-float camera_bottom();
-
-float camera_top();
-
-static float camera_width() {
-    return -camera_left() + camera_right();
+static float camera_width(const Camera_s *self) {
+    return -self->RO.left + self->RO.right;
 }
 
-static float camera_height() {
-    return -camera_bottom() + camera_top();
+static float camera_height(const Camera_s *self) {
+    return -self->RO.bottom + self->RO.top;
 }
 
-static bool camera_is_portrait_mode() {
-    return camera_height() > camera_width();
+static bool camera_is_portrait_mode(const Camera_s *self) {
+    return camera_height(self) > camera_width(self);
 }
-
 
 #endif //PIXELC_CAMERA_H

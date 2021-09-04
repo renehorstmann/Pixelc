@@ -59,7 +59,11 @@ static void cmat2_println_f(cmat2 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -128,7 +132,9 @@ static void cmat3_println_f(cmat3 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -196,7 +202,9 @@ static void cmat4_println_f(cmat4 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 

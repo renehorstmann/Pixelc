@@ -1,8 +1,9 @@
 #include <float.h>    // FLT_MAX
 #include "mathc/float.h"
 #include "rhc/allocator.h"
-#include "r/ro_text.h"
 #include "r/texture.h"
+#include "r/ro_batch.h"
+#include "r/ro_text.h"
 
 //
 // private
@@ -46,16 +47,14 @@ static mat4 pose(RoText *self, int c, int r) {
 // public
 //
 
-RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, const float *vp, rTexture tex_sink, Allocator_s alloc) {
+RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_s alloc) {
     RoText self;
     self.sprite_fn = sprite_fn;
     self.pose = mat4_eye();
     self.size = (vec2) {{5, 5}};
     self.offset = (vec2) {{6, 6}};
-    self.vp = vp;
-    self.L.mvp = mat4_eye();
     // batch.vp will be set each time before rendering
-    self.ro = ro_batch_new_a(max, NULL, tex_sink, alloc);
+    self.ro = ro_batch_new_a(max, tex_sink, alloc);
     hide(&self, 0);
     ro_batch_update(&self.ro);
     return self;
@@ -65,10 +64,9 @@ void ro_text_kill(RoText *self) {
     ro_batch_kill(&self->ro);
 }
 
-void ro_text_render(RoText *self) {
-    self->L.mvp = mat4_mul_mat(Mat4(self->vp), self->pose);
-    self->ro.vp = &self->L.mvp.m00;
-    ro_batch_render(&self->ro);
+void ro_text_render(RoText *self, const mat4 *camera_mat) {
+    mat4 mvp = mat4_mul_mat(*camera_mat, self->pose);
+    ro_batch_render(&self->ro, &mvp);
 }
 
 vec2 ro_text_set_text(RoText *self, const char *text) {
@@ -168,8 +166,8 @@ static bool font55_sprite_cb(vec2 *sprite, char c) {
 // public
 //
 
-RoText ro_text_new_font55(int max, const float *vp) {
+RoText ro_text_new_font55(int max) {
     const int columns = 12;
     const int rows = 5;
-    return ro_text_new(max, font55_sprite_cb, vp, r_texture_new_file(columns, rows, "res/r/font55.png"));
+    return ro_text_new(max, font55_sprite_cb, r_texture_new_file(columns, rows, "res/r/font55.png"));
 }

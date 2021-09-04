@@ -22,37 +22,17 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
-#include <stdbool.h>
-#include "core.h"
-#include "rect.h"
-#include "texture.h"
-#include "texture2d.h"
+#include "rhc/allocator.h"
+#include "ro_types.h"
 
-
-typedef struct {
-    rRect_s rect;
-    const float *vp;                        // mat4
-    const float *scale;                     // float
-    const float *view_aabb;                 // vec4
-    bool owns_tex_main;                     // if true, the textures will be deleted by this class
-    bool owns_tex_refraction;
-    const rTexture2D *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
-
-    struct {
-        GLuint program;                         // shader
-        GLuint vao;                             // internal vertex array object
-        rTexture tex_main;                      // used main texture
-        rTexture tex_refraction;                // used refraction texture
-    } L;
-} RoSingleRefract;
 
 RoSingleRefract ro_singlerefract_new(
-        const float *vp, const float *scale_ptr,
+        const float *scale_ptr,
         rTexture tex_main_sink, rTexture tex_refraction_sink);
 
 void ro_singlerefract_kill(RoSingleRefract *self);
 
-void ro_singlerefract_render(RoSingleRefract *self);
+void ro_singlerefract_render(RoSingleRefract *self, const mat4 *camera_mat);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_singlerefract_set_texture_main(RoSingleRefract *self, rTexture tex_main_sink);

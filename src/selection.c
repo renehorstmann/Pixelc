@@ -7,17 +7,12 @@
 // private
 //
 
-static struct {
-    int left, top;
-    int cols, rows;
-    uImage opt_img;
-} L;
-
-static bool valid_to_copy(uImage img, int layer) {
-    return L.left >= 0 && L.top >= 0
-           && L.cols > 0 && L.rows > 0
-           && L.left + L.cols <= img.cols
-           && L.top + L.rows <= img.rows;
+static bool valid_to_copy(const Selection *self, uImage img, int layer) {
+    return self
+           && self->left >= 0 && self->top >= 0
+           && self->cols > 0 && self->rows > 0
+           && self->left + self->cols <= img.cols
+           && self->top + self->rows <= img.rows;
 }
 
 
@@ -25,119 +20,109 @@ static bool valid_to_copy(uImage img, int layer) {
 // public
 //
 
-void selection_init(int left, int top, int cols, int rows) {
-    log_info("selection: init");
-    u_image_kill(&L.opt_img);
-    L.left = left;
-    L.top = top;
-    L.cols = cols;
-    L.rows = rows;
+Selection *selection_new(int left, int top, int cols, int rows) {
+    log_info("selection: new");
+    Selection *self = rhc_calloc_raising(sizeof *self);
+
+    self->left = left;
+    self->top = top;
+    self->cols = cols;
+    self->rows = rows;
+
+    return self;
 }
 
-void selection_kill() {
+void selection_kill(Selection **self_ptr) {
+    if (!*self_ptr)
+        return;
     log_info("selection: kill");
-    L.left = L.top = L.rows = L.cols = 0;
-    u_image_kill(&L.opt_img);
-}
-
-bool selection_active() {
-    return L.cols > 0 && L.rows > 0;
-}
-
-ivec2 selection_pos() {
-    return (ivec2) {{L.left, L.top}};
-}
-
-ivec2 selection_size() {
-    return (ivec2) {{L.cols, L.rows}};
+    Selection *self = *self_ptr;
+    u_image_kill(&self->opt_img);
+    rhc_free(*self_ptr);
+    *self_ptr = NULL;
 }
 
 
-void selection_move(int left, int top) {
-    L.left = left;
-    L.top = top;
+bool selection_contains(const Selection *self, int c, int r) {
+    if (!self) return false;
+    return (c >= self->left && c < self->left + self->cols
+            && r >= self->top && r < self->top + self->rows);
 }
 
-bool selection_contains(int c, int r) {
-    return !selection_active()
-           || (c >= L.left && c < L.left + L.cols
-               && r >= L.top && r < L.top + L.rows);
-}
-
-void selection_copy(uImage from, int layer) {
+void selection_copy(Selection *self, uImage from, int layer) {
     log_info("selection: copy");
-    if (!valid_to_copy(from, layer)) {
+    if (!valid_to_copy(self, from, layer)) {
         log_error("selection_copy failed");
         return;
     }
 
     // invalid safe
-    u_image_kill(&L.opt_img);
+    u_image_kill(&self->opt_img);
 
-    L.opt_img = u_image_new_empty(L.cols, L.rows, 1);
+    self->opt_img = u_image_new_empty(self->cols, self->rows, 1);
 
-    for (int r = 0; r < L.rows; r++) {
-        for (int c = 0; c < L.cols; c++) {
-            *u_image_pixel(L.opt_img, c, r, 0) =
-                    *u_image_pixel(from,c + L.left, r + L.top, layer);
+    for (int r = 0; r < self->rows; r++) {
+        for (int c = 0; c < self->cols; c++) {
+            *u_image_pixel(self->opt_img, c, r, 0) =
+                    *u_image_pixel(from, c + self->left, r + self->top, layer);
         }
     }
 }
 
-void selection_cut(uImage from, int layer, uColor_s replace) {
+void selection_cut(Selection *self, uImage from, int layer, uColor_s replace) {
     log_info("selection: cut");
-    if (!valid_to_copy(from, layer)) {
+    if (!valid_to_copy(self, from, layer)) {
         log_error("selection_cut failed");
         return;
     }
-    selection_copy(from, layer);
+    selection_copy(self, from, layer);
 
-    for (int r = 0; r < L.rows; r++) {
-        for (int c = 0; c < L.cols; c++) {
-            *u_image_pixel(from, c + L.left, r + L.top, layer) = replace;
+    for (int r = 0; r < self->rows; r++) {
+        for (int c = 0; c < self->cols; c++) {
+            *u_image_pixel(from, c + self->left, r + self->top, layer) = replace;
         }
     }
 }
 
-void selection_paste(uImage to, int layer) {
+void selection_paste(Selection *self, uImage to, int layer) {
     log_info("selection: paste");
-    if (!u_image_valid(L.opt_img)) {
+    if (!self || !u_image_valid(self->opt_img)) {
         log_error("selection_paste failed");
         return;
     }
-    for (int r = 0; r < L.rows; r++) {
-        int to_r = r + L.top;
+    for (int r = 0; r < self->rows; r++) {
+        int to_r = r + self->top;
         if (to_r < 0 || to_r >= to.rows)
             continue;
-        for (int c = 0; c < L.cols; c++) {
-            int to_c = c + L.left;
+        for (int c = 0; c < self->cols; c++) {
+            int to_c = c + self->left;
             if (to_c < 0 || to_c >= to.cols)
                 continue;
 
             *u_image_pixel(to, to_c, to_r, layer) =
-                    *u_image_pixel(L.opt_img, c, r, 0);
+                    *u_image_pixel(self->opt_img, c, r, 0);
         }
     }
 }
 
-void selection_rotate(bool right) {
+void selection_rotate(Selection *self, bool right) {
     log_info("selection: right (r=%i)", right);
-    if (!u_image_valid(L.opt_img)) {
+    if (!self || !u_image_valid(self->opt_img)) {
         log_error("selection_rotate failed");
         return;
     }
 
-    u_image_rotate(&L.opt_img, right);
-    L.cols = L.opt_img.cols;
-    L.rows = L.opt_img.rows;
+    u_image_rotate(&self->opt_img, right);
+    self->cols = self->opt_img.cols;
+    self->rows = self->opt_img.rows;
 }
 
-void selection_mirror(bool vertical) {
+void selection_mirror(Selection *self, bool vertical) {
     log_info("selection: mirror (v=%i)", vertical);
-    if (!u_image_valid(L.opt_img)) {
+    if (!self || !u_image_valid(self->opt_img)) {
         log_error("selection_mirror failed");
         return;
     }
 
-    u_image_mirror(L.opt_img, vertical);
+    u_image_mirror(self->opt_img, vertical);
 }

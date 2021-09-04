@@ -10,7 +10,7 @@
 
 /** dquat = [0, 0, 0, 1] */
 static dquat dquat_eye() {
-    return (dquat) QUAT4_INIT_EYE;
+    return (dquat) {{0, 0, 0, 1}};
 }
 
 

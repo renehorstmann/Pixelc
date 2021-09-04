@@ -23,16 +23,6 @@ typedef struct {
     bool enter, space;
 } eInputKeys;
 
-struct eInputGlobals_s {
-    eInputKeys keys;
-
-    bool is_touch;
-    // acceleration sensor (mobile)
-    bool accel_active;
-    vec3 accel;
-};
-extern struct eInputGlobals_s e_input;
-
 
 enum ePointerAction {
     E_POINTER_DOWN, E_POINTER_MOVE, E_POINTER_UP,
@@ -50,21 +40,35 @@ typedef void (*ePointerEventFn)(ePointer_s, void *user_data);
 typedef void (*eWheelEventFn)(bool up, void *user_data);
 
 
-void e_input_init();
+struct eWindow;
+struct eGui;
+typedef struct eInput eInput;
+
+eInput *e_input_new(const struct eWindow *window);
+
+void e_input_kill(eInput **self_ptr);
 
 // runs the sdl event loop
-void e_input_update();
+void e_input_update(const eInput *self);
+
+eInputKeys e_input_get_keys(const eInput *self);
+
+bool e_input_is_touch(const eInput *self);
+
+bool e_input_accel_active(const eInput *self);
+
+vec3 e_input_get_accel(const eInput *self);
 
 // registers a callback for mouse and touch
-void e_input_register_pointer_event(ePointerEventFn event, void *user_data);
+void e_input_register_pointer_event(const eInput *self, ePointerEventFn event, void *user_data);
 
 // unregisters a callback
-void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister);
+void e_input_unregister_pointer_event(const eInput *self, ePointerEventFn event_to_unregister);
 
 // registers a callback for mouse wheel
-void e_input_register_wheel_event(eWheelEventFn event, void *user_data);
+void e_input_register_wheel_event(const eInput *self, eWheelEventFn event, void *user_data);
 
 // unregisters a callback
-void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister);
+void e_input_unregister_wheel_event(const eInput *self, eWheelEventFn event_to_unregister);
 
 #endif //E_INPUT_H

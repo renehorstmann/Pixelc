@@ -12,7 +12,7 @@
 #include "palette.h"
 #include "palettepresave.h"
 #include "toolbar.h"
-#include "input.h"
+#include "inputctrl.h"
 #include "savestate.h"
 
 //
@@ -60,7 +60,7 @@
 // #define PALETTE endesga64
 // #define PALETTE nes
 #define PALETTE aap64
- 
+
 //#define PALETTE refrection_values
 
 
@@ -88,46 +88,65 @@
 static void main_loop(float delta_time);
 
 
+static struct {
+    eWindow *window;
+    eInput *input;
+    eGui *gui;
+    rRender *render;
+
+    Camera_s *camera;
+    CanvasCam_s *canvascam;
+    SaveState *savestate;
+    Background *background;
+    Canvas *canvas;
+    Animation *animation;
+    Brush *brush;
+    Palette *palette;
+    CanvasCamCtrl *canvascamctrl;
+    Toolbar *toolbar;
+    InputCtrl *inputctrl;
+} L;
+
 int main(int argc, char **argv) {
     log_info("Pixelc");
 
-#ifdef IMAGE_FILE
-    canvas.default_image_file = IMAGE_FILE;
-#endif
-#ifdef IMPORT_FILE
-    canvas.default_import_file = IMPORT_FILE;
-#endif
-
     // init e (environment)
-    e_window_init("Pixelc");
-    e_input_init();
-    e_gui_init();
+    L.window = e_window_new("Pixelc");
+    L.input = e_input_new(L.window);
+    L.gui = e_gui_new(L.window);
 
     // init r (render)
-    r_render_init(e_window.window);
+    L.render = r_render_new(e_window_get_sdl_window(L.window));
 
     // init systems
-    camera_init();
-    canvascam_init();
-    background_init(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
-    canvas_init(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
-    animation_init(PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
-    brush_init();
-    canvascamctrl_init();
-    palette_init();
-    toolbar_init();
-    input_init();
-    savestate_init();
+    L.camera = camera_new();
+    L.canvascam = canvascam_new();
+    L.savestate = savestate_new();
+    L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
+    L.canvas = canvas_new(L.savestate, COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
+#ifdef IMAGE_FILE
+    L.canvas->default_image_file = IMAGE_FILE;
+#endif
+#ifdef IMPORT_FILE
+    L.canvas->default_import_file = IMPORT_FILE;
+#endif
 
-    // calls "palettepresave_PALETTE();"
-    PalettePresave(PALETTE)();
+    L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
+    L.brush = brush_new(L.canvas);
+    L.palette = palette_new(L.camera, L.brush);
+    L.canvascamctrl = canvascamctrl_new(L.input, L.canvascam, L.brush);
+    L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
+    L.inputctrl = inputctrl_new(L.input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
+
+    // calls "palettepresave_PALETTE(L.palette);"
+    PalettePresave(PALETTE)(L.palette);
 
     // save start frame
-    savestate_save();
+    savestate_save(L.savestate);
 
-    e_window_main_loop(main_loop);
+    e_window_main_loop(L.window, main_loop);
 
-    e_gui_kill();
+    e_gui_kill(&L.gui);
 
     return 0;
 }
@@ -135,31 +154,35 @@ int main(int argc, char **argv) {
 
 static void main_loop(float delta_time) {
     // e updates
-    e_input_update();
+    ivec2 window_size = e_window_get_size(L.window);
+    e_input_update(L.input);
 
 
     // simulate
-    camera_update();
-    canvascam_update();
-    background_update(delta_time);
-    canvas_update(delta_time);
-    animation_update(delta_time);
-    palette_update(delta_time);
-    toolbar_update(delta_time);
+    camera_update(L.camera, window_size.x, window_size.y);
+    canvascam_update(L.canvascam, window_size.x, window_size.y);
+    background_update(L.background, L.camera, delta_time);
+    canvas_update(L.canvas, L.canvascam, delta_time);
+    palette_update(L.palette, delta_time);
+    animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
+    toolbar_update(L.toolbar, delta_time);
 
     // render
-    r_render_begin_frame(e_window.size.x, e_window.size.y);
+    r_render_begin_frame(L.render, window_size.x, window_size.y);
 
-    background_render();
-    animation_render();
-    canvas_render();
-    palette_render();
-    toolbar_render();
+    const mat4 *camera_mat = &L.camera->matrices.p;
+    const mat4 *canvascam_mat = &L.canvascam->matrices.p;
 
-    e_gui_render();
+    background_render(L.background, camera_mat);
+    animation_render(L.animation, camera_mat);
+    canvas_render(L.canvas, canvascam_mat);
+    palette_render(L.palette, camera_mat);
+    toolbar_render(L.toolbar, camera_mat);
+
+    e_gui_render(L.gui);
 
     // swap buffers
-    r_render_end_frame();
+    r_render_end_frame(L.render);
 }
 
 

@@ -72,7 +72,9 @@ static void mat2_println_f(mat2 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -151,7 +153,9 @@ static void mat3_println_f(mat3 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -229,7 +233,9 @@ static void mat4_println_f(mat4 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 

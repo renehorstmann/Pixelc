@@ -13,10 +13,10 @@
 
 #endif
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #ifndef OPTION_GLEW
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
 

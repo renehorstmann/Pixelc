@@ -10,7 +10,7 @@
 
 /** quat = [0, 0, 0, 1] */
 static quat quat_eye() {
-    return (quat) QUAT4_INIT_EYE;
+    return (quat) {{0, 0, 0, 1}};
 }
 
 

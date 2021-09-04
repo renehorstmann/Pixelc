@@ -1,6 +1,5 @@
 #include "mathc/int.h"
 #include "brush.h"
-#include "canvas.h"
 #include "brushmode.h"
 
 
@@ -8,12 +7,7 @@
 // private
 //
 
-static struct {
-    bool is_drawing;
-    ivec2 last;
-} L;
-
-static bool lineto(ivec2 from, ivec2 to) {
+static bool lineto(BrushMode *self, ivec2 from, ivec2 to) {
 
     int sign_x = 1, sign_y = 1;
     if (from.x > to.x)
@@ -27,19 +21,19 @@ static bool lineto(ivec2 from, ivec2 to) {
     bool changed = false;
     if (dx == 0) {
         for (int i = 0; i <= dy; i++)
-            changed |= brush_draw(from.x, from.y + i * sign_y);
+            changed |= brush_draw(self->brush_ref, from.x, from.y + i * sign_y);
         return changed;
     }
 
     float m = (float) dy / dx;
     if (m <= 1) {
         for (int i = 0; i <= dx; i++)
-            changed |= brush_draw(from.x + i * sign_x, (from.y + i * m * sign_y));
+            changed |= brush_draw(self->brush_ref, from.x + i * sign_x, (from.y + i * m * sign_y));
         return changed;
     }
 
     for (int i = 0; i <= dy; i++)
-        changed |= brush_draw((from.x + i * m * sign_x), from.y + i * sign_y);
+        changed |= brush_draw(self->brush_ref, (from.x + i * m * sign_x), from.y + i * sign_y);
     return changed;
 }
 
@@ -49,50 +43,57 @@ static bool lineto(ivec2 from, ivec2 to) {
 // public
 //
 
-void brushmode_reset() {
-    L.is_drawing = false;
+BrushMode *brushmode_new(Brush *brush, const Canvas *canvas) {
+    BrushMode *self = rhc_calloc_raising(sizeof *self);
+    self->brush_ref = brush;
+    self->canvas_ref = canvas;
+    return self;
 }
 
-bool brushmode_dot(ePointer_s pointer) {
+void brushmode_reset(BrushMode *self) {
+    self->L.is_drawing = false;
+}
+
+bool brushmode_dot(BrushMode *self, ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    ivec2 cr = canvas_get_cr(pointer.pos);
-    return brush_draw(cr.x, cr.y);
+    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    return brush_draw(self->brush_ref, cr.x, cr.y);
 }
 
-bool brushmode_free(ePointer_s pointer) {
+bool brushmode_free(BrushMode *self, ePointer_s pointer) {
     if (pointer.action == E_POINTER_DOWN) {
-        L.is_drawing = true;
+        self->L.is_drawing = true;
     } else if (pointer.action != E_POINTER_MOVE) {
-        L.is_drawing = false;
+        self->L.is_drawing = false;
     }
 
-    if (!L.is_drawing)
+    if (!self->L.is_drawing)
         return false;
 
-    ivec2 cr = canvas_get_cr(pointer.pos);
-    return brush_draw(cr.x, cr.y);
+    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    return brush_draw(self->brush_ref, cr.x, cr.y);
 }
 
-bool brushmode_free_line(ePointer_s pointer) {
-    ivec2 cr = canvas_get_cr(pointer.pos);
+bool brushmode_free_line(BrushMode *self, ePointer_s pointer) {
+    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
 
     if (pointer.action == E_POINTER_DOWN) {
-        L.is_drawing = true;
-        L.last = cr;
+        self->L.is_drawing = true;
+        self->L.last = cr;
     } else if (pointer.action != E_POINTER_MOVE) {
-        L.is_drawing = false;
+        self->L.is_drawing = false;
     }
 
-    if (!L.is_drawing)
+    if (!self->L.is_drawing)
         return false;
 
     // just 1 pixel length
-    if (ivec2_norm_inf(ivec2_sub_vec(cr, L.last)) <= 1)
-        return brush_draw(cr.x, cr.y);
+    if (ivec2_norm_inf(ivec2_sub_vec(cr, self->L.last)) <= 1)
+        return brush_draw(self->brush_ref, cr.x, cr.y);
 
-    bool changed = lineto(L.last, cr);
-    L.last = cr;
+    bool changed = lineto(self, self->L.last, cr);
+    self->L.last = cr;
     return changed;
 }

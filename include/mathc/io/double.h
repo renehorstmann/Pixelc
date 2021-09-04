@@ -71,7 +71,9 @@ static void dmat2_println_f(dmat2 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -149,7 +151,9 @@ static void dmat3_println_f(dmat3 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -226,7 +230,9 @@ static void dmat4_println_f(dmat4 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 

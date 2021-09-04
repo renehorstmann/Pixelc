@@ -15,7 +15,7 @@
 ///     1. Context section
 ///     2. Input section
 ///     3. Drawing section
-///     4. Window section
+///     4. eWindow section
 ///     5. Layouting section
 ///     6. Groups section
 ///     7. Tree section
@@ -1306,7 +1306,7 @@ NK_API const struct nk_draw_command* nk__draw_next(const struct nk_draw_command*
  *                                  WINDOW
  *
  * =============================================================================
-/// ### Window
+/// ### eWindow
 /// Windows are the main persistent state used inside nuklear and are life time
 /// controlled by simply "retouching" (i.e. calling) each window each frame.
 /// All widgets inside nuklear can only be added inside the function pair `nk_begin_xxx`
@@ -1472,9 +1472,9 @@ enum nk_panel_flags {
 /// Parameter   | Description
 /// ------------|-----------------------------------------------------------
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
-/// __title__   | Window title and identifier. Needs to be persistent over frames to identify the window
+/// __title__   | eWindow title and identifier. Needs to be persistent over frames to identify the window
 /// __bounds__  | Initial position and window size. However if you do not define `NK_WINDOW_SCALABLE` or `NK_WINDOW_MOVABLE` you can set window position and size every frame
-/// __flags__   | Window flags defined in the nk_panel_flags section with a number of different window behaviors
+/// __flags__   | eWindow flags defined in the nk_panel_flags section with a number of different window behaviors
 ///
 /// Returns `true(1)` if the window can be filled up with widgets from this point
 /// until `nk_end` or `false(0)` otherwise for example if minimized
@@ -1491,10 +1491,10 @@ NK_API int nk_begin(struct nk_context *ctx, const char *title, struct nk_rect bo
 /// Parameter   | Description
 /// ------------|-----------------------------------------------------------
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
-/// __name__    | Window identifier. Needs to be persistent over frames to identify the window
-/// __title__   | Window title displayed inside header if flag `NK_WINDOW_TITLE` or either `NK_WINDOW_CLOSABLE` or `NK_WINDOW_MINIMIZED` was set
+/// __name__    | eWindow identifier. Needs to be persistent over frames to identify the window
+/// __title__   | eWindow title displayed inside header if flag `NK_WINDOW_TITLE` or either `NK_WINDOW_CLOSABLE` or `NK_WINDOW_MINIMIZED` was set
 /// __bounds__  | Initial position and window size. However if you do not define `NK_WINDOW_SCALABLE` or `NK_WINDOW_MOVABLE` you can set window position and size every frame
-/// __flags__   | Window flags defined in the nk_panel_flags section with a number of different window behaviors
+/// __flags__   | eWindow flags defined in the nk_panel_flags section with a number of different window behaviors
 ///
 /// Returns `true(1)` if the window can be filled up with widgets from this point
 /// until `nk_end` or `false(0)` otherwise for example if minimized
@@ -1523,7 +1523,7 @@ NK_API void nk_end(struct nk_context *ctx);
 /// Parameter   | Description
 /// ------------|-----------------------------------------------------------
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
-/// __name__    | Window identifier
+/// __name__    | eWindow identifier
 ///
 /// Returns a `nk_window` struct pointing to the identified window or NULL if
 /// no window with the given name was found
@@ -2607,7 +2607,7 @@ NK_API struct nk_rect nk_layout_space_rect_to_local(struct nk_context*, struct n
 ///     }
 ///     nk_input_end(&ctx);
 ///     //
-///     // Window
+///     // eWindow
 ///     if (nk_begin_xxx(...) {
 ///         // [...widgets...]
 ///         nk_layout_row_dynamic(...);
@@ -2657,7 +2657,7 @@ NK_API struct nk_rect nk_layout_space_rect_to_local(struct nk_context*, struct n
 /// ------------|-----------------------------------------------------------
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
 /// __title__   | Must be an unique identifier for this group that is also used for the group header
-/// __flags__   | Window flags defined in the nk_panel_flags section with a number of different group behaviors
+/// __flags__   | eWindow flags defined in the nk_panel_flags section with a number of different group behaviors
 ///
 /// Returns `true(1)` if visible and fillable with widgets or `false(0)` otherwise
 */
@@ -2673,7 +2673,7 @@ NK_API int nk_group_begin(struct nk_context*, const char *title, nk_flags);
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
 /// __id__      | Must be an unique identifier for this group
 /// __title__   | Group header title
-/// __flags__   | Window flags defined in the nk_panel_flags section with a number of different group behaviors
+/// __flags__   | eWindow flags defined in the nk_panel_flags section with a number of different group behaviors
 ///
 /// Returns `true(1)` if visible and fillable with widgets or `false(0)` otherwise
 */
@@ -2701,8 +2701,8 @@ NK_API void nk_group_end(struct nk_context*);
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
 /// __x_offset__| Scrollbar x-offset to offset all widgets inside the group horizontally.
 /// __y_offset__| Scrollbar y-offset to offset all widgets inside the group vertically
-/// __title__   | Window unique group title used to both identify and display in the group header
-/// __flags__   | Window flags from the nk_panel_flags section
+/// __title__   | eWindow unique group title used to both identify and display in the group header
+/// __flags__   | eWindow flags from the nk_panel_flags section
 ///
 /// Returns `true(1)` if visible and fillable with widgets or `false(0)` otherwise
 */
@@ -2718,8 +2718,8 @@ NK_API int nk_group_scrolled_offset_begin(struct nk_context*, nk_uint *x_offset,
 /// ------------|-----------------------------------------------------------
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
 /// __off__     | Both x- and y- scroll offset. Allows for manual scrollbar control
-/// __title__   | Window unique group title used to both identify and display in the group header
-/// __flags__   | Window flags from nk_panel_flags section
+/// __title__   | eWindow unique group title used to both identify and display in the group header
+/// __flags__   | eWindow flags from nk_panel_flags section
 ///
 /// Returns `true(1)` if visible and fillable with widgets or `false(0)` otherwise
 */
@@ -3239,7 +3239,7 @@ NK_API int nk_color_pick(struct nk_context*, struct nk_colorf*, enum nk_color_fo
 ///     }
 ///     nk_input_end(&ctx);
 ///     //
-///     // Window
+///     // eWindow
 ///     if (nk_begin_xxx(...) {
 ///         // Property
 ///         nk_layout_row_dynamic(...);

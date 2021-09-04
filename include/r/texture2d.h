@@ -9,11 +9,7 @@
 #include <stdbool.h>
 #include "core.h"
 #include "mathc/types/int.h"
-
-typedef struct {
-    GLuint tex;    // GL_TEXTURE_2D
-    ivec2 size;
-} rTexture2D;
+#include "types.h"
 
 static bool r_texture2d_valid(rTexture2D self) {
     return self.tex > 0

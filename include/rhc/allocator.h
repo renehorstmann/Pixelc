@@ -25,6 +25,9 @@
 // malloc
 void *rhc_malloc(size_t size);
 
+// calloc
+void *rhc_calloc(size_t size);
+
 // realloc
 void *rhc_realloc(void *memory, size_t size);
 
@@ -33,6 +36,9 @@ void rhc_free(void *memory);
 
 // malloc + assume
 void *rhc_malloc_raising(size_t size);
+
+// calloc + assume
+void *rhc_calloc_raising(size_t size);
 
 // realloc + assume
 void *rhc_realloc_raising(void *memory, size_t size);

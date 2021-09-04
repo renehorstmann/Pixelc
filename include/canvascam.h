@@ -10,54 +10,46 @@
 #include "mathc/types/float.h"
 
 
-#define CANVAS_CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
+#define CANVASCAM_SIZE 180 // *4=720; *6=1080; *8=1440
 
-struct CanvasCameraMatrices_s {
-    mat4 v;
-    mat4 v_inv;
-    mat4 p;
-    mat4 p_inv;
-    mat4 vp;
-    mat4 v_p_inv;   // v @ p_inv
-};
+typedef struct {
+    mat4 v;         // view / pose of the canvascam in 3d space
+    mat4 v_inv;     // inv(v)
+    mat4 p;         // projection of the canvascam (perspective / orthogonal)
+    mat4 p_inv;     // inv(p)
+    mat4 vp;        // p @ v_inv   used for render objects (ro)
+    mat4 v_p_inv;   // v @ p_inv   used for input
+} CanvasCamMatrices_s;
 
-struct CanvasCameraGlobals_s {
-    struct CanvasCameraMatrices_s matrices;
-    const float *gl;
-};
-extern struct CanvasCameraGlobals_s canvascam;
+typedef struct {
+    CanvasCamMatrices_s matrices;
 
+    struct {
+        float real_pixel_per_pixel;
+        float left, right, bottom, top;
+    } RO;   // read only
+} CanvasCam_s;
 
-void canvascam_init();
+CanvasCam_s *canvascam_new();
 
-void canvascam_update();
+void canvascam_update(CanvasCam_s *self, int wnd_width, int wnd_height);
 
-float canvascam_real_pixel_per_pixel();
+void canvascam_set_pos(CanvasCam_s *self, float x, float y);
 
-float canvascam_left();
+void canvascam_set_size(CanvasCam_s *self, float size);
 
-float canvascam_right();
+void canvascam_set_angle(CanvasCam_s *self, float alpha);
 
-float canvascam_bottom();
-
-float canvascam_top();
-
-static float canvascam_width() {
-    return -canvascam_left() + canvascam_right();
+static float canvascam_width(const CanvasCam_s *self) {
+    return -self->RO.left + self->RO.right;
 }
 
-static float canvascam_height() {
-    return -canvascam_bottom() + canvascam_top();
+static float canvascam_height(const CanvasCam_s *self) {
+    return -self->RO.bottom + self->RO.top;
 }
 
-static bool canvascam_is_portrait_mode() {
-    return canvascam_height() > canvascam_width();
+static bool canvascam_is_portrait_mode(const CanvasCam_s *self) {
+    return canvascam_height(self) > canvascam_width(self);
 }
-
-void canvascam_set_pos(float x, float y);
-
-void canvascam_set_size(float size);
-
-void canvascam_set_angle(float alpha);
 
 #endif //PIXELC_CANVASCAM_H

@@ -2,53 +2,54 @@
 #define MATHC_UTILS_CAMERA_H
 
 #include "../vec/vec3.h"
+#include "../mat/mat4.h"
 
 /**
  * Creates an orthogonal camera matrix
- * @param near: near clipping plane
- * @param far: far flipping plane
+ * @param near_z: near clipping plane
+ * @param far_z: far flipping plane
  */
 static mat4 mat4_camera_ortho(float left, float right,
                               float bottom, float top,
-                              float near, float far) {
+                              float near_z, float far_z) {
     // from cglm/cam.h/glm_ortho
     float rl = 1.0f / (right - left);
     float tb = 1.0f / (top - bottom);
-    float fn = -1.0f / (far - near);
+    float fn = -1.0f / (far_z - near_z);
 
-    mat4 res = MAT4_INIT_ZERO;
+    mat4 res = {{0}};
     res.m[0][0] = 2.0f * rl;
     res.m[1][1] = 2.0f * tb;
     res.m[2][2] = 2.0f * fn;
     res.m[3][0] = -(right + left) * rl;
     res.m[3][1] = -(top + bottom) * tb;
-    res.m[3][2] = (far + near) * fn;
+    res.m[3][2] = (far_z + near_z) * fn;
     res.m[3][3] = 1.0f;
     return res;
 }
 
 /** 
  * Creates a perspective (frustum) camera matrix
- * @param near: near clipping plane
- * @param far: far flipping plane
+ * @param near_z: near clipping plane
+ * @param far_z: far flipping plane
  */
 static mat4 mat4_camera_frustum(float left, float right,
                                 float bottom, float top,
-                                float near, float far) {
+                                float near_z, float far_z) {
     // from cglm/cam.h/glm_frustum
     float rl = 1.0f / (right  - left);
     float tb = 1.0f / (top    - bottom);
-    float fn =-1.0f / (far - near);
-    float nv = 2.0f * near;
+    float fn =-1.0f / (far_z - near_z);
+    float nv = 2.0f * near_z;
 
-    mat4 res = MAT4_INIT_ZERO;
+    mat4 res = {{0}};
     res.m[0][0] = nv * rl;
     res.m[1][1] = nv * tb;
     res.m[2][0] = (right  + left)    * rl;
     res.m[2][1] = (top    + bottom)  * tb;
-    res.m[2][2] = (far + near) * fn;
+    res.m[2][2] = (far_z + near_z) * fn;
     res.m[2][3] =-1.0f;
-    res.m[3][2] = far * nv * fn;
+    res.m[3][2] = far_z * nv * fn;
     return res;
 }
 
@@ -56,20 +57,20 @@ static mat4 mat4_camera_frustum(float left, float right,
  * Creates a perspective camera matrix.
  * @param fovy: field of view angle [rad]
  * @param aspect: width/height ratio
- * @param near: near clipping plane
- * @param far: far flipping plane
+ * @param near_z: near clipping plane
+ * @param far_z: far flipping plane
  */
-static mat4 mat4_camera_perspective(float fovy, float aspect, float near, float far) {
+static mat4 mat4_camera_perspective(float fovy, float aspect, float near_z, float far_z) {
     // from cglm/cam.h/glm_perspective
     float f = 1.0f / tanf(fovy * 0.5f);
-    float fn = 1.0f / (near - far);
+    float fn = 1.0f / (near_z - far_z);
 
-    mat4 res = MAT4_INIT_ZERO;
+    mat4 res = {{0}};
     res.m[0][0] = f / aspect;
     res.m[1][1] = f;
-    res.m[2][2] = (near + far) * fn;
+    res.m[2][2] = (near_z + far_z) * fn;
     res.m[2][3] = -1.0f;
-    res.m[3][2] = 2.0f * near * far * fn;
+    res.m[3][2] = 2.0f * near_z * far_z * fn;
     return res;
 }
 
@@ -77,7 +78,6 @@ static mat4 mat4_camera_perspective(float fovy, float aspect, float near, float 
  * Creates the view matrix for a 3d camera.
  * up vector must not be parallel with eye to center vector
  */
-
 static mat4 mat4_camera_lookat(vec3 eye, vec3 center, vec3 up) {
     // from cglm/cam.h/glm_lookar
 
@@ -89,7 +89,7 @@ static mat4 mat4_camera_lookat(vec3 eye, vec3 center, vec3 up) {
     
     vec3 u = vec3_cross(s, f);
 
-    mat4 res = MAT4_INIT_EYE;
+    mat4 res = mat4_eye();
     res.col[0].xyz = s;
     res.col[1].xyz = u;
     res.col[2].xyz = vec3_neg(f);

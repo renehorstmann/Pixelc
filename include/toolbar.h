@@ -3,20 +3,87 @@
 
 #include <stdbool.h>
 #include "e/input.h"
+#include "r/ro_types.h"
+#include "savestate.h"
+#include "canvas.h"
+#include "brush.h"
+#include "canvascamctrl.h"
+#include "animation.h"
 
-struct ToolbarGlobals_s {
+#define TOOLBAR_MODES 7
+#define TOOLBAR_TOOL_MAX 32
+
+struct Toolbar_Tool {
+    RoSingle btn;
+    float x, y;
+};
+
+typedef struct Toolbar {
+    const Camera_s *camera_ref;
+    SaveState *savestate_ref;
+    Canvas *canvas_ref;
+    Brush *brush_ref;
+    CanvasCamCtrl *canvascamctrl_ref;
+    Animation *animation_ref;
+
     bool show_selection_copy_cut;
     bool show_selection_ok;
-};
-extern struct ToolbarGlobals_s toolbar;
 
-void toolbar_init();
+    // private
+    struct {
+        struct Toolbar_Tool tools[TOOLBAR_TOOL_MAX];
+        int tools_size;
 
-void toolbar_update(float dtime);
+        RoSingle *undo;
+        RoSingle *clear;
+        RoSingle *import;
+        RoSingle *selection;
+        RoSingle *grid;
+        bool grid_status;
 
-void toolbar_render();
+        RoSingle *camera;
+        RoSingle *animation;
+        RoSingle *shade;
+
+        RoSingle *modes[TOOLBAR_MODES];
+
+        RoSingle *shape_minus;
+        RoSingle *shape_plus;
+
+        //non tools:
+        RoSingle shape;
+        float shape_minus_time, shape_plus_time;
+
+        RoSingle color_bg, color_drop;
+
+        RoSingle selection_copy;
+        RoSingle selection_cut;
+        RoSingle selection_rotate_left;
+        RoSingle selection_rotate_right;
+        RoSingle selection_mirror_horizontal;
+        RoSingle selection_mirror_vertical;
+        RoSingle selection_ok;
+
+        RoSingle layer_prev;
+        RoSingle layer_next;
+        RoText layer_num;
+
+        bool prev_show_selection_ok;
+    } L;
+} Toolbar;
+
+Toolbar *toolbar_new(const Camera_s *camera,
+                     SaveState *savestate,
+                     Canvas *canvas,
+                     Brush *brush,
+                     CanvasCamCtrl *canvascamctrl,
+                     Animation *animation);
+
+void toolbar_update(Toolbar *self, float dtime);
+
+void toolbar_render(Toolbar *self, const mat4 *camera_mat);
 
 // return true if the pointer was used (indicate event done)
-bool toolbar_pointer_event(ePointer_s pointer);
+bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer);
 
 #endif //PIXELC_TOOLBAR_H

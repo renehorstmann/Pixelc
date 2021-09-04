@@ -3,17 +3,32 @@
 
 #include <stdbool.h>
 #include "e/input.h"
+#include "canvas.h"
 
-void brushmode_reset();
+struct Brush;
 
-bool brushmode_dot(ePointer_s pointer);
+typedef struct {
+    struct Brush *brush_ref;
+    const Canvas *canvas_ref;
 
-bool brushmode_free(ePointer_s pointer);
+    struct {
+        bool is_drawing;
+        ivec2 last;
+    } L;
+} BrushMode;
 
-bool brushmode_free_line(ePointer_s pointer);
+BrushMode *brushmode_new(struct Brush *brush, const Canvas *canvas);
 
-bool brushmode_fill(ePointer_s pointer, bool mode8);
+void brushmode_reset(BrushMode *self);
 
-bool brushmode_replace(ePointer_s pointer);
+bool brushmode_dot(BrushMode *self, ePointer_s pointer);
+
+bool brushmode_free(BrushMode *self, ePointer_s pointer);
+
+bool brushmode_free_line(BrushMode *self, ePointer_s pointer);
+
+bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8);
+
+bool brushmode_replace(BrushMode *self, ePointer_s pointer);
 
 #endif //PIXELC_BRUSHMODE_H

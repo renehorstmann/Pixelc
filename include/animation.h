@@ -2,17 +2,28 @@
 #define PIXELC_ANIMATION_H
 
 #include <stdbool.h>
+#include "r/ro_types.h"
+#include "canvas.h"
+#include "camera.h"
 
-struct AnimationGlobals_s {
+typedef struct {
     bool show;
-};
-extern struct AnimationGlobals_s animation;
+    const Canvas *canvas_ref;
+    struct {
+        RoText horsimann;
+        RoBatch ro[CANVAS_MAX_LAYERS];
+        int mcols, mrows;
+        float size;
+        int frames;
+        float time;
+        float fps;
+    } L;
+} Animation;
 
+Animation *animation_new(const Canvas *canvas, int multi_cols, int multi_rows, float size, int frames, float fps);
 
-void animation_init(int multi_cols, int multi_rows, float size, int frames, float fps);
+void animation_update(Animation *self, const Camera_s *camera, float palette_hud_size, float dtime);
 
-void animation_update(float dtime);
-
-void animation_render();
+void animation_render(Animation *self, const mat4 *camera_mat);
 
 #endif //PIXELC_ANIMATION_H

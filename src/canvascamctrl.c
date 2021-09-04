@@ -9,32 +9,13 @@
 // private
 //
 
-static struct {
-    vec2 pos;
-    float size;
-
-    vec2 pos0;
-
-    vec2 move0;
-
-#if OPTION_TOUCH
-    float size0;
-    vec2 touch[2];
-    bvec2 touching;
-    float distance0;
-    bool touched;
-#else
-    vec2 pointer_pos;
-    bool moving;
-#endif
-
-} L;
 
 
-static void move_camera(vec2 current_pos) {
-    vec2 diff = vec2_sub_vec(current_pos, L.move0);
-    L.pos = vec2_sub_vec(L.pos0, diff);
-    canvascam_set_pos(L.pos.x, L.pos.y);
+
+static void move_camera(CanvasCamCtrl *self, vec2 current_pos) {
+    vec2 diff = vec2_sub_vec(current_pos, self->L.move0);
+    self->L.pos = vec2_sub_vec(self->L.pos0, diff);
+    canvascam_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
 }
 
 static float clampf(float f, float min, float max) {
@@ -42,20 +23,21 @@ static float clampf(float f, float min, float max) {
 }
 
 #if OPTION_TOUCH
-static void zoom_camera(float new_distance) {
-    float factor = new_distance / L.distance0;
+static void zoom_camera(CanvasCamCtrl *self, float new_distance) {
+    float factor = new_distance / self->L.distance0;
     factor = clampf(factor, 0.3, 3);
-    L.size = L.size0 / factor;
-    canvascam_set_size(L.size);
+    self->L.size = self->L.size0 / factor;
+    canvascam_set_size(self->camera_ref, self->L.size);
 }
 #endif
 
 static void wheel_event(bool up, void *user_data) {
+    CanvasCamCtrl *self = user_data;
     if (up)
-        L.size /= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
+        self->L.size /= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
     else
-        L.size *= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
-    canvascam_set_size(L.size);
+        self->L.size *= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
+    canvascam_set_size(self->camera_ref, self->L.size);
 }
 
 
@@ -64,77 +46,84 @@ static void wheel_event(bool up, void *user_data) {
 //
 
 
-void canvascamctrl_init() {
-    L.size = 1;
-    e_input_register_wheel_event(wheel_event, NULL);
+CanvasCamCtrl *canvascamctrl_new(eInput *input, CanvasCam_s *camera, Brush *brush_ref) {
+    CanvasCamCtrl *self = rhc_calloc_raising(sizeof *self);
+
+    self->camera_ref = camera;
+    self->brush_ref = brush_ref;
+
+    self->L.size = 1;
+    e_input_register_wheel_event(input, wheel_event, self);
+
+    return self;
 }
 
-void canvascamctrl_set_home() {
-    memset(&L, 0, sizeof(L));
-    L.size = 1;
-    canvascam_set_pos(L.pos.x, L.pos.y);
-    canvascam_set_size(L.size);
+void canvascamctrl_set_home(CanvasCamCtrl *self) {
+    memset(&self->L, 0, sizeof(self->L));
+    self->L.size = 1;
+    canvascam_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
+    canvascam_set_size(self->camera_ref, self->L.size);
 }
 
-bool canvascamctrl_pointer_event(ePointer_s pointer) {
+bool canvascamctrl_pointer_event(CanvasCamCtrl *self, ePointer_s pointer) {
 #ifdef OPTION_TOUCH
     if (pointer.id < 0 || pointer.id > 1)
         return false;
 
-    L.touch[pointer.id] = vec2_mix(L.touch[pointer.id], pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
+    self->L.touch[pointer.id] = vec2_mix(self->L.touch[pointer.id], pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
 
     if (pointer.action == E_POINTER_DOWN) {
-        L.touching.v[pointer.id] = true;
-        L.touch[pointer.id] = pointer.pos.xy;
+        self->L.touching.v[pointer.id] = true;
+        self->L.touch[pointer.id] = pointer.pos.xy;
     }
 
     if (pointer.action == E_POINTER_UP) {
-        L.touching.v[pointer.id] = false;
+        self->L.touching.v[pointer.id] = false;
     }
 
-    if (bvec2_all(L.touching)) {
-        if(!L.touched) {
-            L.touched = true;
-            brush_abort_current_draw();
+    if (bvec2_all(self->L.touching)) {
+        if(!self->L.touched) {
+            self->L.touched = true;
+            brush_abort_current_draw(self->brush_ref);
         }
         
-        vec2 mean = vec2_div(vec2_add_vec(L.touch[0], L.touch[1]), 2);
-        float distance = vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
+        vec2 mean = vec2_div(vec2_add_vec(self->L.touch[0], self->L.touch[1]), 2);
+        float distance = vec2_norm(vec2_sub_vec(self->L.touch[0], self->L.touch[1]));
 
         if (pointer.action == E_POINTER_DOWN) {
-            L.size0 = L.size;
-            L.pos0 = L.pos;
-            L.move0 = mean;
-            L.distance0 = distance;
+            self->L.size0 = self->L.size;
+            self->L.pos0 = self->L.pos;
+            self->L.move0 = mean;
+            self->L.distance0 = distance;
         } else {
-            move_camera(mean);
-            zoom_camera(distance);
+            move_camera(self, mean);
+            zoom_camera(self, distance);
         }
     }
     
-    if (L.touched && !bvec2_any(L.touching))
-        L.touched = false;
+    if (self->L.touched && !bvec2_any(self->L.touching))
+        self->L.touched = false;
     
-    return L.touched;
+    return self->L.touched;
 #else
-    L.pointer_pos = vec2_mix(L.pointer_pos, pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
-    if (L.moving) {
-        move_camera(L.pointer_pos);
+    self->L.pointer_pos = vec2_mix(self->L.pointer_pos, pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
+    if (self->L.moving) {
+        move_camera(self, self->L.pointer_pos);
         if (pointer.action == E_POINTER_DOWN) {
-            L.moving = false;
+            self->L.moving = false;
             return true;
         }
     } else if (pointer.action == E_POINTER_DOWN
                && pointer.id < 0) { // middle + right
-        L.pointer_pos = pointer.pos.xy;
-        L.pos0 = L.pos;
-        L.move0 = pointer.pos.xy;
-        L.moving = true;
+        self->L.pointer_pos = pointer.pos.xy;
+        self->L.pos0 = self->L.pos;
+        self->L.move0 = pointer.pos.xy;
+        self->L.moving = true;
 
-        brush_abort_current_draw();
+        brush_abort_current_draw(self->brush_ref);
     }
 
-    return L.moving;
+    return self->L.moving;
 #endif
 }
 

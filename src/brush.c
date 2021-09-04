@@ -1,98 +1,86 @@
 #include <assert.h>
-#include "canvas.h"
-#include "selection.h"
-#include "savestate.h"
 #include "toolbar.h"
-#include "brushmode.h"
 #include "brushshape.h"
 #include "brush.h"
-
-struct BrushGlobals_s brush;
-
 
 //
 // private
 //
 
-static struct {
-    bool change;
-    bool selection_active;
-    bool selection_set;
-    bool selection_moving;
-    ivec2 selection_pos;
-} L;
 
+static void setup_selection(Brush *self, ePointer_s pointer) {
+    uImage img = self->canvas_ref->RO.image;
 
-static void setup_selection(ePointer_s pointer) {
-    uImage img = canvas_image();
-
-    if (selection_active() && pointer.action == E_POINTER_UP) {
-        L.selection_set = true;
+    if (self->selection && pointer.action == E_POINTER_UP) {
+        self->L.selection_set = true;
         return;
     }
-    ivec2 cr = canvas_get_cr(pointer.pos);
+    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
     if (!u_image_contains(img, cr.x, cr.y))
         return;
 
-    if (L.selection_pos.x < 0) {
+    if (self->L.selection_pos.x < 0) {
         if (pointer.action == E_POINTER_DOWN) {
-            L.selection_pos = cr;
-            toolbar.show_selection_copy_cut = true;
+            self->L.selection_pos = cr;
+            assert(self->toolbar_ref);
+            self->toolbar_ref->show_selection_copy_cut = true;
         }
     }
 
-    if (L.selection_pos.x < 0)
+    if (self->L.selection_pos.x < 0)
         return;
 
-    int left = cr.x < L.selection_pos.x ? cr.x : L.selection_pos.x;
-    int top = cr.y < L.selection_pos.y ? cr.y : L.selection_pos.y;
-    int cols = 1 + abs(cr.x - L.selection_pos.x);
-    int rows = 1 + abs(cr.y - L.selection_pos.y);
+    int left = cr.x < self->L.selection_pos.x ? cr.x : self->L.selection_pos.x;
+    int top = cr.y < self->L.selection_pos.y ? cr.y : self->L.selection_pos.y;
+    int cols = 1 + abs(cr.x - self->L.selection_pos.x);
+    int rows = 1 + abs(cr.y - self->L.selection_pos.y);
 
-    selection_init(left, top, cols, rows);
+    self->selection = selection_new(left, top, cols, rows);
 }
 
-static void move_selection(ePointer_s pointer) {
-    uImage img = canvas_image();
-    int layer = canvas.current_layer;
+static void move_selection(Brush *self, ePointer_s pointer) {
+    uImage img = self->canvas_ref->RO.image;
+    int layer = self->canvas_ref->current_layer;
 
     if (pointer.action == E_POINTER_UP) {
-        L.selection_moving = false;
+        self->L.selection_moving = false;
         return;
     }
     if (pointer.action == E_POINTER_DOWN) {
-        L.selection_moving = true;
+        self->L.selection_moving = true;
     }
 
-    if (!L.selection_moving) {
+    if (!self->L.selection_moving) {
         return;
     }
 
-    ivec2 cr = canvas_get_cr(pointer.pos);
+    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
 
-    if (brush.selection_mode != BRUSH_SELECTION_PASTE) {
+    if (self->selection_mode != BRUSH_SELECTION_PASTE) {
         if (!u_image_contains(img, cr.x, cr.y))
             return;
 
-        assert(brush.selection_mode == BRUSH_SELECTION_COPY
-               || brush.selection_mode == BRUSH_SELECTION_CUT);
+        assert(self->selection_mode == BRUSH_SELECTION_COPY
+               || self->selection_mode == BRUSH_SELECTION_CUT);
 
-        if (brush.selection_mode == BRUSH_SELECTION_COPY)
-            selection_copy(img, layer);
+        if (self->selection_mode == BRUSH_SELECTION_COPY)
+            selection_copy(self->selection, img, layer);
         else
-            selection_cut(img, layer, brush.secondary_color);
+            selection_cut(self->selection, img, layer, self->secondary_color);
 
-        canvas_save();
-        brush.selection_mode = BRUSH_SELECTION_PASTE;
-        toolbar.show_selection_copy_cut = false;
-        toolbar.show_selection_ok = true;
+        canvas_save(self->canvas_ref);
+        self->selection_mode = BRUSH_SELECTION_PASTE;
+
+        assert(self->toolbar_ref);
+        self->toolbar_ref->show_selection_copy_cut = false;
+        self->toolbar_ref->show_selection_ok = true;
     }
 
-    selection_move(cr.x - selection_size().x / 2,
-                   cr.y - selection_size().y / 2);
+    self->selection->left = cr.x - self->selection->cols / 2;
+    self->selection->top = cr.y - self->selection->rows / 2;
 
-    canvas_redo_image();
-    selection_paste(img, layer);
+    canvas_redo_image(self->canvas_ref);
+    selection_paste(self->selection, img, layer);
 }
 
 
@@ -101,107 +89,116 @@ static void move_selection(ePointer_s pointer) {
 // public
 //
 
-void brush_init() {
-    brush.current_color = U_COLOR_TRANSPARENT;
-    brush.secondary_color = U_COLOR_TRANSPARENT;
-    brush.mode = BRUSH_MODE_FREE;
-    brush.shape = 0;
-    brush.shading_active = false;
+Brush *brush_new(Canvas *canvas) {
+    Brush *self = rhc_calloc_raising(sizeof *self);
+
+    self->canvas_ref = canvas;
+    self->canvas_ref->brush_ref = self;     // ...
+
+    self->brushmode = brushmode_new(self, canvas);
+
+    self->current_color = U_COLOR_TRANSPARENT;
+    self->secondary_color = U_COLOR_TRANSPARENT;
+    self->mode = BRUSH_MODE_FREE;
+    self->shape = 0;
+    self->shading_active = false;
+
+    return self;
 }
 
-void brush_pointer_event(ePointer_s pointer) {
+void brush_pointer_event(Brush *self, ePointer_s pointer) {
     if (pointer.id != 0)
         return;
 
-    if (L.selection_active) {
-        if (!L.selection_set) {
-            setup_selection(pointer);
+    if (self->L.selection_active) {
+        if (!self->L.selection_set) {
+            setup_selection(self, pointer);
             return;
         }
 
-        if (brush.selection_mode != BRUSH_SELECTION_NONE) {
-            move_selection(pointer);
+        if (self->selection_mode != BRUSH_SELECTION_NONE) {
+            move_selection(self, pointer);
             return;
         }
     }
 
     bool change = false;
-    switch (brush.mode) {
+    switch (self->mode) {
         case BRUSH_MODE_FREE:
         case BRUSH_MODE_DITHER:
         case BRUSH_MODE_DITHER2:
-            change = brushmode_free(pointer);
+            change = brushmode_free(self->brushmode, pointer);
             break;
         case BRUSH_MODE_DOT:
-            change = brushmode_dot(pointer);
+            change = brushmode_dot(self->brushmode, pointer);
             break;
         case BRUSH_MODE_FILL:
-            change = brushmode_fill(pointer, false);
+            change = brushmode_fill(self->brushmode, pointer, false);
             break;
         case BRUSH_MODE_FILL8:
-            change = brushmode_fill(pointer, true);
+            change = brushmode_fill(self->brushmode, pointer, true);
             break;
         case BRUSH_MODE_REPLACE:
-            change = brushmode_replace(pointer);
+            change = brushmode_replace(self->brushmode, pointer);
             break;
         default:
             log_wtf("brush unknown mode");
     }
 
     if (change)
-        L.change = true;
+        self->L.change = true;
 
-    if (L.change && pointer.action == E_POINTER_UP) {
-        L.change = false;
-        canvas_save();
+    if (self->L.change && pointer.action == E_POINTER_UP) {
+        self->L.change = false;
+        canvas_save(self->canvas_ref);
     }
 
 }
 
-bool brush_draw_pixel(int c, int r) {
-    uImage img = canvas_image();
-    int layer = canvas.current_layer;
+bool brush_draw_pixel(Brush *self, int c, int r) {
+    uImage img = self->canvas_ref->RO.image;
+    int layer = self->canvas_ref->current_layer;
     if (!u_image_contains(img, c, r))
         return false;
 
-    if (!selection_contains(c, r))
+    if (!selection_contains(self->selection, c, r))
         return false;
 
     uColor_s *pixel = u_image_pixel(img, c, r, layer);
-    if (brush.shading_active) {
-        if (!u_color_equals(*pixel, brush.secondary_color))
+    if (self->shading_active) {
+        if (!u_color_equals(*pixel, self->secondary_color))
             return false;
     }
 
-    *pixel = brush.current_color;
+    *pixel = self->current_color;
     return true;
 }
 
 
-bool brush_draw(int c, int r) {
-    if (brush.mode == BRUSH_MODE_DITHER)
-        return brushshape_draw_dither(c, r, true);
-    if (brush.mode == BRUSH_MODE_DITHER2)
-        return brushshape_draw_dither(c, r, false);
-    return brushshape_draw(c, r);
+bool brush_draw(Brush *self, int c, int r) {
+    if (self->mode == BRUSH_MODE_DITHER)
+        return brushshape_draw_dither(self, c, r, true);
+    if (self->mode == BRUSH_MODE_DITHER2)
+        return brushshape_draw_dither(self, c, r, false);
+    return brushshape_draw(self, c, r);
 }
 
-void brush_abort_current_draw() {
+void brush_abort_current_draw(Brush *self) {
     log_info("brush: abort_current_draw");
-    if (L.change) {
-        canvas_redo_image();
-        brushmode_reset(); // sets drawing to false
-        L.change = false;
+    if (self->L.change) {
+        canvas_redo_image(self->canvas_ref);
+        brushmode_reset(self->brushmode); // sets drawing to false
+        self->L.change = false;
     }
 }
 
-void brush_set_selection_active(bool active, bool reset) {
+void brush_set_selection_active(Brush *self, bool active, bool reset) {
     log_info("brush: set_selection_active : %i %i", active, reset);
-    L.selection_active = active;
+    self->L.selection_active = active;
     if (reset) {
-        L.selection_set = false;
-        L.selection_pos = (ivec2) {{-1, -1}};
-        selection_kill();
-        brush.selection_mode = BRUSH_SELECTION_NONE;
+        self->L.selection_set = false;
+        self->L.selection_pos = (ivec2) {{-1, -1}};
+        selection_kill(&self->selection);
+        self->selection_mode = BRUSH_SELECTION_NONE;
     }
 }

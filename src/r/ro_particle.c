@@ -4,10 +4,12 @@
 #include "rhc/error.h"
 #include "r/render.h"
 #include "r/program.h"
+#include "r/rect.h"
+#include "r/texture.h"
 #include "r/ro_particle.h"
 
 
-RoParticle ro_particle_new_a(int num, const float *vp, rTexture tex_sink, Allocator_s alloc) {
+RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_s alloc) {
     r_render_error_check("ro_particle_newBEGIN");
     RoParticle self;
     self.L.allocator = alloc;
@@ -20,7 +22,6 @@ RoParticle ro_particle_new_a(int num, const float *vp, rTexture tex_sink, Alloca
     }
 
     self.num = num;
-    self.vp = vp;
 
     self.L.program = r_program_new_file("res/r/particle.glsl");
     const int loc_pose = 0;
@@ -177,13 +178,13 @@ void ro_particle_update_sub(RoParticle *self, int offset, int size) {
     r_render_error_check("ro_particle_update");
 }
 
-void ro_particle_render_sub(RoParticle *self, float time, int num) {
+void ro_particle_render_sub(RoParticle *self, float time, int num, const mat4 *camera_mat) {
     r_render_error_check("ro_particle_renderBEGIN");
     glUseProgram(self->L.program);
 
     // base
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"),
-                       1, GL_FALSE, self->vp);
+                       1, GL_FALSE, &camera_mat->m00);
 
     vec2 sprites = vec2_cast_from_int(&self->L.tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);

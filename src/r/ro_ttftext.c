@@ -1,5 +1,6 @@
 #ifdef OPTION_TTF
 #include "r/texture.h"
+#include "r/ro_single.h"
 #include "r/ro_ttftext.h"
 
 struct RoTtfTextGlobals_s ro_ttftext;
@@ -59,12 +60,12 @@ static void u_pose_set_size(mat4 *p, float w, float h) {
 // public
 //
 
-RoTtfText ro_ttftext_new(const float *vp, vec4 color, const char *text) {
+RoTtfText ro_ttftext_new(vec4 color, const char *text) {
     RoTtfText self;
     
     self.font = ro_ttftext.default_font;
     int w, h;
-    self.ro = ro_single_new(vp, ro_ttftext_create_texture(self.font, color, text, &w, &h));
+    self.ro = ro_single_new(ro_ttftext_create_texture(self.font, color, text, &w, &h));
     self.ratio = (float) w / h;
     
     return self;
@@ -74,8 +75,8 @@ void ro_ttftext_kill(RoTtfText *self) {
     ro_single_kill(&self->ro);
 }
 
-void ro_ttftext_render(RoTtfText *self) {
-    ro_single_render(&self->ro);
+void ro_ttftext_render(RoTtfText *self, const mat4 *camera_mat) {
+    ro_single_render(&self->ro, camera_mat);
 }
 
 void ro_ttftext_set_size(RoTtfText *self, float h) {

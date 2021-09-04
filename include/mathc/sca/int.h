@@ -39,6 +39,15 @@ static int isca_abs(int x) {
     return abs(x);
 }
 
+/** dst = x % y (always positive) **/
+static int isca_mod_positive(int x, unsigned y) {
+    int dst = x % (int) y;
+    if (dst < 0) {
+        dst += y;
+    }
+    return dst;
+}
+
 /** dst = a < b ? a : b */
 static int isca_min(int a, int b) {
     return a < b ? a : b;

@@ -81,13 +81,13 @@ typedef struct ITEM {
 
 typedef struct {
     ITEM **map;
-    int size;
+    size_t size;
     Allocator_s allocator;
 } CLASS;
 
 typedef struct {
     CLASS *hashmap;
-    int map_index;
+    size_t map_index;
     ITEM *next;
 } ITER;
 
@@ -98,7 +98,7 @@ static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
 }
 
 // Foo foo_new_a(size_t approx_size, Allocator_s a)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(int approx_size, Allocator_s a) {
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t approx_size, Allocator_s a) {
     assume(allocator_valid(a), "allocator needs to be valid");
     CLASS self = {
             a.malloc(a, approx_size * sizeof(ITEM *)),
@@ -116,7 +116,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(int approx_size, Allocator_s a) {
 }
 
 // Foo foo_new(size_t approx_size)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new)(int approx_size) {
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new)(size_t approx_size) {
     // new_a
     return RHC_NAME_CONCAT2(FN_NAME, _new_a)(approx_size, RHC_HASHMAP_DEFAULT_ALLOCATOR);
 }
@@ -158,7 +158,7 @@ static TYPE *RHC_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
     
     // if item not found, create a new one
     if(!(*item)) {
-        *item = (ITEM *) self->allocator.alloc(self->allocator, sizeof(ITEM));
+        *item = (ITEM *) self->allocator.malloc(self->allocator, sizeof(ITEM));
         assume(*item, "hashmap failed: to allocate a new item");
         memset(*item, 0, sizeof(ITEM));
         (*item)->key = KEY_CLONE_FN(key, self->allocator);

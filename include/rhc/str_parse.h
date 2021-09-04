@@ -290,4 +290,169 @@ static Str_s str_eat_double_binary_be(Str_s s, double *opt_eaten) {
     return s;
 }
 
+//
+// feed binary
+//
+
+// feeds an intx_t as binary little endian and returns the str without it (behind it).
+#define RHC_STR__HELPER_FEED_INTX_BINARY_LE_PROTOTPYE_(x)\
+static Str_s str_feed_int ## x ## _binary_le(Str_s s, int ## x ## _t feed) {\
+    if(str_empty(s))\
+        return s;\
+    if(s.size < (x)/8) {\
+        rhc_error = "str_feed_int_binary_le failed";\
+        log_warn("str_feed_int" #x "_binary_le: failed");\
+        return (Str_s) {s.data, 0};\
+    }\
+    if(!rhc_str__helper_system_is_binary_little_endian_())\
+        rhc_str__helper_swap_endian_(&feed, (x)/8);\
+    memcpy(s.data, &feed, (x)/8);\
+    s.data += (x)/8;\
+    s.size -= (x)/8;\
+    return s;\
+}
+
+RHC_STR__HELPER_FEED_INTX_BINARY_LE_PROTOTPYE_(8)
+RHC_STR__HELPER_FEED_INTX_BINARY_LE_PROTOTPYE_(16)
+RHC_STR__HELPER_FEED_INTX_BINARY_LE_PROTOTPYE_(32)
+RHC_STR__HELPER_FEED_INTX_BINARY_LE_PROTOTPYE_(64)
+
+// feeds an intx_t as binary bigb endian and returns the str without it (behind it).
+#define RHC_STR__HELPER_FEED_INTX_BINARY_BE_PROTOTPYE_(x)\
+static Str_s str_feed_int ## x ## _binary_be(Str_s s, int ## x ## _t feed) {\
+    if(str_empty(s))\
+        return s;\
+    if(s.size < (x)/8) {\
+        rhc_error = "str_feed_int_binary_be failed";\
+        log_warn("str_feed_int" #x "_binary_be: failed");\
+        return (Str_s) {s.data, 0};\
+    }\
+    if(rhc_str__helper_system_is_binary_little_endian_())\
+        rhc_str__helper_swap_endian_(&feed, (x)/8);\
+    memcpy(s.data, &feed, (x)/8);\
+    s.data += (x)/8;\
+    s.size -= (x)/8;\
+    return s;\
+}
+
+RHC_STR__HELPER_FEED_INTX_BINARY_BE_PROTOTPYE_(8)
+RHC_STR__HELPER_FEED_INTX_BINARY_BE_PROTOTPYE_(16)
+RHC_STR__HELPER_FEED_INTX_BINARY_BE_PROTOTPYE_(32)
+RHC_STR__HELPER_FEED_INTX_BINARY_BE_PROTOTPYE_(64)
+
+// feeds an uintx_t as binary little endian and returns the str without it (behind it).
+#define RHC_STR__HELPER_FEED_UINTX_BINARY_LE_PROTOTPYE_(x)\
+static Str_s str_feed_uint ## x ## _binary_le(Str_s s, uint ## x ## _t feed) {\
+    if(str_empty(s))\
+        return s;\
+    if(s.size < (x)/8) {\
+        rhc_error = "str_feed_uint_binary_le failed";\
+        log_warn("str_feed_uint" #x "_binary_le: failed");\
+        return (Str_s) {s.data, 0};\
+    }\
+    if(!rhc_str__helper_system_is_binary_little_endian_())\
+        rhc_str__helper_swap_endian_(&feed, (x)/8);\
+    memcpy(s.data, &feed, (x)/8);\
+    s.data += (x)/8;\
+    s.size -= (x)/8;\
+    return s;\
+}
+
+RHC_STR__HELPER_FEED_UINTX_BINARY_LE_PROTOTPYE_(8)
+RHC_STR__HELPER_FEED_UINTX_BINARY_LE_PROTOTPYE_(16)
+RHC_STR__HELPER_FEED_UINTX_BINARY_LE_PROTOTPYE_(32)
+RHC_STR__HELPER_FEED_UINTX_BINARY_LE_PROTOTPYE_(64)
+
+// feeds an uintx_t as binary bigb endian and returns the str without it (behind it).
+#define RHC_STR__HELPER_FEED_UINTX_BINARY_BE_PROTOTPYE_(x)\
+static Str_s str_feed_uint ## x ## _binary_be(Str_s s, uint ## x ## _t feed) {\
+    if(str_empty(s))\
+        return s;\
+    if(s.size < (x)/8) {\
+        rhc_error = "str_feed_uint_binary_be failed";\
+        log_warn("str_feed_uint" #x "_binary_be: failed");\
+        return (Str_s) {s.data, 0};\
+    }\
+    if(rhc_str__helper_system_is_binary_little_endian_())\
+        rhc_str__helper_swap_endian_(&feed, (x)/8);\
+    memcpy(s.data, &feed, (x)/8);\
+    s.data += (x)/8;\
+    s.size -= (x)/8;\
+    return s;\
+}
+
+RHC_STR__HELPER_FEED_UINTX_BINARY_BE_PROTOTPYE_(8)
+RHC_STR__HELPER_FEED_UINTX_BINARY_BE_PROTOTPYE_(16)
+RHC_STR__HELPER_FEED_UINTX_BINARY_BE_PROTOTPYE_(32)
+RHC_STR__HELPER_FEED_UINTX_BINARY_BE_PROTOTPYE_(64)
+
+
+// feeds a float as binary little endian and returns the str without it (behind it).
+static Str_s str_feed_float_binary_le(Str_s s, float feed) {
+    if(str_empty(s))
+        return s;
+    if(s.size < 4) {
+        rhc_error = "str_feed_float_binary_le failed";
+        log_warn("str_feed_float_binary_le: failed");
+        return (Str_s) {s.data, 0};
+    }
+    if (!rhc_str__helper_system_is_binary_little_endian_())
+        rhc_str__helper_swap_endian_(&feed, 4);
+    memcpy(s.data, &feed, 4);
+    s.data += 4;
+    s.size -= 4;
+    return s;
+}
+
+// feeds a float as binary little endian and returns the str without it (behind it).
+static Str_s str_feed_float_binary_be(Str_s s, float feed) {
+    if(str_empty(s))
+        return s;
+    if(s.size < 4) {
+        rhc_error = "str_feed_float_binary_be failed";
+        log_warn("str_feed_float_binary_be: failed");
+        return (Str_s) {s.data, 0};
+    }
+    if (rhc_str__helper_system_is_binary_little_endian_())
+        rhc_str__helper_swap_endian_(&feed, 4);
+    memcpy(s.data, &feed, 4);
+    s.data += 4;
+    s.size -= 4;
+    return s;
+}
+
+// feeds a double as binary little endian and returns the str without it (behind it).
+static Str_s str_feed_double_binary_le(Str_s s, double feed) {
+    if(str_empty(s))
+        return s;
+    if(s.size < 8) {
+        rhc_error = "str_feed_double_binary_le failed";
+        log_warn("str_feed_double_binary_le: failed");
+        return (Str_s) {s.data, 0};
+    }
+    if (!rhc_str__helper_system_is_binary_little_endian_())
+        rhc_str__helper_swap_endian_(&feed, 8);
+    memcpy(s.data, &feed, 8);
+    s.data += 8;
+    s.size -= 8;
+    return s;
+}
+
+// feeds a double as binary little endian and returns the str without it (behind it).
+static Str_s str_feed_double_binary_be(Str_s s, double feed) {
+    if(str_empty(s))
+        return s;
+    if(s.size < 8) {
+        rhc_error = "str_feed_double_binary_be failed";
+        log_warn("str_feed_double_binary_be: failed");
+        return (Str_s) {s.data, 0};
+    }
+    if (rhc_str__helper_system_is_binary_little_endian_())
+        rhc_str__helper_swap_endian_(&feed, 8);
+    memcpy(s.data, &feed, 8);
+    s.data += 8;
+    s.size -= 8;
+    return s;
+}
+
 #endif //RHC_STR_PARSE_H

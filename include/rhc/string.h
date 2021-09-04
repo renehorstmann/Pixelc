@@ -15,12 +15,10 @@ static String string_new_invalid_a(Allocator_s a);
 static String string_new_a(size_t start_capacity, Allocator_s a) {
     assume(allocator_valid(a), "allocator needs to be valid");
     String self = {
-            {
-                a.malloc(a, start_capacity + 1),
-                0
-            },
-            start_capacity,
-            a
+            .str.data = a.malloc(a, start_capacity + 1),
+            .str.size = 0,
+            .capacity = start_capacity,
+            .allocator = a
     };
     if(!self.data)
         return string_new_invalid_a(a);
@@ -35,12 +33,16 @@ static String string_new(size_t start_capacity) {
 
 // new empty invalid string
 static String string_new_invalid_a(Allocator_s a) {
-    return (String) {NULL, .allocator = a};
+    String self = {0};
+    self.allocator = a;
+    return self;
 }
 
 // new empty invalid string with the default allocator
 static String string_new_invalid() {
-    return (String) {NULL, .allocator = RHC_STRING_DEFAULT_ALLOCATOR};
+    String self = {0};
+    self.allocator = RHC_STRING_DEFAULT_ALLOCATOR;
+    return self;
 }
 
 // clones Str_s and appends null
@@ -62,7 +64,7 @@ static String string_new_replace_a(Str_s to_replace, Str_s old, Str_s replacemen
     if(str_empty(to_replace) || str_empty(old) || !str_valid(replacement)) {
         return string_new_invalid_a(a);
     }
-    int cnt = str_count_str(to_replace, old);
+    size_t cnt = str_count_str(to_replace, old);
     if(cnt <= 0) {
         return string_new_clone_a(to_replace, a);
     }
@@ -82,14 +84,14 @@ static String string_new_replace(Str_s to_replace, Str_s old, Str_s replacement)
 // concatenates all strs
 static String string_new_cat_a(Str_s *strs, int n, Allocator_s a) {
     size_t size = 0;
-    for(int i=0; i<n; i++) {
+    for(size_t i=0; i<n; i++) {
         size += str_empty(strs[i])? 0 : strs[i].size;
     }
     String res = string_new_a(size, a);
     if(!string_valid(res))
         return res;
 
-    for(int i=0; i<n; i++) {
+    for(size_t i=0; i<n; i++) {
         if(!str_empty(strs[i])) {
             str_cpy(strs[i], (Str_s) {res.data + res.size, strs[i].size});
             res.size += strs[i].size;

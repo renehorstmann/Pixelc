@@ -59,7 +59,9 @@ static void ucmat2_println_f(ucmat2 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -128,7 +130,9 @@ static void ucmat3_println_f(ucmat3 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 
@@ -196,7 +200,9 @@ static void ucmat4_println_f(ucmat4 mat, FILE *ostream) {
 
         fprintf(ostream, " |\n");
     }
+#ifndef MATHC_NO_PRINT_COLOR
     fprintf(ostream, MATHC_PRINT_COLOR_RESET);
+#endif
     setlocale(LC_ALL, local_save);
 }
 

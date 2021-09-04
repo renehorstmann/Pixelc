@@ -9,8 +9,8 @@
 rTexture brushshape_create_kernel_texture(uColor_s bg, uColor_s fg) {
     uImage img = u_image_new_empty(BRUSH_KERNEL_TEXTURE_SIZE, BRUSH_KERNEL_TEXTURE_SIZE, BRUSH_NUM_SHAPES);
 
-    for(int l=0; l<img.layers; l++) {
-        for(int i=0; i<img.rows*img.cols; i++) {
+    for (int l = 0; l < img.layers; l++) {
+        for (int i = 0; i < img.rows * img.cols; i++) {
             *u_image_pixel_index(img, i, l) = bg;
         }
     }
@@ -32,7 +32,7 @@ rTexture brushshape_create_kernel_texture(uColor_s bg, uColor_s fg) {
     return tex;
 }
 
-bool brushshape_draw(int c, int r) {
+bool brushshape_draw(Brush *brush, int c, int r) {
     bool changed = false;
     for (int kr = 0; kr < BRUSH_KERNEL_SIZE; kr++) {
         int dr = r + kr - BRUSH_KERNEL_SIZE / 2;
@@ -40,17 +40,17 @@ bool brushshape_draw(int c, int r) {
         for (int kc = 0; kc < BRUSH_KERNEL_SIZE; kc++) {
             int dc = c + kc - BRUSH_KERNEL_SIZE / 2;
 
-            if (brushshape.kernels[brush.shape]
+            if (brushshape.kernels[brush->shape]
             [kr][kc]) {
 
-                changed |= brush_draw_pixel(dc, dr);
+                changed |= brush_draw_pixel(brush, dc, dr);
             }
         }
     }
     return changed;
 }
 
-bool brushshape_draw_dither(int c, int r, bool a) {
+bool brushshape_draw_dither(Brush *brush, int c, int r, bool a) {
     bool changed = false;
     for (int kr = 0; kr < BRUSH_KERNEL_SIZE; kr++) {
         int dr = r + kr - BRUSH_KERNEL_SIZE / 2;
@@ -58,11 +58,11 @@ bool brushshape_draw_dither(int c, int r, bool a) {
         for (int kc = 0; kc < BRUSH_KERNEL_SIZE; kc++) {
             int dc = c + kc - BRUSH_KERNEL_SIZE / 2;
 
-            if (brushshape.kernels[brush.shape]
+            if (brushshape.kernels[brush->shape]
             [kr][kc]) {
 
                 if ((dc % 2 + dr % 2) % 2 == a ? 0 : 1)
-                    changed |= brush_draw_pixel(dc, dr);
+                    changed |= brush_draw_pixel(brush, dc, dr);
             }
         }
     }

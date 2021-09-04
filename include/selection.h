@@ -4,29 +4,26 @@
 #include "u/image.h"
 #include "mathc/types/int.h"
 
+typedef struct {
+    int left, top;
+    int cols, rows;
+    uImage opt_img;
+} Selection;
 
-void selection_init(int left, int top, int cols, int rows);
+Selection *selection_new(int left, int top, int cols, int rows);
 
-void selection_kill();
+void selection_kill(Selection **self_ptr);
 
-bool selection_active();
+bool selection_contains(const Selection *self, int c, int r);
 
-ivec2 selection_pos();
+void selection_copy(Selection *self, uImage from, int layer);
 
-ivec2 selection_size();
+void selection_cut(Selection *self, uImage from, int layer, uColor_s replace);
 
-void selection_move(int left, int top);
+void selection_paste(Selection *self, uImage to, int layer);
 
-bool selection_contains(int c, int r);
+void selection_rotate(Selection *self, bool right);
 
-void selection_copy(uImage from, int layer);
-
-void selection_cut(uImage from, int layer, uColor_s replace);
-
-void selection_paste(uImage to, int layer);
-
-void selection_rotate(bool right);
-
-void selection_mirror(bool vertical);
+void selection_mirror(Selection *self, bool vertical);
 
 #endif //PIXELC_SELECTION_H

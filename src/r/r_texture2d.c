@@ -1,4 +1,4 @@
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include "rhc/error.h"
 #include "rhc/log.h"
 #include "r/render.h"

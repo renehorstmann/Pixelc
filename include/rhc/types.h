@@ -10,12 +10,13 @@
 // Types
 //
 
-// virtuel allocator, see alloc.h
+// virtual allocator, see alloc.h
 typedef struct Allocator_s {
     void *user_data;
 
     // virtual functions
     void *(*malloc)(struct Allocator_s self, size_t size);
+    void *(*calloc)(struct Allocator_s self, size_t size);
     void *(*realloc)(struct Allocator_s self, void *memory, size_t size);
     void (*free)(struct Allocator_s self, void *memory);
 } Allocator_s;

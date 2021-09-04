@@ -7,14 +7,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "core.h"
-#include "mathc/types/int.h"
+#include "types.h"
 
-typedef struct {
-    GLuint tex;    // GL_TEXTURE_2D_ARRAY
-    ivec2 sprite_size;
-    ivec2 sprites;
-} rTexture;
 
 static bool r_texture_valid(rTexture self) {
     return self.tex > 0

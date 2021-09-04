@@ -39,6 +39,15 @@ static signed char csca_abs(signed char x) {
     return abs(x);
 }
 
+/** dst = x % m (always positive) **/
+static signed char csca_mod_positive(signed char x, unsigned y) {
+    signed char dst = (int) x % (int) y;
+    if (dst < 0) {
+        dst += y;
+    }
+    return dst;
+}
+
 /** dst = a < b ? a : b */
 static signed char csca_min(signed char a, signed char b) {
     return a < b ? a : b;

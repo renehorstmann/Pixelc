@@ -1,33 +1,39 @@
 #include "mathc/float.h"
 #include "r/render.h"
 #include "r/program.h"
+#include "r/rect.h"
+#include "r/texture.h"
 #include "r/ro_singlerefract.h"
+
+//
+// protected
+//
+extern rRender *r_render_singleton_;
 
 
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 
 RoSingleRefract ro_singlerefract_new(
-        const float *vp, const float *scale_ptr,
-        rTexture tex_main_sink, rTexture tex_refraction_sink){
-                                
+        const float *scale_ptr,
+        rTexture tex_main_sink, rTexture tex_refraction_sink) {
+
     r_render_error_check("ro_singlerefract_newBEGIN");
     RoSingleRefract self;
-    
+
     self.rect = r_rect_new();
 
-    self.vp = vp;
     self.scale = scale_ptr;
     self.view_aabb = &VIEW_AABB_FULLSCREEN.v0;
 
     self.L.program = r_program_new_file("res/r/singlerefract.glsl");
-    
+
     self.L.tex_main = tex_main_sink;
     self.L.tex_refraction = tex_refraction_sink;
     self.owns_tex_main = true;
     self.owns_tex_refraction = true;
-    
-    self.tex_framebuffer_ptr = &r_render.framebuffer_tex;
+
+    self.tex_framebuffer_ptr = r_render_get_framebuffer_tex(r_render_singleton_);
 
     // needs a vao, even if its empty
     glGenVertexArrays(1, &self.L.vao);
@@ -46,7 +52,7 @@ void ro_singlerefract_kill(RoSingleRefract *self) {
 }
 
 
-void ro_singlerefract_render(RoSingleRefract *self) {
+void ro_singlerefract_render(RoSingleRefract *self, const mat4 *camera_mat) {
     r_render_error_check("ro_singlerefract_renderBEGIN");
     glUseProgram(self->L.program);
 
@@ -56,29 +62,29 @@ void ro_singlerefract_render(RoSingleRefract *self) {
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "uv"), 1, GL_FALSE, &self->rect.uv.m00);
 
     glUniform4fv(glGetUniformLocation(self->L.program, "color"), 1, &self->rect.color.v0);
-    
+
     glUniform2fv(glGetUniformLocation(self->L.program, "sprite"), 1, &self->rect.sprite.v0);
 
     // base
-    glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"), 1, GL_FALSE, self->vp);
-    
+    glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"), 1, GL_FALSE, &camera_mat->m00);
+
     vec2 sprites = vec2_cast_from_int(&self->L.tex_main.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 
-    
+
     // fragment shader
     glUniform1f(glGetUniformLocation(self->L.program, "scale"), *self->scale);
-    
+
     glUniform4fv(glGetUniformLocation(self->L.program, "view_aabb"), 1, self->view_aabb);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex_main"), 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex_main.tex);
-    
+
     glUniform1i(glGetUniformLocation(self->L.program, "tex_refract"), 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex_refraction.tex);
-    
+
     glUniform1i(glGetUniformLocation(self->L.program, "tex_framebuffer"), 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, self->tex_framebuffer_ptr->tex);
@@ -100,7 +106,7 @@ void ro_singlerefract_set_texture_main(RoSingleRefract *self, rTexture tex_main_
     self->L.tex_main = tex_main_sink;
 }
 
-void ro_singlerefract_set_texture_refraction(RoSingleRefract *self, rTexture tex_refraction_sink){
+void ro_singlerefract_set_texture_refraction(RoSingleRefract *self, rTexture tex_refraction_sink) {
     if (self->owns_tex_refraction)
         r_texture_kill(&self->L.tex_refraction);
     self->L.tex_refraction = tex_refraction_sink;

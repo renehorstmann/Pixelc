@@ -4,25 +4,62 @@
 
 
 #include "e/window.h"
+#include "e/gui_nk.h"
 #include "e/gui.h"
+#include "rhc/error.h"
 
 #define MAX_VERTEX_MEMORY 512 * 1024
 #define MAX_ELEMENT_MEMORY 128 * 1024
+ 
+ 
+struct eGui {
+    struct nk_context *ctx;
+    int auto_offset;
+};
 
-struct eGuiGlobals_s e_gui;
+//
+// singleton
+//
+static eGui singleton;
+static bool singleton_created;
+//
+//
+//
+
+//
+// protected
+//
+eGui *e_gui_singleton_;
+
+void e_gui_input_begin_(const eGui *self) {
+    if(!self)
+        return;
+    assume(self == &singleton, "singleton?");
+    nk_input_begin(singleton.ctx);
+}
+void e_gui_handle_sdl_event_(const eGui *self, SDL_Event *event) {
+    if(!self)
+        return;
+    assume(self == &singleton, "singleton?");
+    nk_sdl_handle_event(event);
+}
+
+void e_gui_input_end_(const eGui *self) {
+    if(!self)
+        return;
+    assume(self == &singleton, "singleton?");
+    nk_input_end(singleton.ctx);
+}
+
 
 //
 // private
 //
 
-static struct {
-    int auto_offset;
-} L;
-
 static struct nk_rect window_rect(float w, float h) {
-    int row = L.auto_offset / 3;
-    int col = L.auto_offset % 3;
-    L.auto_offset++;
+    int row = singleton.auto_offset / 3;
+    int col = singleton.auto_offset % 3;
+    singleton.auto_offset++;
     return nk_rect(50 + col * 100, 50 + row * 200, w, h);
 }
 
@@ -31,26 +68,57 @@ static struct nk_rect window_rect(float w, float h) {
 // public
 //
 
-void e_gui_init() {
-    e_gui.ctx = nk_sdl_init(e_window.window);
+eGui *e_gui_new(const struct eWindow *window) {
+    assume(!singleton_created, "e_gui_new should be called only onve");
+    singleton_created = true;
+
+    singleton.ctx = nk_sdl_init(e_window_get_sdl_window(window));
 
     struct nk_font_atlas *atlas;
     nk_sdl_font_stash_begin(&atlas);
     nk_sdl_font_stash_end();
+
+    e_gui_singleton_ = &singleton;
+    return &singleton;
 }
 
-void e_gui_kill() {
+void e_gui_kill(eGui **self_ptr) {
+    // safe to free NULL
+    if(!self_ptr)
+        return;
+
+    if(!singleton.ctx)
+        return;
+
     nk_sdl_shutdown();
+
+    assume(*self_ptr == &singleton, "singleton?");
+    memset(&singleton, 0, sizeof(singleton));
+    *self_ptr = NULL;
 }
 
-void e_gui_render() {
-    L.auto_offset = 0;
+void e_gui_render(const eGui *self) {
+    if(!self)
+        return;
+    assume(self == &singleton, "singleton?");
+    singleton.auto_offset = 0;
     nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
 }
 
-void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, float max, float step) {
+struct nk_context *e_gui_get_nk_context(const eGui *self) {
+    if(!self)
+        return NULL;
+    assume(self == &singleton, "singleton?");
+    return singleton.ctx;
+}
 
-    struct nk_context *ctx = e_gui.ctx;
+void e_gui_wnd_float_attribute(const eGui *self, const char *title, float *attribute, float min, float max, float step) {
+    if(!self)
+        return;
+    assume(self == &singleton, "singleton?");
+    if(!singleton.ctx)
+        return;
+    struct nk_context *ctx = singleton.ctx;
     if (nk_begin(ctx, title, window_rect(300, 100),
                  NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
                  NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
@@ -61,10 +129,15 @@ void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, f
     nk_end(ctx);
 }
 
-void e_gui_test() {
+void e_gui_test(const eGui *self) {
+    if(!self)
+        return;
+    assume(self == &singleton, "singleton?");
+    if(!singleton.ctx)
+        return;
 
     /* GUI */
-    struct nk_context *ctx = e_gui.ctx;
+    struct nk_context *ctx = singleton.ctx;
     static struct nk_colorf bg;
     if (nk_begin(ctx, "Demo", window_rect(300, 600),
                  NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |

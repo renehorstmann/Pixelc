@@ -3,6 +3,11 @@
 
 #include "e/input.h"
 #include "u/color.h"
+#include "canvas.h"
+#include "selection.h"
+#include "brushmode.h"
+
+struct Toolbar;
 
 enum brushmodes {
     BRUSH_MODE_FREE,
@@ -23,28 +28,40 @@ enum selectionmode {
     BRUSH_NUM_SELECTION_MODES
 };
 
-struct BrushGlobals_s {
+typedef struct Brush {
+    Selection *selection;
+    BrushMode *brushmode;
+
+    Canvas *canvas_ref;
+    struct Toolbar *toolbar_ref;    // warning, set by toolbar.c
+
     uColor_s current_color;
     uColor_s secondary_color;
     enum brushmodes mode;
     int shape;
     bool shading_active;
     enum selectionmode selection_mode;
-};
-extern struct BrushGlobals_s brush;
 
+    struct {
+        bool change;
+        bool selection_active;
+        bool selection_set;
+        bool selection_moving;
+        ivec2 selection_pos;
+    } L;
+} Brush;
 
-void brush_init();
+Brush *brush_new(Canvas *canvas);
 
-void brush_pointer_event(ePointer_s pointer);
+void brush_pointer_event(Brush *self, ePointer_s pointer);
 
-bool brush_draw_pixel(int c, int r);
+bool brush_draw_pixel(Brush *self, int c, int r);
 
-bool brush_draw(int c, int r);
+bool brush_draw(Brush *self, int c, int r);
 
-void brush_abort_current_draw();
+void brush_abort_current_draw(Brush *self);
 
-void brush_set_selection_active(bool active, bool reset);
+void brush_set_selection_active(Brush *self, bool active, bool reset);
 
 
 #endif //PIXELC_BRUSH_H

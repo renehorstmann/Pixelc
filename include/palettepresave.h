@@ -4,7 +4,7 @@
 #include "palette.h"
 
 
-static void palettepresave_grayscale() {
+static void palettepresave_grayscale(Palette *self) {
     uColor_s palette[10];
     int size = 10;
     palette[0] = U_COLOR_TRANSPARENT;
@@ -12,10 +12,10 @@ static void palettepresave_grayscale() {
         uint8_t val = (i - 1) * 255 / 8;
         palette[i] = (uColor_s) {val, val, val, 255};
     }
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
-static void palettepresave_grayscale_alpha() {
+static void palettepresave_grayscale_alpha(Palette *self) {
     uColor_s palette[40];
     int size = 40;
     for (int r = 0; r < 4; r++) {
@@ -26,10 +26,10 @@ static void palettepresave_grayscale_alpha() {
             palette[i + r * 10] = (uColor_s) {val, val, val, alpha};
         }
     }
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
-static void palettepresave_pixilmatt() {
+static void palettepresave_pixilmatt(Palette *self) {
     uColor_s palette[38];
     int size = 38;
     const char *hex[38] = {
@@ -77,10 +77,10 @@ static void palettepresave_pixilmatt() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
-static void palettepresave_slso8() {
+static void palettepresave_slso8(Palette *self) {
     uColor_s palette[10];
     int size = 10;
     const char *hex[10] = {
@@ -100,11 +100,11 @@ static void palettepresave_slso8() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
 
-static void palettepresave_gameboy() {
+static void palettepresave_gameboy(Palette *self) {
     uColor_s palette[5];
     int size = 5;
     const char *hex[5] = {
@@ -119,11 +119,11 @@ static void palettepresave_gameboy() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
 
-static void palettepresave_endesga32() {
+static void palettepresave_endesga32(Palette *self) {
     uColor_s palette[33];
     int size = 33;
     const char *hex[33] = {
@@ -166,11 +166,11 @@ static void palettepresave_endesga32() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
 
-static void palettepresave_endesga64() {
+static void palettepresave_endesga64(Palette *self) {
     uColor_s palette[65];
     int size = 65;
     const char *hex[65] = {
@@ -245,11 +245,11 @@ static void palettepresave_endesga64() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
 
-static void palettepresave_nes() {
+static void palettepresave_nes(Palette *self) {
     uColor_s palette[56];
     int size = 56;
     const char *hex[56] = {
@@ -315,11 +315,11 @@ static void palettepresave_nes() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
 
-static void palettepresave_aap64() {
+static void palettepresave_aap64(Palette *self) {
     uColor_s palette[65];
     int size = 65;
     const char *hex[65] = {
@@ -394,10 +394,10 @@ static void palettepresave_aap64() {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(palette, size);
+    palette_set_colors(self, palette, size);
 }
 
-static void palettepresave_refrection_values() {
+static void palettepresave_refrection_values(Palette *self) {
     // red = x in pixel, 128 is 0
     // green = y
     // blue = stretch value. xs+xy*16 [0-16). 
@@ -405,17 +405,17 @@ static void palettepresave_refrection_values() {
     //    4+12*16 is x mirror
     // alpha = alpha
     uColor_s palette[] = {
-        {{0}},
-        {{128+8, 128+64, 12+4*16, 96}},
-        {{128+32, 128+16, 14+12*16, 128}},
-        {{128-32, 128-8, 15+12*16, 64}},
-        {.a=255},
-        {{128-32, 128, 4+12*16, 200}},
+            {{0}},
+            {{128 + 8,  128 + 64, 12 + 4 * 16,  96}},
+            {{128 + 32, 128 + 16, 14 + 12 * 16, 128}},
+            {{128 - 32, 128 - 8,  15 + 12 * 16, 64}},
+            {.a=255},
+            {{128 - 32, 128,      4 + 12 * 16,  200}},
     };
-    
-    int size = sizeof(palette)/sizeof(uColor_s);
 
-    palette_set_colors(palette, size);
+    int size = sizeof(palette) / sizeof(uColor_s);
+
+    palette_set_colors(self, palette, size);
 }
 
 #endif //PIXELC_PALETTEPRESAVE_H

@@ -5,34 +5,57 @@
 #include "mathc/types/int.h"
 #include "mathc/types/float.h"
 #include "u/image.h"
+#include "r/ro_types.h"
+#include "canvascam.h"
+#include "savestate.h"
 
 #define CANVAS_MAX_LAYERS 16
 
-struct CanvasGlobals_s {
+
+struct Brush;
+
+typedef struct {
+    SaveState *savestate_ref;
+    struct Brush *brush_ref;       // warning, set by brush.c
+
     int current_layer;
     bool show_grid;
     float alpha;
     const char *default_image_file;
     const char *default_import_file;
-};
-extern struct CanvasGlobals_s canvas;
 
-void canvas_init(int cols, int rows, int layers, int grid_cols, int grid_rows);
+    // read only
+    struct {
+        mat4 pose;
+        uImage image;
+    } RO;
 
-void canvas_update(float dtime);
+    // private
+    struct {
+        uImage prev_image;
+        RoSingle render_objects[CANVAS_MAX_LAYERS];
 
-void canvas_render();
+        RoSingle bg;
+        RoSingle grid;
 
-mat4 canvas_pose();
+        RoBatch selection_border;
 
-uImage canvas_image();
+        int save_id;
+    } L;
+} Canvas;
 
-ivec2 canvas_get_cr(vec4 pointer_pos);
+Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int grid_cols, int grid_rows);
 
-void canvas_clear();
+void canvas_update(Canvas *self, const CanvasCam_s *camera, float dtime);
 
-void canvas_save();
+void canvas_render(Canvas *self, const mat4 *canvascam_mat);
 
-void canvas_redo_image();
+ivec2 canvas_get_cr(const Canvas *self, vec4 pointer_pos);
+
+void canvas_clear(Canvas *self);
+
+void canvas_save(Canvas *self);
+
+void canvas_redo_image(Canvas *self);
 
 #endif //PIXELC_CANVAS_H

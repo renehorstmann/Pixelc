@@ -5,44 +5,23 @@
 // debug gui, nuklear based
 //
 
+struct nk_context;
+struct eWindow;
+typedef struct eGui eGui;
 
-// setup nuklear
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
+eGui *e_gui_new(const struct eWindow *window);
 
-#include "nuklear/nuklear.h"
+void e_gui_kill(eGui **self_ptr);
 
-#ifdef OPTION_GLES
-#include "nuklear/nuklear_sdl_gles2.h"
-#else
+void e_gui_render(const eGui *self);
 
-#include "nuklear/nuklear_sdl_gl3.h"
-
-#endif
-
-#include "SDL.h"
-
-struct eGuiGlobals_s {
-    struct nk_context *ctx;
-};
-extern struct eGuiGlobals_s e_gui;
-
-void e_gui_init();
-
-void e_gui_kill();
-
-void e_gui_render();
+struct nk_context *e_gui_get_nk_context(const eGui *self);
 
 // creates a nuklear window to set the float attribute with a slider
-void e_gui_wnd_float_attribute(const char *title, float *attribute, float min, float max, float step);
+void e_gui_wnd_float_attribute(const eGui *self, const char *title, float *attribute, float min, float max, float step);
 
 // nuklear test window
-void e_gui_test();
+void e_gui_test(const eGui *self);
 
 
 #endif //E_GUI_H
