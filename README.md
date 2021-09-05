@@ -19,6 +19,7 @@ Palette, canvas size, animation size can be configured in code (main.c).
 - selection should grow to the border, if pointer is out of the canvas
 - selection adjust
   - left top, width height (+- 1 with buttons)
+- selection paste blend option (alpha...)
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?
