@@ -7,8 +7,8 @@ Have a look at [Tilec](https://github.com/renehorstmann/Tilec) for a forked tile
 
 ## Status:
 Ready to draw.
-Saves after each tip on the screen to sprite.png.
-Loads sprite.png at start, if available.
+Saves after each tip on the screen to image.png.
+Loads image.png at start, if available.
 An import button can load import.png as selection, if available.
 Palette, canvas size, animation size can be configured in code (main.c).
 
