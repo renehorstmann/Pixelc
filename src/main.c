@@ -21,8 +21,8 @@
 
 // canvas size
 //*
-#define COLS 32
-#define ROWS 16*8
+#define COLS 16
+#define ROWS 16
 #define LAYERS 1
 //*/
 
@@ -53,13 +53,13 @@
 // uncomment the used palette:
 // #define PALETTE grayscale
 // #define PALETTE grayscale_alpha
-#define PALETTE pixilmatt
+// #define PALETTE pixilmatt
 // #define PALETTE slso8
 // #define PALETTE gameboy
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-// #define PALETTE aap64
+#define PALETTE aap64
 
 //#define PALETTE refrection_values
 

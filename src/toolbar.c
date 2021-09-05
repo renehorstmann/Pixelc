@@ -137,6 +137,13 @@ Toolbar *toolbar_new(const Camera_s *camera,
     self->L.selection_mirror_vertical = ro_single_new(r_texture_new_file(2, 1, "res/button_vertical.png"));
 
     self->L.selection_ok = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    
+    rTexture move_tex = r_texture_new_file(2, 8, "res/button_selection_move.png");
+    for(int i=0; i<8; i++) {
+        self->L.selection_move[i] = ro_single_new(move_tex);
+        self->L.selection_move[i].owns_tex = i==0;
+        self->L.selection_move[i].rect.sprite.y = i;
+    }
 
     // layer:
     self->L.layer_prev = ro_single_new(r_texture_new_file(2, 1, "res/button_prev.png"));
@@ -166,13 +173,16 @@ void toolbar_update(Toolbar *self, float dtime) {
     if (self->show_selection_ok)
         self->L.selection_copy.rect.pose = pose16(self->camera_ref, 10, 43);
     else
-        self->L.selection_copy.rect.pose = pose16(self->camera_ref, -8, 43);
-    self->L.selection_cut.rect.pose = pose16(self->camera_ref, 8, 43);
+        self->L.selection_copy.rect.pose = pose16(self->camera_ref, 54, 43);
+    self->L.selection_cut.rect.pose = pose16(self->camera_ref, 70, 43);
     self->L.selection_rotate_left.rect.pose = pose16(self->camera_ref, -58, 43);
     self->L.selection_rotate_right.rect.pose = pose16(self->camera_ref, -42, 43);
     self->L.selection_mirror_horizontal.rect.pose = pose16(self->camera_ref, -26, 43);
     self->L.selection_mirror_vertical.rect.pose = pose16(self->camera_ref, -10, 43);
     self->L.selection_ok.rect.pose = pose16(self->camera_ref, 26, 43);
+    for(int i=0; i<8; i++) {
+        self->L.selection_move[i].rect.pose = pose16(self->camera_ref, -80 + i*16, 43);
+    }
 
     // layer:
     self->L.layer_prev.rect.pose = pose16(self->camera_ref, 50, 43);
@@ -232,6 +242,9 @@ void toolbar_render(Toolbar *self, const mat4 *camera_mat) {
     if (self->show_selection_copy_cut) {
         ro_single_render(&self->L.selection_copy, camera_mat);
         ro_single_render(&self->L.selection_cut, camera_mat);
+        for(int i=0; i<8; i++) {
+            ro_single_render(&self->L.selection_move[i], camera_mat);
+        }
     }
     if (self->show_selection_ok) {
         ro_single_render(&self->L.selection_rotate_left, camera_mat);
