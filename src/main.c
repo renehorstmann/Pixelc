@@ -21,8 +21,8 @@
 
 // canvas size
 //*
-#define COLS 16
-#define ROWS 16
+#define COLS 32
+#define ROWS 16*8
 #define LAYERS 1
 //*/
 
@@ -47,19 +47,19 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
-#define PLAY_FRAMES 4
-#define PLAY_FPS 6.0
+#define PLAY_FRAMES 2
+#define PLAY_FPS 2.0
 
 // uncomment the used palette:
 // #define PALETTE grayscale
 // #define PALETTE grayscale_alpha
-// #define PALETTE pixilmatt
+#define PALETTE pixilmatt
 // #define PALETTE slso8
 // #define PALETTE gameboy
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-#define PALETTE aap64
+// #define PALETTE aap64
 
 //#define PALETTE refrection_values
 
@@ -73,7 +73,7 @@
 
 // uncomment to change the file locations:
 // #define IMAGE_FILE "../JumpHare/res/tiles/tile_02.png"
-// #define IMPORT_FILE "res/color_drop.png"
+// #define IMPORT_FILE "res/button_dot.png"
 
 //
 // end of options
