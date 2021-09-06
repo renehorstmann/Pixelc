@@ -2,6 +2,7 @@
 #include "r/texture.h"
 #include "r/ro_text.h"
 #include "u/pose.h"
+#include "mathc/sca/int.h"
 #include "mathc/float.h"
 #include "button.h"
 #include "camera.h"
@@ -137,11 +138,11 @@ Toolbar *toolbar_new(const Camera_s *camera,
     self->L.selection_mirror_vertical = ro_single_new(r_texture_new_file(2, 1, "res/button_vertical.png"));
 
     self->L.selection_ok = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
-    
+
     rTexture move_tex = r_texture_new_file(2, 8, "res/button_selection_move.png");
-    for(int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
         self->L.selection_move[i] = ro_single_new(move_tex);
-        self->L.selection_move[i].owns_tex = i==0;
+        self->L.selection_move[i].owns_tex = i == 0;
         self->L.selection_move[i].rect.sprite.y = i;
     }
 
@@ -180,8 +181,8 @@ void toolbar_update(Toolbar *self, float dtime) {
     self->L.selection_mirror_horizontal.rect.pose = pose16(self->camera_ref, -26, 43);
     self->L.selection_mirror_vertical.rect.pose = pose16(self->camera_ref, -10, 43);
     self->L.selection_ok.rect.pose = pose16(self->camera_ref, 26, 43);
-    for(int i=0; i<8; i++) {
-        self->L.selection_move[i].rect.pose = pose16(self->camera_ref, -80 + i*16, 43);
+    for (int i = 0; i < 8; i++) {
+        self->L.selection_move[i].rect.pose = pose16(self->camera_ref, -80 + i * 16, 43);
     }
 
     // layer:
@@ -242,7 +243,7 @@ void toolbar_render(Toolbar *self, const mat4 *camera_mat) {
     if (self->show_selection_copy_cut) {
         ro_single_render(&self->L.selection_copy, camera_mat);
         ro_single_render(&self->L.selection_cut, camera_mat);
-        for(int i=0; i<8; i++) {
+        for (int i = 0; i < 8; i++) {
             ro_single_render(&self->L.selection_move[i], camera_mat);
         }
     }
@@ -408,6 +409,43 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
             if (pressed) {
                 button_set_pressed(&self->L.selection_copy, false);
                 self->brush_ref->selection_mode = BRUSH_SELECTION_CUT;
+            }
+        }
+
+        for (int i = 0; i < 8; i++) {
+            if (button_clicked(&self->L.selection_move[i], pointer)) {
+                Selection *s = self->brush_ref->selection;
+                if (!s) {
+                    log_error("toolbar: selection_move failed, selection invalid (NULL)");
+                    break;
+                }
+                int img_cols = self->canvas_ref->RO.image.cols;
+                int img_rows = self->canvas_ref->RO.image.rows;
+                if (i == 0 && s->left > 0) {
+                    s->left--;
+                    s->cols++;
+                } else if (i == 1 && s->cols > 1) {
+                    s->left++;
+                    s->cols--;
+                } else if (i == 2) {
+                    s->cols--;
+                } else if (i == 3) {
+                    s->cols++;
+                } else if (i == 4 && s->top > 0) {
+                    s->top--;
+                    s->rows++;
+                } else if (i == 5 && s->rows > 1) {
+                    s->top++;
+                    s->rows--;
+                } else if (i == 6) {
+                    s->rows--;
+                } else if (i == 7) {
+                    s->rows++;
+                }
+                s->left = isca_clamp(s->left, 0, img_cols - 1);
+                s->top = isca_clamp(s->top, 0, img_rows - 1);
+                s->cols = isca_clamp(s->cols, 1, img_cols - s->left);
+                s->rows = isca_clamp(s->rows, 1, img_rows - s->top);
             }
         }
     }

@@ -16,8 +16,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Todo
 - selection mirror, rotate is buggy
-- selection adjust
-  - left top, width height (+- 1 with buttons)
 - selection paste blend option (alpha...)
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
