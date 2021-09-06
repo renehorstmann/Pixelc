@@ -99,8 +99,14 @@ void selection_paste(Selection *self, uImage to, int layer) {
             if (to_c < 0 || to_c >= to.cols)
                 continue;
 
-            *u_image_pixel(to, to_c, to_r, layer) =
-                    *u_image_pixel(self->opt_img, c, r, 0);
+            uColor_s *pixel_to = u_image_pixel(to, to_c, to_r, layer);
+            const uColor_s *pixel_from = u_image_pixel(self->opt_img, c, r, 0);
+
+            if(self->blend) {
+                *pixel_to = ucvec4_mix(*pixel_to, *pixel_from, (float) pixel_from->a/255);
+            } else {
+                *pixel_to = *pixel_from;
+            }
         }
     }
 }

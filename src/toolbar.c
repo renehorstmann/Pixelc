@@ -137,6 +137,8 @@ Toolbar *toolbar_new(const Camera_s *camera,
 
     self->L.selection_mirror_vertical = ro_single_new(r_texture_new_file(2, 1, "res/button_vertical.png"));
 
+    self->L.selection_blend = ro_single_new(r_texture_new_file(2, 1, "res/button_blend.png"));
+
     self->L.selection_ok = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
 
     rTexture move_tex = r_texture_new_file(2, 8, "res/button_selection_move.png");
@@ -172,7 +174,7 @@ void toolbar_update(Toolbar *self, float dtime) {
 
     // selection buttons:
     if (self->show_selection_ok)
-        self->L.selection_copy.rect.pose = pose16(self->camera_ref, 10, 43);
+        self->L.selection_copy.rect.pose = pose16(self->camera_ref, 30, 43);
     else
         self->L.selection_copy.rect.pose = pose16(self->camera_ref, 54, 43);
     self->L.selection_cut.rect.pose = pose16(self->camera_ref, 70, 43);
@@ -180,7 +182,8 @@ void toolbar_update(Toolbar *self, float dtime) {
     self->L.selection_rotate_right.rect.pose = pose16(self->camera_ref, -42, 43);
     self->L.selection_mirror_horizontal.rect.pose = pose16(self->camera_ref, -26, 43);
     self->L.selection_mirror_vertical.rect.pose = pose16(self->camera_ref, -10, 43);
-    self->L.selection_ok.rect.pose = pose16(self->camera_ref, 26, 43);
+    self->L.selection_blend.rect.pose = pose16(self->camera_ref, 10, 43);
+    self->L.selection_ok.rect.pose = pose16(self->camera_ref, 46, 43);
     for (int i = 0; i < 8; i++) {
         self->L.selection_move[i].rect.pose = pose16(self->camera_ref, -80 + i * 16, 43);
     }
@@ -252,6 +255,7 @@ void toolbar_render(Toolbar *self, const mat4 *camera_mat) {
         ro_single_render(&self->L.selection_rotate_right, camera_mat);
         ro_single_render(&self->L.selection_mirror_horizontal, camera_mat);
         ro_single_render(&self->L.selection_mirror_vertical, camera_mat);
+        ro_single_render(&self->L.selection_blend, camera_mat);
         ro_single_render(&self->L.selection_copy, camera_mat);
         ro_single_render(&self->L.selection_ok, camera_mat);
     }
@@ -472,6 +476,15 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
             log_info("toolbar: selection_mirror_vertical");
             selection_mirror(self->brush_ref->selection, true);
             changed = true;
+        }
+
+        if(button_toggled(&self->L.selection_blend, pointer)) {
+            if(!self->brush_ref->selection) {
+                log_error("toolbar: selection_blend failed, selection not valid (NULL)");
+            } else {
+                self->brush_ref->selection->blend = button_is_pressed(&self->L.selection_blend);
+                changed = true;
+            }
         }
 
         if (changed) {

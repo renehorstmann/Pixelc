@@ -7,6 +7,7 @@
 typedef struct {
     int left, top;
     int cols, rows;
+    bool blend;
     uImage opt_img;
 } Selection;
 

@@ -62,6 +62,7 @@ typedef struct Toolbar {
         RoSingle selection_rotate_right;
         RoSingle selection_mirror_horizontal;
         RoSingle selection_mirror_vertical;
+        RoSingle selection_blend;
         RoSingle selection_ok;
         RoSingle selection_move[8];
 
