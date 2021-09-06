@@ -117,6 +117,7 @@ static void load_state(SaveState *savestate, const void *data, size_t size, void
 
     self->RO.image = u_image_new_clone(*img);
     u_image_save_file(self->RO.image, self->default_image_file);
+    u_image_copy(self->L.prev_image, self->RO.image);
 }
 
 
