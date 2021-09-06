@@ -167,7 +167,7 @@ void u_image_rotate(uImage *self, bool right) {
     self->rows = tmp.cols;
     for (int l = 0; l < self->layers; l++) {
         for (int r = 0; r < self->rows; r++) {
-            for (int c = 0; c < self->rows; c++) {
+            for (int c = 0; c < self->cols; c++) {
                 int mc = right ? r : tmp.cols - 1 - r;
                 int mr = right ? tmp.rows - 1 - c : c;
                 *u_image_pixel(*self, c, r, l) = *u_image_pixel(tmp, mc, mr, l);
@@ -188,7 +188,7 @@ void u_image_mirror(uImage self, bool vertical) {
 
     for (int l = 0; l < self.layers; l++) {
         for (int r = 0; r < self.rows; r++) {
-            for (int c = 0; c < self.rows; c++) {
+            for (int c = 0; c < self.cols; c++) {
                 int mc = vertical ? self.cols - 1 - c : c;
                 int mr = vertical ? r : self.rows - 1 - r;
                 *u_image_pixel(self, c, r, l) = *u_image_pixel(tmp, mc, mr, l);
