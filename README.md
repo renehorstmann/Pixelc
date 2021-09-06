@@ -16,7 +16,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Todo
 - selection mirror, rotate is buggy
-- selection should grow to the border, if pointer is out of the canvas
 - selection adjust
   - left top, width height (+- 1 with buttons)
 - selection paste blend option (alpha...)

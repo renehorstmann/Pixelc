@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "mathc/sca/int.h"
 #include "toolbar.h"
 #include "brushshape.h"
 #include "brush.h"
@@ -16,8 +17,11 @@ static void setup_selection(Brush *self, ePointer_s pointer) {
         return;
     }
     ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
-    if (!u_image_contains(img, cr.x, cr.y))
+    if (self->L.selection_pos.x < 0 && !u_image_contains(img, cr.x, cr.y))
         return;
+
+    cr.x = isca_clamp(cr.x, 0, img.cols - 1);
+    cr.y = isca_clamp(cr.y, 0, img.rows - 1);
 
     if (self->L.selection_pos.x < 0) {
         if (pointer.action == E_POINTER_DOWN) {
@@ -35,7 +39,14 @@ static void setup_selection(Brush *self, ePointer_s pointer) {
     int cols = 1 + abs(cr.x - self->L.selection_pos.x);
     int rows = 1 + abs(cr.y - self->L.selection_pos.y);
 
-    self->selection = selection_new(left, top, cols, rows);
+    if (self->selection) {
+        self->selection->left = left;
+        self->selection->top = top;
+        self->selection->cols = cols;
+        self->selection->rows = rows;
+    } else {
+        self->selection = selection_new(left, top, cols, rows);
+    }
 }
 
 static void move_selection(Brush *self, ePointer_s pointer) {
