@@ -15,6 +15,13 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
+- also load old image.png if size changed
+- options menu
+  - size
+  - frames + fps
+  - palette? or swipe on palette
+  - save as?
+  - import from?
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?
