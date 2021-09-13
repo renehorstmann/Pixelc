@@ -50,6 +50,8 @@ void canvas_update(Canvas *self, const CanvasCam_s *camera, float dtime);
 
 void canvas_render(Canvas *self, const mat4 *canvascam_mat);
 
+void canvas_resize(Canvas *self, int cols, int rows, int layers);
+
 ivec2 canvas_get_cr(const Canvas *self, vec4 pointer_pos);
 
 void canvas_clear(Canvas *self);

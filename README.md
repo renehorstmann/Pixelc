@@ -22,6 +22,7 @@ Palette, canvas size, animation size can be configured in code (main.c).
   - palette? or swipe on palette
   - save as?
   - import from?
+- savestate has pre allocated memory and max saves like a ring buffer
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?

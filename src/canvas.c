@@ -225,6 +225,10 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
         ro_batch_render(&self->L.selection_border, canvascam_mat);
 }
 
+void canvas_resize(Canvas *self, int cols, int rows, int layers) {
+    // todo
+}
+
 ivec2 canvas_get_cr(const Canvas *self, vec4 pointer_pos) {
     mat4 pose_inv = mat4_inv(self->RO.pose);
     vec4 pose_pos = mat4_mul_vec(pose_inv, pointer_pos);
