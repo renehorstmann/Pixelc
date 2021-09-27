@@ -6,7 +6,7 @@
 // based on a font sprite sheet and is monospaced.
 //
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "ro_types.h"
 
 
@@ -15,7 +15,7 @@
 RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_s alloc);
 
 static RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink) {
-    return ro_text_new_a(max, sprite_fn, tex_sink, allocator_new_default());
+    return ro_text_new_a(max, sprite_fn, tex_sink, rhc_allocator_new());
 }
 
 // inits text with the r/font55.png sprite sheet

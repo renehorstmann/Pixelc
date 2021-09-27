@@ -101,7 +101,7 @@ static void move_selection(Brush *self, ePointer_s pointer) {
 //
 
 Brush *brush_new(Canvas *canvas) {
-    Brush *self = rhc_calloc_raising(sizeof *self);
+    Brush *self = rhc_calloc(sizeof *self);
 
     self->canvas_ref = canvas;
     self->canvas_ref->brush_ref = self;     // ...

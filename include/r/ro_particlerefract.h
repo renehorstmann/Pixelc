@@ -22,7 +22,7 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "ro_types.h"
 
 
@@ -38,7 +38,7 @@ static RoParticleRefract ro_particlerefract_new(int num,
                                                 rTexture tex_refraction_sink) {
     return ro_particlerefract_new_a(num, scale_ptr,
                                     tex_main_sink, tex_refraction_sink,
-                                    allocator_new_default());
+                                    rhc_allocator_new());
 }
 
 

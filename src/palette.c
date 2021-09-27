@@ -3,7 +3,7 @@
 #include "e/input.h"
 #include "r/r.h"
 #include "u/pose.h"
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "brush.h"
 #include "palette.h"
 
@@ -55,7 +55,7 @@ static mat4 setup_palette_color_pose(const Palette *self, int r, int c) {
 //
 
 Palette *palette_new(const Camera_s *camera, Brush *brush) {
-    Palette *self = rhc_calloc_raising(sizeof *self);
+    Palette *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
     self->brush_ref = brush;

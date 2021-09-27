@@ -47,7 +47,7 @@ static void wheel_event(bool up, void *user_data) {
 
 
 CanvasCamCtrl *canvascamctrl_new(eInput *input, CanvasCam_s *camera, Brush *brush_ref) {
-    CanvasCamCtrl *self = rhc_calloc_raising(sizeof *self);
+    CanvasCamCtrl *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
     self->brush_ref = brush_ref;

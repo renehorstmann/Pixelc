@@ -88,13 +88,13 @@ static void save_state(SaveState *savestate, void *user_data) {
 
     // costum uImage with data concatenated
     size_t img_size = sizeof(uImage) + u_image_data_size(self->RO.image);
-    char *data = rhc_malloc_raising(img_size);
+    char *data = rhc_malloc(img_size);
     uImage *img = (uImage *) data;
     img->data = (uColor_s *) (data + sizeof(uImage));
     img->cols = self->RO.image.cols;
     img->rows = self->RO.image.rows;
     img->layers = self->RO.image.layers;
-    img->allocator = allocator_new_empty_raising();
+    img->allocator = rhc_allocator_new_empty();
 
     u_image_copy(*img, self->RO.image);
     savestate_save_data(savestate, img, img_size);
@@ -127,7 +127,7 @@ static void load_state(SaveState *savestate, const void *data, size_t size, void
 
 
 Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int grid_cols, int grid_rows) {
-    Canvas *self = rhc_calloc_raising(sizeof *self);
+    Canvas *self = rhc_calloc(sizeof *self);
 
     self->savestate_ref = savestate;
 

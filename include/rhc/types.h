@@ -29,7 +29,7 @@ typedef struct {
 
 // array of Str_s, allocated
 typedef struct {
-    Str_s *restrict array;
+    Str_s *array;
     size_t size;
 
     Allocator_s allocator;

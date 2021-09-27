@@ -22,7 +22,7 @@ struct Background {
 //
 
 Background *background_new(uColor_s a, uColor_s b) {
-    Background *self = rhc_calloc_raising(sizeof *self);
+    Background *self = rhc_calloc(sizeof *self);
     uColor_s buf[4];
     buf[0] = buf[3] = a;
     buf[1] = buf[2] = b;

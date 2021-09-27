@@ -2,10 +2,11 @@
 // can be used multiple times, with different types
 
 #include <string.h>
+#include "alloc.h"
 #include "error.h"
 
 static const char *rhc_hashmap_string_key_clone_(const char *key, Allocator_s a) {
-    char *clone = a.alloc(a, strlen(key)+1);
+    char *clone = a.malloc(a, strlen(key)+1);
     assume(clone, "hashmap_string failed to clone a key");
     memcpy(clone, key, strlen(key)+1);
     return clone;

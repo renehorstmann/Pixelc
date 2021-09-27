@@ -12,11 +12,6 @@ extern _Thread_local const char *rhc_error;
 // functions
 //
 
-// set and return rhc_error
-static const char *error(const char *err) {
-    return rhc_error = err;
-}
-
 // assert like function, that also uses formatting print to stderr.
 // Calls raise(SIG_ABRT).
 // If NDEBUG is defined, only msg will get displayed (without expression, file and line infos)

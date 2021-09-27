@@ -35,7 +35,7 @@ static void set_pose(Animation *self, const Camera_s *camera, float palette_hud_
 
 
 Animation *animation_new(const Canvas *canvas, int multi_cols, int multi_rows, float size, int frames, float fps) {
-    Animation *self = rhc_calloc_raising(sizeof *self);
+    Animation *self = rhc_calloc(sizeof *self);
 
     self->canvas_ref = canvas;
 

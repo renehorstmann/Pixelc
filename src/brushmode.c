@@ -44,7 +44,7 @@ static bool lineto(BrushMode *self, ivec2 from, ivec2 to) {
 //
 
 BrushMode *brushmode_new(Brush *brush, const Canvas *canvas) {
-    BrushMode *self = rhc_calloc_raising(sizeof *self);
+    BrushMode *self = rhc_calloc(sizeof *self);
     self->brush_ref = brush;
     self->canvas_ref = canvas;
     return self;

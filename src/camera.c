@@ -1,4 +1,4 @@
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "u/pose.h"
 #include "mathc/utils/camera.h"
 #include "camera.h"
@@ -16,7 +16,7 @@
 //
 
 Camera_s *camera_new() {
-    Camera_s *self = rhc_calloc_raising(sizeof *self);
+    Camera_s *self = rhc_calloc(sizeof *self);
     self->matrices.p = mat4_eye();
     self->matrices.p_inv = mat4_eye();
     return self;

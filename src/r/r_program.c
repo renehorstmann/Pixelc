@@ -43,7 +43,7 @@ GLuint r_programshader_new(Str_s source, GLint shader_type) {
         int log_len;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
 
-        char *buffer = rhc_malloc_raising(log_len + 1);
+        char *buffer = rhc_malloc(log_len + 1);
         glGetShaderInfoLog(shader, log_len, NULL, buffer);
         log_error("r_programshader_new: Shader compile failure in %s shader: %s",  type, buffer);
         rhc_free(buffer);
@@ -84,7 +84,7 @@ GLuint r_program_new(const GLuint *shaders, int n, bool delete_shaders) {
         int log_len;
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_len);
 
-        char *buffer = rhc_malloc_raising(log_len + 1);
+        char *buffer = rhc_malloc(log_len + 1);
         glGetProgramInfoLog(program, log_len, NULL, buffer);
         log_error("r_program_new: Shader linking failure: %s", buffer);
         rhc_free(buffer);
@@ -132,7 +132,7 @@ void r_program_validate(GLuint program) {
         int log_len;
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_len);
 
-        char *buffer = rhc_malloc_raising(log_len + 1);
+        char *buffer = rhc_malloc(log_len + 1);
         glGetProgramInfoLog(program, log_len, NULL, buffer);
         log_error("r_program_validate: Program validate failure: %s", buffer);
         rhc_free(buffer);

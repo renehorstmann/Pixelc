@@ -2,7 +2,7 @@
 #include "u/pose.h"
 #include "u/image.h"
 #include "rhc/error.h"
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "brush.h"
 #include "brushshape.h"
 

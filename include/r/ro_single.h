@@ -5,7 +5,7 @@
 // class to render a single rect with a draw call
 //
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "ro_types.h"
 
 

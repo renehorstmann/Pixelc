@@ -1,4 +1,4 @@
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "u/pose.h"
 #include "mathc/utils/camera.h"
 #include "canvascam.h"
@@ -16,7 +16,7 @@
 //
 
 CanvasCam_s *canvascam_new() {
-    CanvasCam_s *self = rhc_calloc_raising(sizeof *self);
+    CanvasCam_s *self = rhc_calloc(sizeof *self);
     self->matrices.v = mat4_eye();
 
     self->matrices.v_inv = mat4_eye();

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "canvas.h"
 #include "palette.h"
 #include "brush.h"
@@ -34,7 +34,7 @@ struct SaveState {
 typedef struct SaveState_State State;
 
 SaveState *savestate_new() {
-    return rhc_calloc_raising(sizeof(SaveState));
+    return rhc_calloc(sizeof(SaveState));
 }
 
 int savestate_register(SaveState *self, savestate_save_fn save_fn, savestate_load_fn load_fn, void *user_data) {
@@ -55,7 +55,7 @@ void savestate_save_data(SaveState *self, const void *data, size_t size) {
     }
     State *state = &self->L.states[self->L.state_size - 1];
     if (size > 0) {
-        state->data[self->L.current_id] = rhc_malloc_raising(size);
+        state->data[self->L.current_id] = rhc_malloc(size);
         memcpy(state->data[self->L.current_id], data, size);
         state->size[self->L.current_id] = size;
     } else
@@ -66,7 +66,7 @@ void savestate_save(SaveState *self) {
     log_info("savestate_save: %d", self->L.state_size);
 
     self->L.state_size++;
-    self->L.states = rhc_realloc_raising(self->L.states, self->L.state_size * sizeof(State));
+    self->L.states = rhc_realloc(self->L.states, self->L.state_size * sizeof(State));
 
     State *state = &self->L.states[self->L.state_size - 1];
     *state = (State) {0};

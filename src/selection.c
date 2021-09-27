@@ -22,7 +22,7 @@ static bool valid_to_copy(const Selection *self, uImage img, int layer) {
 
 Selection *selection_new(int left, int top, int cols, int rows) {
     log_info("selection: new");
-    Selection *self = rhc_calloc_raising(sizeof *self);
+    Selection *self = rhc_calloc(sizeof *self);
 
     self->left = left;
     self->top = top;

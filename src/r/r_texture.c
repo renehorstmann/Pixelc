@@ -2,7 +2,7 @@
 #include "mathc/uchar.h"
 #include "rhc/error.h"
 #include "rhc/log.h"
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "r/render.h"
 #include "r/texture.h"
 
@@ -60,7 +60,7 @@ rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int spr
     // reorder vertical
     void *tmp_buffer = NULL;
     if(opt_buffer && self.sprites.x > 1) {
-        tmp_buffer = rhc_malloc_raising(4 * image_cols * image_rows);
+        tmp_buffer = rhc_malloc(4 * image_cols * image_rows);
         
         reorder(tmp_buffer, opt_buffer, self.sprite_size, self.sprites);
         opt_buffer = tmp_buffer;
@@ -136,7 +136,7 @@ void r_texture_set(rTexture self, const void *buffer) {
     if(self.sprites.x > 1) {
         int image_cols = self.sprite_size.x * self.sprites.x;
         int image_rows = self.sprite_size.y * self.sprites.y;
-        tmp_buffer = rhc_malloc_raising(4 * image_cols * image_rows);
+        tmp_buffer = rhc_malloc(4 * image_cols * image_rows);
 
         reorder(tmp_buffer, buffer, self.sprite_size, self.sprites);
         buffer = tmp_buffer;

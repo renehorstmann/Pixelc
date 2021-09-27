@@ -2,7 +2,7 @@
 // can be used multiple times, with different types
 
 #include <string.h>     // memcpy
-#include "allocator.h"
+#include "alloc.h"
 #include "log.h"
 
 #define RHC_NAME_CONCAT(a, b) a ## b

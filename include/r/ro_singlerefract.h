@@ -22,7 +22,7 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "ro_types.h"
 
 

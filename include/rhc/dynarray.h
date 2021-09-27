@@ -3,7 +3,7 @@
 
 #include <string.h>     // memcpy
 #include "error.h"
-#include "allocator.h"
+#include "alloc.h"
 #include "log.h"
 
 

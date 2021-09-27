@@ -43,7 +43,7 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 
 InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const CanvasCam_s *canvascam,
                          Palette *palette, Brush *brush, Toolbar *toolbar, CanvasCamCtrl *canvascamctrl) {
-    InputCtrl *self = rhc_calloc_raising(sizeof *self);
+    InputCtrl *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
     self->canvascam_ref = canvascam;

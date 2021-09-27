@@ -5,7 +5,7 @@
 #include "error.h"
 #include "log.h"
 #include "time.h"
-#include "allocator.h"
+#include "alloc.h"
 #include "file.h"
 #include "str.h"
 #include "string.h"
@@ -15,7 +15,7 @@
 #ifdef RHC_IMPL
 #include "impl/error_impl.h"
 #include "impl/log_impl.h"
-#include "impl/allocator_impl.h"
+#include "impl/alloc_impl.h"
 #include "impl/file_impl.h"
 #endif
 

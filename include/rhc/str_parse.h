@@ -36,7 +36,7 @@ static Str_s str_eat_int ## x ## _ascii(Str_s s, int ## x ## _t *opt_eaten) {\
     if(ate_size <= 0 || ate_size > s.size) {\
         rhc_error = "str_eat_int_ascii failed";\
         log_warn("str_eat_int" #x "_ascii: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(opt_eaten)\
         *opt_eaten = (int ## x ##_t) res;\
@@ -60,7 +60,7 @@ static Str_s str_eat_uint ## x ## _ascii(Str_s s, uint ## x ## _t *opt_eaten) {\
     if(ate_size <= 0 || ate_size > s.size) {\
         rhc_error = "str_eat_uint_ascii failed";\
         log_warn("str_eat_uint" #x "_ascii: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(opt_eaten)\
         *opt_eaten = (int ## x ##_t) res;\
@@ -83,7 +83,7 @@ static Str_s str_eat_float_ascii(Str_s s, float *opt_eaten) {
     if(ate_size <= 0 || ate_size > s.size) {
         rhc_error = "str_eat_float_ascii failed";
         log_warn("str_eat_float_ascii: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if(opt_eaten)
         *opt_eaten = (float) res;
@@ -100,7 +100,7 @@ static Str_s str_eat_double_ascii(Str_s s, double *opt_eaten) {
     if(ate_size <= 0 || ate_size > s.size) {
         rhc_error = "str_eat_double_ascii failed";
         log_warn("str_eat_double_ascii: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if(opt_eaten)
         *opt_eaten = (double) res;
@@ -120,7 +120,7 @@ static Str_s str_eat_int ## x ## _binary_le(Str_s s, int ## x ## _t *opt_eaten) 
     if(s.size < (x)/8) {\
         rhc_error = "str_eat_int_binary_le failed";\
         log_warn("str_eat_int" #x "_binary_le: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(opt_eaten){\
         memcpy(opt_eaten, s.data, (x)/8);\
@@ -145,7 +145,7 @@ static Str_s str_eat_int ## x ## _binary_be(Str_s s, int ## x ## _t *opt_eaten) 
     if(s.size < (x)/8) {\
         rhc_error = "str_eat_int_binary_be failed";\
         log_warn("str_eat_int" #x "_binary_be: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(opt_eaten){\
         memcpy(opt_eaten, s.data, (x)/8);\
@@ -170,7 +170,7 @@ static Str_s str_eat_uint ## x ## _binary_le(Str_s s, uint ## x ## _t *opt_eaten
     if(s.size < (x)/8) {\
         rhc_error = "str_eat_uint_binary_le failed";\
         log_warn("str_eat_uint" #x "_binary_le: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(opt_eaten){\
         memcpy(opt_eaten, s.data, (x)/8);\
@@ -195,7 +195,7 @@ static Str_s str_eat_uint ## x ## _binary_be(Str_s s, uint ## x ## _t *opt_eaten
     if(s.size < (x)/8) {\
         rhc_error = "str_eat_uint_binary_be failed";\
         log_warn("str_eat_uint" #x "_binary_be: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(opt_eaten){\
         memcpy(opt_eaten, s.data, (x)/8);\
@@ -220,7 +220,7 @@ static Str_s str_eat_float_binary_le(Str_s s, float *opt_eaten) {
     if(s.size < 4) {
         rhc_error = "str_eat_float_binary_le failed";
         log_warn("str_eat_float_binary_le: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if(opt_eaten) {
         memcpy(opt_eaten, s.data, 4);
@@ -239,7 +239,7 @@ static Str_s str_eat_float_binary_be(Str_s s, float *opt_eaten) {
     if(s.size < 4) {
         rhc_error = "str_eat_float_binary_be failed";
         log_warn("str_eat_float_binary_be: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if(opt_eaten) {
         memcpy(opt_eaten, s.data, 4);
@@ -259,7 +259,7 @@ static Str_s str_eat_double_binary_le(Str_s s, double *opt_eaten) {
     if(s.size < 8) {
         rhc_error = "str_eat_double_binary_le failed";
         log_warn("str_eat_double_binary_le: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if(opt_eaten) {
         memcpy(opt_eaten, s.data, 8);
@@ -278,7 +278,7 @@ static Str_s str_eat_double_binary_be(Str_s s, double *opt_eaten) {
     if(s.size < 8) {
         rhc_error = "str_eat_double_binary_be failed";
         log_warn("str_eat_double_binary_be: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if(opt_eaten) {
         memcpy(opt_eaten, s.data, 8);
@@ -302,7 +302,7 @@ static Str_s str_feed_int ## x ## _binary_le(Str_s s, int ## x ## _t feed) {\
     if(s.size < (x)/8) {\
         rhc_error = "str_feed_int_binary_le failed";\
         log_warn("str_feed_int" #x "_binary_le: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(!rhc_str__helper_system_is_binary_little_endian_())\
         rhc_str__helper_swap_endian_(&feed, (x)/8);\
@@ -325,7 +325,7 @@ static Str_s str_feed_int ## x ## _binary_be(Str_s s, int ## x ## _t feed) {\
     if(s.size < (x)/8) {\
         rhc_error = "str_feed_int_binary_be failed";\
         log_warn("str_feed_int" #x "_binary_be: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(rhc_str__helper_system_is_binary_little_endian_())\
         rhc_str__helper_swap_endian_(&feed, (x)/8);\
@@ -348,7 +348,7 @@ static Str_s str_feed_uint ## x ## _binary_le(Str_s s, uint ## x ## _t feed) {\
     if(s.size < (x)/8) {\
         rhc_error = "str_feed_uint_binary_le failed";\
         log_warn("str_feed_uint" #x "_binary_le: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(!rhc_str__helper_system_is_binary_little_endian_())\
         rhc_str__helper_swap_endian_(&feed, (x)/8);\
@@ -371,7 +371,7 @@ static Str_s str_feed_uint ## x ## _binary_be(Str_s s, uint ## x ## _t feed) {\
     if(s.size < (x)/8) {\
         rhc_error = "str_feed_uint_binary_be failed";\
         log_warn("str_feed_uint" #x "_binary_be: failed");\
-        return (Str_s) {s.data, 0};\
+        return str_new_invalid();\
     }\
     if(rhc_str__helper_system_is_binary_little_endian_())\
         rhc_str__helper_swap_endian_(&feed, (x)/8);\
@@ -394,7 +394,7 @@ static Str_s str_feed_float_binary_le(Str_s s, float feed) {
     if(s.size < 4) {
         rhc_error = "str_feed_float_binary_le failed";
         log_warn("str_feed_float_binary_le: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if (!rhc_str__helper_system_is_binary_little_endian_())
         rhc_str__helper_swap_endian_(&feed, 4);
@@ -411,7 +411,7 @@ static Str_s str_feed_float_binary_be(Str_s s, float feed) {
     if(s.size < 4) {
         rhc_error = "str_feed_float_binary_be failed";
         log_warn("str_feed_float_binary_be: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if (rhc_str__helper_system_is_binary_little_endian_())
         rhc_str__helper_swap_endian_(&feed, 4);
@@ -428,7 +428,7 @@ static Str_s str_feed_double_binary_le(Str_s s, double feed) {
     if(s.size < 8) {
         rhc_error = "str_feed_double_binary_le failed";
         log_warn("str_feed_double_binary_le: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if (!rhc_str__helper_system_is_binary_little_endian_())
         rhc_str__helper_swap_endian_(&feed, 8);
@@ -445,7 +445,7 @@ static Str_s str_feed_double_binary_be(Str_s s, double feed) {
     if(s.size < 8) {
         rhc_error = "str_feed_double_binary_be failed";
         log_warn("str_feed_double_binary_be: failed");
-        return (Str_s) {s.data, 0};
+        return str_new_invalid();
     }
     if (rhc_str__helper_system_is_binary_little_endian_())
         rhc_str__helper_swap_endian_(&feed, 8);

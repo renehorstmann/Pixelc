@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "../allocator.h"
+#include "../alloc.h"
 #include "../log.h"
 
 #define RHC_LOG_MAX_LENGTH 4096     // Should be the same as SDL's log max

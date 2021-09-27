@@ -22,7 +22,7 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "ro_types.h"
 
 
@@ -35,7 +35,7 @@ static RoBatchRefract ro_batchrefract_new(int num,
                                           const float *scale_ptr,
                                           rTexture tex_main_sink, rTexture tex_refraction_sink) {
     return ro_batchrefract_new_a(num, scale_ptr, tex_main_sink, tex_refraction_sink,
-                                 allocator_new_default()
+                                 rhc_allocator_new()
     );
 }
 

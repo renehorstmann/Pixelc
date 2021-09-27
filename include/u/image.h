@@ -1,11 +1,9 @@
 #ifndef U_IMAGE_H
 #define U_IMAGE_H
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "color.h"
 
-
-#define IMAGE_DEFAULT_ALLCOATOR allocator_new_raising()
 
 
 typedef struct {
@@ -26,35 +24,35 @@ static uImage u_image_new_invalid_a(Allocator_s a) {
 }
 
 static uImage u_image_new_invalid() {
-    return u_image_new_invalid_a(IMAGE_DEFAULT_ALLCOATOR);
+    return u_image_new_invalid_a(rhc_allocator_new());
 }
 
 uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a);
 
 static uImage u_image_new_empty(int cols, int rows, int layers) {
     return u_image_new_empty_a(cols, rows, layers,
-                               IMAGE_DEFAULT_ALLCOATOR);
+                               rhc_allocator_new());
 }
 
 uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a);
 
 static uImage u_image_new_zeros(int cols, int rows, int layers) {
     return u_image_new_zeros_a(cols, rows, layers,
-                               IMAGE_DEFAULT_ALLCOATOR);
+                               rhc_allocator_new());
 }
 
 uImage u_image_new_clone_a(uImage from, Allocator_s a);
 
 static uImage u_image_new_clone(uImage from) {
     return u_image_new_clone_a(from,
-                               allocator_new_raising());
+                               rhc_allocator_new());
 }
 
 uImage u_image_new_file_a(int layers, const char *file, Allocator_s a);
 
 static uImage u_image_new_file(int layers, const char *file) {
     return u_image_new_file_a(layers, file,
-                              allocator_new_raising());
+                              rhc_allocator_new());
 }
 
 

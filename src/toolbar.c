@@ -78,7 +78,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
                      Brush *brush,
                      CanvasCamCtrl *canvascamctrl,
                      Animation *animation) {
-    Toolbar *self = rhc_calloc_raising(sizeof *self);
+    Toolbar *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
     self->savestate_ref = savestate;

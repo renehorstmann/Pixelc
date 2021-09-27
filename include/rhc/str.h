@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "allocator.h"
+#include "alloc.h"
 #include "error.h"
 #include "log.h"
 
@@ -116,7 +116,7 @@ static bool str_ends_with(Str_s s, Str_s cmp) {
 // returns a new str, based on s, but without the leading chars of strip (space -> isspace())
 static Str_s str_lstrip(Str_s s, char strip) {
     // invalid safe
-    if(isspace(strip)) {
+    if(strip==' ') {
         while (!str_empty(s) && isspace(*s.data)) {
             s.data++;
             s.size--;
@@ -133,7 +133,7 @@ static Str_s str_lstrip(Str_s s, char strip) {
 // returns a new str, based on s, but without the least chars of strip (space -> isspace())
 static Str_s str_rstrip(Str_s s, char strip) {
     // invalid safe
-    if(isspace(strip)) {
+    if(strip==' ') {
         while (!str_empty(s) && isspace(s.data[s.size-1])) {
             s.size--;
         }
@@ -155,7 +155,7 @@ static Str_s str_next_split(Str_s s, char split) {
     if(str_empty(s))
         return str_new_invalid();
     Str_s res = {s.data, 0};
-    if (isspace(split)) {
+    if (split==' ') {
         while (res.size < s.size && !isspace(res.data[res.size]))
             res.size++;
     } else {
@@ -210,7 +210,7 @@ static StrArray str_split_allocated(Str_s s, char split, Allocator_s a) {
 static ssize_t str_find_first(Str_s s, char find) {
     if(str_empty(s))
         return -1;
-    if (isspace(find)) {
+    if (find==' ') {
         for(ssize_t i=0; i<s.size; i++) {
             if(isspace(s.data[i]))
                 return i;
@@ -229,7 +229,7 @@ static ssize_t str_find_first(Str_s s, char find) {
 static ssize_t str_find_last(Str_s s, char find) {
     if(str_empty(s))
         return -1;
-    if (isspace(find)) {
+    if (find==' ') {
         for(ssize_t i=s.size-1; i>=0; i--) {
             if(isspace(s.data[i]))
                 return i;
@@ -286,6 +286,47 @@ static ssize_t str_find_last_set(Str_s s, const char *char_set) {
         }
     }
     return -1;
+}
+
+// returns new str, based on s, but missing the first n characters
+static Str_s str_eat(Str_s s, size_t n) {
+    if(n>=s.size) {
+        s.data += s.size;
+        s.size = 0;
+    } else {
+        s.data += n;
+        s.size -= n;
+    }
+    return s;
+}
+
+// returns new str, based on s, but missing the last n characters
+static Str_s str_eat_back(Str_s s, size_t n) {
+    if(n>=s.size) {
+        s.size = 0;
+    } else {
+        s.size -= n;
+    }
+    return s;
+}
+
+// checks if s begins with eat_begin and returns a new str, based on s, without eat_begin at the beginning
+// if s does not begin with eat_begin, an invalid str is returned
+static Str_s str_eat_str(Str_s s, Str_s eat_begin) {
+    if(!str_begins_with(s, eat_begin))
+        return str_new_invalid();
+    s.data+=eat_begin.size;
+    s.size-=eat_begin.size;
+    return s;
+}
+
+// checks if s ends with eat_back and returns a new str, based on s, without eat_back at the end
+// if s does not end with eat_back, an invalid str is returned
+static Str_s str_eat_back_str(Str_s s, Str_s eat_back) {
+    if(!str_ends_with(s, eat_back))
+        return str_new_invalid();
+    s.size-=eat_back.size;
+    return s;
 }
 
 // returns new str, based on s, without every leading char until the char until.
@@ -398,7 +439,7 @@ static size_t str_count(Str_s s, char search) {
     if(str_empty(s))
         return 0;
     size_t cnt = 0;
-    if(isspace(search)) {
+    if(search==' ') {
         for(size_t i=0; i<s.size; i++) {
             if(isspace(s.data[i]))
                 cnt++;
@@ -437,7 +478,7 @@ static size_t str_count_set(Str_s s, const char *set_search) {
 static void str_replace(Str_s s, char old, char replacement) {
     if(str_empty(s))
         return;
-    if(isspace(old)) {
+    if(old==' ') {
         for(size_t i=0; i<s.size; i++) {
             if(isspace(s.data[i]))
                 s.data[i] = replacement;
