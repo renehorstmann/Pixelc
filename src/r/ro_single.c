@@ -32,7 +32,7 @@ void ro_single_kill(RoSingle *self) {
 }
 
 
-void ro_single_render(RoSingle *self, const mat4 *camera_mat) {
+void ro_single_render(const RoSingle *self, const mat4 *camera_mat) {
     r_render_error_check("ro_single_renderBEGIN");
     glUseProgram(self->L.program);
 

@@ -22,7 +22,7 @@ RoTtfText ro_ttftext_new(vec4 color, const char *text);
 
 void ro_ttftext_kill(RoTtfText *self);
 
-void ro_ttftext_render(RoTtfText *self, const mat4 *camera_mat);
+void ro_ttftext_render(const RoTtfText *self, const mat4 *camera_mat);
 
 void ro_ttftext_set_size(RoTtfText *self, float h);
 

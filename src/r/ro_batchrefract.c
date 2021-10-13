@@ -120,7 +120,7 @@ void ro_batchrefract_kill(RoBatchRefract *self) {
     *self = (RoBatchRefract) {0};
 }
 
-void ro_batchrefract_update_sub(RoBatchRefract *self, int offset, int size) {
+void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size) {
     r_render_error_check("ro_batchrefract_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
@@ -152,7 +152,7 @@ void ro_batchrefract_update_sub(RoBatchRefract *self, int offset, int size) {
 }
 
 
-void ro_batchrefract_render_sub(RoBatchRefract *self, int num, const mat4 *camera_mat) {
+void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat) {
     r_render_error_check("ro_batchrefract_renderBEGIN");
     glUseProgram(self->L.program);
 

@@ -147,7 +147,7 @@ void ro_particle_kill(RoParticle *self) {
     *self = (RoParticle) {0};
 }
 
-void ro_particle_update_sub(RoParticle *self, int offset, int size) {
+void ro_particle_update_sub(const RoParticle *self, int offset, int size) {
     r_render_error_check("ro_particle_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
@@ -178,7 +178,7 @@ void ro_particle_update_sub(RoParticle *self, int offset, int size) {
     r_render_error_check("ro_particle_update");
 }
 
-void ro_particle_render_sub(RoParticle *self, float time, int num, const mat4 *camera_mat) {
+void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat) {
     r_render_error_check("ro_particle_renderBEGIN");
     glUseProgram(self->L.program);
 

@@ -101,7 +101,7 @@ void ro_batch_kill(RoBatch *self) {
     *self = (RoBatch) {0};
 }
 
-void ro_batch_update_sub(RoBatch *self, int offset, int size) {
+void ro_batch_update_sub(const RoBatch *self, int offset, int size) {
     r_render_error_check("ro_batch_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
@@ -133,7 +133,7 @@ void ro_batch_update_sub(RoBatch *self, int offset, int size) {
 }
 
 
-void ro_batch_render_sub(RoBatch *self, int num, const mat4 *camera_mat) {
+void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat) {
     r_render_error_check("ro_batch_renderBEGIN");
     glUseProgram(self->L.program);
 

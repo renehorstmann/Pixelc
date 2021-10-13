@@ -75,7 +75,7 @@ void ro_ttftext_kill(RoTtfText *self) {
     ro_single_kill(&self->ro);
 }
 
-void ro_ttftext_render(RoTtfText *self, const mat4 *camera_mat) {
+void ro_ttftext_render(const RoTtfText *self, const mat4 *camera_mat) {
     ro_single_render(&self->ro, camera_mat);
 }
 

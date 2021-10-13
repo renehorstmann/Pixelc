@@ -36,7 +36,7 @@ static void hide(RoText *self, int from) {
     }
 }
 
-static mat4 pose(RoText *self, int c, int r) {
+static mat4 pose(const RoText *self, int c, int r) {
     return u_pose_new_aa(c * self->offset.x, -r * self->offset.y, self->size.x, self->size.y);
 }
 
@@ -63,7 +63,7 @@ void ro_text_kill(RoText *self) {
     ro_batch_kill(&self->ro);
 }
 
-void ro_text_render(RoText *self, const mat4 *camera_mat) {
+void ro_text_render(const RoText *self, const mat4 *camera_mat) {
     mat4 mvp = mat4_mul_mat(*camera_mat, self->pose);
     ro_batch_render(&self->ro, &mvp);
 }
@@ -98,7 +98,7 @@ vec2 ro_text_set_text(RoText *self, const char *text) {
                    }};
 }
 
-vec2 ro_text_get_size(RoText *self, const char *text) {
+vec2 ro_text_get_size(const RoText *self, const char *text) {
     int cols = 0;
     int rows = 0;
     int c = 0;

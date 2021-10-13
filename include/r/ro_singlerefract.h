@@ -32,7 +32,7 @@ RoSingleRefract ro_singlerefract_new(
 
 void ro_singlerefract_kill(RoSingleRefract *self);
 
-void ro_singlerefract_render(RoSingleRefract *self, const mat4 *camera_mat);
+void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_singlerefract_set_texture_main(RoSingleRefract *self, rTexture tex_main_sink);

@@ -52,7 +52,7 @@ void ro_singlerefract_kill(RoSingleRefract *self) {
 }
 
 
-void ro_singlerefract_render(RoSingleRefract *self, const mat4 *camera_mat) {
+void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat) {
     r_render_error_check("ro_singlerefract_renderBEGIN");
     glUseProgram(self->L.program);
 

@@ -18,20 +18,20 @@ static RoBatch ro_batch_new(int num, rTexture tex_sink) {
 void ro_batch_kill(RoBatch *self);
 
 // updates a subset of the batch into the gpu
-void ro_batch_update_sub(RoBatch *self, int offset, int size);
+void ro_batch_update_sub(const RoBatch *self, int offset, int size);
 
 // renders a subset of the batch
-void ro_batch_render_sub(RoBatch *self, int num, const mat4 *camera_mat);
+void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat);
 
 // resets the texture, if .owns_tex is true, it will delete the old texture
 void ro_batch_set_texture(RoBatch *self, rTexture tex_sink);
 
 
-static void ro_batch_update(RoBatch *self) {
+static void ro_batch_update(const RoBatch *self) {
     ro_batch_update_sub(self, 0, self->num);
 }
 
-static void ro_batch_render(RoBatch *self, const mat4 *camera_mat) {
+static void ro_batch_render(const RoBatch *self, const mat4 *camera_mat) {
     ro_batch_render_sub(self, self->num, camera_mat);
 }
 

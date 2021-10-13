@@ -165,7 +165,7 @@ void ro_particlerefract_kill(RoParticleRefract *self) {
     *self = (RoParticleRefract) {0};
 }
 
-void ro_particlerefract_update_sub(RoParticleRefract *self, int offset, int size) {
+void ro_particlerefract_update_sub(const RoParticleRefract *self, int offset, int size) {
     r_render_error_check("ro_particlerefract_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
@@ -196,7 +196,7 @@ void ro_particlerefract_update_sub(RoParticleRefract *self, int offset, int size
     r_render_error_check("ro_particlerefract_update");
 }
 
-void ro_particlerefract_render_sub(RoParticleRefract *self, float time, int num, const mat4 *camera_mat) {
+void ro_particlerefract_render_sub(const RoParticleRefract *self, float time, int num, const mat4 *camera_mat) {
     r_render_error_check("ro_particlerefract_renderBEGIN");
     glUseProgram(self->L.program);
 
