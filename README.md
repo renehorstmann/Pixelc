@@ -15,9 +15,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
-- rhc allocation -> alloc
-- rhc *_raising <> *_try
-- some const self (render, update)
 - also load old image.png if size changed
 - vkeyboard module
   - transparent overlay
