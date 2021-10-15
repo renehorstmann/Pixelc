@@ -170,7 +170,7 @@ Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int gri
 
     uImage img = u_image_new_file(layers, self->default_image_file);
     if (u_image_valid(img)) {
-        u_image_copy(self->RO.image, img);
+        u_image_copy_top_left(self->RO.image, img);
         u_image_kill(&img);
     }
 

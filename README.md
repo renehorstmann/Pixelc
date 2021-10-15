@@ -15,7 +15,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
-- also load old image.png if size changed
 - vkeyboard module
   - transparent overlay
   - key buttons with a background + back and enter button

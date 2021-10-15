@@ -62,6 +62,8 @@ bool u_image_save_file(uImage self, const char *file);
 
 bool u_image_copy(uImage self, uImage from);
 
+void u_image_copy_top_left(uImage self, uImage from);
+
 bool u_image_equals(uImage self, uImage from);
 
 void u_image_rotate(uImage *self, bool right);
