@@ -16,6 +16,7 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Todo
 - vkeyboard module
+  - font88 with small glyphs...
   - transparent overlay
   - key buttons with a background + back and enter button
   - shows entered text

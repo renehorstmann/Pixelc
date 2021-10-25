@@ -21,8 +21,8 @@
 
 // canvas size
 //*
-#define COLS 100
-#define ROWS 150
+#define COLS 32
+#define ROWS 16
 #define LAYERS 1
 //*/
 
@@ -47,7 +47,7 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
-#define PLAY_FRAMES 1
+#define PLAY_FRAMES 2
 #define PLAY_FPS 2.0
 
 // uncomment the used palette:
