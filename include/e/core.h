@@ -15,6 +15,14 @@
 
 #include <SDL2/SDL.h>
 
+#ifdef OPTION_TTF
+#include <SDL2/SDL_ttf.h>
+#endif
+
+#ifdef OPTION_SOCKET
+#include <SDL2/SDL_net.h>
+#endif
+
 #ifndef OPTION_GLEW
 #include <SDL2/SDL_opengl.h>
 #endif

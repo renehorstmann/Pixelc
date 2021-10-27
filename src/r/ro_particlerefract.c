@@ -19,7 +19,7 @@ static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 RoParticleRefract ro_particlerefract_new_a(int num,
                                            const float *scale_ptr,
-                                           rTexture tex_main_sink, rTexture tex_refraction_sink, Allocator_s alloc) {
+                                           rTexture tex_main_sink, rTexture tex_refraction_sink, Allocator_i alloc) {
     r_render_error_check("ro_particlerefract_newBEGIN");
     RoParticleRefract self;
     self.L.allocator = alloc;

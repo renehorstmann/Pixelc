@@ -1,243 +1,110 @@
 #ifndef RHC_SOCKET_H
 #define RHC_SOCKET_H
+#ifdef OPTION_SOCKET
 
-#include <assert.h>
-#include <stddef.h>
-#include <errno.h>
-#include "log.h"
-#include "error.h"
+#include <stdint.h>
+#include "types.h"
+#include "alloc.h"
 
+#define RHC_SOCKET_STORAGE_SIZE 8
 
-struct Socket;
-typedef struct Socket Socket;
+typedef struct {
+    Stream_i stream;
+    Allocator_i allocator;
+    char impl_storage[RHC_SOCKET_STORAGE_SIZE];
+} Socket;
 
-static bool socket_valid(Socket self);
-static Socket socket_new_invalid();
-static void socket_kill(Socket *self);
-
-static Socket socket_new_server(const char *addr, const char *port);
-static Socket socket_new_client(const char *addr, const char *port);
-
-static Socket socket_server_accept(Socket *self);
-
-static bool socket_recv(Socket *self, void *msg, size_t size);
-static bool socket_send(Socket *self, const void *msg, size_t size);
+typedef struct {
+    char impl_storage[RHC_SOCKET_STORAGE_SIZE];
+} SocketServer;
 
 
-#ifdef WIN32
-#include <winsock2.h>
-#include <winsock.h>
-#include <ws2tcpip.h>
-#include <windows.h>
+//
+// SocketServer
+//
 
-struct Socket {
-    SOCKET so;
-};
+// returns true if the SocketServer is valid to use
+bool rhc_socketserver_valid(SocketServer self);
 
-static bool socket_valid(Socket self) {
-    return self.so != INVALID_SOCKET;
+// returns a new invalid SocketServer
+SocketServer rhc_socketserver_new_invalid();
+
+// Creates a new SocketServer
+// address may be "localhost" or "127.0.0.1", to only enable local connections
+// address may be "0.0.0.0" to enable all incoming connections
+SocketServer rhc_socketserver_new(const char *address, uint16_t port);
+
+// kills the socketserver and sets it invalid
+void rhc_socketserver_kill(SocketServer *self);
+
+// Accepts a new client for a SocketServer
+// If an error occures, SocketServer will be set invalid and false is returned
+Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a);
+
+
+//
+// Socket
+//
+
+// safe way to use the Stream interface
+static Stream_i socket_get_stream(Socket *self) {
+    if(!self)
+        return stream_new_invalid();
+    return self->stream;
 }
 
-static Socket socket_new_invalid() {
-    return (Socket) {INVALID_SOCKET};
+// returns true if the Socket is valid to use
+bool rhc_socket_valid(const Socket *self);
+// returns a new invalid Socket
+Socket *rhc_socket_new_invalid();
+
+// Creates and connects to a server
+Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a);
+
+// kills the socket and sets it invalid
+void rhc_socket_kill(Socket **self_ptr);
+
+
+
+//
+// wrapper without _rhc
+//
+
+// Accepts a new client for a SocketServer
+// If an error occures, SocketServer will be set invalid and false is returned
+static Socket *socketserver_accept(SocketServer *self) {
+    return rhc_socketserver_accept_a(self, RHC_DEFAULT_ALLOCATOR);
 }
 
-static void socket_kill(Socket *self) {
-    closesocket(self->so);
-    self->so = INVALID_SOCKET;
-}
-
-static Socket socket_new_server(const char *addr, const char *port) {
-    Socket self = {0};
-
-    // winsock startup (can be called multiple times...)
-    {
-        WORD version = MAKEWORD(2, 2);
-        WSADATA wsadata;
-        int status = WSAStartup(version, &wsadata);
-        if(status != 0) {
-            log_error("socket_new_server failed, WSAStartup failed: &i", status);
-            rhc_error = "socket_new_server failed";
-            return socket_new_invalid();
-        }
-    }
-
-    struct addrinfo hints = {
-            .ai_family = AF_UNSPEC,
-            .ai_socktype = SOCK_STREAM
-    };
-//    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
-
-    // find a valid address and create a socket on it
-    {
-        struct addrinfo *servinfo;
-        int status = getaddrinfo(addr, port, &hints, &servinfo);
-        if (status != 0) {
-            log_error("socket_new_server failed: getaddrinfo error: %s\n", gai_strerror(status));
-            rhc_error = "socket_new_server failed";
-            return socket_new_invalid();
-        }
-
-        for (struct addrinfo *ai = servinfo; ai != NULL; ai = ai->ai_next) {
-            self.so = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-            if (!socket_valid(self))
-                continue;
-
-            if(bind(self.so, ai->ai_addr, (int) ai->ai_addrlen) == -1) {
-                socket_kill(&self);
-                continue;
-            }
-
-            // valid socket + bind
-            break;
-        }
-
-        freeaddrinfo(servinfo); // free the linked-list
-    }
-
-    // no valid address found?
-    if(!socket_valid(self)) {
-        log_error("socket_new_server failed to create the server socket");
-        rhc_error = "socket_new_server failed";
-        return socket_new_invalid();
-    }
-
-    // reuse socket port
-    {
-        BOOL yes = 1;
-        setsockopt(self.so, SOL_SOCKET, SO_REUSEADDR, (char*) &yes, sizeof yes);
-    }
-
-    int backlog = 10;   // queue size of incoming connections
-    if(listen(self.so, backlog) == -1) {
-        log_error("socket_new_server failed to listen");
-        rhc_error = "socket_new_server failed";
-        socket_kill(&self);
-    }
-
-    return self;
-}
-
-static Socket socket_new_client(const char *addr, const char *port) {
-    Socket self = {0};
-
-    // winsock startup (can be called multiple times...)
-    {
-        WORD version = MAKEWORD(2, 2);
-        WSADATA wsadata;
-        int status = WSAStartup(version, &wsadata);
-        if(status != 0) {
-            log_error("socket_new_server failed, WSAStartup failed: &i", status);
-            rhc_error = "socket_new_server failed";
-            return socket_new_invalid();
-        }
-    }
-
-    struct addrinfo hints = {
-            .ai_family = AF_UNSPEC,
-            .ai_socktype = SOCK_STREAM
-    };
-
-    // find a valid address and connect to it
-    {
-        struct addrinfo *servinfo;
-        int status = getaddrinfo(addr, port, &hints, &servinfo);
-        if (status != 0) {
-            log_error("socket_new_client failed: getaddrinfo error: %s\n", gai_strerror(status));
-            rhc_error = "socket_new_client failed";
-            return socket_new_invalid();
-        }
-
-        for (struct addrinfo *ai = servinfo; ai != NULL; ai = ai->ai_next) {
-            self.so = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-            if (!socket_valid(self))
-                continue;
-
-            if(connect(self.so, ai->ai_addr, (int) ai->ai_addrlen) == -1) {
-                socket_kill(&self);
-                continue;
-            }
-
-            // valid socket + connect
-            break;
-        }
-
-        freeaddrinfo(servinfo); // free the linked-list
-    }
-
-    // no valid address found?
-    if(!socket_valid(self)) {
-        log_error("socket_new_client failed to create the connection");
-        rhc_error = "socket_new_client failed";
-        return socket_new_invalid();
-    }
-
-    return self;
-}
-
-static Socket socket_server_accept(Socket *self) {
-    if(!socket_valid(*self))
-        return socket_new_invalid();
-
-    Socket client = {0};
-
-    struct sockaddr_storage addr;
-    int addrlen = sizeof addr;
-    client.so = accept(self->so, (struct sockaddr *) &addr, &addrlen);
-
-    if(!socket_valid(client)) {
-        log_error("socket_server_accept failed, killing the server");
-        socket_kill(self);
-        return socket_new_invalid();
-    }
-
-    char *client_ip = inet_ntoa(((struct sockaddr_in *) &addr)->sin_addr);
-    log_info("socket_server_accept connected with: %s", client_ip);
-
-    return client;
+// Creates and connects to a server
+static Socket *socket_new(const char *address, uint16_t port) {
+    return rhc_socket_new_a(address, port, RHC_DEFAULT_ALLOCATOR);
 }
 
 
-static bool socket_recv(Socket *self, void *msg, size_t size) {
-    if(!socket_valid(*self))
-        false;
+// returns true if the SocketServer is valid to use
+#define socketserver_valid rhc_socketserver_valid
 
-    char *buf = msg;
-    while(size > 0) {
-        int n = recv(self->so, buf, (int) size, 0);
-        if(n <= 0) {
-            log_error("socket_recv failed, killing socket...");
-            socket_kill(self);
-            return false;
-        }
-        assert(n <= size);
-        buf += n;
-        size -= n;
-    }
-    return true;
-}
+// returns a new invalid SocketServer
+#define socketserver_new_invalid rhc_socketserver_new_invalid
 
-static bool socket_send(Socket *self, const void *msg, size_t size) {
-    if(!socket_valid(*self))
-        false;
+// Creates a new SocketServer
+// address may be "localhost" or "127.0.0.1", to only enable local connections
+// address may be "0.0.0.0" to enable all incoming connections
+#define socketserver_new rhc_socketserver_new
 
-    const char *buf = msg;
-    while(size > 0) {
-        int n = send(self->so, buf, (int) size, 0);
-        if(n <= 0) {
-            log_error("socket_send failed, killing socket...");
-            socket_kill(self);
-            return false;
-        }
-        assert(n <= size);
-
-        buf += n;
-        size -= n;
-    }
-    return true;
-}
-
-#endif
+// kills the socketserver and sets it invalid
+#define socketserver_kill rhc_socketserver_kill
 
 
+// returns true if the Socket is valid to use
+#define socket_valid rhc_socket_valid
+// returns a new invalid Socket
+#define socket_new_invalid rhc_socket_new_invalid
+
+// kills the socket and sets it invalid
+#define socket_kill rhc_socket_kill
+
+
+#endif //OPTION_SOCKET
 #endif //RHC_SOCKET_H

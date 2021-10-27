@@ -29,7 +29,7 @@
 RoBatchRefract ro_batchrefract_new_a(int num,
                                      const float *scale_ptr,
                                      rTexture tex_main_sink, rTexture tex_refraction_sink,
-                                     Allocator_s alloc);
+                                     Allocator_i alloc);
 
 static RoBatchRefract ro_batchrefract_new(int num,
                                           const float *scale_ptr,

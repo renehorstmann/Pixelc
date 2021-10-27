@@ -5,6 +5,7 @@ project(pixelc C)
 # OPTION_GLES           for OpenGLES3.0 instead of OpenGL3.3
 # OPTION_GLEW           if GLEW is available
 # OPTION_SDL            is set to let rhc code use SDL function
+# OPTION_SOCKET         to use rhc sockets
 # OPTION_TTF            to use ro_ttftext
 # OPTION_GYRO           if gyro sensor is available
 # OPTION_TOUCH          to use touch movement
@@ -55,6 +56,7 @@ endif()
 
 
 # all platforms:
+# add_definitions(-DOPTION_SOCKET)
 # add_definitions(-DOPTION_TTF)
 target_link_libraries(pixelc m)
 
@@ -77,6 +79,7 @@ if (PLATFORM_MINGW)
             SDL2main
             SDL2
             SDL2_image
+            SDL2_net
             SDL2_ttf
             ${OPENGL_LIB}
             ${GLEW_LIB}
@@ -90,6 +93,7 @@ if (PLATFORM_UNIX)
     message("Setup Unix")
     find_package(SDL2 REQUIRED)
     find_library(SDL2_IMAGE_LIBRARIES SDL2_image REQUIRED)
+    find_library(SDL2_NET_LIBRARIES SDL2_net REQUIRED)
     find_library(SDL2_TTF_LIBRARIES SDL2_ttf REQUIRED)
 
     find_library(GL_LIB GL REQUIRED)
@@ -97,6 +101,7 @@ if (PLATFORM_UNIX)
     target_link_libraries(pixelc
             ${SDL2_LIBRARIES}
             ${SDL2_IMAGE_LIBRARIES}
+            ${SDL2_NET_LIBRARIES}
             ${SDL2_TTF_LIBRARIES}
             ${GL_LIB}
     )
@@ -123,6 +128,7 @@ if (PLATFORM_MOBILE)
 
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
+    find_package(SDL2_net REQUIRED)
     find_package(SDL2_ttf REQUIRED)
 
     find_library(GLES_LIB GLESv3 REQUIRED)
@@ -130,6 +136,7 @@ if (PLATFORM_MOBILE)
     target_link_libraries(pixelc
             ${SDL2_LIBRARIES}
             ${SDL2_IMAGE_LIBRARIES}
+            ${SDL2_NET_LIBRARIES}
             ${SDL2_TTF_LIBRARIES}
             ${GLES_LIB}
     )

@@ -35,7 +35,7 @@ static SDL_Surface *load_buffer(void *data, int cols, int rows) {
 // public
 //
 
-uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
+uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a) {
     size_t data_size = cols * rows * layers * sizeof(uColor_s);
 
     if (data_size <= 0) {
@@ -53,7 +53,7 @@ uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
     return self;
 }
 
-uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
+uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_i a) {
     uImage self = u_image_new_empty_a(cols, rows, layers, a);
     if (!u_image_valid(self))
         return self;
@@ -61,7 +61,7 @@ uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
     return self;
 }
 
-uImage u_image_new_clone_a(uImage from, Allocator_s a) {
+uImage u_image_new_clone_a(uImage from, Allocator_i a) {
     uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers, a);
     if (!u_image_valid(self))
         return u_image_new_invalid();
@@ -69,7 +69,7 @@ uImage u_image_new_clone_a(uImage from, Allocator_s a) {
     return self;
 }
 
-uImage u_image_new_file_a(int layers, const char *file, Allocator_s a) {
+uImage u_image_new_file_a(int layers, const char *file, Allocator_i a) {
     assume(layers > 0, "A single layer needed");
     uImage self = u_image_new_invalid_a(a);
     SDL_Surface *img = IMG_Load(file);

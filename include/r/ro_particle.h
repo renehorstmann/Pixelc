@@ -9,7 +9,7 @@
 #include "ro_types.h"
 
 
-RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_s alloc);
+RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_i alloc);
 
 static RoParticle ro_particle_new(int num, rTexture tex_sink) {
     return ro_particle_new_a(num, tex_sink, rhc_allocator_new());

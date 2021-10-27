@@ -28,7 +28,7 @@ typedef struct {
         GLuint vao;         // internal vertex array object
         GLuint vbo;         // internal vertex buffer object
         rTexture tex;       // used texture
-        Allocator_s allocator;
+        Allocator_i allocator;
     } L;
 } RoBatch;
 
@@ -44,7 +44,7 @@ typedef struct {
         GLuint vao;         // internal vertex array object
         GLuint vbo;         // internal vertex buffer object
         rTexture tex;       // used texture
-        Allocator_s allocator;
+        Allocator_i allocator;
     } L;
 } RoParticle;
 
@@ -83,7 +83,7 @@ typedef struct {
         GLuint vbo;                         // internal vertex buffer object
         rTexture tex_main;                  // used main texture
         rTexture tex_refraction;            // used refraction texture
-        Allocator_s allocator;
+        Allocator_i allocator;
     } L;
 } RoBatchRefract;
 
@@ -104,7 +104,7 @@ typedef struct {
         GLuint vbo;                         // internal vertex buffer object
         rTexture tex_main;                  // used main texture
         rTexture tex_refraction;            // used refraction texture
-        Allocator_s allocator;
+        Allocator_i allocator;
     } L;
 } RoParticleRefract;
 

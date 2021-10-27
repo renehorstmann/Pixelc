@@ -10,7 +10,7 @@ typedef struct {
     uColor_s *data;
     int cols, rows;
     int layers;
-    Allocator_s allocator;
+    Allocator_i allocator;
 } uImage;
 
 static bool u_image_valid(uImage self) {
@@ -19,7 +19,7 @@ static bool u_image_valid(uImage self) {
            && allocator_valid(self.allocator);
 }
 
-static uImage u_image_new_invalid_a(Allocator_s a) {
+static uImage u_image_new_invalid_a(Allocator_i a) {
     return (uImage) {.allocator = a};
 }
 
@@ -27,28 +27,28 @@ static uImage u_image_new_invalid() {
     return u_image_new_invalid_a(rhc_allocator_new());
 }
 
-uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a);
+uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a);
 
 static uImage u_image_new_empty(int cols, int rows, int layers) {
     return u_image_new_empty_a(cols, rows, layers,
                                rhc_allocator_new());
 }
 
-uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a);
+uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_i a);
 
 static uImage u_image_new_zeros(int cols, int rows, int layers) {
     return u_image_new_zeros_a(cols, rows, layers,
                                rhc_allocator_new());
 }
 
-uImage u_image_new_clone_a(uImage from, Allocator_s a);
+uImage u_image_new_clone_a(uImage from, Allocator_i a);
 
 static uImage u_image_new_clone(uImage from) {
     return u_image_new_clone_a(from,
                                rhc_allocator_new());
 }
 
-uImage u_image_new_file_a(int layers, const char *file, Allocator_s a);
+uImage u_image_new_file_a(int layers, const char *file, Allocator_i a);
 
 static uImage u_image_new_file(int layers, const char *file) {
     return u_image_new_file_a(layers, file,

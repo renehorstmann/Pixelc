@@ -33,11 +33,11 @@
 #endif
 
 #ifndef KEY_CLONE_FN
-#error hashmap.h needs a function to clone a key(key key_clone_fn(key to_clone, Allocator_s a))
+#error hashmap.h needs a function to clone a key(key key_clone_fn(key to_clone, Allocator_i a))
 #endif
 
 #ifndef KEY_KILL_FN
-#error hashmap.h needs a function to kill a key(key key_clone_fn(key to_clone, Allocator_s a))
+#error hashmap.h needs a function to kill a key(key key_clone_fn(key to_clone, Allocator_i a))
 #endif
 
 #ifndef KEY_EQUALS_FN
@@ -82,7 +82,7 @@ typedef struct ITEM {
 typedef struct {
     ITEM **map;
     size_t size;
-    Allocator_s allocator;
+    Allocator_i allocator;
 } CLASS;
 
 typedef struct {
@@ -97,8 +97,8 @@ static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
     return self.map != NULL && self.size >= 1 && allocator_valid(self.allocator);
 }
 
-// Foo foo_new_a(size_t approx_size, Allocator_s a)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t approx_size, Allocator_s a) {
+// Foo foo_new_a(size_t approx_size, Allocator_i a)
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t approx_size, Allocator_i a) {
     assume(allocator_valid(a), "allocator needs to be valid");
     CLASS self = {
             a.malloc(a, approx_size * sizeof(ITEM *)),
@@ -118,18 +118,18 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t approx_size, Allocator_s a
 // Foo foo_new(size_t approx_size)
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new)(size_t approx_size) {
     // new_a
-    return RHC_NAME_CONCAT2(FN_NAME, _new_a)(approx_size, RHC_HASHMAP_DEFAULT_ALLOCATOR);
+    return RHC_NAME_CONCAT2(FN_NAME, _new_a)(approx_size, RHC_DEFAULT_ALLOCATOR);
 }
 
-// Foo foo_new_invalid_a(Allocator_s a)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(Allocator_s a) {
+// Foo foo_new_invalid_a(Allocator_i a)
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(Allocator_i a) {
     return (CLASS) {.allocator = a};
 }
 
 // Foo foo_new_invalid_a()
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid)() {
     // new_invalid_a
-    return RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(RHC_HASHMAP_DEFAULT_ALLOCATOR);
+    return RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(RHC_DEFAULT_ALLOCATOR);
 }
 
 

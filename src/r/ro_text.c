@@ -46,7 +46,7 @@ static mat4 pose(const RoText *self, int c, int r) {
 // public
 //
 
-RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_s alloc) {
+RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_i alloc) {
     RoText self;
     self.sprite_fn = sprite_fn;
     self.pose = mat4_eye();
@@ -161,6 +161,29 @@ static bool font55_sprite_cb(vec2 *sprite, char c) {
 }
 
 
+static bool font85_sprite_cb(vec2 *sprite, char c) {
+    const int columns = 12;
+    const int rows = 8;
+
+    bool nl = false;
+    if (c == '\n') {
+        nl = true;
+        c = ' ';
+    }
+
+    if (c < ' ' || c > '~')
+        c = ' ';
+    c -= ' ';
+    int col = c % columns;
+    int row = c / columns;
+    
+    sprite->x = col;
+    sprite->y = row;
+
+    return nl;
+}
+
+
 //
 // public
 //
@@ -169,4 +192,13 @@ RoText ro_text_new_font55(int max) {
     const int columns = 12;
     const int rows = 5;
     return ro_text_new(max, font55_sprite_cb, r_texture_new_file(columns, rows, "res/r/font55.png"));
+}
+
+RoText ro_text_new_font85(int max) {
+    const int columns = 12;
+    const int rows = 8;
+    RoText self = ro_text_new(max, font85_sprite_cb, r_texture_new_file(columns, rows, "res/r/font85.png"));
+    self.size = (vec2) {{5, 8}};
+    self.offset = (vec2) {{6, 9}};
+    return self;
 }

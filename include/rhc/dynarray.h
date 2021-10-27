@@ -53,7 +53,7 @@ typedef struct {
     size_t size;
 
     size_t capacity;
-    Allocator_s allocator;
+    Allocator_i allocator;
 } CLASS;
 
 
@@ -63,8 +63,8 @@ static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
 }
 
 
-// Foo foo_new_a(size_t start_capacity, Allocator_s a)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t start_capacity, Allocator_s a) {
+// Foo foo_new_a(size_t start_capacity, Allocator_i a)
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t start_capacity, Allocator_i a) {
     assume(allocator_valid(a), "allocator needs to be valid");
     CLASS self = {
             a.malloc(a, start_capacity * sizeof(TYPE)),
@@ -83,22 +83,22 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t start_capacity, Allocator_
 // Foo foo_new(size_t start_capacity)
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new)(size_t start_capacity) {
     // new_a
-    return RHC_NAME_CONCAT2(FN_NAME, _new_a)(start_capacity, RHC_DYNARRAY_DEFAULT_ALLOCATOR);
+    return RHC_NAME_CONCAT2(FN_NAME, _new_a)(start_capacity, RHC_DEFAULT_ALLOCATOR);
 }
 
-// Foo foo_new_invalid_a(Allocator_s a)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(Allocator_s a) {
+// Foo foo_new_invalid_a(Allocator_i a)
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(Allocator_i a) {
     return (CLASS) {.allocator = a};
 }
 
 // Foo foo_new_invalid_a()
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid)() {
     // new_invalid_a
-    return RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(RHC_DYNARRAY_DEFAULT_ALLOCATOR);
+    return RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(RHC_DEFAULT_ALLOCATOR);
 }
 
-// Foo foo_new_clone_a(int *to_clone, size_t n, Allocator_s a)
-static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone_a)(TYPE *to_clone, size_t n, Allocator_s a) {
+// Foo foo_new_clone_a(int *to_clone, size_t n, Allocator_i a)
+static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone_a)(TYPE *to_clone, size_t n, Allocator_i a) {
     // new_a
     CLASS self = RHC_NAME_CONCAT2(FN_NAME, _new_a)(n, a);
 
@@ -114,7 +114,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone_a)(TYPE *to_clone, size_t n, A
 // Foo foo_new_clone(int *to_clone, size_t n)
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone)(TYPE *to_clone, size_t n) {
     // new_clone_a
-    return RHC_NAME_CONCAT2(FN_NAME, _new_clone_a)(to_clone, n, RHC_DYNARRAY_DEFAULT_ALLOCATOR);
+    return RHC_NAME_CONCAT2(FN_NAME, _new_clone_a)(to_clone, n, RHC_DEFAULT_ALLOCATOR);
 }
 
 // void foo_kill(Foo *self)

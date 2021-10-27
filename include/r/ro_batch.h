@@ -8,7 +8,7 @@
 #include "rhc/alloc.h"
 #include "ro_types.h"
 
-RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_s alloc);
+RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_i alloc);
 
 static RoBatch ro_batch_new(int num, rTexture tex_sink) {
     return ro_batch_new_a(num, tex_sink, rhc_allocator_new());

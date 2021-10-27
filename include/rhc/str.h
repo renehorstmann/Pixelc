@@ -80,7 +80,7 @@ static void str_as_c(char *out_c_string, Str_s s) {
 }
 
 // returns a new allocated buffer with str as cstring
-static char *str_as_new_c_a(Str_s s, Allocator_s a) {
+static char *str_as_new_c_a(Str_s s, Allocator_i a) {
     assume(allocator_valid(a), "allocator needs to be valid");
     if(!str_valid(s))
         return NULL;
@@ -94,7 +94,7 @@ static char *str_as_new_c_a(Str_s s, Allocator_s a) {
 
 // returns a new allocated buffer with str as cstring
 static char *str_as_new_c(Str_s s) {
-    return str_as_new_c_a(s, RHC_STRING_DEFAULT_ALLOCATOR);
+    return str_as_new_c_a(s, RHC_DEFAULT_ALLOCATOR);
 }
 
 
@@ -186,7 +186,7 @@ static int str_split(Str_s *splits, int max, Str_s s, char split) {
 }
 
 // returns a str array, based on s, containing all non empty splits between each split (allocated version)
-static StrArray str_split_allocated(Str_s s, char split, Allocator_s a) {
+static StrArray str_split_allocated(Str_s s, char split, Allocator_i a) {
     StrArray res = {.allocator = a};
     assume(allocator_valid(a), "allocator needs to be valid");
     for (;;) {

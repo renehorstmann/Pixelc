@@ -12,7 +12,7 @@
 
 
 
-RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_s alloc);
+RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_i alloc);
 
 static RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink) {
     return ro_text_new_a(max, sprite_fn, tex_sink, rhc_allocator_new());
@@ -20,6 +20,10 @@ static RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sin
 
 // inits text with the r/font55.png sprite sheet
 RoText ro_text_new_font55(int max);
+
+
+// inits text with the r/font88.png sprite sheet
+RoText ro_text_new_font85(int max);
 
 void ro_text_kill(RoText *self);
 

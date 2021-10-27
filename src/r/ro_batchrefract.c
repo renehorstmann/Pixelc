@@ -19,7 +19,7 @@ static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 RoBatchRefract ro_batchrefract_new_a(int num,
         const float *scale_ptr,
         rTexture tex_main_sink, rTexture tex_refraction_sink,
-        Allocator_s alloc) {
+        Allocator_i alloc) {
     r_render_error_check("ro_batchrefract_newBEGIN");
     RoBatchRefract self;
     self.L.allocator = alloc;

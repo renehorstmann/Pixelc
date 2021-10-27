@@ -8,7 +8,7 @@
 
 
 
-RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_s alloc) {
+RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
     r_render_error_check("ro_batch_newBEGIN");
     RoBatch self;
     self.L.allocator = alloc;

@@ -74,7 +74,7 @@ static void loop() {
         singleton.main_loop_fn(dtime);
 }
 
-static void pause() {
+static void pause_wnd() {
     if(singleton.pause)
         return;
     log_info("e_window: pause");
@@ -84,7 +84,7 @@ static void pause() {
     }
 }
 
-static void resume() {
+static void resume_wnd() {
     if(!singleton.pause)
         return;
     log_info("e_window: resume");
@@ -114,12 +114,12 @@ void e_window_handle_window_event_(const SDL_Event *event) {
 //        case SDL_WINDOWEVENT_SHOWN:
 //        case SDL_WINDOWEVENT_RESTORED:
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                resume();
+                resume_wnd();
                 break;
 //        case SDL_WINDOWEVENT_HIDDEN:
 //        case SDL_WINDOWEVENT_MINIMIZED:
             case SDL_WINDOWEVENT_FOCUS_LOST:
-                pause();
+                pause_wnd();
                 break;
         }
     }
@@ -156,6 +156,14 @@ eWindow *e_window_new(const char *name) {
     // initialize TTF
     if (TTF_Init() == -1) {
         log_error("e_window_new: TTF_Init failed: %s", TTF_GetError());
+        exit(EXIT_FAILURE);
+    }
+#endif
+
+#ifdef OPTION_SOCKET
+    // initialize net
+    if (SDLNet_Init() == -1) {
+        log_error("e_window_new: SDLNet_Init failed: %s", SDLNet_GetError());
         exit(EXIT_FAILURE);
     }
 #endif

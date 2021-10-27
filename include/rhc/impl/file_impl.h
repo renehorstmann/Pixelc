@@ -15,7 +15,107 @@
 
 
 #ifdef OPTION_SDL
-String rhc_file_read_a(const char *file, bool ascii, Allocator_s a) {
+typedef struct {
+    SDL_RWops *file;
+} SdlFile;
+_Static_assert(sizeof (SdlFile) <= RHC_FILE_STORAGE_SIZE, "storage not big enough");
+
+static size_t file_stream_read(Stream_i stream, void *msg, size_t size) {
+    RhcFile *self = stream.user_data;
+    if(!rhc_file_valid(self))
+        return 0;
+
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+
+    size_t n = SDL_RWread(impl->file,msg, 1, size);
+    if(n <= 0) {
+        log_error("rhc_file_read failed, killing file...");
+        SDL_RWclose(impl->file);
+        impl->file = NULL;
+        return 0;
+    }
+    assert(n <= size);
+    return (size_t) n;
+}
+
+static size_t file_stream_write(Stream_i stream, void *msg, size_t size) {
+    RhcFile *self = stream.user_data;
+    if(!rhc_file_valid(self))
+        return 0;
+
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+
+    size_t n = SDL_RWwrite(impl->file, msg, 1, size);
+    if(n <= 0) {
+        log_error("rhc_file_write failed, killing file...");
+        SDL_RWclose(impl->file);
+        impl->file = NULL;
+        return 0;
+    }
+    assert(n <= size);
+    return (size_t) n;
+}
+
+bool rhc_file_valid(const RhcFile *self) {
+    if(!self)
+        return false;
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+    return impl->file;
+}
+
+RhcFile *rhc_file_open_read_a(const char *file, bool ascii, Allocator_i a) {
+    RhcFile *self = a.calloc(a, sizeof *self);
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+    self->stream = (Stream_i) {self, file_stream_read, NULL};
+    self->allocator = a;
+    impl->file = SDL_RWFromFile(file, ascii ? "r" : "rb");
+    if (!impl->file) {
+        rhc_error = "rhc_file_open_read_a failed";
+        log_warn("rhc_file_open_read_a failed: %s", file);
+        a.free(a, self);
+        return NULL;
+    }
+    return self;
+}
+RhcFile *rhc_file_open_write_a(const char *file, bool ascii, Allocator_i a) {
+    RhcFile *self = a.calloc(a, sizeof *self);
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+    self->stream = (Stream_i) {self, file_stream_read, NULL};
+    self->allocator = a;
+    impl->file = SDL_RWFromFile(file, ascii ? "w" : "wb");
+    if (!impl->file) {
+        rhc_error = "rhc_file_open_write_a failed";
+        log_warn("rhc_file_open_write_a failed: %s", file);
+        a.free(a, self);
+        return NULL;
+    }
+    return self;
+}
+RhcFile *rhc_file_open_append_a(const char *file, bool ascii, Allocator_i a) {
+    RhcFile *self = a.calloc(a, sizeof *self);
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+    self->stream = (Stream_i) {self, file_stream_read, NULL};
+    self->allocator = a;
+    impl->file = SDL_RWFromFile(file, ascii ? "a" : "ab");
+    if (!impl->file) {
+        rhc_error = "rhc_file_open_append_a failed";
+        log_warn("rhc_file_open_append_a failed: %s", file);
+        a.free(a, self);
+        return NULL;
+    }
+    return self;
+}
+
+void rhc_file_kill(RhcFile **self_ptr) {
+    RhcFile *self = *self_ptr;
+    if(!self)
+        return;
+    SdlFile *impl = (SdlFile*) self->impl_storage;
+    SDL_RWclose(impl->file);
+    self->allocator.free(self->allocator, self);
+    *self_ptr = NULL;
+}
+String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
     if(!allocator_valid(a)) {
         rhc_error = "file read failed, allocator invalid";
         log_error("rhc_file_read_a failed, allocator invalid: %s", file);
@@ -118,7 +218,108 @@ bool rhc_file_append(const char *file, Str_s content, bool ascii) {
 #else
 // unix file implementation
 
-String rhc_file_read_a(const char *file, bool ascii, Allocator_s a) {
+typedef struct {
+    FILE *file;
+} UnixFile;
+_Static_assert(sizeof (UnixFile) <= RHC_FILE_STORAGE_SIZE, "storage not big enough");
+
+static size_t file_stream_read(Stream_i stream, void *msg, size_t size) {
+    RhcFile *self = stream.user_data;
+    if(!rhc_file_valid(self))
+        return 0;
+
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+
+    size_t n = fread(msg, 1, size, impl->file);
+    if(n <= 0) {
+        log_error("rhc_file_read failed, killing file...");
+        fclose(impl->file);
+        impl->file = NULL;
+        return 0;
+    }
+    assert(n <= size);
+    return (size_t) n;
+}
+
+static size_t file_stream_write(Stream_i stream, const void *msg, size_t size) {
+    RhcFile *self = stream.user_data;
+    if(!rhc_file_valid(self))
+        return 0;
+
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+
+    size_t n = fwrite(msg, 1, size, impl->file);
+    if(n <= 0) {
+        log_error("rhc_file_write failed, killing file...");
+        fclose(impl->file);
+        impl->file = NULL;
+        return 0;
+    }
+    assert(n <= size);
+    return (size_t) n;
+}
+
+bool rhc_file_valid(const RhcFile *self) {
+    if(!self)
+        return false;
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+    return impl->file;
+}
+
+RhcFile *rhc_file_open_read_a(const char *file, bool ascii, Allocator_i a) {
+    RhcFile *self = a.calloc(a, sizeof *self);
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+    self->stream = (Stream_i) {self, file_stream_read, NULL};
+    self->allocator = a;
+    impl->file = fopen(file, ascii ? "r" : "rb");
+    if (!impl->file) {
+        rhc_error = "rhc_file_open_read_a failed";
+        log_warn("rhc_file_open_read_a failed: %s", file);
+        a.free(a, self);
+        return NULL;
+    }
+    return self;
+}
+RhcFile *rhc_file_open_write_a(const char *file, bool ascii, Allocator_i a) {
+    RhcFile *self = a.calloc(a, sizeof *self);
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+    self->stream = (Stream_i) {self, NULL, file_stream_write};
+    self->allocator = a;
+    impl->file = fopen(file, ascii ? "w" : "wb");
+    if (!impl->file) {
+        rhc_error = "rhc_file_open_write_a failed";
+        log_warn("rhc_file_open_write_a failed: %s", file);
+        a.free(a, self);
+        return NULL;
+    }
+    return self;
+}
+RhcFile *rhc_file_open_append_a(const char *file, bool ascii, Allocator_i a) {
+    RhcFile *self = a.calloc(a, sizeof *self);
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+    self->stream = (Stream_i) {self, NULL, file_stream_write};
+    self->allocator = a;
+    impl->file = fopen(file, ascii ? "a" : "ab");
+    if (!impl->file) {
+        rhc_error = "rhc_file_open_append_a failed";
+        log_warn("rhc_file_open_append_a failed: %s", file);
+        a.free(a, self);
+        return NULL;
+    }
+    return self;
+}
+
+void rhc_file_kill(RhcFile **self_ptr) {
+    RhcFile *self = *self_ptr;
+    if(!self)
+        return;
+    UnixFile *impl = (UnixFile*) self->impl_storage;
+    fclose(impl->file);
+    self->allocator.free(self->allocator, self);
+    *self_ptr = NULL;
+}
+
+String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
     if(!allocator_valid(a)) {
         rhc_error = "file read failed, allocator invalid";
         log_error("rhc_file_read_a failed, allocator invalid: %s", file);

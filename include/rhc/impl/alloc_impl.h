@@ -81,71 +81,71 @@ void *rhc_realloc(void *memory, size_t size) {
 }
 
 
-static void *rhc_allocator_try_malloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_try_malloc_impl_(Allocator_i self, size_t size) {
     return rhc_malloc_try(size);
 }
 
-static void *rhc_allocator_try_calloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_try_calloc_impl_(Allocator_i self, size_t size) {
     return rhc_calloc_try(size);
 }
 
-static void *rhc_allocator_try_realloc_impl_(Allocator_s self, void *memory, size_t size) {
+static void *rhc_allocator_try_realloc_impl_(Allocator_i self, void *memory, size_t size) {
     return rhc_realloc_try(memory, size);
 }
 
-static void rhc_allocator_free_impl_(Allocator_s self, void *memory) {
+static void rhc_allocator_free_impl_(Allocator_i self, void *memory) {
     rhc_free(memory);
 }
 
-static void *rhc_allocator_malloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_malloc_impl_(Allocator_i self, size_t size) {
     return rhc_malloc(size);
 }
 
-static void *rhc_allocator_calloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_calloc_impl_(Allocator_i self, size_t size) {
     return rhc_calloc(size);
 }
 
-static void *rhc_allocator_realloc_impl_(Allocator_s self, void *memory, size_t size) {
+static void *rhc_allocator_realloc_impl_(Allocator_i self, void *memory, size_t size) {
     return rhc_realloc(memory, size);
 }
 
-static void *rhc_allocator_empty_try_malloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_empty_try_malloc_impl_(Allocator_i self, size_t size) {
     return NULL;
 }
 
-static void *rhc_allocator_empty_try_calloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_empty_try_calloc_impl_(Allocator_i self, size_t size) {
     return NULL;
 }
 
-static void *rhc_allocator_empty_try_realloc_impl_(Allocator_s self, void *memory, size_t size) {
+static void *rhc_allocator_empty_try_realloc_impl_(Allocator_i self, void *memory, size_t size) {
     return NULL;
 }
 
-static void rhc_allocator_empty_try_free_impl_(Allocator_s self, void *memory) {
+static void rhc_allocator_empty_try_free_impl_(Allocator_i self, void *memory) {
 }
 
-static void *rhc_allocator_empty_malloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_empty_malloc_impl_(Allocator_i self, size_t size) {
     assume(false, "allocator empty raising malloc called");
     return NULL;
 }
 
-static void *rhc_allocator_empty_calloc_impl_(Allocator_s self, size_t size) {
+static void *rhc_allocator_empty_calloc_impl_(Allocator_i self, size_t size) {
     assume(false, "allocator empty raising calloc called");
     return NULL;
 }
 
-static void *rhc_allocator_empty_realloc_impl_(Allocator_s self, void *memory, size_t size) {
+static void *rhc_allocator_empty_realloc_impl_(Allocator_i self, void *memory, size_t size) {
     assume(false, "allocator empty raising realloc called");
     return NULL;
 }
 
-static void rhc_allocator_empty_free_impl_(Allocator_s self, void *memory) {
+static void rhc_allocator_empty_free_impl_(Allocator_i self, void *memory) {
     assume(false, "allocator empty raising free called");
 }
 
 
-Allocator_s rhc_allocator_new_try() {
-    return (Allocator_s) {
+Allocator_i rhc_allocator_new_try() {
+    return (Allocator_i) {
         NULL,
         rhc_allocator_try_malloc_impl_,
         rhc_allocator_try_calloc_impl_,
@@ -155,8 +155,8 @@ Allocator_s rhc_allocator_new_try() {
 }
 
 
-Allocator_s rhc_allocator_new() {
-    return (Allocator_s) {
+Allocator_i rhc_allocator_new() {
+    return (Allocator_i) {
         NULL,
         rhc_allocator_malloc_impl_,
         rhc_allocator_calloc_impl_,
@@ -165,8 +165,8 @@ Allocator_s rhc_allocator_new() {
     };
 }
 
-Allocator_s rhc_allocator_new_empty_try() {
-    return (Allocator_s) {
+Allocator_i rhc_allocator_new_empty_try() {
+    return (Allocator_i) {
         NULL,
         rhc_allocator_empty_try_malloc_impl_,
         rhc_allocator_empty_try_calloc_impl_,
@@ -175,8 +175,8 @@ Allocator_s rhc_allocator_new_empty_try() {
     };
 }
 
-Allocator_s rhc_allocator_new_empty() {
-    return (Allocator_s) {
+Allocator_i rhc_allocator_new_empty() {
+    return (Allocator_i) {
         NULL,
         rhc_allocator_empty_malloc_impl_,
         rhc_allocator_empty_calloc_impl_,

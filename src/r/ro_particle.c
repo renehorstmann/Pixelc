@@ -9,7 +9,7 @@
 #include "r/ro_particle.h"
 
 
-RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_s alloc) {
+RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
     r_render_error_check("ro_particle_newBEGIN");
     RoParticle self;
     self.L.allocator = alloc;
