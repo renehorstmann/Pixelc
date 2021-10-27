@@ -21,8 +21,8 @@
 
 // canvas size
 //*
-#define COLS 32
-#define ROWS 16
+#define COLS 12*5
+#define ROWS 8*8
 #define LAYERS 1
 //*/
 
@@ -47,11 +47,11 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1
-#define PLAY_FRAMES 2
+#define PLAY_FRAMES 1
 #define PLAY_FPS 2.0
 
 // uncomment the used palette:
-// #define PALETTE grayscale
+#define PALETTE grayscale
 // #define PALETTE grayscale_alpha
 // #define PALETTE pixilmatt
 // #define PALETTE slso8
@@ -59,7 +59,7 @@
 // #define PALETTE endesga32
 // #define PALETTE endesga64
 // #define PALETTE nes
-#define PALETTE aap64
+// #define PALETTE aap64
 
 //#define PALETTE refrection_values
 
@@ -67,7 +67,7 @@
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
 
-#define GRID_COLS 8
+#define GRID_COLS 5
 #define GRID_ROWS 8
 
 
