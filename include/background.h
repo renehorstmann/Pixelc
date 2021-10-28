@@ -1,10 +1,8 @@
 #ifndef PIXELC_BACKGROUND_H
 #define PIXELC_BACKGROUND_H
 
-#include "r/types.h"
 #include "u/color.h"
 #include "camera.h"
-#include "r/ro_types.h"
 
 typedef struct Background Background;
 
