@@ -15,13 +15,15 @@
 #include "inputctrl.h"
 #include "savestate.h"
 
+#include "textinput.h"
+
 //
 // options
 //
 
 // canvas size
 //*
-#define COLS 32
+#define COLS 16*6*2
 #define ROWS 16
 #define LAYERS 1
 //*/
@@ -105,6 +107,8 @@ static struct {
     CanvasCamCtrl *canvascamctrl;
     Toolbar *toolbar;
     InputCtrl *inputctrl;
+    
+    TextInput *textinput;
 } L;
 
 int main(int argc, char **argv) {
@@ -137,6 +141,8 @@ int main(int argc, char **argv) {
     L.canvascamctrl = canvascamctrl_new(L.input, L.canvascam, L.brush);
     L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
     L.inputctrl = inputctrl_new(L.input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
+    
+    L.textinput = textinput_new(L.input);
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
@@ -161,12 +167,16 @@ static void main_loop(float delta_time) {
     // simulate
     camera_update(L.camera, window_size.x, window_size.y);
     canvascam_update(L.canvascam, window_size.x, window_size.y);
+    
     background_update(L.background, L.camera, delta_time);
+    
+    
     canvas_update(L.canvas, L.canvascam, delta_time);
     palette_update(L.palette, delta_time);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
     toolbar_update(L.toolbar, delta_time);
-
+    
+    
     // render
     r_render_begin_frame(L.render, window_size.x, window_size.y);
 
@@ -174,10 +184,16 @@ static void main_loop(float delta_time) {
     const mat4 *canvascam_mat = &L.canvascam->matrices.vp;
 
     background_render(L.background, camera_mat);
+    
+    
     animation_render(L.animation, camera_mat);
     canvas_render(L.canvas, canvascam_mat);
     palette_render(L.palette, camera_mat);
     toolbar_render(L.toolbar, camera_mat);
+    
+    
+    textinput_update(L.textinput, L.camera, delta_time);
+    //textinput_render(L.textinput, camera_mat);
 
     e_gui_render(L.gui);
 

@@ -7,6 +7,13 @@
 
 #define TEXTINPUT_MAX_CHARS 32
 
+enum TextInput_shiftstate {
+    TEXTINPUT_SHIFT_LOWER,
+    TEXTINPUT_SHIFT_UPPER,
+    TEXTINPUT_SHIFT_ALT,
+    TEXTINPUT_SHIFT_NUM_STATES
+};
+
 typedef struct {
     eInput *input_ref;
     
@@ -18,6 +25,8 @@ typedef struct {
         RoText textfield;
         RoBatch keys;
         RoBatch chars;
+        
+        enum TextInput_shiftstate shiftstate;
     } L;
 } TextInput;
 
@@ -27,6 +36,6 @@ void textinput_kill(TextInput **self_ptr);
 
 void textinput_update(TextInput *self, const Camera_s *cam, float dtime);
 
-void textinput_render(const TextInput *self, const mat4 *camera_mat);
+void textinput_render(const TextInput *self, const mat4 *cam_mat);
 
 #endif //PIXELC_TEXTINPUT_H
