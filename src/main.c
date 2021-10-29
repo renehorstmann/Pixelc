@@ -170,12 +170,12 @@ static void main_loop(float delta_time) {
     
     background_update(L.background, L.camera, delta_time);
     
-    
+    /*
     canvas_update(L.canvas, L.canvascam, delta_time);
     palette_update(L.palette, delta_time);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
     toolbar_update(L.toolbar, delta_time);
-    
+    */
     
     // render
     r_render_begin_frame(L.render, window_size.x, window_size.y);
@@ -185,15 +185,15 @@ static void main_loop(float delta_time) {
 
     background_render(L.background, camera_mat);
     
-    
+    /*
     animation_render(L.animation, camera_mat);
     canvas_render(L.canvas, canvascam_mat);
     palette_render(L.palette, camera_mat);
     toolbar_render(L.toolbar, camera_mat);
-    
+    */
     
     textinput_update(L.textinput, L.camera, delta_time);
-    //textinput_render(L.textinput, camera_mat);
+    textinput_render(L.textinput, camera_mat);
 
     e_gui_render(L.gui);
 

@@ -15,6 +15,9 @@ Palette, canvas size, animation size can be configured in code (main.c).
 ![example_image](example.jpg)
 
 ## Todo
+- some update
+  - input ignore others
+    - touch + key stuff?, mainly touch
 - vkeyboard module
   - font88 with small glyphs...
   - transparent overlay
