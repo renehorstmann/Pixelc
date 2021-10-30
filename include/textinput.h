@@ -16,6 +16,7 @@ enum TextInput_shiftstate {
 
 typedef struct {
     eInput *input_ref;
+    const Camera_s *camera_ref;
     
     char text[TEXTINPUT_MAX_CHARS];
     bool finished;
@@ -32,11 +33,11 @@ typedef struct {
     } L;
 } TextInput;
 
-TextInput *textinput_new(eInput *input);
+TextInput *textinput_new(eInput *input, const Camera_s *cam);
 
 void textinput_kill(TextInput **self_ptr);
 
-void textinput_update(TextInput *self, const Camera_s *cam, float dtime);
+void textinput_update(TextInput *self, float dtime);
 
 void textinput_render(const TextInput *self, const mat4 *cam_mat);
 

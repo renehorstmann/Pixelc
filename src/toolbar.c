@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "r/texture.h"
+#include "r/ro_single.h"
 #include "r/ro_text.h"
 #include "u/pose.h"
 #include "mathc/sca/int.h"
@@ -48,7 +49,7 @@ static void unpress(RoSingle **btns, int n, int ignore) {
     for (int i = 0; i < n; i++) {
         if (i == ignore)
             continue;
-        button_set_pressed(btns[i], false);
+        button_set_pressed(&btns[i]->rect, false);
     }
 }
 
@@ -109,7 +110,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
                                                "res/button_replace.png"
                                        }[i]);
     }
-    button_set_pressed(self->L.modes[0], true);
+    button_set_pressed(&self->L.modes[0]->rect, true);
 
     self->L.shape_minus = tool_append(self, 9, 9, "res/button_minus.png");
     self->L.shape_plus = tool_append(self, 25, 9, "res/button_plus.png");
@@ -207,7 +208,7 @@ void toolbar_update(Toolbar *self, float dtime) {
     }
 
     // shape longpress:
-    if (button_is_pressed(self->L.shape_minus)) {
+    if (button_is_pressed(&self->L.shape_minus->rect)) {
         self->L.shape_minus_time += dtime;
         if (self->L.shape_minus_time > LONG_PRESS_TIME) {
             self->brush_ref->shape = 0;
@@ -215,7 +216,7 @@ void toolbar_update(Toolbar *self, float dtime) {
     } else
         self->L.shape_minus_time = 0;
 
-    if (button_is_pressed(self->L.shape_plus)) {
+    if (button_is_pressed(&self->L.shape_plus->rect)) {
         self->L.shape_plus_time += dtime;
         if (self->L.shape_plus_time > LONG_PRESS_TIME) {
             self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
@@ -226,7 +227,7 @@ void toolbar_update(Toolbar *self, float dtime) {
 
     // unpress cpy button if selection ok is toggled
     if (!self->L.prev_show_selection_ok && self->show_selection_ok)
-        button_set_pressed(&self->L.selection_copy, false);
+        button_set_pressed(&self->L.selection_copy.rect, false);
     self->L.prev_show_selection_ok = self->show_selection_ok;
 }
 
@@ -273,17 +274,17 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         return false;
 
 
-    if (button_clicked(self->L.undo, pointer)) {
+    if (button_clicked(&self->L.undo->rect, pointer)) {
         log_info("toolbar: undo");
         savestate_undo(self->savestate_ref);
     }
 
-    if (button_clicked(self->L.clear, pointer)) {
+    if (button_clicked(&self->L.clear->rect, pointer)) {
         log_info("toolbar: clear");
         canvas_clear(self->canvas_ref);
     }
 
-    if (button_clicked(self->L.import, pointer)) {
+    if (button_clicked(&self->L.import->rect, pointer)) {
         log_info("toolbar: import");
         brush_set_selection_active(self->brush_ref, false, true);
         if (self->show_selection_ok) {
@@ -292,7 +293,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         self->show_selection_copy_cut = false;
 
         uImage img = u_image_new_file(1, self->canvas_ref->default_import_file);
-        button_set_pressed(self->L.selection, u_image_valid(img));
+        button_set_pressed(&self->L.selection->rect, u_image_valid(img));
         self->show_selection_ok = u_image_valid(img);
 
 
@@ -308,12 +309,12 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         log_trace("toolbar: import finished");
     }
 
-    if (button_toggled(self->L.selection, pointer)) {
+    if (button_toggled(&self->L.selection->rect, pointer)) {
         log_info("toolbar: selection");
-        bool pressed = button_is_pressed(self->L.selection);
+        bool pressed = button_is_pressed(&self->L.selection->rect);
         brush_set_selection_active(self->brush_ref, pressed, true);
-        button_set_pressed(&self->L.selection_copy, false);
-        button_set_pressed(&self->L.selection_cut, false);
+        button_set_pressed(&self->L.selection_copy.rect, false);
+        button_set_pressed(&self->L.selection_cut.rect, false);
 
         if (!pressed && self->show_selection_ok) {
             canvas_redo_image(self->canvas_ref);
@@ -322,9 +323,9 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         self->show_selection_ok = false;
     }
 
-    if (button_toggled(self->L.grid, pointer)) {
+    if (button_toggled(&self->L.grid->rect, pointer)) {
         log_info("toolbar: grid");
-        bool pressed = button_is_pressed(self->L.grid);
+        bool pressed = button_is_pressed(&self->L.grid->rect);
         self->canvas_ref->show_grid = pressed;
 
         if (pressed) {
@@ -333,24 +334,24 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         }
     }
 
-    if (button_clicked(self->L.camera, pointer)) {
+    if (button_clicked(&self->L.camera->rect, pointer)) {
         log_info("toolbar: camera");
         canvascamctrl_set_home(self->canvascamctrl_ref);
     }
 
-    if (button_toggled(self->L.animation, pointer)) {
+    if (button_toggled(&self->L.animation->rect, pointer)) {
         log_info("toolbar: animation");
-        self->animation_ref->show = button_is_pressed(self->L.animation);
+        self->animation_ref->show = button_is_pressed(&self->L.animation->rect);
     }
 
-    if (button_toggled(self->L.shade, pointer)) {
+    if (button_toggled(&self->L.shade->rect, pointer)) {
         log_info("toolbar: shade");
-        self->brush_ref->shading_active = button_is_pressed(self->L.shade);
+        self->brush_ref->shading_active = button_is_pressed(&self->L.shade->rect);
     }
 
 
     for (int i = 0; i < TOOLBAR_MODES; i++) {
-        if (button_pressed(self->L.modes[i], pointer)) {
+        if (button_pressed(&self->L.modes[i]->rect, pointer)) {
             log_info("toolbar: mode %i", i);
             unpress(self->L.modes, TOOLBAR_MODES, i);
 
@@ -371,14 +372,14 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         }
     }
 
-    if (button_clicked(self->L.shape_minus, pointer)) {
+    if (button_clicked(&self->L.shape_minus->rect, pointer)) {
         log_info("toolbar: shape_minus");
         self->brush_ref->shape--;
         if (self->brush_ref->shape < 0)
             self->brush_ref->shape = 0;
     }
 
-    if (button_clicked(self->L.shape_plus, pointer)) {
+    if (button_clicked(&self->L.shape_plus->rect, pointer)) {
         log_info("toolbar: shape_plus");
         self->brush_ref->shape++;
         if (self->brush_ref->shape >= BRUSH_NUM_SHAPES)
@@ -396,28 +397,28 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     // selection buttons:
     if (self->show_selection_copy_cut) {
-        if (button_toggled(&self->L.selection_copy, pointer)) {
+        if (button_toggled(&self->L.selection_copy.rect, pointer)) {
             log_info("toolbar: selection_copy");
-            bool pressed = button_is_pressed(&self->L.selection_copy);
+            bool pressed = button_is_pressed(&self->L.selection_copy.rect);
 
             if (pressed) {
-                button_set_pressed(&self->L.selection_cut, false);
+                button_set_pressed(&self->L.selection_cut.rect, false);
                 self->brush_ref->selection_mode = BRUSH_SELECTION_COPY;
             }
         }
 
-        if (button_toggled(&self->L.selection_cut, pointer)) {
+        if (button_toggled(&self->L.selection_cut.rect, pointer)) {
             log_info("toolbar: selection_cut");
-            bool pressed = button_is_pressed(&self->L.selection_cut);
+            bool pressed = button_is_pressed(&self->L.selection_cut.rect);
 
             if (pressed) {
-                button_set_pressed(&self->L.selection_copy, false);
+                button_set_pressed(&self->L.selection_copy.rect, false);
                 self->brush_ref->selection_mode = BRUSH_SELECTION_CUT;
             }
         }
 
         for (int i = 0; i < 8; i++) {
-            if (button_clicked(&self->L.selection_move[i], pointer)) {
+            if (button_clicked(&self->L.selection_move[i].rect, pointer)) {
                 Selection *s = self->brush_ref->selection;
                 if (!s) {
                     log_error("toolbar: selection_move failed, selection invalid (NULL)");
@@ -456,33 +457,33 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (self->show_selection_ok) {
         bool changed = false;
-        if (button_clicked(&self->L.selection_rotate_left, pointer)) {
+        if (button_clicked(&self->L.selection_rotate_left.rect, pointer)) {
             log_info("toolbar: selection_rotate_left");
             selection_rotate(self->brush_ref->selection, false);
             changed = true;
         }
-        if (button_clicked(&self->L.selection_rotate_right, pointer)) {
+        if (button_clicked(&self->L.selection_rotate_right.rect, pointer)) {
             log_info("toolbar: selection_rotate_right");
             selection_rotate(self->brush_ref->selection, true);
             changed = true;
         }
 
-        if (button_clicked(&self->L.selection_mirror_horizontal, pointer)) {
+        if (button_clicked(&self->L.selection_mirror_horizontal.rect, pointer)) {
             log_info("toolbar: selection_mirror_horizontal");
             selection_mirror(self->brush_ref->selection, false);
             changed = true;
         }
-        if (button_clicked(&self->L.selection_mirror_vertical, pointer)) {
+        if (button_clicked(&self->L.selection_mirror_vertical.rect, pointer)) {
             log_info("toolbar: selection_mirror_vertical");
             selection_mirror(self->brush_ref->selection, true);
             changed = true;
         }
 
-        if(button_toggled(&self->L.selection_blend, pointer)) {
+        if(button_toggled(&self->L.selection_blend.rect, pointer)) {
             if(!self->brush_ref->selection) {
                 log_error("toolbar: selection_blend failed, selection not valid (NULL)");
             } else {
-                self->brush_ref->selection->blend = button_is_pressed(&self->L.selection_blend);
+                self->brush_ref->selection->blend = button_is_pressed(&self->L.selection_blend.rect);
                 changed = true;
             }
         }
@@ -492,27 +493,27 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
             selection_paste(self->brush_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
         }
 
-        if (button_clicked(&self->L.selection_copy, pointer)) {
+        if (button_clicked(&self->L.selection_copy.rect, pointer)) {
             log_info("toolbar: selection_copy");
             canvas_save(self->canvas_ref);
         }
 
-        if (button_clicked(&self->L.selection_ok, pointer)) {
+        if (button_clicked(&self->L.selection_ok.rect, pointer)) {
             log_info("toolbar: selection_ok");
             canvas_save(self->canvas_ref);
             brush_set_selection_active(self->brush_ref, false, true);
             self->show_selection_ok = false;
-            button_set_pressed(self->L.selection, false);
+            button_set_pressed(&self->L.selection->rect, false);
         }
     }
 
 
     if (self->canvas_ref->RO.image.layers > 1) {
-        if (button_clicked(&self->L.layer_prev, pointer)) {
+        if (button_clicked(&self->L.layer_prev.rect, pointer)) {
             log_info("toolbar: layer_prev");
             self->canvas_ref->current_layer = sca_max(0, self->canvas_ref->current_layer - 1);
         }
-        if (button_clicked(&self->L.layer_next, pointer)) {
+        if (button_clicked(&self->L.layer_next.rect, pointer)) {
             log_info("toolbar: layer_next");
             self->canvas_ref->current_layer = sca_min(self->canvas_ref->RO.image.layers - 1,
                                                       self->canvas_ref->current_layer + 1);

@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
     L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
     L.inputctrl = inputctrl_new(L.input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
     
-    L.textinput = textinput_new(L.input);
+    L.textinput = textinput_new(L.input, L.camera);
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
@@ -175,7 +175,7 @@ static void main_loop(float delta_time) {
     palette_update(L.palette, delta_time);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
     toolbar_update(L.toolbar, delta_time);
-    */
+    //*/
     
     // render
     r_render_begin_frame(L.render, window_size.x, window_size.y);
@@ -190,9 +190,9 @@ static void main_loop(float delta_time) {
     canvas_render(L.canvas, canvascam_mat);
     palette_render(L.palette, camera_mat);
     toolbar_render(L.toolbar, camera_mat);
-    */
+    //*/
     
-    textinput_update(L.textinput, L.camera, delta_time);
+    textinput_update(L.textinput, delta_time);
     textinput_render(L.textinput, camera_mat);
 
     e_gui_render(L.gui);

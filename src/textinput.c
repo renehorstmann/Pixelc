@@ -5,6 +5,7 @@
 #include "r/ro_batch.h"
 #include "r/ro_text.h"
 #include "u/pose.h"
+#include "button.h"
 #include "textinput.h"
 
 #define KEY_COLS 10
@@ -42,20 +43,35 @@ void set_key_pos(mat4 *pose, const Camera_s *cam, int col, int row, int cols, fl
     
     
     float x = 8-width/2 + width * col / KEY_COLS + (cols-1) * 8;
-    float y = cam->RO.bottom + 12 + 16*(KEY_ROWS-row-1) + y_offset;
+    float y = cam->RO.bottom + 12 + 18*(KEY_ROWS-row-1) + y_offset + (row!=3)*4;
     u_pose_set_xy(pose, (int) x, (int) y);
 }
 
+
+static void pointer_event(ePointer_s pointer, void *user_data) {
+    TextInput *self = user_data;
+    pointer.pos = mat4_mul_vec(self->camera_ref->matrices.p_inv, pointer.pos);
+    
+    if(button_clicked(&self->L.shift.rect, pointer)) {
+        self->L.shiftstate++;
+        if(self->L.shiftstate >= TEXTINPUT_SHIFT_NUM_STATES) {
+            self->L.shiftstate = 0;
+        }
+    }
+}
 
 
 //
 // public
 //
 
-TextInput *textinput_new(eInput *input) {
+TextInput *textinput_new(eInput *input, const Camera_s *cam) {
     TextInput *self = rhc_calloc(sizeof *self);
     
+    e_input_register_pointer_event(input, pointer_event, self);
+    
     self->input_ref = input;
+    self->camera_ref = cam;
     
     self->L.textfield = ro_text_new_font85(TEXTINPUT_MAX_CHARS);
     
@@ -92,6 +108,8 @@ void textinput_kill(TextInput **self_ptr) {
     TextInput *self = *self_ptr;
     if(!self)
         return;
+        
+    e_input_unregister_pointer_event(self->input_ref, pointer_event);
     
     ro_text_kill(&self->L.textfield);
     ro_batch_kill(&self->L.keys);
@@ -101,7 +119,9 @@ void textinput_kill(TextInput **self_ptr) {
     *self_ptr = NULL;
 }
 
-void textinput_update(TextInput *self, const Camera_s *cam, float dtime) {
+void textinput_update(TextInput *self, float dtime) {
+    const Camera_s *cam = self->camera_ref;
+    
     ro_text_set_text(&self->L.textfield, self->text);
     
     int idx = 0;
@@ -122,6 +142,7 @@ void textinput_update(TextInput *self, const Camera_s *cam, float dtime) {
         } 
     }
     
+    self->L.shift.rect.sprite.y = self->L.shiftstate;
     set_key_pos(&self->L.shift.rect.pose, cam, 0, 2, 1, 0);
     set_key_pos(&self->L.space.rect.pose, cam, 2, 3, 6, 0);
     

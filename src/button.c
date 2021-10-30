@@ -1,19 +1,19 @@
 #include "u/pose.h"
-#include "camera.h"
 #include "button.h"
 
 
-bool button_is_pressed(RoSingle *self) {
-    return self->rect.sprite.x > 0.5;
+
+bool button_is_pressed(rRect_s *self) {
+    return self->sprite.x > 0.5;
 }
 
-void button_set_pressed(RoSingle *self, bool pressed) {
-    self->rect.sprite.x = pressed ? 1 : 0;
+void button_set_pressed(rRect_s *self, bool pressed) {
+    self->sprite.x = pressed? 1 : 0;
 }
 
 
-bool button_clicked(RoSingle *self, ePointer_s pointer) {
-    bool in_r = u_pose_aa_contains(self->rect.pose, pointer.pos.xy);
+bool button_clicked(rRect_s *self, ePointer_s pointer) {
+    bool in_r = u_pose_aa_contains(self->pose, pointer.pos.xy);
     bool press = pointer.action == E_POINTER_DOWN && in_r;
     bool clicked = pointer.action == E_POINTER_UP && button_is_pressed(self);   // was pressed before
 
@@ -26,8 +26,8 @@ bool button_clicked(RoSingle *self, ePointer_s pointer) {
     return clicked;
 }
 
-bool button_pressed(RoSingle *self, ePointer_s pointer) {
-    bool press = pointer.action == E_POINTER_DOWN && u_pose_aa_contains(self->rect.pose, pointer.pos.xy);
+bool button_pressed(rRect_s *self, ePointer_s pointer) {
+    bool press = pointer.action == E_POINTER_DOWN && u_pose_aa_contains(self->pose, pointer.pos.xy);
 
     if (press) {
         button_set_pressed(self, true);
@@ -35,8 +35,8 @@ bool button_pressed(RoSingle *self, ePointer_s pointer) {
     return press;
 }
 
-bool button_toggled(RoSingle *self, ePointer_s pointer) {
-    bool toggle = pointer.action == E_POINTER_UP && u_pose_aa_contains(self->rect.pose, pointer.pos.xy);
+bool button_toggled(rRect_s *self, ePointer_s pointer) {
+    bool toggle = pointer.action == E_POINTER_UP && u_pose_aa_contains(self->pose, pointer.pos.xy);
 
     if (toggle) {
         button_set_pressed(self, !button_is_pressed(self));

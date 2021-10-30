@@ -3,17 +3,16 @@
 
 #include <stdbool.h>
 #include "e/input.h"
-#include "r/ro_single.h"
+#include "r/rect.h"
 
+bool button_is_pressed(rRect_s *self);
 
-bool button_is_pressed(RoSingle *self);
+void button_set_pressed(rRect_s *self, bool pressed);
 
-void button_set_pressed(RoSingle *self, bool pressed);
+bool button_clicked(rRect_s *self, ePointer_s pointer);
 
-bool button_clicked(RoSingle *self, ePointer_s pointer);
+bool button_pressed(rRect_s *self, ePointer_s pointer);
 
-bool button_pressed(RoSingle *self, ePointer_s pointer);
-
-bool button_toggled(RoSingle *self, ePointer_s pointer);
+bool button_toggled(rRect_s *self, ePointer_s pointer);
 
 #endif //PIXELC_BUTTON_H
