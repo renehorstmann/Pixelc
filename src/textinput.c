@@ -58,6 +58,22 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
             self->L.shiftstate = 0;
         }
     }
+    
+    if(button_clicked(&self->L.space.rect, pointer)) {
+        
+    }
+    
+    for(int i=0; i<27; i++) {
+        if(button_clicked(&self->L.keys.rects[i], pointer)) {
+            
+        }
+    }
+    
+    for(int i=0; i<3; i++) {
+        if(button_clicked(&self->L.special.rects[i], pointer)) {
+            
+        }
+    }
 }
 
 
@@ -133,8 +149,10 @@ void textinput_update(TextInput *self, float dtime) {
             if(self->L.shiftstate==TEXTINPUT_SHIFT_UPPER)
                 key = toupper(key);
                 
+            bool pressed = button_is_pressed(&self->L.keys.rects[idx]);    
+                
             set_key_pos(&self->L.keys.rects[idx].pose, cam, c, r, 1, 0);
-            set_key_pos(&self->L.chars.rects[idx].pose, cam, c, r, 1, 1);
+            set_key_pos(&self->L.chars.rects[idx].pose, cam, c, pressed? 0 : r, 1, pressed? 16 : 1);
             
             self->L.textfield.sprite_fn(&self->L.chars.rects[idx].sprite, key);
             
