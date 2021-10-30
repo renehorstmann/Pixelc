@@ -30,6 +30,8 @@ typedef struct {
         RoBatch special;
         
         enum TextInput_shiftstate shiftstate;
+        
+        float blink_time;
     } L;
 } TextInput;
 
