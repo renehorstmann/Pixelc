@@ -141,7 +141,10 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam)
         r_texture_new_file(2, 1, "res/textinput_key_space.png"));
     self->L.special = ro_batch_new(3,
                                    r_texture_new_file(2, 3, "res/textinput_key_special.png"));
-
+                                   
+    self->L.bg = ro_single_new(r_texture_new_white_pixel());
+    self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.25}};
+     
     for (int i = 0; i < 27; i++) {
         self->L.keys.rects[i].pose = u_pose_new(0, 0, 16, 16);
         self->L.chars.rects[i].pose = u_pose_new(0, 0, 5, 8);
@@ -223,6 +226,10 @@ void textinput_update(TextInput *self, float dtime)
     set_key_pos(&self->L.special.rects[0].pose, cam, 8, 3, 2, 0);
     set_key_pos(&self->L.special.rects[1].pose, cam, 0, 3, 2, 0);
     set_key_pos(&self->L.special.rects[2].pose, cam, 8, 2, 2, 0);
+    
+    self->L.bg.rect.pose = u_pose_new_aa(
+            cam->RO.left, cam->RO.top,
+            camera_width(cam), camera_height(cam));
 
     ro_batch_update(&self->L.keys);
     ro_batch_update(&self->L.chars);
@@ -231,6 +238,8 @@ void textinput_update(TextInput *self, float dtime)
 
 void textinput_render(const TextInput *self, const mat4 *cam_mat)
 {
+    ro_single_render(&self->L.bg, cam_mat);
+    
     ro_text_render(&self->L.textfield, cam_mat);
     ro_batch_render(&self->L.keys, cam_mat);
     ro_batch_render(&self->L.chars, cam_mat);

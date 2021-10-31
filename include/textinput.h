@@ -28,6 +28,7 @@ typedef struct {
         RoBatch chars;
         RoSingle shift, space;
         RoBatch special;
+        RoSingle bg;
         
         enum TextInput_shiftstate shiftstate;
         
