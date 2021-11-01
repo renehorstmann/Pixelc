@@ -5,7 +5,7 @@
 #include "camera.h"
 #include "e/input.h"
 
-#define TEXTINPUT_MAX_CHARS 32
+#define TEXTINPUT_MAX_CHARS 27
 
 enum TextInput_shiftstate {
     TEXTINPUT_SHIFT_LOWER,
@@ -28,7 +28,7 @@ typedef struct {
         RoBatch chars;
         RoSingle shift, space;
         RoBatch special;
-        RoSingle bg;
+        RoSingle text_bg, bg;
         
         enum TextInput_shiftstate shiftstate;
         
