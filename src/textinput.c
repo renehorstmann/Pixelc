@@ -143,7 +143,7 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam)
                                    r_texture_new_file(2, 3, "res/textinput_key_special.png"));
                                    
     self->L.bg = ro_single_new(r_texture_new_white_pixel());
-    self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.25}};
+    self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.5}};
     
     self->L.text_bg = ro_single_new(r_texture_new_white_pixel());
     self->L.text_bg.rect.color = (vec4) {{1, 1, 1, 0.5}};
@@ -218,6 +218,7 @@ void textinput_update(TextInput *self, float dtime)
 
             set_key_pos(&self->L.keys.rects[idx].pose, cam, c, r, 1, 0);
             set_key_pos(&self->L.chars.rects[idx].pose, cam, c, pressed ? 0 : r, 1, pressed ? 16 : 1);
+            self->L.chars.rects[idx].color = pressed ? R_COLOR_WHITE : R_COLOR_BLACK;
 
             self->L.textfield.sprite_fn(&self->L.chars.rects[idx].sprite, key);
 
