@@ -119,7 +119,7 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam)
 {
     TextInput *self = rhc_calloc(sizeof *self);
 
-    e_input_register_pointer_event(input, pointer_event, self);
+    e_input_set_vip_pointer_event(input, pointer_event, self);
 
     strcpy(self->text, "Hello World");
 
@@ -170,7 +170,7 @@ void textinput_kill(TextInput **self_ptr)
     if (!self)
         return;
 
-    e_input_unregister_pointer_event(self->input_ref, pointer_event);
+    e_input_set_vip_pointer_event(self->input_ref, NULL, NULL); // reset
 
     ro_text_kill(&self->L.textfield);
     ro_batch_kill(&self->L.keys);

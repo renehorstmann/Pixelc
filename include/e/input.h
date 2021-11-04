@@ -12,6 +12,7 @@
 
 #define E_MAX_POINTER_EVENTS 32
 #define E_MAX_WHEEL_EVENTS 32
+#define E_MAX_KEY_RAW_EVENTS 32
 
 // ePointer_s::id for middle and right button clicks
 #define E_POINTER_BUTTON_MIDDLE -1
@@ -39,6 +40,7 @@ typedef void (*ePointerEventFn)(ePointer_s, void *user_data);
 
 typedef void (*eWheelEventFn)(bool up, void *user_data);
 
+typedef void (*eKeyRawEventFn)(const SDL_Event *event, void *user_data);
 
 struct eWindow;
 struct eGui;
@@ -65,10 +67,25 @@ void e_input_register_pointer_event(const eInput *self, ePointerEventFn event, v
 // unregisters a callback
 void e_input_unregister_pointer_event(const eInput *self, ePointerEventFn event_to_unregister);
 
+// sets a pointer event to a vip call, pass event=NULL to reset
+void e_input_set_vip_pointer_event(const eInput *self, ePointerEventFn event, void *user_data);
+
 // registers a callback for mouse wheel
 void e_input_register_wheel_event(const eInput *self, eWheelEventFn event, void *user_data);
 
 // unregisters a callback
 void e_input_unregister_wheel_event(const eInput *self, eWheelEventFn event_to_unregister);
+
+// sets a wheel event to a vip call, pass event=NULL to reset
+void e_input_set_vip_wheel_event(const eInput *self, eWheelEventFn event, void *user_data);
+
+// registers a callback for sdl key events
+void e_input_register_key_raw_event(const eInput *self, eKeyRawEventFn event, void *user_data);
+
+// unregisters a callback
+void e_input_unregister_key_raw_event(const eInput *self, eKeyRawEventFn event_to_unregister);
+
+// sets a key raw event to a vip call, pass event=NULL to reset
+void e_input_set_vip_key_raw_event(const eInput *self, eKeyRawEventFn event, void *user_data);
 
 #endif //E_INPUT_H
