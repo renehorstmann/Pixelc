@@ -39,7 +39,7 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Without Cmake
 
-Instead of cmake, the following call to gcc should work, too.
+Instead of cmake, the following call to gcc may work, too.
 
 ```sh
 mkdir build && cd build
