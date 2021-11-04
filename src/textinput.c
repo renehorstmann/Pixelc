@@ -1,5 +1,6 @@
 #include "rhc/error.h"
 #include "rhc/alloc.h"
+#include "rhc/log.h"
 #include "mathc/sca/float.h"
 #include "r/texture.h"
 #include "r/ro_single.h"
@@ -25,59 +26,72 @@
 // OO = ok
 
 static const char layout[4][10] = {
-    "qwertzuiop",
-    "asdfghjkl_",
-    "SyxcvbnmBB",
-    "CCSSSSSSOO"
+        "qwertzuiop",
+        "asdfghjkl_",
+        "SyxcvbnmBB",
+        "CCSSSSSSOO"
 };
 static const char layout_alt[4][10] = {
-    "1234567890",
-    "+-*/=<>()%",
-    "S!?#.,;:BB",
-    "CCSSSSSSOO"
+        "1234567890",
+        "+-*/=<>()%",
+        "S!?#.,;:BB",
+        "CCSSSSSSOO"
 };
 
-void set_key_pos(mat4 *pose, const Camera_s *cam, int col, int row, int cols, float y_offset) 
-{
+void set_key_pos(mat4 *pose, const Camera_s *cam, int col, int row, int cols, float y_offset) {
     float width = camera_width(cam) - 16;
     width = sca_min(width, MAX_WIDTH);
 
     float x = 8 - width / 2 + width * col / KEY_COLS + (cols - 1) * 8;
     float y = cam->RO.bottom + 12 + 18 * (KEY_ROWS - row - 1) + y_offset + (row != 3) * 4;
-    u_pose_set_xy(pose, (int)x, (int)y);
+    u_pose_set_xy(pose, (int) x, (int) y);
 }
 
-static char get_key_char(const TextInput *self, int idx) 
-{
+static char get_key_char(const TextInput *self, int idx) {
     int row = idx / 10;
     int col = idx % 10;
     if (row == 2)
         col += 1; // S(hift)
     switch (self->L.shiftstate) {
-    case TEXTINPUT_SHIFT_LOWER:
-        return layout[row][col];
-    case TEXTINPUT_SHIFT_UPPER:
-        return toupper(layout[row][col]);
-    case TEXTINPUT_SHIFT_ALT:
-        return layout_alt[row][col];
-    default:
-        assume(false, "wtf");
-        return 0;
+        case TEXTINPUT_SHIFT_LOWER:
+            return layout[row][col];
+        case TEXTINPUT_SHIFT_UPPER:
+            return toupper(layout[row][col]);
+        case TEXTINPUT_SHIFT_ALT:
+            return layout_alt[row][col];
+        default:
+            assume(false, "wtf");
+            return 0;
     }
 }
 
-static void append_char(TextInput *self, char append) 
-{
-    int len = strlen(self->text);
+static void append_char(TextInput *self, char append) {
+    int len = strlen(self->out.text);
     if (len >= TEXTINPUT_MAX_CHARS - 1)
         return;
-    self->text[len++] = append;
-    self->text[len] = '\0';
+    self->out.text[len++] = append;
+    self->out.text[len] = '\0';
     self->L.blink_time = 0;
 }
 
-static void pointer_event(ePointer_s pointer, void *user_data) 
-{
+static void handle_backspace(TextInput *self) {
+    int len = strlen(self->out.text);
+    if (len > 0)
+        self->out.text[len - 1] = '\0';
+    self->L.blink_time = 0;
+}
+
+static void handle_cancel(TextInput *self) {
+    log_info("textinput canceled: %s", self->out.text);
+    self->out.state = TEXTINPUT_CANCELED;
+}
+
+static void handle_ok(TextInput *self) {
+    log_info("textinput finished: %s", self->out.text);
+    self->out.state = TEXTINPUT_DONE;
+}
+
+static void pointer_event(ePointer_s pointer, void *user_data) {
     TextInput *self = user_data;
     pointer.pos = mat4_mul_vec(self->camera_ref->matrices.p_inv, pointer.pos);
 
@@ -101,30 +115,54 @@ static void pointer_event(ePointer_s pointer, void *user_data)
     // ok, cancel, backspace
     for (int i = 0; i < 3; i++) {
         if (button_clicked(&self->L.special.rects[i], pointer)) {
-            if (i == 2) {
-                int len = strlen(self->text);
-                if (len > 0)
-                    self->text[len - 1] = '\0';
-                self->L.blink_time = 0;
-            }
+            if (i == 0)
+                handle_ok(self);
+            else if (i == 1)
+                handle_cancel(self);
+            else if (i == 2)
+                handle_backspace(self);
         }
     }
+}
+
+static void key_raw_event(const SDL_Event *event, void *user_data) {
+    TextInput *self = user_data;
+    bool down = event->type == SDL_KEYDOWN;
+    if (!down)
+        return;
+
+    SDL_Keycode code = event->key.keysym.sym;
+    if (event->key.keysym.mod & KMOD_SHIFT) {
+        if (code >= 'a' && code <= 'z')
+            code = code - 'a' + 'A';
+        // special keys can be set with the virtual keyboard btns
+    }
+
+    if (code >= ' ' && code <= '~')
+        append_char(self, (char) code);
+    else if (code == SDLK_BACKSPACE)
+        handle_backspace(self);
+    else if(code == SDLK_ESCAPE)
+        handle_cancel(self);
+    else if(code == SDLK_RETURN || code == SDLK_KP_ENTER)
+        handle_ok(self);
+
 }
 
 //
 // public
 //
 
-TextInput *textinput_new(eInput *input, const Camera_s *cam)
-{
+TextInput *textinput_new(eInput *input, const Camera_s *cam) {
     TextInput *self = rhc_calloc(sizeof *self);
 
     e_input_set_vip_pointer_event(input, pointer_event, self);
-
-    strcpy(self->text, "Hello World");
+    e_input_set_vip_key_raw_event(input, key_raw_event, self);
 
     self->input_ref = input;
     self->camera_ref = cam;
+
+    self->out.state = TEXTINPUT_IN_PROGRESS;
 
     self->L.textfield = ro_text_new_font85(TEXTINPUT_MAX_CHARS);
     ro_text_set_color(&self->L.textfield, R_COLOR_BLACK);
@@ -136,18 +174,18 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam)
     self->L.chars.owns_tex = false;
 
     self->L.shift = ro_single_new(
-        r_texture_new_file(2, 3, "res/textinput_key_shift.png"));
+            r_texture_new_file(2, 3, "res/textinput_key_shift.png"));
     self->L.space = ro_single_new(
-        r_texture_new_file(2, 1, "res/textinput_key_space.png"));
+            r_texture_new_file(2, 1, "res/textinput_key_space.png"));
     self->L.special = ro_batch_new(3,
                                    r_texture_new_file(2, 3, "res/textinput_key_special.png"));
-                                   
+
     self->L.bg = ro_single_new(r_texture_new_white_pixel());
     self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.5}};
-    
+
     self->L.text_bg = ro_single_new(r_texture_new_white_pixel());
     self->L.text_bg.rect.color = (vec4) {{1, 1, 1, 0.5}};
-     
+
     for (int i = 0; i < 27; i++) {
         self->L.keys.rects[i].pose = u_pose_new(0, 0, 16, 16);
         self->L.chars.rects[i].pose = u_pose_new(0, 0, 5, 8);
@@ -164,13 +202,13 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam)
     return self;
 }
 
-void textinput_kill(TextInput **self_ptr)
-{
+void textinput_kill(TextInput **self_ptr) {
     TextInput *self = *self_ptr;
     if (!self)
         return;
 
     e_input_set_vip_pointer_event(self->input_ref, NULL, NULL); // reset
+    e_input_set_vip_key_raw_event(self->input_ref, NULL, NULL); // reset
 
     ro_text_kill(&self->L.textfield);
     ro_batch_kill(&self->L.keys);
@@ -180,12 +218,11 @@ void textinput_kill(TextInput **self_ptr)
     *self_ptr = NULL;
 }
 
-void textinput_update(TextInput *self, float dtime)
-{
+void textinput_update(TextInput *self, float dtime) {
     const Camera_s *cam = self->camera_ref;
 
     char text[TEXTINPUT_MAX_CHARS];
-    strcpy(text, self->text);
+    strcpy(text, self->out.text);
 
     self->L.blink_time += dtime;
     if (self->L.blink_time > 1.0)
@@ -200,7 +237,7 @@ void textinput_update(TextInput *self, float dtime)
     ro_text_set_text(&self->L.textfield, text);
 
     u_pose_set_xy(&self->L.textfield.pose, -80, 4);
-    
+
     self->L.text_bg.rect.pose = u_pose_new_aa(
             cam->RO.left, 6,
             camera_width(cam), 12);
@@ -234,7 +271,7 @@ void textinput_update(TextInput *self, float dtime)
     set_key_pos(&self->L.special.rects[0].pose, cam, 8, 3, 2, 0);
     set_key_pos(&self->L.special.rects[1].pose, cam, 0, 3, 2, 0);
     set_key_pos(&self->L.special.rects[2].pose, cam, 8, 2, 2, 0);
-    
+
     self->L.bg.rect.pose = u_pose_new_aa(
             cam->RO.left, cam->RO.top,
             camera_width(cam), camera_height(cam));
@@ -244,11 +281,10 @@ void textinput_update(TextInput *self, float dtime)
     ro_batch_update(&self->L.special);
 }
 
-void textinput_render(const TextInput *self, const mat4 *cam_mat)
-{
+void textinput_render(const TextInput *self, const mat4 *cam_mat) {
     ro_single_render(&self->L.bg, cam_mat);
     ro_single_render(&self->L.text_bg, cam_mat);
-    
+
     ro_text_render(&self->L.textfield, cam_mat);
     ro_batch_render(&self->L.keys, cam_mat);
     ro_batch_render(&self->L.chars, cam_mat);

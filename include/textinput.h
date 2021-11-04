@@ -14,12 +14,22 @@ enum TextInput_shiftstate {
     TEXTINPUT_SHIFT_NUM_STATES
 };
 
+enum TextInput_state {
+    TEXTINPUT_IN_PROGRESS,
+    TEXTINPUT_CANCELED,
+    TEXTINPUT_DONE,
+    TEXTINPUT_NUM_STATES,
+};
+
 typedef struct {
     eInput *input_ref;
     const Camera_s *camera_ref;
-    
-    char text[TEXTINPUT_MAX_CHARS];
-    bool finished;
+
+
+    struct {
+        char text[TEXTINPUT_MAX_CHARS];
+        enum TextInput_state state;
+    } out;
 
     struct {
         // RoSingle field_bg;
