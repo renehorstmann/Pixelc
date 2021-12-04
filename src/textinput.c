@@ -153,7 +153,7 @@ static void key_raw_event(const SDL_Event *event, void *user_data) {
 // public
 //
 
-TextInput *textinput_new(eInput *input, const Camera_s *cam) {
+TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title) {
     TextInput *self = rhc_calloc(sizeof *self);
 
     e_input_set_vip_pointer_event(input, pointer_event, self);
@@ -163,6 +163,10 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam) {
     self->camera_ref = cam;
 
     self->out.state = TEXTINPUT_IN_PROGRESS;
+    
+    
+    self->L.title = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
+    ro_text_set_text(&self->L.title, title);
 
     self->L.textfield = ro_text_new_font85(TEXTINPUT_MAX_CHARS);
     ro_text_set_color(&self->L.textfield, R_COLOR_BLACK);
@@ -235,6 +239,8 @@ void textinput_update(TextInput *self, float dtime) {
     }
 
     ro_text_set_text(&self->L.textfield, text);
+    
+    self->L.title.pose = u_pose_new(-80, 32, 1.5, 1.5);
 
     u_pose_set_xy(&self->L.textfield.pose, -80, 4);
 
@@ -285,6 +291,7 @@ void textinput_render(const TextInput *self, const mat4 *cam_mat) {
     ro_single_render(&self->L.bg, cam_mat);
     ro_single_render(&self->L.text_bg, cam_mat);
 
+    ro_text_render(&self->L.title, cam_mat);
     ro_text_render(&self->L.textfield, cam_mat);
     ro_batch_render(&self->L.keys, cam_mat);
     ro_batch_render(&self->L.chars, cam_mat);

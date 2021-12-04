@@ -23,8 +23,8 @@
 
 // canvas size
 //*
-#define COLS 16*4
-#define ROWS 16*3
+#define COLS 128*2
+#define ROWS 16
 #define LAYERS 1
 //*/
 
@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
     L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
     L.inputctrl = inputctrl_new(L.input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
     
-    L.textinput = textinput_new(L.input, L.camera);
+    L.textinput = textinput_new(L.input, L.camera, "Your name:");
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
@@ -170,7 +170,7 @@ static void main_loop(float delta_time) {
     
     background_update(L.background, L.camera, delta_time);
     
-    
+    /*
     canvas_update(L.canvas, L.canvascam, delta_time);
     palette_update(L.palette, delta_time);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
@@ -185,7 +185,7 @@ static void main_loop(float delta_time) {
 
     background_render(L.background, camera_mat);
     
-    
+    /*
     animation_render(L.animation, camera_mat);
     canvas_render(L.canvas, canvascam_mat);
     palette_render(L.palette, camera_mat);

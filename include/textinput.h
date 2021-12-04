@@ -6,6 +6,7 @@
 #include "e/input.h"
 
 #define TEXTINPUT_MAX_CHARS 27
+#define TEXTINPUT_TITLE_MAX_LENGTH 18
 
 enum TextInput_shiftstate {
     TEXTINPUT_SHIFT_LOWER,
@@ -32,7 +33,7 @@ typedef struct {
     } out;
 
     struct {
-        // RoSingle field_bg;
+        RoText title;
         RoText textfield;
         RoBatch keys;
         RoBatch chars;
@@ -46,7 +47,7 @@ typedef struct {
     } L;
 } TextInput;
 
-TextInput *textinput_new(eInput *input, const Camera_s *cam);
+TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title);
 
 void textinput_kill(TextInput **self_ptr);
 
