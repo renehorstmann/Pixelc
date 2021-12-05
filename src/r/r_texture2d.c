@@ -55,10 +55,6 @@ rTexture2D r_texture2d_new_file(const char *file) {
     return self;
 }
 
-rTexture2D r_texture2d_new_empty(int image_cols, int image_rows) {
-    return r_texture2d_new(image_cols, image_rows, NULL);
-}
-
 rTexture2D r_texture2d_new_white_pixel() {
     return r_texture2d_new(1, 1, (uint8_t[]) {255, 255, 255, 255});
 }

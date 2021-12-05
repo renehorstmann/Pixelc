@@ -1,18 +1,17 @@
 #ifndef SOME_RO_TYPES_H
 #define SOME_RO_TYPES_H
 
-#include "rhc/types.h"
 #include "types.h"
 
 // Renders a single rect in a draw call
 typedef struct {
     rRect_s rect;
-    bool owns_tex;      // if true, the texture will be deleted by this class
+    rTexture tex;       // used texture
+    bool owns_tex;      // if true (default), tex will be killed by this class
 
     struct {
         GLuint program;     // shader
         GLuint vao;         // internal vertex array object
-        rTexture tex;       // used texture
     } L;
 } RoSingle;
 
@@ -21,14 +20,13 @@ typedef struct {
 typedef struct {
     rRect_s *rects;
     int num;
-    bool owns_tex;      // if true, the texture will be deleted by this class
+    rTexture tex;       // used texture
+    bool owns_tex;      // if true (default), text will be killed by this class
 
     struct {
         GLuint program;     // shader
         GLuint vao;         // internal vertex array object
         GLuint vbo;         // internal vertex buffer object
-        rTexture tex;       // used texture
-        Allocator_i allocator;
     } L;
 } RoBatch;
 
@@ -37,14 +35,13 @@ typedef struct {
 typedef struct {
     rParticleRect_s *rects;
     int num;
-    bool owns_tex;      // if true, the texture will be deleted by this class
+    rTexture tex;       // used texture
+    bool owns_tex;      // if true (default), tex will be killed by this class
 
     struct {
         GLuint program;     // shader
         GLuint vao;         // internal vertex array object
         GLuint vbo;         // internal vertex buffer object
-        rTexture tex;       // used texture
-        Allocator_i allocator;
     } L;
 } RoParticle;
 
@@ -52,17 +49,14 @@ typedef struct {
 // Like RoSingle, but with refraction
 typedef struct {
     rRect_s rect;
-    const float *scale;                     // float
-    const float *view_aabb;                 // vec4
-    bool owns_tex_main;                     // if true, the textures will be deleted by this class
-    bool owns_tex_refraction;
-    const rTexture2D *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
-
+    rTexture tex_main;          // used main texture
+    rTexture tex_refraction;    // used refraction texture
+    bool owns_tex_main;         // if true (default), tex_main will be killed by this class
+    bool owns_tex_refraction;   // if true (default), tex_refraction will be killer by this clasd
+    
     struct {
-        GLuint program;                         // shader
-        GLuint vao;                             // internal vertex array object
-        rTexture tex_main;                      // used main texture
-        rTexture tex_refraction;                // used refraction texture
+        GLuint program;         // shader
+        GLuint vao;             // internal vertex array object
     } L;
 } RoSingleRefract;
 
@@ -71,19 +65,15 @@ typedef struct {
 typedef struct {
     rRect_s *rects;
     int num;
-    const float *scale;                 // float
-    const float *view_aabb;             // vec4
-    bool owns_tex_main;                 // if true, the textures will be deleted by this class
-    bool owns_tex_refraction;
-    const rTexture2D *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
+    rTexture tex_main;          // used main texture
+    rTexture tex_refraction;    // used refraction texture
+    bool owns_tex_main;         // if true (default), tex_main will be killed by this class
+    bool owns_tex_refraction;   // if true (default), tex_refraction will be killer by this clasd
 
     struct {
-        GLuint program;                     // shader
-        GLuint vao;                         // internal vertex array object
-        GLuint vbo;                         // internal vertex buffer object
-        rTexture tex_main;                  // used main texture
-        rTexture tex_refraction;            // used refraction texture
-        Allocator_i allocator;
+        GLuint program;         // shader
+        GLuint vao;             // internal vertex array object
+        GLuint vbo;             // internal vertex buffer object
     } L;
 } RoBatchRefract;
 
@@ -92,24 +82,20 @@ typedef struct {
 typedef struct {
     rParticleRect_s *rects;
     int num;
-    const float *scale;                 // float
-    const float *view_aabb;             // vec4
-    bool owns_tex_main;                 // if true, the textures will be deleted by this class
-    bool owns_tex_refraction;
-    const rTexture2D *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
+    rTexture tex_main;          // used main texture
+    rTexture tex_refraction;    // used refraction texture
+    bool owns_tex_main;         // if true (default), tex_main will be killed by this class
+    bool owns_tex_refraction;   // if true (default), tex_refraction will be killer by this clasd
 
     struct {
-        GLuint program;                     // shader
-        GLuint vao;                         // internal vertex array object
-        GLuint vbo;                         // internal vertex buffer object
-        rTexture tex_main;                  // used main texture
-        rTexture tex_refraction;            // used refraction texture
-        Allocator_i allocator;
+        GLuint program;         // shader
+        GLuint vao;             // internal vertex array object
+        GLuint vbo;             // internal vertex buffer object
     } L;
 } RoParticleRefract;
 
 
-
+// text sprite from char callback
 // return true for a newline
 typedef bool (*ro_text_sprite_fn)(vec2 *sprite, char c);
 

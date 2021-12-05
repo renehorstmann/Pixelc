@@ -22,17 +22,22 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
-#include "rhc/alloc.h"
+
 #include "ro_types.h"
 
-
+// creates a single with refraction enabled for one rRect
+// this class takes ownership of tex_sink (see .owns_tex)
 RoSingleRefract ro_singlerefract_new(
         const float *scale_ptr,
         rTexture tex_main_sink, rTexture tex_refraction_sink);
 
 void ro_singlerefract_kill(RoSingleRefract *self);
 
-void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat);
+// renders the single rRect with refraction enabled
+// scale: real pixels per pixel
+// opt_view_aabb, opt_framebuffer: see note at the top of the file
+void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat, float scale, 
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_singlerefract_set_texture_main(RoSingleRefract *self, rTexture tex_main_sink);

@@ -87,15 +87,7 @@
 #define PalettePresave(pal) Cat(palettepresave_, pal)
 
 
-static void main_loop(float delta_time);
-
-
 static struct {
-    eWindow *window;
-    eInput *input;
-    eGui *gui;
-    rRender *render;
-
     Camera_s *camera;
     CanvasCam_s *canvascam;
     SaveState *savestate;
@@ -111,16 +103,8 @@ static struct {
     TextInput *textinput;
 } L;
 
-int main(int argc, char **argv) {
-    log_info("Pixelc");
-
-    // init e (environment)
-    L.window = e_window_new("Pixelc");
-    L.input = e_input_new(L.window);
-    L.gui = e_gui_new(L.window);
-
-    // init r (render)
-    L.render = r_render_new(e_window_get_sdl_window(L.window));
+// this function will be called at the start of the app
+static void init(eSimple *simple, ivec2 window_size) {
 
     // init systems
     L.camera = camera_new();
@@ -138,67 +122,58 @@ int main(int argc, char **argv) {
     L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     L.brush = brush_new(L.canvas);
     L.palette = palette_new(L.camera, L.brush);
-    L.canvascamctrl = canvascamctrl_new(L.input, L.canvascam, L.brush);
+    L.canvascamctrl = canvascamctrl_new(simple->input, L.canvascam, L.brush);
     L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
-    L.inputctrl = inputctrl_new(L.input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
-    
-    L.textinput = textinput_new(L.input, L.camera, "Your name:");
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
+
+    L.textinput = textinput_new(simple->input, L.camera, "Your name:");
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
 
     // save start frame
     savestate_save(L.savestate);
-
-    e_window_main_loop(L.window, main_loop);
-
-    e_gui_kill(&L.gui);
-
-    return 0;
 }
 
-
-static void main_loop(float delta_time) {
-    // e updates
-    ivec2 window_size = e_window_get_size(L.window);
-    e_input_update(L.input);
-
-
+// this functions is called either each frame or at a specific update/s time
+static void update(eSimple *simple, ivec2 window_size, float delta_time) {
     // simulate
     camera_update(L.camera, window_size.x, window_size.y);
     canvascam_update(L.canvascam, window_size.x, window_size.y);
-    
+
     background_update(L.background, L.camera, delta_time);
-    
-    /*
+
+    //*
     canvas_update(L.canvas, L.canvascam, delta_time);
     palette_update(L.palette, delta_time);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
     toolbar_update(L.toolbar, delta_time);
     //*/
-    
-    // render
-    r_render_begin_frame(L.render, window_size.x, window_size.y);
 
+    //textinput_update(L.textinput, delta_time);
+}
+
+// this function is calles each frame to render stuff
+static void render(eSimple *simple, ivec2 window_size) {
     const mat4 *camera_mat = &L.camera->matrices.p;
     const mat4 *canvascam_mat = &L.canvascam->matrices.vp;
 
     background_render(L.background, camera_mat);
-    
-    /*
+
+    //*
     animation_render(L.animation, camera_mat);
     canvas_render(L.canvas, canvascam_mat);
     palette_render(L.palette, camera_mat);
     toolbar_render(L.toolbar, camera_mat);
     //*/
-    
-    textinput_update(L.textinput, delta_time);
-    textinput_render(L.textinput, camera_mat);
 
-    e_gui_render(L.gui);
-
-    // swap buffers
-    r_render_end_frame(L.render);
+    //textinput_render(L.textinput, camera_mat);
 }
 
+int main(int argc, char **argv) {
+    e_simple_start("Pixelc", "Horsimann",
+                   0, // updates/s, <=0 to turn off and use fps
+                   init, update, render);
+    return 0;
+}
 

@@ -20,14 +20,16 @@ static rTexture2D r_texture2d_new_invalid() {
     return (rTexture2D) {0};
 }
 
+// returns a new texture from an optional buffer
 rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffer);
 
+// returns a new texture, loaded from an SDL_Surface
 rTexture2D r_texture2d_new_sdl_surface(const SDL_Surface *img);
 
+// returns a new texture, loaded from a file (.png)
 rTexture2D r_texture2d_new_file(const char *file);
 
-rTexture2D r_texture2d_new_empty(int image_cols, int image_rows);
-
+// returns a new white texture, useful for quads with color, specified in the rRect
 rTexture2D r_texture2d_new_white_pixel();
 
 void r_texture2d_kill(rTexture2D *self);
@@ -42,9 +44,10 @@ void r_texture2d_set(rTexture2D self, const void *buffer);
 //     4 * size.x * _y
 void r_texture2d_get(rTexture2D self, void *buffer);
 
-
+// sets the rendering interpolation to linear (normal images)
 void r_texture2d_filter_linear(rTexture2D self);
 
+// sets the rendering interpolation to nearest (pixelart)
 void r_texture2d_filter_nearest(rTexture2D self);
 
 #endif //R_TEXTURE2D_H

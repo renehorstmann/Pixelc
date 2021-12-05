@@ -17,15 +17,18 @@ rTexture ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
 
 
 
-
+// creates a new ttf text with tge ro.ttftext.default_font as init
 RoTtfText ro_ttftext_new(vec4 color, const char *text);
 
 void ro_ttftext_kill(RoTtfText *self);
 
+// renders the text via the underlying RoSingle
 void ro_ttftext_render(const RoTtfText *self, const mat4 *camera_mat);
 
+// sets the text height
 void ro_ttftext_set_size(RoTtfText *self, float h);
 
+// resets the printed text
 void ro_ttftext_set_text(RoTtfText *self, vec4 color, const char *text);
 
 #endif //R_RO_TTFTEXT_H

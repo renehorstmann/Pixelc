@@ -15,6 +15,7 @@
 //
 // protected
 //
+
 void e_window_handle_window_event_(const SDL_Event *event);
 
 
@@ -97,6 +98,7 @@ static void resume_wnd() {
     singleton.pause = false;
 }
 
+
 static void log_window_event(const SDL_Event *event);
 
 //
@@ -129,10 +131,13 @@ void e_window_handle_window_event_(const SDL_Event *event) {
 // public
 //
 
-eWindow *e_window_new(const char *name) {
+eWindow *e_window_new(const char *title) {
+    log_info("e_window_new");
+
     assume(!singleton_created, "e_window_new should be called only onve");
     singleton_created = true;
 
+    
 #ifdef NDEBUG
     rhc_log_set_min_level(RHC_LOG_WARN);
 #else
@@ -141,7 +146,7 @@ eWindow *e_window_new(const char *name) {
 
     if (SDL_Init(E_SDL_INIT_FLAGS) != 0) {
         log_error("e_window_new: SDL_Init failed: %s", SDL_GetError());
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
 
 
@@ -149,14 +154,14 @@ eWindow *e_window_new(const char *name) {
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
         log_error("e_window_new: IMG_Init failed: %s", IMG_GetError());
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
 
 #ifdef OPTION_TTF
     // initialize TTF
     if (TTF_Init() == -1) {
         log_error("e_window_new: TTF_Init failed: %s", TTF_GetError());
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
 #endif
 
@@ -164,7 +169,7 @@ eWindow *e_window_new(const char *name) {
     // initialize net
     if (SDLNet_Init() == -1) {
         log_error("e_window_new: SDLNet_Init failed: %s", SDLNet_GetError());
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
 #endif
 
@@ -177,7 +182,7 @@ eWindow *e_window_new(const char *name) {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // create window
-    singleton.window = SDL_CreateWindow(name,
+    singleton.window = SDL_CreateWindow(title,
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             640, 480,
@@ -186,7 +191,7 @@ eWindow *e_window_new(const char *name) {
             );
     if (!singleton.window) {
         log_error("e_window_new: SDL_CreateWindow failed: %s", SDL_GetError());
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
     SDL_SetWindowMinimumSize(singleton.window, 480, 320);
     
@@ -195,16 +200,15 @@ eWindow *e_window_new(const char *name) {
     singleton.gl_context = SDL_GL_CreateContext(singleton.window);
     if (!singleton.gl_context) {
         log_error("e_window_new: SDL_GL_CreateContext failed: %s", SDL_GetError());
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
-    SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
 
 #ifdef OPTION_GLEW
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
         log_error( "e_window_new faled: %s", glewGetErrorString(err));
-        exit(EXIT_FAILURE);
+        e_exit_failure();
     }
     log_info("e_window_new: Using GLEW version: %s", glewGetString(GLEW_VERSION));
 #endif
@@ -228,6 +232,7 @@ void e_window_kill(eWindow **self_ptr) {
     
 #ifdef __EMSCRIPTEN__
     emscripten_cancel_main_loop();
+    EM_ASM(set_error_img(););
 #endif
 
     // will be killed in the main loop
@@ -242,11 +247,6 @@ SDL_Window *e_window_get_sdl_window(const eWindow *self) {
 SDL_GLContext e_window_get_sdl_gl_context(const eWindow *self) {
     assume(self == &singleton, "singleton?");
     return singleton.gl_context;
-}
-
-ivec2 e_window_get_size(const eWindow *self) {
-    assume(self == &singleton, "singleton?");
-    return singleton.size;
 }
 
 void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
@@ -274,6 +274,43 @@ void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
     memset(&singleton, 0, sizeof(singleton));
     singleton_created = false;
     log_info("e_window_kill: killed");
+}
+
+void e_window_reset_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
+    assume(self == &singleton, "singleton?");
+    assume(singleton.main_loop_fn, "main_loop not started yet?");
+    log_info("e_window_reset_main_loop");
+    singleton.main_loop_fn = main_loop;
+}
+
+ivec2 e_window_get_size(const eWindow *self) {
+    assume(self == &singleton, "singleton?");
+    return singleton.size;
+}
+
+void e_window_set_vsync(const eWindow *self, bool activate) {
+    int ret;
+    if(!activate) {
+        ret = SDL_GL_SetSwapInterval(0);
+        if(ret == 0) {
+            log_info("e_window_set_vsync: turned off", activate);
+            return;
+        }
+        log_error("e_window_set_vsync: failed to turn off vsync");
+        return;
+    }
+    // try adaptive vsync
+    ret = SDL_GL_SetSwapInterval(-1);
+    if(ret == 0) {
+        log_info("e_window_set_vsync: applied adaptive-vsync");
+        return;
+    }
+    ret = SDL_GL_SetSwapInterval(1);
+    if(ret == 0) {
+        log_info("e_window_set_vsync: applied vsync");
+        return;
+    }
+    log_error("e_window_set_vsync: failed to turn on vsync");
 }
 
 void e_window_set_screen_mode(const eWindow *self, enum e_window_screen_modes mode) {

@@ -9,14 +9,12 @@
 #include "r/ro_particle.h"
 
 
-RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
+RoParticle ro_particle_new(int num, rTexture tex_sink) {
     r_render_error_check("ro_particle_newBEGIN");
     RoParticle self;
-    self.L.allocator = alloc;
     
     assume(num>0, "particle needs atleast 1 particlerect");
-    self.rects = alloc.malloc(alloc, num * sizeof(rParticleRect_s));
-    assume(self.rects, "allocation failed");
+    self.rects = rhc_malloc(sizeof *self.rects * num);
     for(int i=0; i<num; i++) {
         self.rects[i] = r_particlerect_new();
     }
@@ -36,7 +34,7 @@ RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
     
     const int loc_start_time = 14;
 
-    self.L.tex = tex_sink;
+    self.tex = tex_sink;
     self.owns_tex = true;
 
     // vao scope
@@ -138,12 +136,12 @@ RoParticle ro_particle_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
 
 
 void ro_particle_kill(RoParticle *self) {
-    self->L.allocator.free(self->L.allocator, self->rects);
+    rhc_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
     glDeleteBuffers(1, &self->L.vbo);
     if (self->owns_tex)
-        r_texture_kill(&self->L.tex);
+        r_texture_kill(&self->tex);
     *self = (RoParticle) {0};
 }
 
@@ -186,14 +184,14 @@ void ro_particle_render_sub(const RoParticle *self, float time, int num, const m
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"),
                        1, GL_FALSE, &camera_mat->m00);
 
-    vec2 sprites = vec2_cast_from_int(&self->L.tex.sprites.v0);
+    vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
     
     glUniform1f(glGetUniformLocation(self->L.program, "time"), time);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex.tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex.tex);
 
     {
         glBindVertexArray(self->L.vao);
@@ -208,6 +206,6 @@ void ro_particle_render_sub(const RoParticle *self, float time, int num, const m
 
 void ro_particle_set_texture(RoParticle *self, rTexture tex_sink) {
     if (self->owns_tex)
-        r_texture_kill(&self->L.tex);
-    self->L.tex = tex_sink;
+        r_texture_kill(&self->tex);
+    self->tex = tex_sink;
 }

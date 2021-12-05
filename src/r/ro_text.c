@@ -46,14 +46,14 @@ static mat4 pose(const RoText *self, int c, int r) {
 // public
 //
 
-RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_i alloc) {
+RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink) {
     RoText self;
     self.sprite_fn = sprite_fn;
     self.pose = mat4_eye();
     self.size = (vec2) {{5, 5}};
     self.offset = (vec2) {{6, 6}};
     // batch.vp will be set each time before rendering
-    self.ro = ro_batch_new_a(max, tex_sink, alloc);
+    self.ro = ro_batch_new(max, tex_sink);
     hide(&self, 0);
     ro_batch_update(&self.ro);
     return self;

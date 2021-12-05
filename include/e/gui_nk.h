@@ -1,6 +1,8 @@
 #ifndef SOME_GUI_NK_H
 #define SOME_GUI_NK_H
 
+// includes nuklear for costum windows
+
 // setup nuklear
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO

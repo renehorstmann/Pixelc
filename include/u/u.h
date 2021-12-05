@@ -9,5 +9,6 @@
 #include "image.h"
 #include "pose.h"
 #include "prandom.h"
+#include "fetch.h"
 
 #endif //U_U_H

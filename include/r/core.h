@@ -5,6 +5,8 @@
 // as e/core.h, this file includes headers of sdl and opengl and has some color constants
 //
 
+#include <stdbool.h>
+
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef OPTION_GLEW
@@ -19,6 +21,23 @@
 
 #include "mathc/types/float.h"
 
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+// #include <emscripten/html5.h>
+#endif
+
+
+// exit the app, on emscripten an error message will be shown
+static void r_exit_failure() {
+#ifdef __EMSCRIPTEN__
+    emscripten_cancel_main_loop();
+    EM_ASM(
+            set_exit_failure_error_msg();
+            );
+#endif
+    exit(EXIT_FAILURE);
+}
 
 static const vec4 R_COLOR_TRANSPARENT = {{0, 0, 0, 0}};
 static const vec4 R_COLOR_BLACK = {{0, 0, 0, 1}};

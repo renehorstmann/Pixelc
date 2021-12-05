@@ -7,6 +7,7 @@
 #include "e/gui_nk.h"
 #include "e/gui.h"
 #include "rhc/error.h"
+#include "rhc/log.h"
 
 #define MAX_VERTEX_MEMORY 512 * 1024
 #define MAX_ELEMENT_MEMORY 128 * 1024
@@ -69,6 +70,8 @@ static struct nk_rect window_rect(float w, float h) {
 //
 
 eGui *e_gui_new(const struct eWindow *window) {
+    log_info("e_gui_new");
+
     assume(!singleton_created, "e_gui_new should be called only onve");
     singleton_created = true;
 
@@ -93,7 +96,8 @@ void e_gui_kill(eGui **self_ptr) {
     nk_sdl_shutdown();
 
     assume(*self_ptr == &singleton, "singleton?");
-    memset(&singleton, 0, sizeof(singleton));
+    memset(&singleton, 0, sizeof(singleton));    singleton_created = false;
+    
     *self_ptr = NULL;
 }
 
@@ -105,34 +109,143 @@ void e_gui_render(const eGui *self) {
     nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
 }
 
-struct nk_context *e_gui_get_nk_context(const eGui *self) {
-    if(!self)
-        return NULL;
-    assume(self == &singleton, "singleton?");
+struct nk_context *e_gui_get_nk_context() {
     return singleton.ctx;
 }
 
-void e_gui_wnd_float_attribute(const eGui *self, const char *title, float *attribute, float min, float max, float step) {
-    if(!self)
-        return;
-    assume(self == &singleton, "singleton?");
+void e_gui_float(const char *title, float *attribute, float min, float max) {
     if(!singleton.ctx)
         return;
     struct nk_context *ctx = singleton.ctx;
-    if (nk_begin(ctx, title, window_rect(300, 100),
+    if (nk_begin(ctx, title, window_rect(300, 90),
                  NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
                  NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
-        nk_layout_row_static(ctx, 30, 120, 2);
-        nk_slider_float(ctx, min, attribute, max, step);
-        nk_labelf(ctx, NK_TEXT_LEFT, "%f", *attribute);
+        nk_layout_row_dynamic(ctx, 30, 1);
+        *attribute = nk_propertyf(ctx, title, min, *attribute, max, 0, (max-min)/100);
     }
     nk_end(ctx);
 }
 
-void e_gui_test(const eGui *self) {
-    if(!self)
+void e_gui_vec2(const char *title, vec2 *attribute, vec2 min, vec2 max) {
+    if(!singleton.ctx)
         return;
-    assume(self == &singleton, "singleton?");
+    struct nk_context *ctx = singleton.ctx;
+    if (nk_begin(ctx, title, window_rect(300, 125),
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 25, 1);
+        for(int i=0; i<2; i++) {
+            char name[3] = "vX";
+            name[1] = '0'+i;
+            attribute->v[i] = nk_propertyf(ctx, 
+                    name, 
+                    min.v[i], attribute->v[i], max.v[i], 0, (max.v[i]-min.v[i])/100);
+        }
+    }
+    nk_end(ctx);
+}
+
+void e_gui_vec3(const char *title, vec3 *attribute, vec3 min, vec3 max) {
+    if(!singleton.ctx)
+        return;
+    struct nk_context *ctx = singleton.ctx;
+    if (nk_begin(ctx, title, window_rect(300, 150),
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 25, 1);
+        for(int i=0; i<3; i++) {
+            char name[3] = "vX";
+            name[1] = '0'+i;
+            attribute->v[i] = nk_propertyf(ctx, 
+                    name, 
+                    min.v[i], attribute->v[i], max.v[i], 0, (max.v[i]-min.v[i])/100);
+        }
+    }
+    nk_end(ctx);
+}
+
+void e_gui_vec4(const char *title, vec4 *attribute, vec4 min, vec4 max) {
+    if(!singleton.ctx)
+        return;
+    struct nk_context *ctx = singleton.ctx;
+    if (nk_begin(ctx, title, window_rect(300, 175),
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 25, 1);
+        for(int i=0; i<4; i++) {
+            char name[3] = "vX";
+            name[1] = '0'+i;
+            attribute->v[i] = nk_propertyf(ctx, 
+                    name, 
+                    min.v[i], attribute->v[i], max.v[i], 0, (max.v[i]-min.v[i])/100);
+        }
+    }
+    nk_end(ctx);
+}
+
+
+
+void e_gui_rgb(const char *title, vec3 *attribute) {
+    if(!singleton.ctx)
+        return;
+    struct nk_context *ctx = singleton.ctx;
+    struct nk_colorf color = {
+        .r = attribute->r,
+        .g = attribute->g,
+        .b = attribute->b,
+        .a = 1
+    };
+    if (nk_begin(ctx, title, window_rect(300, 275),
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 120, 1);
+        color = nk_color_picker(ctx, color, NK_RGB);
+        nk_layout_row_dynamic(ctx, 25, 1);
+        color.r = nk_propertyf(ctx, "red", 0, color.r, 1, 0, 0.01f);
+        color.g = nk_propertyf(ctx, "green", 0, color.g, 1, 0, 0.01f);
+        color.b = nk_propertyf(ctx, "blue", 0, color.b, 1, 0, 0.01f);
+    }
+    nk_end(ctx);
+    
+    *attribute = (vec3) {{
+        color.r,
+        color.g,
+        color.b
+    }};
+}
+
+void e_gui_rgba(const char *title, vec4 *attribute) {
+    if(!singleton.ctx)
+        return;
+    struct nk_context *ctx = singleton.ctx;
+    struct nk_colorf color = {
+        .r = attribute->r,
+        .g = attribute->g,
+        .b = attribute->b,
+        .a = attribute->a
+    };
+    if (nk_begin(ctx, title, window_rect(300, 300),
+                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+                 NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 120, 1);
+        color = nk_color_picker(ctx, color, NK_RGBA);
+        nk_layout_row_dynamic(ctx, 25, 1);
+        color.r = nk_propertyf(ctx, "red", 0, color.r, 1, 0, 0.01f);
+        color.g = nk_propertyf(ctx, "green", 0, color.g, 1, 0, 0.01f);
+        color.b = nk_propertyf(ctx, "blue", 0, color.b, 1, 0, 0.01f);
+        color.a = nk_propertyf(ctx, "alpha", 0, color.a, 1, 0, 0.01f);
+    }
+    nk_end(ctx);
+    
+    *attribute = (vec4) {{
+        color.r,
+        color.g,
+        color.b,
+        color.a
+    }};
+}
+
+void e_gui_test() {
     if(!singleton.ctx)
         return;
 

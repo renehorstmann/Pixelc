@@ -174,7 +174,7 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title) 
     self->L.keys = ro_batch_new(27,
                                 r_texture_new_file(2, 1, "res/textinput_key.png"));
 
-    self->L.chars = ro_batch_new(27, self->L.textfield.ro.L.tex);
+    self->L.chars = ro_batch_new(27, self->L.textfield.ro.tex);
     self->L.chars.owns_tex = false;
 
     self->L.shift = ro_single_new(

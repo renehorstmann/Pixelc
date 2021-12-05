@@ -88,7 +88,7 @@ void animation_update(Animation *self, const Camera_s *camera, float palette_hud
 
     uImage img = self->canvas_ref->RO.image;
     for (int i = 0; i <= self->canvas_ref->current_layer; i++) {
-        r_texture_set(self->L.ro[i].L.tex, u_image_layer(img, i));
+        r_texture_set(self->L.ro[i].tex, u_image_layer(img, i));
         ro_batch_update(&self->L.ro[i]);
     }
 }

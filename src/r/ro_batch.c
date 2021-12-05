@@ -8,14 +8,12 @@
 
 
 
-RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
+RoBatch ro_batch_new(int num, rTexture tex_sink) {
     r_render_error_check("ro_batch_newBEGIN");
     RoBatch self;
-    self.L.allocator = alloc;
     
     assume(num>0, "batch needs atleast 1 rect");
-    self.rects = alloc.malloc(alloc, num * sizeof(rRect_s));
-    assume(self.rects, "allocation failed");
+    self.rects = rhc_malloc(sizeof *self.rects * num);
     for(int i=0; i<num; i++) {
         self.rects[i] = r_rect_new();
     }
@@ -28,7 +26,7 @@ RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
     const int loc_color = 8;
     const int loc_sprite = 9;
 
-    self.L.tex = tex_sink;
+    self.tex = tex_sink;
     self.owns_tex = true;
 
     // L.vao scope
@@ -92,12 +90,12 @@ RoBatch ro_batch_new_a(int num, rTexture tex_sink, Allocator_i alloc) {
 
 
 void ro_batch_kill(RoBatch *self) {
-    self->L.allocator.free(self->L.allocator, self->rects);
+    rhc_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
     glDeleteBuffers(1, &self->L.vbo);
     if (self->owns_tex)
-        r_texture_kill(&self->L.tex);
+        r_texture_kill(&self->tex);
     *self = (RoBatch) {0};
 }
 
@@ -141,12 +139,12 @@ void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat) {
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"),
                        1, GL_FALSE, &camera_mat->m00);
                        
-    vec2 sprites = vec2_cast_from_int(&self->L.tex.sprites.v0);
+    vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex.tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex.tex);
 
     {
         glBindVertexArray(self->L.vao);
@@ -161,7 +159,7 @@ void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat) {
 
 void ro_batch_set_texture(RoBatch *self, rTexture tex_sink) {
     if (self->owns_tex)
-        r_texture_kill(&self->L.tex);
-    self->L.tex = tex_sink;
+        r_texture_kill(&self->tex);
+    self->tex = tex_sink;
 }
 

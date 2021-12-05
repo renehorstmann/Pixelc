@@ -51,6 +51,7 @@ static String string_new_clone_a(Str_s to_clone, Allocator_i a) {
     if(!string_valid(sb))
         return sb;
     memcpy(sb.data, to_clone.data, to_clone.size);
+    sb.size = to_clone.size;
     return sb;
 }
 

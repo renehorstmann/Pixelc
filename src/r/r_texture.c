@@ -112,10 +112,6 @@ rTexture r_texture_new_file(int sprites_cols, int sprites_rows, const char *file
     return self;
 }
 
-rTexture r_texture_new_empty(int image_cols, int image_rows, int sprites_cols, int sprites_rows) {
-    return r_texture_new(image_cols, image_rows, sprites_cols, sprites_rows, NULL);
-}
-
 rTexture r_texture_new_white_pixel() {
     return r_texture_new(1, 1, 1, 1, (uint8_t[]) {255, 255, 255, 255});
 }

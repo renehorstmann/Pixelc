@@ -14,7 +14,7 @@ RoSingle ro_single_new(rTexture tex_sink) {
 
     self.L.program = r_program_new_file("res/r/single.glsl");
     
-    self.L.tex = tex_sink;
+    self.tex = tex_sink;
     self.owns_tex = true;
 
     // needs a vao, even if its empty
@@ -27,7 +27,7 @@ RoSingle ro_single_new(rTexture tex_sink) {
 void ro_single_kill(RoSingle *self) {
     glDeleteProgram(self->L.program);
     if (self->owns_tex)
-        r_texture_kill(&self->L.tex);
+        r_texture_kill(&self->tex);
     *self = (RoSingle) {0};
 }
 
@@ -48,12 +48,12 @@ void ro_single_render(const RoSingle *self, const mat4 *camera_mat) {
     // base
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"), 1, GL_FALSE, &camera_mat->m00);
     
-    vec2 sprites = vec2_cast_from_int(&self->L.tex.sprites.v0);
+    vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, self->L.tex.tex);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex.tex);
 
     {
         glBindVertexArray(self->L.vao);
@@ -68,6 +68,6 @@ void ro_single_render(const RoSingle *self, const mat4 *camera_mat) {
 
 void ro_single_set_texture(RoSingle *self, rTexture tex_sink) {
     if (self->owns_tex)
-        r_texture_kill(&self->L.tex);
-    self->L.tex = tex_sink;
+        r_texture_kill(&self->tex);
+    self->tex = tex_sink;
 }

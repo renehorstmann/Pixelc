@@ -43,6 +43,17 @@ void rhc_assume_impl_(const char *expression, const char *file, int line, const 
     fprintf(stderr, "Assumption failed: %s at %s:%d %s\n", expression, file, line, msg);
 #endif
     raise(RHC_ERROR_ASSUME_SIGNAL);
+    
+#ifdef __EMSCRIPTEN__
+    // exit emscriptens main loop and call js error handler
+    emscripten_cancel_main_loop();
+    EM_ASM(
+            set_exit_failure_error_msg();
+            );
+    // emscripten does not handle signals            
+    exit(EXIT_FAILURE);
+#endif
+    
 }
 
 #endif //RHC_IMPL

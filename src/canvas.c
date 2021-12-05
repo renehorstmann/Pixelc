@@ -197,7 +197,7 @@ void canvas_update(Canvas *self, const CanvasCam_s *camera, float dtime) {
     u_pose_set(&self->RO.pose, x, y, w, h, 0);
 
     for (int i = 0; i < self->RO.image.layers; i++) {
-        r_texture_set(self->L.render_objects[i].L.tex, u_image_layer(self->RO.image, i));
+        r_texture_set(self->L.render_objects[i].tex, u_image_layer(self->RO.image, i));
 
         // set pose
         self->L.render_objects[i].rect.pose = self->RO.pose;

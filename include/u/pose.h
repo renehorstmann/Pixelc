@@ -31,12 +31,16 @@
 // width
 // height
 
+// some functions have *_aa_* in their names
+// aa stand for axis aligned / not rotated
+// these functions are usually faster
 
 #include <stdbool.h>
 #include <math.h>
 #include <float.h>  // FLT_MAX
 #include "mathc/mat/mat4.h"
 
+// new pose without a rotation
 static mat4 u_pose_new(float x, float y, float w, float h) {
     // mat4 has column major order
     return (mat4) {{
@@ -47,11 +51,12 @@ static mat4 u_pose_new(float x, float y, float w, float h) {
                    }};
 }
 
-// x, y, w, h
+// rect as x, y, w, h
 static mat4 u_pose_new_rect(vec4 rect) {
     return u_pose_new(rect.x, rect.y, rect.v2, rect.v3);
 }
 
+// new pose with a rotation
 static mat4 u_pose_new_angle(float x, float y, float w, float h, float angle_rad) {
     // mat4 has column major order
     return (mat4) {{
@@ -62,6 +67,7 @@ static mat4 u_pose_new_angle(float x, float y, float w, float h, float angle_rad
                    }};
 }
 
+// new axis aligned pose from left top with width and height
 static mat4 u_pose_new_aa(float l, float t, float w, float h) {
     return u_pose_new(l + w / 2, t - h / 2, w, h);
 }
@@ -104,34 +110,43 @@ static vec2 u_pose_get_wh(mat4 p) {
     }};
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static float u_pose_aa_get_w(mat4 p) {
     return p.m00;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static float u_pose_aa_get_h(mat4 p) {
     return p.m11;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static vec2 u_pose_aa_get_wh(mat4 p) {
     return (vec2) {{p.m00, p.m11}};
 }
 
+// only safe to call for a not rotated pose (axis aligned)
+// rect as x, y, w, h
 static vec4 u_pose_aa_get_rect(mat4 p) {
     return (vec4) {{p.m30, p.m31, p.m00, p.m11}};
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static float u_pose_aa_get_left(mat4 p) {
     return p.m30 - p.m00 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static float u_pose_aa_get_right(mat4 p) {
     return p.m30 + p.m00 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static float u_pose_aa_get_top(mat4 p) {
     return p.m31 + p.m11 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static float u_pose_aa_get_bottom(mat4 p) {
     return p.m31 - p.m11 / 2;
 }
@@ -213,28 +228,32 @@ static void u_pose_shift(mat4 *p, float x, float y, float angle_rad) {
     u_pose_shift_angle(p, angle_rad);
 }
 
-
+// only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set_left(mat4 *p, float l) {
     p->m30 = l + p->m00 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set_right(mat4 *p, float r) {
     p->m30 = r - p->m00 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set_top(mat4 *p, float t) {
     p->m31 = t - p->m11 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set_bottom(mat4 *p, float b) {
     p->m31 = b + p->m11 / 2;
 }
 
+// only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
     u_pose_set(p, l + w / 2, t - w / 2, w, h, 0);
 }
 
-
+// returns true if pos is within the pose ranges
 static bool u_pose_contains(mat4 p, vec4 pos) {
 
     mat4 p_inv = mat4_inv(p);
@@ -244,7 +263,8 @@ static bool u_pose_contains(mat4 p, vec4 pos) {
            && p_pos.y >= -0.5 && p_pos.y <= 0.5;
 }
 
-
+// returns true if pos is within the pose ranges
+// only safe to call for a not rotated pose (axis aligned)
 static bool u_pose_aa_contains(mat4 p, vec2 pos) {
     float l = u_pose_aa_get_left(p);
     float r = u_pose_aa_get_right(p);
@@ -254,6 +274,8 @@ static bool u_pose_aa_contains(mat4 p, vec2 pos) {
     return pos.x >= l && pos.x <= r && pos.y <= t && pos.y >= b;
 }
 
+// returns true if the pose intersexts with the given line ab
+// only safe to call for a not rotated pose (axis aligned)
 static bool u_pose_aa_intersects_line(mat4 p, vec2 a, vec2 b) {
     vec2 wh = u_pose_get_wh(p);
     float size = wh.v0 < wh.v1 ? wh.v0: wh.v1;

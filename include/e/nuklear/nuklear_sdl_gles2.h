@@ -425,8 +425,8 @@ nk_sdl_handle_event(SDL_Event *evt)
         /* mouse motion */
         if (ctx->input.mouse.grabbed) {
             int x = (int)ctx->input.mouse.prev.x, y = (int)ctx->input.mouse.prev.y;
-            nk_input_motion(ctx, (x + evt->motion.xrel) / NK_SCALE , (y + evt->motion.yrel) / NK_SCALE );
-        } else nk_input_motion(ctx, evt->motion.x / NK_SCALE , evt->motion.y / NK_SCALE );
+            nk_input_motion(ctx, x + evt->motion.xrel/NK_SCALE , y + evt->motion.yrel/NK_SCALE);
+        } else nk_input_motion(ctx, evt->motion.x/NK_SCALE , evt->motion.y/NK_SCALE );
         return 1;
     } else if (evt->type == SDL_TEXTINPUT) {
         /* text input */

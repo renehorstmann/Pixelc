@@ -6,14 +6,21 @@
 #include "e/gui.h"
 #include "e/input.h"
 
+
 //
 // protected
 //
+
 extern eGui *e_gui_singleton_;
 void e_window_handle_window_event_(const SDL_Event *event);
 void e_gui_input_begin_(const eGui *self);
 void e_gui_handle_sdl_event_(const eGui *self, SDL_Event *event);
 void e_gui_input_end_(const eGui *self);
+
+typedef struct {
+    SDL_FingerID id;
+    bool active;
+} TouchID;
 
 typedef struct {
     ePointerEventFn cb;
@@ -39,6 +46,9 @@ struct eInput{
     // acceleration sensor (mobile)
     bool accel_active;
     vec3 accel;
+    
+    TouchID touch_ids[E_MAX_TOUCH_IDS];
+    int touch_ids_size;
     
     RegPointer reg_pointer_e[E_MAX_POINTER_EVENTS];
     int reg_pointer_e_size;
@@ -79,10 +89,52 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
     return res;
 }
 
-static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, int finger_id) {
+static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, SDL_FingerID finger_id) {
+    
+    // check finger ids to cast to pointer id
+    int id = -1;
+    for(int i=0; i<singleton.touch_ids_size; i++) {
+        if(singleton.touch_ids[i].id == finger_id) {
+            id = i;
+            break;
+        }
+    }
+    if(id < 0) {
+        if(singleton.touch_ids_size>=E_MAX_TOUCH_IDS) {
+            log_warn("e_input_update: to many touch ids, reset to 0!");
+            singleton.touch_ids_size = 0;
+        }
+            
+        singleton.touch_ids[singleton.touch_ids_size].id = finger_id;
+        singleton.touch_ids[singleton.touch_ids_size].active = true;
+        id = singleton.touch_ids_size++;
+        
+        if(action == E_POINTER_MOVE) {
+            action = E_POINTER_DOWN;
+            log_warn("e_input_update: touch got new id but action==move");
+        }
+        if(action == E_POINTER_UP) {
+            log_error("e_input_update: touch got up but unknown id");
+            id--;
+            singleton.touch_ids_size--;
+        }
+    }
+    
+    if(action == E_POINTER_UP) {
+        singleton.touch_ids[id].active = false;
+        if(id+1 >= singleton.touch_ids_size) {
+            while(singleton.touch_ids_size > 0
+                    && !singleton.touch_ids[singleton.touch_ids_size-1].active) {
+                
+                singleton.touch_ids_size--;
+            }
+        }
+    }
+    
+    
     ePointer_s res;
     res.action = action;
-    res.id = finger_id;
+    res.id = id;
 
     res.pos.x = 2.0f * x - 1.0f;
     res.pos.y = 1.0f - 2.0f * y;
@@ -209,8 +261,11 @@ static void input_handle_sensors(SDL_Event *event) {
 //
 
 eInput *e_input_new(const struct eWindow *window) {
+    log_info("e_input_new");
+
     assume(!singleton_created, "e_input_new should be called only onve");
     singleton_created = true;
+
     
     assume(window, "needs an sdl window to get its size");
     singleton.window = window;
@@ -250,7 +305,6 @@ void e_input_kill(eInput **self_ptr) {
 void e_input_update(const eInput *self) {
     assume(self == &singleton, "singleton?");
     singleton.is_touch = SDL_GetNumTouchDevices() > 0;
-
 
     e_gui_input_begin_(e_gui_singleton_);    // NULL safe
 

@@ -6,17 +6,13 @@
 // based on a font sprite sheet and is monospaced.
 //
 
-#include "rhc/alloc.h"
 #include "ro_types.h"
 
 
 
-
-RoText ro_text_new_a(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink, Allocator_i alloc);
-
-static RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink) {
-    return ro_text_new_a(max, sprite_fn, tex_sink, rhc_allocator_new());
-}
+// creates a new costum text
+// sprite_fn should set the sprite from a char and return true for newline
+RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink);
 
 // inits text with the r/font55.png sprite sheet
 RoText ro_text_new_font55(int max);
@@ -27,14 +23,17 @@ RoText ro_text_new_font85(int max);
 
 void ro_text_kill(RoText *self);
 
+// renders the text via the underlying RoBatch
 void ro_text_render(const RoText *self, const mat4 *camera_mat);
 
+// resets the printed text
 // returns the used size
 vec2 ro_text_set_text(RoText *self, const char *text);
 
 // returns the size, without setting the text
 vec2 ro_text_get_size(const RoText *self, const char *text);
 
+// sets the color of each character via the internal RoBatch's rRect's
 void ro_text_set_color(RoText *self, vec4 color);
 
 
