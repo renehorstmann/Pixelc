@@ -1,5 +1,5 @@
-#ifndef PIXELC_TEXTINPUT_H
-#define PIXELC_TEXTINPUT_H
+#ifndef SOME_TEXTINPUT_H
+#define SOME_TEXTINPUT_H
 
 #include "r/ro_types.h"
 #include "camera.h"
@@ -56,4 +56,4 @@ void textinput_update(TextInput *self, float dtime);
 
 void textinput_render(const TextInput *self, const mat4 *cam_mat);
 
-#endif //PIXELC_TEXTINPUT_H
+#endif //SOME_TEXTINPUT_H
