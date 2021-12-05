@@ -67,7 +67,7 @@ static char get_key_char(const TextInput *self, int idx) {
 
 static void append_char(TextInput *self, char append) {
     int len = strlen(self->out.text);
-    if (len >= TEXTINPUT_MAX_CHARS - 1)
+    if (len >= self->L.max_chars)
         return;
     self->out.text[len++] = append;
     self->out.text[len] = '\0';
@@ -142,9 +142,9 @@ static void key_raw_event(const SDL_Event *event, void *user_data) {
         append_char(self, (char) code);
     else if (code == SDLK_BACKSPACE)
         handle_backspace(self);
-    else if(code == SDLK_ESCAPE)
+    else if (code == SDLK_ESCAPE)
         handle_cancel(self);
-    else if(code == SDLK_RETURN || code == SDLK_KP_ENTER)
+    else if (code == SDLK_RETURN || code == SDLK_KP_ENTER)
         handle_ok(self);
 
 }
@@ -153,7 +153,7 @@ static void key_raw_event(const SDL_Event *event, void *user_data) {
 // public
 //
 
-TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title) {
+TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title, int opt_max_chars) {
     TextInput *self = rhc_calloc(sizeof *self);
 
     e_input_set_vip_pointer_event(input, pointer_event, self);
@@ -163,26 +163,31 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title) 
     self->camera_ref = cam;
 
     self->out.state = TEXTINPUT_IN_PROGRESS;
-    
-    
+
+    if (opt_max_chars <= 0) {
+        opt_max_chars = TEXTINPUT_MAX_CHARS;
+    } else if (opt_max_chars > TEXTINPUT_MAX_CHARS) {
+        log_warn("textinput_new: opt_max_chars > TEXTINPUT_MAX_CHARS, reset from (%i) to (%i)",
+                 opt_max_chars, TEXTINPUT_MAX_CHARS);
+        opt_max_chars = TEXTINPUT_MAX_CHARS;
+    }
+    self->L.max_chars = opt_max_chars;
+
+
     self->L.title = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
     ro_text_set_text(&self->L.title, title);
 
-    self->L.textfield = ro_text_new_font85(TEXTINPUT_MAX_CHARS);
+    self->L.textfield = ro_text_new_font85(self->L.max_chars);
     ro_text_set_color(&self->L.textfield, R_COLOR_BLACK);
 
-    self->L.keys = ro_batch_new(27,
-                                r_texture_new_file(2, 1, "res/textinput_key.png"));
+    self->L.keys = ro_batch_new(27, r_texture_new_file(2, 1, "res/textinput_key.png"));
 
     self->L.chars = ro_batch_new(27, self->L.textfield.ro.tex);
     self->L.chars.owns_tex = false;
 
-    self->L.shift = ro_single_new(
-            r_texture_new_file(2, 3, "res/textinput_key_shift.png"));
-    self->L.space = ro_single_new(
-            r_texture_new_file(2, 1, "res/textinput_key_space.png"));
-    self->L.special = ro_batch_new(3,
-                                   r_texture_new_file(2, 3, "res/textinput_key_special.png"));
+    self->L.shift = ro_single_new(r_texture_new_file(2, 3, "res/textinput_key_shift.png"));
+    self->L.space = ro_single_new(r_texture_new_file(2, 1, "res/textinput_key_space.png"));
+    self->L.special = ro_batch_new(3, r_texture_new_file(2, 3, "res/textinput_key_special.png"));
 
     self->L.bg = ro_single_new(r_texture_new_white_pixel());
     self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.5}};
@@ -233,13 +238,13 @@ void textinput_update(TextInput *self, float dtime) {
         self->L.blink_time -= 1.0;
     if (self->L.blink_time < 0.5) {
         int len = strlen(text);
-        if (len < TEXTINPUT_MAX_CHARS - 1) {
+        if (len < self->L.max_chars - 1) {
             strcpy(text + len, "|");
         }
     }
 
     ro_text_set_text(&self->L.textfield, text);
-    
+
     self->L.title.pose = u_pose_new(-80, 32, 1.5, 1.5);
 
     u_pose_set_xy(&self->L.textfield.pose, -80, 4);

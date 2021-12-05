@@ -26,9 +26,8 @@ typedef struct {
     eInput *input_ref;
     const Camera_s *camera_ref;
 
-
     struct {
-        char text[TEXTINPUT_MAX_CHARS];
+        char text[TEXTINPUT_MAX_CHARS+1];   // + '\0'
         enum TextInput_state state;
     } out;
 
@@ -42,12 +41,14 @@ typedef struct {
         RoSingle text_bg, bg;
         
         enum TextInput_shiftstate shiftstate;
-        
+
+        int max_chars;
         float blink_time;
     } L;
 } TextInput;
 
-TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title);
+// if opt_max_chars <= 0, TEXTINPUT_MAX_CHARS is used instead
+TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title, int opt_max_chars);
 
 void textinput_kill(TextInput **self_ptr);
 
