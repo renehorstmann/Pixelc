@@ -126,7 +126,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
     L.inputctrl = inputctrl_new(simple->input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
 
-    L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
+    // L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
