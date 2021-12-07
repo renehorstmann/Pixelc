@@ -28,14 +28,33 @@ typedef struct {
 } RegPointer;
 
 typedef struct {
+    RegPointer array[E_MAX_POINTER_EVENTS];
+    int size;
+} RegPointerArray;
+
+
+typedef struct {
     eWheelEventFn cb;
     void *ud;
 } RegWheel;
 
 typedef struct {
+    RegWheel array[E_MAX_WHEEL_EVENTS];
+    int size;
+} RegWheelArray;
+
+
+typedef struct {
     eKeyRawEventFn cb;
     void *ud;
 } RegKeyRaw;
+
+typedef struct {
+    RegKeyRaw array[E_MAX_KEY_RAW_EVENTS];
+    int size;
+} RegKeyRawArray;
+
+
 
 struct eInput{
     const struct eWindow *window;
@@ -50,16 +69,13 @@ struct eInput{
     TouchID touch_ids[E_MAX_TOUCH_IDS];
     int touch_ids_size;
     
-    RegPointer reg_pointer_e[E_MAX_POINTER_EVENTS];
-    int reg_pointer_e_size;
+    RegPointerArray reg_pointer;
     RegPointer reg_pointer_e_vip;  // .cb==NULL if none
 
-    RegWheel reg_wheel_e[E_MAX_WHEEL_EVENTS];
-    int reg_wheel_e_size;
+    RegWheelArray reg_wheel;
     RegWheel reg_wheel_e_vip;  // .cb==NULL if none
 
-    RegKeyRaw reg_key_raw_e[E_MAX_KEY_RAW_EVENTS];
-    int reg_key_raw_e_size;
+    RegKeyRawArray reg_key_raw;
     RegKeyRaw reg_key_raw_e_vip;  // .cb==NULL if none
 };
 
@@ -149,8 +165,11 @@ static void emit_pointer_events(ePointer_s action) {
         singleton.reg_pointer_e_vip.cb(action, singleton.reg_pointer_e_vip.ud);
         return;
     }
-    for (int i = 0; i < singleton.reg_pointer_e_size; i++)
-        singleton.reg_pointer_e[i].cb(action, singleton.reg_pointer_e[i].ud);
+    
+    // copy to be safe to unregister in an event
+    RegPointerArray array = singleton.reg_pointer;
+    for (int i = 0; i < array.size; i++)
+        array.array[i].cb(action, array.array[i].ud);
 }
 
 static void emit_wheel_events(bool up) {
@@ -158,8 +177,11 @@ static void emit_wheel_events(bool up) {
         singleton.reg_wheel_e_vip.cb(up, singleton.reg_wheel_e_vip.ud);
         return;
     }
-    for (int i = 0; i < singleton.reg_wheel_e_size; i++)
-        singleton.reg_wheel_e[i].cb(up, singleton.reg_wheel_e[i].ud);
+    
+    // copy to be safe to unregister in an event
+    RegWheelArray array = singleton.reg_wheel;
+    for (int i = 0; i < array.size; i++)
+        array.array[i].cb(up, array.array[i].ud);
 }
 
 static void input_handle_pointer_touch(SDL_Event *event) {
@@ -213,8 +235,11 @@ static void input_handle_keys(SDL_Event *event) {
         singleton.reg_key_raw_e_vip.cb(event, singleton.reg_key_raw_e_vip.ud);
         return;
     }
-    for(int i=0; singleton.reg_key_raw_e_size; i++) {
-        singleton.reg_key_raw_e[i].cb(event, singleton.reg_key_raw_e[i].ud);
+    
+    // copy to be safe to unregister ik an event
+    RegKeyRawArray array = singleton.reg_key_raw;
+    for(int i=0; array.size; i++) {
+        array.array[i].cb(event, array.array[i].ud);
     }
     bool down = event->type == SDL_KEYDOWN;
     switch (event->key.keysym.sym) {
@@ -367,21 +392,21 @@ vec3 e_input_get_accel(const eInput *self) {
 
 void e_input_register_pointer_event(const eInput *self, ePointerEventFn event, void *user_data) {
     assume(self == &singleton, "singleton?");
-    assume(singleton.reg_pointer_e_size < E_MAX_POINTER_EVENTS, "too many registered pointer events");
-    singleton.reg_pointer_e[singleton.reg_pointer_e_size++] = (RegPointer){event, user_data};
+    assume(singleton.reg_pointer.size < E_MAX_POINTER_EVENTS, "too many registered pointer events");
+    singleton.reg_pointer.array[singleton.reg_pointer.size++] = (RegPointer){event, user_data};
 }
 
 void e_input_unregister_pointer_event(const eInput *self, ePointerEventFn event_to_unregister) {
     assume(self == &singleton, "singleton?");
     bool found = false;
-    for (int i = 0; i < singleton.reg_pointer_e_size; i++) {
-        if (singleton.reg_pointer_e[i].cb == event_to_unregister) {
+    for (int i = 0; i < singleton.reg_pointer.size; i++) {
+        if (singleton.reg_pointer.array[i].cb == event_to_unregister) {
             found = true;
             // move to close hole
-            for (int j = i; j < singleton.reg_pointer_e_size - 1; j++) {
-                singleton.reg_pointer_e[j] = singleton.reg_pointer_e[j + 1];
+            for (int j = i; j < singleton.reg_pointer.size - 1; j++) {
+                singleton.reg_pointer.array[j] = singleton.reg_pointer.array[j + 1];
             }
-            singleton.reg_pointer_e_size--;
+            singleton.reg_pointer.size--;
             i--; // check moved
         }
     }
@@ -398,21 +423,21 @@ void e_input_set_vip_pointer_event(const eInput *self, ePointerEventFn event, vo
 
 void e_input_register_wheel_event(const eInput *self, eWheelEventFn event, void *user_data) {
     assume(self == &singleton, "singleton?");
-    assume(singleton.reg_wheel_e_size < E_MAX_WHEEL_EVENTS, "too many registered wheel events");
-    singleton.reg_wheel_e[singleton.reg_wheel_e_size++] = (RegWheel){event, user_data};
+    assume(singleton.reg_wheel.size < E_MAX_WHEEL_EVENTS, "too many registered wheel events");
+    singleton.reg_wheel.array[singleton.reg_wheel.size++] = (RegWheel){event, user_data};
 }
 
 void e_input_unregister_wheel_event(const eInput *self, eWheelEventFn event_to_unregister) {
     assume(self == &singleton, "singleton?");
     bool found = false;
-    for (int i = 0; i < singleton.reg_wheel_e_size; i++) {
-        if (singleton.reg_wheel_e[i].cb == event_to_unregister) {
+    for (int i = 0; i < singleton.reg_wheel.size; i++) {
+        if (singleton.reg_wheel.array[i].cb == event_to_unregister) {
             found = true;
             // move to close hole
-            for (int j = i; j < singleton.reg_wheel_e_size - 1; j++) {
-                singleton.reg_wheel_e[j] = singleton.reg_wheel_e[j + 1];
+            for (int j = i; j < singleton.reg_wheel.size - 1; j++) {
+                singleton.reg_wheel.array[j] = singleton.reg_wheel.array[j + 1];
             }
-            singleton.reg_wheel_e_size--;
+            singleton.reg_wheel.size--;
             i--; // check moved
         }
     }
@@ -429,21 +454,21 @@ void e_input_set_vip_wheel_event(const eInput *self, eWheelEventFn event, void *
 
 void e_input_register_key_raw_event(const eInput *self, eKeyRawEventFn event, void *user_data) {
     assume(self == &singleton, "singleton?");
-    assume(singleton.reg_key_raw_e_size < E_MAX_KEY_RAW_EVENTS, "too many registered key raw events");
-    singleton.reg_key_raw_e[singleton.reg_key_raw_e_size++] = (RegKeyRaw){event, user_data};
+    assume(singleton.reg_key_raw.size < E_MAX_KEY_RAW_EVENTS, "too many registered key raw events");
+    singleton.reg_key_raw.array[singleton.reg_key_raw.size++] = (RegKeyRaw){event, user_data};
 }
 
 void e_input_unregister_key_raw_event(const eInput *self, eKeyRawEventFn event_to_unregister) {
     assume(self == &singleton, "singleton?");
     bool found = false;
-    for (int i = 0; i < singleton.reg_key_raw_e_size; i++) {
-        if (singleton.reg_key_raw_e[i].cb == event_to_unregister) {
+    for (int i = 0; i < singleton.reg_key_raw.size; i++) {
+        if (singleton.reg_key_raw.array[i].cb == event_to_unregister) {
             found = true;
             // move to close hole
-            for (int j = i; j < singleton.reg_key_raw_e_size - 1; j++) {
-                singleton.reg_key_raw_e[j] = singleton.reg_key_raw_e[j + 1];
+            for (int j = i; j < singleton.reg_key_raw.size - 1; j++) {
+                singleton.reg_key_raw.array[j] = singleton.reg_key_raw.array[j + 1];
             }
-            singleton.reg_key_raw_e_size--;
+            singleton.reg_key_raw.size--;
             i--; // check moved
         }
     }
