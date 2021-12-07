@@ -94,7 +94,7 @@ static void main_loop(float delta_time) {
     // render
     r_render_begin_frame(L.super.render, window_size);
 
-    L.super.render_fn(&L.super, window_size);
+    L.super.render_fn(&L.super, window_size, delta_time);
 
     // renders the debug gui windows
     e_gui_render(L.super.gui);

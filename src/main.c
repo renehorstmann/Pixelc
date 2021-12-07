@@ -153,8 +153,8 @@ static void update(eSimple *simple, ivec2 window_size, float delta_time) {
     //textinput_update(L.textinput, delta_time);
 }
 
-// this function is calles each frame to render stuff
-static void render(eSimple *simple, ivec2 window_size) {
+// this function is calles each frame to render stuff, dtime is the time between frames
+static void render(eSimple *simple, ivec2 window_size, float dtime) {
     const mat4 *camera_mat = &L.camera->matrices.p;
     const mat4 *canvascam_mat = &L.canvascam->matrices.vp;
 
