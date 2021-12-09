@@ -48,3 +48,11 @@ cp -r ../res .
 
 gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/ $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lglew32 -lopengl32 -lglu32 -DOPTION_GLEW -DOPTION_SDL -o pixelc
 ```
+
+## Author
+René Horstmann
+
+## Licence
+- The app and its assets are licenced under GPLv3, see LICENCE.
+- The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
+- Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
