@@ -27,7 +27,7 @@ static void zoom_camera(CameraCtrl *self, float new_distance) {
     float factor = new_distance / self->L.distance0;
     factor = clampf(factor, 0.3, 3);
     self->L.size = self->L.size0 / factor;
-    canvascam_set_size(self->camera_ref, self->L.size);
+    camera_set_size(self->camera_ref, self->L.size);
 }
 #endif
 
