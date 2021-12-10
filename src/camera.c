@@ -18,8 +18,13 @@
 
 Camera_s *camera_new() {
     Camera_s *self = rhc_calloc(sizeof *self);
+    self->matrices.v = mat4_eye();
+
+    self->matrices.v_inv = mat4_eye();
     self->matrices.p = mat4_eye();
     self->matrices.p_inv = mat4_eye();
+    self->matrices.vp = mat4_eye();
+    self->matrices.v_p_inv = mat4_eye();
     return self;
 }
 
@@ -46,5 +51,23 @@ void camera_update(Camera_s *self, ivec2 window_size) {
 
     self->matrices.p = mat4_camera_ortho(self->RO.left, self->RO.right, self->RO.bottom, self->RO.top, -1, 1);
 
+    self->matrices.v_inv = mat4_inv(self->matrices.v);
     self->matrices.p_inv = mat4_inv(self->matrices.p);
+
+    self->matrices.vp = mat4_mul_mat(self->matrices.p, self->matrices.v_inv);
+
+    self->matrices.v_p_inv = mat4_mul_mat(self->matrices.v, self->matrices.p_inv);
+}
+
+
+void camera_set_pos(Camera_s *self, float x, float y) {
+    u_pose_set_xy(&self->matrices.v, x, y);
+}
+
+void camera_set_size(Camera_s *self, float size) {
+    u_pose_set_size(&self->matrices.v, size, size);
+}
+
+void camera_set_angle(Camera_s *self, float alpha) {
+    u_pose_set_angle(&self->matrices.v, alpha);
 }

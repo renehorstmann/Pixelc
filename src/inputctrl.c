@@ -29,7 +29,7 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     if (go && palette_pointer_event(self->palette_ref, hud_pointer))
         go = set_go;
 
-    if (go && canvascamctrl_pointer_event(self->canvascamctrl_ref, c_pointer))
+    if (go && cameractrl_pointer_event(self->canvascamctrl_ref, c_pointer))
         go = set_go;
 
     if (go)
@@ -41,8 +41,8 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 // public
 //
 
-InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const CanvasCam_s *canvascam,
-                         Palette *palette, Brush *brush, Toolbar *toolbar, CanvasCamCtrl *canvascamctrl) {
+InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const Camera_s *canvascam,
+                         Palette *palette, Brush *brush, Toolbar *toolbar, CameraCtrl *canvascamctrl) {
     InputCtrl *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;

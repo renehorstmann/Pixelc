@@ -10,7 +10,7 @@
 #include "brush.h"
 #include "brushshape.h"
 #include "canvas.h"
-#include "canvascamctrl.h"
+#include "cameractrl.h"
 #include "animation.h"
 #include "selection.h"
 #include "savestate.h"
@@ -77,7 +77,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
                      SaveState *savestate,
                      Canvas *canvas,
                      Brush *brush,
-                     CanvasCamCtrl *canvascamctrl,
+                     CameraCtrl *canvascamctrl,
                      Animation *animation) {
     Toolbar *self = rhc_calloc(sizeof *self);
 
@@ -336,7 +336,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.camera->rect, pointer)) {
         log_info("toolbar: camera");
-        canvascamctrl_set_home(self->canvascamctrl_ref);
+        cameractrl_set_home(self->canvascamctrl_ref);
     }
 
     if (button_toggled(&self->L.animation->rect, pointer)) {

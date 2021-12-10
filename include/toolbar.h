@@ -7,7 +7,7 @@
 #include "savestate.h"
 #include "canvas.h"
 #include "brush.h"
-#include "canvascamctrl.h"
+#include "cameractrl.h"
 #include "animation.h"
 
 #define TOOLBAR_MODES 7
@@ -23,7 +23,7 @@ typedef struct Toolbar {
     SaveState *savestate_ref;
     Canvas *canvas_ref;
     Brush *brush_ref;
-    CanvasCamCtrl *canvascamctrl_ref;
+    CameraCtrl *canvascamctrl_ref;
     Animation *animation_ref;
 
     bool show_selection_copy_cut;
@@ -78,7 +78,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
                      SaveState *savestate,
                      Canvas *canvas,
                      Brush *brush,
-                     CanvasCamCtrl *canvascamctrl,
+                     CameraCtrl *canvascamctrl,
                      Animation *animation);
 
 void toolbar_update(Toolbar *self, float dtime);

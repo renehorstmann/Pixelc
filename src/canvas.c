@@ -179,7 +179,7 @@ Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int gri
     return self;
 }
 
-void canvas_update(Canvas *self, const CanvasCam_s *camera, float dtime) {
+void canvas_update(Canvas *self, const Camera_s *camera, float dtime) {
     float w, h;
     if (self->RO.image.rows < self->RO.image.cols) {
         w = 160;
@@ -190,7 +190,7 @@ void canvas_update(Canvas *self, const CanvasCam_s *camera, float dtime) {
     }
 
     float x = 0, y = 0;
-    if (canvascam_is_portrait_mode(camera)) {
+    if (camera_is_portrait_mode(camera)) {
         y = 30;
     }
 

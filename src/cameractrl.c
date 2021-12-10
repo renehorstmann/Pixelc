@@ -1,8 +1,8 @@
 #include "mathc/bool.h"
 #include "mathc/float.h"
-#include "canvascam.h"
+#include "camera.h"
 #include "brush.h"
-#include "canvascamctrl.h"
+#include "cameractrl.h"
 
 
 //
@@ -12,10 +12,10 @@
 
 
 
-static void move_camera(CanvasCamCtrl *self, vec2 current_pos) {
+static void move_camera(CameraCtrl *self, vec2 current_pos) {
     vec2 diff = vec2_sub_vec(current_pos, self->L.move0);
     self->L.pos = vec2_sub_vec(self->L.pos0, diff);
-    canvascam_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
+    camera_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
 }
 
 static float clampf(float f, float min, float max) {
@@ -23,7 +23,7 @@ static float clampf(float f, float min, float max) {
 }
 
 #if OPTION_TOUCH
-static void zoom_camera(CanvasCamCtrl *self, float new_distance) {
+static void zoom_camera(CameraCtrl *self, float new_distance) {
     float factor = new_distance / self->L.distance0;
     factor = clampf(factor, 0.3, 3);
     self->L.size = self->L.size0 / factor;
@@ -32,12 +32,12 @@ static void zoom_camera(CanvasCamCtrl *self, float new_distance) {
 #endif
 
 static void wheel_event(bool up, void *user_data) {
-    CanvasCamCtrl *self = user_data;
+    CameraCtrl *self = user_data;
     if (up)
-        self->L.size /= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
+        self->L.size /= CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
     else
-        self->L.size *= CANVAS_CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
-    canvascam_set_size(self->camera_ref, self->L.size);
+        self->L.size *= CAMERA_CONTROL_WHEEL_ZOOM_FACTOR;
+    camera_set_size(self->camera_ref, self->L.size);
 }
 
 
@@ -46,8 +46,8 @@ static void wheel_event(bool up, void *user_data) {
 //
 
 
-CanvasCamCtrl *canvascamctrl_new(eInput *input, CanvasCam_s *camera, Brush *brush_ref) {
-    CanvasCamCtrl *self = rhc_calloc(sizeof *self);
+CameraCtrl *cameractrl_new(eInput *input, Camera_s *camera, Brush *brush_ref) {
+    CameraCtrl *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
     self->brush_ref = brush_ref;
@@ -58,19 +58,19 @@ CanvasCamCtrl *canvascamctrl_new(eInput *input, CanvasCam_s *camera, Brush *brus
     return self;
 }
 
-void canvascamctrl_set_home(CanvasCamCtrl *self) {
+void cameractrl_set_home(CameraCtrl *self) {
     memset(&self->L, 0, sizeof(self->L));
     self->L.size = 1;
-    canvascam_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
-    canvascam_set_size(self->camera_ref, self->L.size);
+    camera_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
+    camera_set_size(self->camera_ref, self->L.size);
 }
 
-bool canvascamctrl_pointer_event(CanvasCamCtrl *self, ePointer_s pointer) {
+bool cameractrl_pointer_event(CameraCtrl *self, ePointer_s pointer) {
 #ifdef OPTION_TOUCH
     if (pointer.id < 0 || pointer.id > 1)
         return false;
 
-    self->L.touch[pointer.id] = vec2_mix(self->L.touch[pointer.id], pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
+    self->L.touch[pointer.id] = vec2_mix(self->L.touch[pointer.id], pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
 
     if (pointer.action == E_POINTER_DOWN) {
         self->L.touching.v[pointer.id] = true;
@@ -106,7 +106,7 @@ bool canvascamctrl_pointer_event(CanvasCamCtrl *self, ePointer_s pointer) {
     
     return self->L.touched;
 #else
-    self->L.pointer_pos = vec2_mix(self->L.pointer_pos, pointer.pos.xy, CANVAS_CAMERA_CONTROL_SMOOTH_ALPHA);
+    self->L.pointer_pos = vec2_mix(self->L.pointer_pos, pointer.pos.xy, CAMERA_CONTROL_SMOOTH_ALPHA);
     if (self->L.moving) {
         move_camera(self, self->L.pointer_pos);
         if (pointer.action == E_POINTER_DOWN) {

@@ -3,12 +3,11 @@
 #include "u/u.h"
 
 #include "camera.h"
-#include "canvascam.h"
 #include "background.h"
 #include "canvas.h"
 #include "animation.h"
 #include "brush.h"
-#include "canvascamctrl.h"
+#include "cameractrl.h"
 #include "palette.h"
 #include "palettepresave.h"
 #include "toolbar.h"
@@ -89,14 +88,13 @@
 
 static struct {
     Camera_s *camera;
-    CanvasCam_s *canvascam;
     SaveState *savestate;
     Background *background;
     Canvas *canvas;
     Animation *animation;
     Brush *brush;
     Palette *palette;
-    CanvasCamCtrl *canvascamctrl;
+    CameraCtrl *canvascamctrl;
     Toolbar *toolbar;
     InputCtrl *inputctrl;
     
@@ -108,7 +106,6 @@ static void init(eSimple *simple, ivec2 window_size) {
 
     // init systems
     L.camera = camera_new();
-    L.canvascam = canvascam_new();
     L.savestate = savestate_new();
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
     L.canvas = canvas_new(L.savestate, COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
@@ -122,9 +119,9 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     L.brush = brush_new(L.canvas);
     L.palette = palette_new(L.camera, L.brush);
-    L.canvascamctrl = canvascamctrl_new(simple->input, L.canvascam, L.brush);
+    L.canvascamctrl = cameractrl_new(simple->input, L.camera, L.brush);
     L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
-    L.inputctrl = inputctrl_new(simple->input, L.camera, L.canvascam, L.palette, L.brush, L.toolbar, L.canvascamctrl);
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.toolbar, L.canvascamctrl);
 
     // L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
 
@@ -139,12 +136,12 @@ static void init(eSimple *simple, ivec2 window_size) {
 static void update(eSimple *simple, ivec2 window_size, float delta_time) {
     // simulate
     camera_update(L.camera, window_size);
-    canvascam_update(L.canvascam, window_size);
+    camera_update(L.camera, window_size);
 
     background_update(L.background, L.camera, delta_time);
 
     //*
-    canvas_update(L.canvas, L.canvascam, delta_time);
+    canvas_update(L.canvas, L.camera, delta_time);
     palette_update(L.palette, delta_time);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
     toolbar_update(L.toolbar, delta_time);
@@ -156,7 +153,7 @@ static void update(eSimple *simple, ivec2 window_size, float delta_time) {
 // this function is calles each frame to render stuff, dtime is the time between frames
 static void render(eSimple *simple, ivec2 window_size, float dtime) {
     const mat4 *camera_mat = &L.camera->matrices.p;
-    const mat4 *canvascam_mat = &L.canvascam->matrices.vp;
+    const mat4 *canvascam_mat = &L.camera->matrices.vp;
 
     background_render(L.background, camera_mat);
 
