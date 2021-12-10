@@ -1,5 +1,6 @@
 #include "rhc/alloc.h"
 #include "u/pose.h"
+#include "mathc/sca/float.h"
 #include "mathc/utils/camera.h"
 #include "canvascam.h"
 
@@ -27,13 +28,19 @@ CanvasCam_s *canvascam_new() {
     return self;
 }
 
-void canvascam_update(CanvasCam_s *self, int wnd_width, int wnd_height) {
-
+void canvascam_update(CanvasCam_s *self, ivec2 window_size) {
+    int wnd_width = window_size.x;
+    int wnd_height = window_size.y;
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    self->RO.real_pixel_per_pixel = floorf(smaller_size / CANVASCAM_SIZE);
 
-    float width_2 = wnd_width / (2 * self->RO.real_pixel_per_pixel);
-    float height_2 = wnd_height / (2 * self->RO.real_pixel_per_pixel);
+    self->RO.scale = smaller_size / CANVASCAM_SIZE;
+
+    if(self->RO.scale > 1) {
+        self->RO.scale = sca_floor(self->RO.scale);
+    }
+
+    float width_2 = wnd_width / (2 * self->RO.scale);
+    float height_2 = wnd_height / (2 * self->RO.scale);
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel

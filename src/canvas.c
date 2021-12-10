@@ -222,7 +222,7 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
         ro_single_render(&self->L.grid, canvascam_mat);
 
     if (self->brush_ref->selection)
-        ro_batch_render(&self->L.selection_border, canvascam_mat);
+        ro_batch_render(&self->L.selection_border, canvascam_mat, false);
 }
 
 void canvas_resize(Canvas *self, int cols, int rows, int layers) {

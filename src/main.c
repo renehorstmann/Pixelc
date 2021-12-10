@@ -138,8 +138,8 @@ static void init(eSimple *simple, ivec2 window_size) {
 // this functions is called either each frame or at a specific update/s time
 static void update(eSimple *simple, ivec2 window_size, float delta_time) {
     // simulate
-    camera_update(L.camera, window_size.x, window_size.y);
-    canvascam_update(L.canvascam, window_size.x, window_size.y);
+    camera_update(L.camera, window_size);
+    canvascam_update(L.canvascam, window_size);
 
     background_update(L.background, L.camera, delta_time);
 

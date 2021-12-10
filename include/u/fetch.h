@@ -27,9 +27,9 @@ void u_fetch_kill(uFetch **self_ptr);
 
 // checks for a completed transmission or error
 // returns a non invalid String on success, containing the data
-// opt_error_code (if not NULL) is set to the http status (e. g. 200, 502, 404, ...)
+// opt_error will be set to true on error, if the fetch is completed (if not NULL) (otherwise false)
 // will call u_fetch_kill, so you dont have to
-String u_fetch_check_response(uFetch **self_ptr, int *opt_status_code);
+String u_fetch_check_response(uFetch **self_ptr, bool *opt_error);
 
 
 #endif //OPTION_FETCH

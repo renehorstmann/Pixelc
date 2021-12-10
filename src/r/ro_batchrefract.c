@@ -145,8 +145,11 @@ void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size
 
 
 void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
-    r_render_error_check("ro_batchrefract_renderBEGIN");
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+        bool update_sub) {
+    if(update_sub)
+        ro_batchrefract_update_sub(self, 0, num);
+     r_render_error_check("ro_batchrefract_renderBEGIN");
     
     if(!opt_view_aabb)
         opt_view_aabb = &VIEW_AABB_FULLSCREEN;

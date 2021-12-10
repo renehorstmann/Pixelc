@@ -193,8 +193,9 @@ eWindow *e_window_new(const char *title) {
         log_error("e_window_new: SDL_CreateWindow failed: %s", SDL_GetError());
         e_exit_failure();
     }
-    SDL_SetWindowMinimumSize(singleton.window, 480, 320);
-    
+//    SDL_SetWindowMinimumSize(singleton.window, 480, 320);
+    SDL_SetWindowMinimumSize(singleton.window, 1, 1);
+
 
     // Not necessary, but recommended to create a gl context:
     singleton.gl_context = SDL_GL_CreateContext(singleton.window);

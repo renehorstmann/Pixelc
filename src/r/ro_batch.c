@@ -131,7 +131,10 @@ void ro_batch_update_sub(const RoBatch *self, int offset, int size) {
 }
 
 
-void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat) {
+void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat, bool update_sub) {
+    if(update_sub)
+        ro_batch_update_sub(self, 0, num);
+    
     r_render_error_check("ro_batch_renderBEGIN");
     glUseProgram(self->L.program);
 

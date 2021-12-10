@@ -289,7 +289,7 @@ bool r_render_startup_update(rRender *self, ivec2 window_size, float delta_time)
     mat4 cam = camera(window_size.x, window_size.y);
     ro_text_render(&self->start_up->author_text, &cam);
     r_render_blit_framebuffer(self, window_size);
-    ro_particlerefract_render(&self->start_up->test, 0, &cam, 1, NULL, NULL);
+    ro_particlerefract_render(&self->start_up->test, 0, &cam, 1, NULL, NULL, false);
     r_render_end_frame(self);
     
     // check error and abort

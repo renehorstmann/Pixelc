@@ -191,7 +191,10 @@ void ro_particlerefract_update_sub(const RoParticleRefract *self, int offset, in
 }
 
 void ro_particlerefract_render_sub(const RoParticleRefract *self, float time, int num, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+        bool update_sub) {
+    if(update_sub)
+        ro_particlerefract_update_sub(self, 0, num);
     r_render_error_check("ro_particlerefract_renderBEGIN");
     
     if(!opt_view_aabb)

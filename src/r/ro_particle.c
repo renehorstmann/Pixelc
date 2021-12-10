@@ -176,7 +176,10 @@ void ro_particle_update_sub(const RoParticle *self, int offset, int size) {
     r_render_error_check("ro_particle_update");
 }
 
-void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat) {
+void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat, bool update_sub) {
+    if(update_sub)
+        ro_particle_update_sub(self, 0, num);
+        
     r_render_error_check("ro_particle_renderBEGIN");
     glUseProgram(self->L.program);
 

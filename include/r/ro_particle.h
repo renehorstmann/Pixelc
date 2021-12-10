@@ -17,7 +17,8 @@ void ro_particle_kill(RoParticle *self);
 void ro_particle_update_sub(const RoParticle *self, int offset, int size);
 
 // renders a subset of the particles
-void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat);
+// if update is true, update is called before rendering
+void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat, bool update_sub);
 
 // resets the texture, if .owns_tex is true, it will delete the old texture
 void ro_particle_set_texture(RoParticle *self, rTexture tex_sink);
@@ -28,8 +29,9 @@ static void ro_particle_update(const RoParticle *self) {
 }
 
 // renders the particles into the gpu
-static void ro_particle_render(const RoParticle *self, float time, const mat4 *camera_mat) {
-    ro_particle_render_sub(self, time, self->num, camera_mat);
+// if update is true, update is called before rendering
+static void ro_particle_render(const RoParticle *self, float time, const mat4 *camera_mat, bool update) {
+    ro_particle_render_sub(self, time, self->num, camera_mat, update);
 }
 
 #endif //R_RO_PARTICLE_H

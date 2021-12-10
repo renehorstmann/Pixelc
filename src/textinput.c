@@ -287,9 +287,6 @@ void textinput_update(TextInput *self, float dtime) {
             cam->RO.left, cam->RO.top,
             camera_width(cam), camera_height(cam));
 
-    ro_batch_update(&self->L.keys);
-    ro_batch_update(&self->L.chars);
-    ro_batch_update(&self->L.special);
 }
 
 void textinput_render(const TextInput *self, const mat4 *cam_mat) {
@@ -298,9 +295,9 @@ void textinput_render(const TextInput *self, const mat4 *cam_mat) {
 
     ro_text_render(&self->L.title, cam_mat);
     ro_text_render(&self->L.textfield, cam_mat);
-    ro_batch_render(&self->L.keys, cam_mat);
-    ro_batch_render(&self->L.chars, cam_mat);
+    ro_batch_render(&self->L.keys, cam_mat, true);
+    ro_batch_render(&self->L.chars, cam_mat, true);
     ro_single_render(&self->L.shift, cam_mat);
     ro_single_render(&self->L.space, cam_mat);
-    ro_batch_render(&self->L.special, cam_mat);
+    ro_batch_render(&self->L.special, cam_mat, true);
 }

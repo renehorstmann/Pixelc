@@ -7,6 +7,7 @@
  */
 
 #include <stdbool.h>
+#include "mathc/types/int.h"
 #include "mathc/types/float.h"
 
 
@@ -25,14 +26,14 @@ typedef struct {
     CanvasCamMatrices_s matrices;
 
     struct {
-        float real_pixel_per_pixel;
+        float scale;    // units per pixel
         float left, right, bottom, top;
     } RO;   // read only
 } CanvasCam_s;
 
 CanvasCam_s *canvascam_new();
 
-void canvascam_update(CanvasCam_s *self, int wnd_width, int wnd_height);
+void canvascam_update(CanvasCam_s *self, ivec2 window_size);
 
 void canvascam_set_pos(CanvasCam_s *self, float x, float y);
 

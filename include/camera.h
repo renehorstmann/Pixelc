@@ -8,6 +8,7 @@
 
 #include <stdbool.h>
 #include "mathc/types/float.h"
+#include "mathc/types/int.h"
 
 
 #define CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
@@ -21,14 +22,14 @@ typedef struct {
     CameraMatrices_s matrices;
 
     struct {
-        float real_pixel_per_pixel;
+        float scale;    // units per pixel
         float left, right, bottom, top;
     } RO;   // read only
 } Camera_s;
 
 Camera_s *camera_new();
 
-void camera_update(Camera_s *self, int wnd_width, int wnd_height);
+void camera_update(Camera_s *self, ivec2 window_size);
 
 static float camera_width(const Camera_s *self) {
     return -self->RO.left + self->RO.right;

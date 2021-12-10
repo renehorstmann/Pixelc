@@ -39,8 +39,10 @@ void ro_particlerefract_update_sub(const RoParticleRefract *self, int offset, in
 // renders a subset of the particles with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
+// if update is true, update is called before rendering
 void ro_particlerefract_render_sub(const RoParticleRefract *self, float time, int num, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+        bool update_sub);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_particlerefract_set_texture_main(RoParticleRefract *self, rTexture tex_main_sink);
@@ -56,9 +58,11 @@ static void ro_particlerefract_update(const RoParticleRefract *self) {
 // renders the particles with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
+// if update is true, update is called before rendering
 static void ro_particlerefract_render(const RoParticleRefract *self, float time, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
-    ro_particlerefract_render_sub(self, time, self->num, camera_mat, scale, opt_view_aabb, opt_framebuffer);
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+        bool update) {
+    ro_particlerefract_render_sub(self, time, self->num, camera_mat, scale, opt_view_aabb, opt_framebuffer, update);
 }
 
 #endif //R_RO_PARTICLEREFRACT_H

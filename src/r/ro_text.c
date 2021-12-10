@@ -65,7 +65,7 @@ void ro_text_kill(RoText *self) {
 
 void ro_text_render(const RoText *self, const mat4 *camera_mat) {
     mat4 mvp = mat4_mul_mat(*camera_mat, self->pose);
-    ro_batch_render(&self->ro, &mvp);
+    ro_batch_render(&self->ro, &mvp, false);
 }
 
 vec2 ro_text_set_text(RoText *self, const char *text) {

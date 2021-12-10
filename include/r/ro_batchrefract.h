@@ -38,8 +38,10 @@ void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size
 // renders a subset of the batch with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
+// if update is true, update is called before rendering
 void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+        bool update_sub);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_batchrefract_set_texture_main(RoBatchRefract *self, rTexture tex_main_sink);
@@ -55,10 +57,12 @@ static void ro_batchrefract_update(const RoBatchRefract *self) {
 // rensers the batch with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
+// if update is true, update is called before rendering
 static void ro_batchrefract_render(const RoBatchRefract *self, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+        bool update) {
     ro_batchrefract_render_sub(self, self->num, camera_mat, scale, 
-            opt_view_aabb, opt_framebuffer);
+            opt_view_aabb, opt_framebuffer, update);
 }
 
 

@@ -136,14 +136,11 @@ void palette_update(Palette *self, float dtime) {
     }
 
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[self->L.last_selected].pose;
-
-    ro_batch_update(&self->L.palette_ro);
-    ro_batch_update(&self->L.background_ro);
 }
 
 void palette_render(Palette *self, const mat4 *camera_mat) {
-    ro_batch_render(&self->L.background_ro, camera_mat);
-    ro_batch_render(&self->L.palette_ro, camera_mat);
+    ro_batch_render(&self->L.background_ro, camera_mat, true);
+    ro_batch_render(&self->L.palette_ro, camera_mat, true);
     ro_single_render(&self->L.select_ro, camera_mat);
 }
 
