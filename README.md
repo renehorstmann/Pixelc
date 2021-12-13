@@ -16,20 +16,19 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ## Todo
 - some update
-  - input ignore others
-    - touch + key stuff?, mainly touch
-- vkeyboard module
-  - font88 with small glyphs...
-  - transparent overlay
-  - key buttons with a background + back and enter button
-  - shows entered text
+  - read n save userfile (web down/upload)
 - options menu
   - size
   - frames + fps
   - palette? or swipe on palette
   - save as?
   - import from?
+- buttons are not fixed in position and are in a flow container
+- buttons can be moved and turned on + off in the options menu
+  - tooltip / title / text for the button
+- scale as + interpolation options
 - savestate has pre allocated memory and max saves like a ring buffer
+  - redo btn
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?
