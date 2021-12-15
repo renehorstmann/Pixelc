@@ -16,7 +16,7 @@ static void set_pose(Animation *self, const Camera_s *camera, float palette_hud_
     float x, y;
     if (camera_is_portrait_mode(camera)) {
         x = camera->RO.left + w / 2 + c * w;
-        y = camera->RO.bottom + palette_hud_size + h / 2 + r * h;
+        y = 1 + camera->RO.bottom + palette_hud_size + h / 2 + r * h;
     } else {
         x = camera->RO.right - palette_hud_size - w / 2 - c * w;
         y = camera->RO.top - h / 2 - r * h;
