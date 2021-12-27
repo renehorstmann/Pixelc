@@ -6,7 +6,7 @@ Based on [some](https://github.com/renehorstmann/some) framework.
 Have a look at [Tilec](https://github.com/renehorstmann/Tilec) for a forked tile map editor.
 
 ## Live demo
-Compiled with emscripten [livedemo](https://renehorstmann.github.ii/pixelc)
+Compiled with emscripten [live demo](https://renehorstmann.github.io/pixelc)
 Lots of features are missing in the web demo! (Loading, Saving, options like size, ...)
 
 ## Status:
