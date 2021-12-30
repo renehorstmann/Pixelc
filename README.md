@@ -18,9 +18,22 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ![example_image](example.jpg)
 
+## Without Cmake
+
+Instead of cmake, the following call to gcc may work, too.
+
+```sh
+mkdir build && cd build
+
+cp -r ../res .
+
+gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/ $(sdl2-config --cflags --libs) -lSDL2_image -lglew32 -lopengl32 -lglu32 -DOPTION_GLEW -DOPTION_SDL -o pixelc
+```
+
 ## Todo
 - some update
   - read n save userfile (web down/upload)
+- reduce module dependencies / *_ref
 - options menu
   - size
   - frames + fps
@@ -39,18 +52,6 @@ Palette, canvas size, animation size can be configured in code (main.c).
   - white to color like the palette
 - background image option?
 
-
-## Without Cmake
-
-Instead of cmake, the following call to gcc may work, too.
-
-```sh
-mkdir build && cd build
-
-cp -r ../res .
-
-gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/ $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lglew32 -lopengl32 -lglu32 -DOPTION_GLEW -DOPTION_SDL -o pixelc
-```
 
 ## Author
 René Horstmann
