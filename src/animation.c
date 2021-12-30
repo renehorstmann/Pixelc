@@ -92,7 +92,7 @@ void animation_update(Animation *self, const Camera_s *camera, float palette_hud
     }
 }
 
-void animation_render(Animation *self, const mat4 *camera_mat) {
+void animation_render(const Animation *self, const mat4 *camera_mat) {
     if (!self->show) {
         ro_text_render(&self->L.horsimann, camera_mat);
         return;

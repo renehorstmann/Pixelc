@@ -38,6 +38,6 @@ void background_update(Background *self, const Camera_s *camera, float dtime) {
     u_pose_set_size(&self->L.ro.rect.uv, cam_w / 2, cam_h / 2);
 }
 
-void background_render(Background *self, const mat4 *camera_mat) {
+void background_render(const Background *self, const mat4 *camera_mat) {
     ro_single_render(&self->L.ro, camera_mat);
 }

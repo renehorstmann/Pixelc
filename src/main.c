@@ -22,8 +22,8 @@
 
 // canvas size
 //*
-#define COLS 64*8
-#define ROWS 64
+#define COLS 128*2
+#define ROWS 128
 #define LAYERS 1
 //*/
 
@@ -47,9 +47,9 @@
 // 16 Pixel * 11 cols = 180...
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
-#define PLAY_SIZE 1
-#define PLAY_FRAMES 4
-#define PLAY_FPS 8.0
+#define PLAY_SIZE 1.0
+#define PLAY_FRAMES 2
+#define PLAY_FPS 2.0
 
 // uncomment the used palette:
 // #define PALETTE grayscale

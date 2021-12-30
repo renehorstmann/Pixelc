@@ -7,8 +7,10 @@
 #include "camera.h"
 
 typedef struct {
-    bool show;
     const Canvas *canvas_ref;
+    
+    bool show;
+    
     struct {
         RoText horsimann;
         RoBatch ro[CANVAS_MAX_LAYERS];
@@ -24,6 +26,6 @@ Animation *animation_new(const Canvas *canvas, int multi_cols, int multi_rows, f
 
 void animation_update(Animation *self, const Camera_s *camera, float palette_hud_size, float dtime);
 
-void animation_render(Animation *self, const mat4 *camera_mat);
+void animation_render(const Animation *self, const mat4 *camera_mat);
 
 #endif //PIXELC_ANIMATION_H
