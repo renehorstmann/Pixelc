@@ -5,12 +5,15 @@
 #include "cameractrl.h"
 
 
+#define HOME_SIZE 140
+#define HOME_PORTRAIT_X 0
+#define HOME_PORTRAIT_Y -20
+#define HOME_LANDSCAPE_X 20
+#define HOME_LANDSCAPE_Y 0
+
 //
 // private
 //
-
-
-
 
 static void move_camera(CameraCtrl *self, vec2 current_pos) {
     vec2 diff = vec2_sub_vec(current_pos, self->L.move0);
@@ -58,9 +61,24 @@ CameraCtrl *cameractrl_new(eInput *input, Camera_s *camera, Brush *brush_ref) {
     return self;
 }
 
-void cameractrl_set_home(CameraCtrl *self) {
+void cameractrl_set_home(CameraCtrl *self, int canvas_cols, int canvas_rows) {
     memset(&self->L, 0, sizeof(self->L));
-    self->L.size = 1;
+    
+    
+    float size = canvas_cols>canvas_rows? canvas_cols : canvas_rows;
+    self->L.size = size / HOME_SIZE;
+    
+    self->L.pos.x = canvas_cols/2;
+    self->L.pos.y = -canvas_rows/2;
+    
+    if(camera_is_portrait_mode(self->camera_ref)) {
+        self->L.pos.x += self->L.size * HOME_PORTRAIT_X;
+        self->L.pos.y += self->L.size * HOME_PORTRAIT_Y;
+    } else {
+        self->L.pos.x += self->L.size * HOME_LANDSCAPE_X;
+        self->L.pos.y += self->L.size * HOME_LANDSCAPE_Y;
+    }
+    
     camera_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
     camera_set_size(self->camera_ref, self->L.size);
 }

@@ -12,7 +12,7 @@
 #include "canvas.h"
 #include "cameractrl.h"
 #include "animation.h"
-#include "selection.h"
+#include "selectionctrl.h"
 #include "savestate.h"
 #include "toolbar.h"
 
@@ -77,6 +77,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
                      SaveState *savestate,
                      Canvas *canvas,
                      Brush *brush,
+                     SelectionCtrl *selectionctrl,
                      CameraCtrl *canvascamctrl,
                      Animation *animation) {
     Toolbar *self = rhc_calloc(sizeof *self);
@@ -85,7 +86,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
     self->savestate_ref = savestate;
     self->canvas_ref = canvas;
     self->brush_ref = brush;
-    self->brush_ref->toolbar_ref = self;    // ...
+    self->selectionctrl_ref = selectionctrl;
     self->canvascamctrl_ref = canvascamctrl;
     self->animation_ref = animation;
 
@@ -281,12 +282,12 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.clear->rect, pointer)) {
         log_info("toolbar: clear");
-        canvas_clear(self->canvas_ref);
+        brush_clear(self->brush_ref);
     }
 
     if (button_clicked(&self->L.import->rect, pointer)) {
         log_info("toolbar: import");
-        brush_set_selection_active(self->brush_ref, false, true);
+        selectionctrl_set_active(self->selectionctrl_ref, false, true);
         if (self->show_selection_ok) {
             canvas_redo_image(self->canvas_ref);
         }
@@ -298,13 +299,13 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
 
         if (u_image_valid(img)) {
-            selection_kill(&self->brush_ref->selection);
-            self->brush_ref->selection = selection_new(0, 0, img.cols, img.rows);
-            selection_copy(self->brush_ref->selection, img, 0);
-            selection_paste(self->brush_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
+            selection_kill(&self->selectionctrl_ref->selection);
+            self->selectionctrl_ref->selection = selection_new(0, 0, img.cols, img.rows);
+            selection_copy(self->selectionctrl_ref->selection, img, 0);
+            selection_paste(self->selectionctrl_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
             u_image_kill(&img);
-            self->brush_ref->selection_mode = BRUSH_SELECTION_PASTE;
-            brush_set_selection_active(self->brush_ref, true, false);
+            self->selectionctrl_ref->mode = SELECTIONCTRL_PASTE;
+            selectionctrl_set_active(self->selectionctrl_ref, true, false);
         }
         log_trace("toolbar: import finished");
     }
@@ -312,7 +313,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
     if (button_toggled(&self->L.selection->rect, pointer)) {
         log_info("toolbar: selection");
         bool pressed = button_is_pressed(&self->L.selection->rect);
-        brush_set_selection_active(self->brush_ref, pressed, true);
+        selectionctrl_set_active(self->selectionctrl_ref, pressed, true);
         button_set_pressed(&self->L.selection_copy.rect, false);
         button_set_pressed(&self->L.selection_cut.rect, false);
 
@@ -336,7 +337,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.camera->rect, pointer)) {
         log_info("toolbar: camera");
-        cameractrl_set_home(self->canvascamctrl_ref);
+        cameractrl_set_home(self->canvascamctrl_ref, self->canvas_ref->RO.image.cols, self->canvas_ref->RO.image.rows);
     }
 
     if (button_toggled(&self->L.animation->rect, pointer)) {
@@ -403,7 +404,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
             if (pressed) {
                 button_set_pressed(&self->L.selection_cut.rect, false);
-                self->brush_ref->selection_mode = BRUSH_SELECTION_COPY;
+                self->selectionctrl_ref->mode = SELECTIONCTRL_COPY;
             }
         }
 
@@ -413,13 +414,13 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
             if (pressed) {
                 button_set_pressed(&self->L.selection_copy.rect, false);
-                self->brush_ref->selection_mode = BRUSH_SELECTION_CUT;
+                self->selectionctrl_ref->mode = SELECTIONCTRL_CUT;
             }
         }
 
         for (int i = 0; i < 8; i++) {
             if (button_clicked(&self->L.selection_move[i].rect, pointer)) {
-                Selection *s = self->brush_ref->selection;
+                Selection *s = self->selectionctrl_ref->selection;
                 if (!s) {
                     log_error("toolbar: selection_move failed, selection invalid (NULL)");
                     break;
@@ -459,38 +460,38 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         bool changed = false;
         if (button_clicked(&self->L.selection_rotate_left.rect, pointer)) {
             log_info("toolbar: selection_rotate_left");
-            selection_rotate(self->brush_ref->selection, false);
+            selection_rotate(self->selectionctrl_ref->selection, false);
             changed = true;
         }
         if (button_clicked(&self->L.selection_rotate_right.rect, pointer)) {
             log_info("toolbar: selection_rotate_right");
-            selection_rotate(self->brush_ref->selection, true);
+            selection_rotate(self->selectionctrl_ref->selection, true);
             changed = true;
         }
 
         if (button_clicked(&self->L.selection_mirror_horizontal.rect, pointer)) {
             log_info("toolbar: selection_mirror_horizontal");
-            selection_mirror(self->brush_ref->selection, false);
+            selection_mirror(self->selectionctrl_ref->selection, false);
             changed = true;
         }
         if (button_clicked(&self->L.selection_mirror_vertical.rect, pointer)) {
             log_info("toolbar: selection_mirror_vertical");
-            selection_mirror(self->brush_ref->selection, true);
+            selection_mirror(self->selectionctrl_ref->selection, true);
             changed = true;
         }
 
         if(button_toggled(&self->L.selection_blend.rect, pointer)) {
-            if(!self->brush_ref->selection) {
+            if(!self->selectionctrl_ref->selection) {
                 log_error("toolbar: selection_blend failed, selection not valid (NULL)");
             } else {
-                self->brush_ref->selection->blend = button_is_pressed(&self->L.selection_blend.rect);
+                self->selectionctrl_ref->selection->blend = button_is_pressed(&self->L.selection_blend.rect);
                 changed = true;
             }
         }
 
         if (changed) {
             canvas_redo_image(self->canvas_ref);
-            selection_paste(self->brush_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
+            selection_paste(self->selectionctrl_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
         }
 
         if (button_clicked(&self->L.selection_copy.rect, pointer)) {
@@ -501,7 +502,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         if (button_clicked(&self->L.selection_ok.rect, pointer)) {
             log_info("toolbar: selection_ok");
             canvas_save(self->canvas_ref);
-            brush_set_selection_active(self->brush_ref, false, true);
+            selectionctrl_set_active(self->selectionctrl_ref, false, true);
             self->show_selection_ok = false;
             button_set_pressed(&self->L.selection->rect, false);
         }

@@ -7,6 +7,7 @@
 #include "canvas.h"
 #include "animation.h"
 #include "brush.h"
+#include "selectionctrl.h"
 #include "cameractrl.h"
 #include "palette.h"
 #include "palettepresave.h"
@@ -22,8 +23,8 @@
 
 // canvas size
 //*
-#define COLS 128*2
-#define ROWS 128
+#define COLS 32
+#define ROWS 32
 #define LAYERS 1
 //*/
 
@@ -92,9 +93,10 @@ static struct {
     Background *background;
     Canvas *canvas;
     Animation *animation;
+    SelectionCtrl *selectionctrl;
     Brush *brush;
     Palette *palette;
-    CameraCtrl *canvascamctrl;
+    CameraCtrl *camctrl;
     Toolbar *toolbar;
     InputCtrl *inputctrl;
     
@@ -106,6 +108,8 @@ static void init(eSimple *simple, ivec2 window_size) {
 
     // init systems
     L.camera = camera_new();
+    camera_update(L.camera, window_size);
+
     L.savestate = savestate_new();
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
     L.canvas = canvas_new(L.savestate, COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
@@ -117,11 +121,16 @@ static void init(eSimple *simple, ivec2 window_size) {
 #endif
 
     L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
-    L.brush = brush_new(L.canvas);
+    L.selectionctrl = selectionctrl_new(L.canvas);
+    L.brush = brush_new(L.canvas, L.selectionctrl);
     L.palette = palette_new(L.camera, L.brush);
-    L.canvascamctrl = cameractrl_new(simple->input, L.camera, L.brush);
-    L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.canvascamctrl, L.animation);
-    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.toolbar, L.canvascamctrl);
+    
+    L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
+    printf("canvassize: %i %i\n", L.canvas->RO.image.cols, L.canvas->RO.image.rows);
+    cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
+    
+    L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar, L.camctrl);
 
     // L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
 
@@ -133,33 +142,47 @@ static void init(eSimple *simple, ivec2 window_size) {
 }
 
 // this functions is called either each frame or at a specific update/s time
-static void update(eSimple *simple, ivec2 window_size, float delta_time) {
+static void update(eSimple *simple, ivec2 window_size, float dtime) {
     // simulate
     camera_update(L.camera, window_size);
     camera_update(L.camera, window_size);
 
-    background_update(L.background, L.camera, delta_time);
+    background_update(L.background, L.camera, dtime);
 
     //*
-    canvas_update(L.canvas, L.camera, delta_time);
-    palette_update(L.palette, delta_time);
-    animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), delta_time);
-    toolbar_update(L.toolbar, delta_time);
+    canvas_update(L.canvas, L.camera, dtime);
+    palette_update(L.palette, dtime);
+    animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), dtime);
+    
+    selectionctrl_update(L.selectionctrl, dtime);
+    
+    if(L.selectionctrl->out.show_copy_cut) {
+        L.selectionctrl->out.show_copy_cut = false;
+        L.toolbar->show_selection_copy_cut = true;
+    }
+    if(L.selectionctrl->out.show_ok) {
+        L.selectionctrl->out.show_ok = false;
+        L.toolbar->show_selection_ok = true;
+        L.toolbar->show_selection_copy_cut = false;
+    }
+    
+    toolbar_update(L.toolbar, dtime);
     //*/
 
-    //textinput_update(L.textinput, delta_time);
+    //textinput_update(L.textinput, dtime);
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
 static void render(eSimple *simple, ivec2 window_size, float dtime) {
     const mat4 *camera_mat = &L.camera->matrices.p;
-    const mat4 *canvascam_mat = &L.camera->matrices.vp;
+    const mat4 *cam_mat = &L.camera->matrices.vp;
 
     background_render(L.background, camera_mat);
 
     //*
     animation_render(L.animation, camera_mat);
-    canvas_render(L.canvas, canvascam_mat);
+    canvas_render(L.canvas, cam_mat);
+    selectionctrl_render(L.selectionctrl, cam_mat);
     palette_render(L.palette, camera_mat);
     toolbar_render(L.toolbar, camera_mat);
     //*/

@@ -16,7 +16,6 @@ struct Brush;
 
 typedef struct {
     SaveState *savestate_ref;
-    struct Brush *brush_ref;       // warning, set by brush.c
 
     int current_layer;
     bool show_grid;
@@ -38,8 +37,6 @@ typedef struct {
         RoSingle bg;
         RoSingle grid;
 
-        RoBatch selection_border;
-
         int save_id;
     } L;
 } Canvas;
@@ -50,11 +47,7 @@ void canvas_update(Canvas *self, const Camera_s *camera, float dtime);
 
 void canvas_render(Canvas *self, const mat4 *canvascam_mat);
 
-void canvas_resize(Canvas *self, int cols, int rows, int layers);
-
 ivec2 canvas_get_cr(const Canvas *self, vec4 pointer_pos);
-
-void canvas_clear(Canvas *self);
 
 void canvas_save(Canvas *self);
 

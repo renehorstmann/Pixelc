@@ -37,7 +37,7 @@ typedef struct {
 
 CameraCtrl *cameractrl_new(eInput *input, Camera_s *camera, Brush *brush_ref);
 
-void cameractrl_set_home(CameraCtrl *self);
+void cameractrl_set_home(CameraCtrl *self, int canvas_cols, int canvas_rows);
 
 bool cameractrl_pointer_event(CameraCtrl *self, ePointer_s pointer);
 

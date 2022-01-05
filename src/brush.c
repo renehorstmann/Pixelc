@@ -1,98 +1,8 @@
 #include <assert.h>
 #include "mathc/sca/int.h"
-#include "toolbar.h"
 #include "brushshape.h"
 #include "brush.h"
 
-//
-// private
-//
-
-
-static void setup_selection(Brush *self, ePointer_s pointer) {
-    uImage img = self->canvas_ref->RO.image;
-
-    if (self->selection && pointer.action == E_POINTER_UP) {
-        self->L.selection_set = true;
-        return;
-    }
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
-    if (self->L.selection_pos.x < 0 && !u_image_contains(img, cr.x, cr.y))
-        return;
-
-    cr.x = isca_clamp(cr.x, 0, img.cols - 1);
-    cr.y = isca_clamp(cr.y, 0, img.rows - 1);
-
-    if (self->L.selection_pos.x < 0) {
-        if (pointer.action == E_POINTER_DOWN) {
-            self->L.selection_pos = cr;
-            assert(self->toolbar_ref);
-            self->toolbar_ref->show_selection_copy_cut = true;
-        }
-    }
-
-    if (self->L.selection_pos.x < 0)
-        return;
-
-    int left = cr.x < self->L.selection_pos.x ? cr.x : self->L.selection_pos.x;
-    int top = cr.y < self->L.selection_pos.y ? cr.y : self->L.selection_pos.y;
-    int cols = 1 + abs(cr.x - self->L.selection_pos.x);
-    int rows = 1 + abs(cr.y - self->L.selection_pos.y);
-
-    if (self->selection) {
-        self->selection->left = left;
-        self->selection->top = top;
-        self->selection->cols = cols;
-        self->selection->rows = rows;
-    } else {
-        self->selection = selection_new(left, top, cols, rows);
-    }
-}
-
-static void move_selection(Brush *self, ePointer_s pointer) {
-    uImage img = self->canvas_ref->RO.image;
-    int layer = self->canvas_ref->current_layer;
-
-    if (pointer.action == E_POINTER_UP) {
-        self->L.selection_moving = false;
-        return;
-    }
-    if (pointer.action == E_POINTER_DOWN) {
-        self->L.selection_moving = true;
-    }
-
-    if (!self->L.selection_moving) {
-        return;
-    }
-
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
-
-    if (self->selection_mode != BRUSH_SELECTION_PASTE) {
-        if (!u_image_contains(img, cr.x, cr.y))
-            return;
-
-        assert(self->selection_mode == BRUSH_SELECTION_COPY
-               || self->selection_mode == BRUSH_SELECTION_CUT);
-
-        if (self->selection_mode == BRUSH_SELECTION_COPY)
-            selection_copy(self->selection, img, layer);
-        else
-            selection_cut(self->selection, img, layer, self->secondary_color);
-
-        canvas_save(self->canvas_ref);
-        self->selection_mode = BRUSH_SELECTION_PASTE;
-
-        assert(self->toolbar_ref);
-        self->toolbar_ref->show_selection_copy_cut = false;
-        self->toolbar_ref->show_selection_ok = true;
-    }
-
-    self->selection->left = cr.x - self->selection->cols / 2;
-    self->selection->top = cr.y - self->selection->rows / 2;
-
-    canvas_redo_image(self->canvas_ref);
-    selection_paste(self->selection, img, layer);
-}
 
 
 
@@ -100,12 +10,12 @@ static void move_selection(Brush *self, ePointer_s pointer) {
 // public
 //
 
-Brush *brush_new(Canvas *canvas) {
+Brush *brush_new(Canvas *canvas, const SelectionCtrl *selectionctrl) {
     Brush *self = rhc_calloc(sizeof *self);
 
     self->canvas_ref = canvas;
-    self->canvas_ref->brush_ref = self;     // ...
-
+    self->selectionctrl_ref = selectionctrl;
+    
     self->brushmode = brushmode_new(self, canvas);
 
     self->current_color = U_COLOR_TRANSPARENT;
@@ -120,18 +30,6 @@ Brush *brush_new(Canvas *canvas) {
 void brush_pointer_event(Brush *self, ePointer_s pointer) {
     if (pointer.id != 0)
         return;
-
-    if (self->L.selection_active) {
-        if (!self->L.selection_set) {
-            setup_selection(self, pointer);
-            return;
-        }
-
-        if (self->selection_mode != BRUSH_SELECTION_NONE) {
-            move_selection(self, pointer);
-            return;
-        }
-    }
 
     bool change = false;
     switch (self->mode) {
@@ -172,7 +70,8 @@ bool brush_draw_pixel(Brush *self, int c, int r) {
     if (!u_image_contains(img, c, r))
         return false;
 
-    if (self->selection && !selection_contains(self->selection, c, r))
+    Selection *selection = self->selectionctrl_ref->selection;
+    if (selection && !selection_contains(selection, c, r))
         return false;
 
     uColor_s *pixel = u_image_pixel(img, c, r, layer);
@@ -203,13 +102,18 @@ void brush_abort_current_draw(Brush *self) {
     }
 }
 
-void brush_set_selection_active(Brush *self, bool active, bool reset) {
-    log_info("brush: set_selection_active : %i %i", active, reset);
-    self->L.selection_active = active;
-    if (reset) {
-        self->L.selection_set = false;
-        self->L.selection_pos = (ivec2) {{-1, -1}};
-        selection_kill(&self->selection);
-        self->selection_mode = BRUSH_SELECTION_NONE;
+void brush_clear(Brush *self) {
+    log_info("brush: clear");
+    uImage img = self->canvas_ref->RO.image;
+    int layer = self->canvas_ref->current_layer;
+    Selection *selection = self->selectionctrl_ref->selection;
+    for (int r = 0; r < img.rows; r++) {
+        for (int c = 0; c < img.cols; c++) {
+            if (selection && !selection_contains(selection, c, r))
+                continue;
+
+            *u_image_pixel(img, c, r, layer) = U_COLOR_TRANSPARENT;
+        }
     }
+    canvas_save(self->canvas_ref);
 }

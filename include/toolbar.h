@@ -7,6 +7,7 @@
 #include "savestate.h"
 #include "canvas.h"
 #include "brush.h"
+#include "selectionctrl.h"
 #include "cameractrl.h"
 #include "animation.h"
 
@@ -23,6 +24,7 @@ typedef struct Toolbar {
     SaveState *savestate_ref;
     Canvas *canvas_ref;
     Brush *brush_ref;
+    SelectionCtrl *selectionctrl_ref;
     CameraCtrl *canvascamctrl_ref;
     Animation *animation_ref;
 
@@ -78,6 +80,7 @@ Toolbar *toolbar_new(const Camera_s *camera,
                      SaveState *savestate,
                      Canvas *canvas,
                      Brush *brush,
+                     SelectionCtrl *selectionctrl,
                      CameraCtrl *canvascamctrl,
                      Animation *animation);
 
