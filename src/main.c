@@ -150,7 +150,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     background_update(L.background, L.camera, dtime);
 
     //*
-    canvas_update(L.canvas, L.camera, dtime);
+    canvas_update(L.canvas, dtime);
     palette_update(L.palette, dtime);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), dtime);
     

@@ -58,7 +58,7 @@ bool brushmode_dot(BrushMode *self, ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     return brush_draw(self->brush_ref, cr.x, cr.y);
 }
 
@@ -72,12 +72,12 @@ bool brushmode_free(BrushMode *self, ePointer_s pointer) {
     if (!self->L.is_drawing)
         return false;
 
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     return brush_draw(self->brush_ref, cr.x, cr.y);
 }
 
 bool brushmode_free_line(BrushMode *self, ePointer_s pointer) {
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
     if (pointer.action == E_POINTER_DOWN) {
         self->L.is_drawing = true;

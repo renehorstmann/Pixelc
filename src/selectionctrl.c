@@ -63,7 +63,7 @@ static void setup_selection(SelectionCtrl *self, ePointer_s pointer) {
         self->L.set = true;
         return;
     }
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     if (self->L.pos.x < 0 && !u_image_contains(img, cr.x, cr.y))
         return;
 
@@ -111,7 +111,7 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
         return;
     }
 
-    ivec2 cr = canvas_get_cr(self->canvas_ref, pointer.pos);
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
     if (self->mode != SELECTIONCTRL_PASTE) {
         if (!u_image_contains(img, cr.x, cr.y))

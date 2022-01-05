@@ -1,18 +1,14 @@
 #ifndef PIXELC_CANVAS_H
 #define PIXELC_CANVAS_H
 
-#include <stdint.h>
 #include "mathc/types/int.h"
 #include "mathc/types/float.h"
 #include "u/image.h"
 #include "r/ro_types.h"
-#include "camera.h"
 #include "savestate.h"
 
 #define CANVAS_MAX_LAYERS 16
 
-
-struct Brush;
 
 typedef struct {
     SaveState *savestate_ref;
@@ -43,14 +39,13 @@ typedef struct {
 
 Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int grid_cols, int grid_rows);
 
-void canvas_update(Canvas *self, const Camera_s *camera, float dtime);
+void canvas_update(Canvas *self, float dtime);
 
 void canvas_render(Canvas *self, const mat4 *canvascam_mat);
-
-ivec2 canvas_get_cr(const Canvas *self, vec4 pointer_pos);
 
 void canvas_save(Canvas *self);
 
 void canvas_redo_image(Canvas *self);
+
 
 #endif //PIXELC_CANVAS_H

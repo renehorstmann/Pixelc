@@ -116,7 +116,7 @@ Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int gri
     return self;
 }
 
-void canvas_update(Canvas *self, const Camera_s *camera, float dtime) {
+void canvas_update(Canvas *self, float dtime) {
     
     self->RO.pose = u_pose_new_aa(0, 0, self->RO.image.cols, self->RO.image.rows);
 
@@ -143,16 +143,6 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
     if (self->show_grid)
         ro_single_render(&self->L.grid, canvascam_mat);
 
-}
-
-ivec2 canvas_get_cr(const Canvas *self, vec4 pointer_pos) {
-    mat4 pose_inv = mat4_inv(self->RO.pose);
-    vec4 pose_pos = mat4_mul_vec(pose_inv, pointer_pos);
-
-    ivec2 cr;
-    cr.x = (pose_pos.x + 0.5) * self->RO.image.cols;
-    cr.y = (0.5 - pose_pos.y) * self->RO.image.rows;
-    return cr;
 }
 
 
