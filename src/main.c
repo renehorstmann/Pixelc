@@ -122,7 +122,7 @@ static void init(eSimple *simple, ivec2 window_size) {
 
     L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     L.selectionctrl = selectionctrl_new(L.canvas);
-    L.brush = brush_new(L.canvas, L.selectionctrl);
+    L.brush = brush_new(L.canvas);
     L.palette = palette_new(L.camera, L.brush);
     
     L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
@@ -155,6 +155,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), dtime);
     
     selectionctrl_update(L.selectionctrl, dtime);
+    L.brush->in.selection_ref = L.selectionctrl->selection;
     
     if(L.selectionctrl->out.show_copy_cut) {
         L.selectionctrl->out.show_copy_cut = false;

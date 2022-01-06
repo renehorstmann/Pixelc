@@ -4,12 +4,12 @@
 #include "e/input.h"
 #include "u/color.h"
 #include "canvas.h"
-#include "selectionctrl.h"
+#include "selection.h"
 #include "brushmode.h"
 
 struct Toolbar;
 
-enum brushmodes {
+enum brush_modes {
     BRUSH_MODE_FREE,
     BRUSH_MODE_DOT,
     BRUSH_MODE_DITHER,
@@ -25,20 +25,23 @@ typedef struct Brush {
     BrushMode *brushmode;
 
     Canvas *canvas_ref;
-    const SelectionCtrl *selectionctrl_ref;
     
     uColor_s current_color;
     uColor_s secondary_color;
-    enum brushmodes mode;
+    enum brush_modes mode;
     int shape;
     bool shading_active;
+    
+    struct {
+        const Selection *selection_ref;
+    } in;
     
     struct {
         bool change;
     } L;
 } Brush;
 
-Brush *brush_new(Canvas *canvas, const SelectionCtrl *selectionctrl);
+Brush *brush_new(Canvas *canvas);
 
 void brush_pointer_event(Brush *self, ePointer_s pointer);
 

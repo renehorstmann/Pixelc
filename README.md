@@ -34,6 +34,11 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 - some update
   - read n save userfile (web down/upload)
 - reduce module dependencies / *_ref
+- remove savestate and replace with filesystem
+  - savestate was a nice idea, but its not really needed, just the canvas has to be saved...
+  - save the canvas as image on each save as a png
+  - ring buffer via file name
+  - save n load a config file, containing the ring size
 - options menu
   - size
   - frames + fps

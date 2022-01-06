@@ -21,7 +21,7 @@ typedef struct {
 
     // read only
     struct {
-        mat4 pose;
+        mat4 pose; // = u_pose_new_aa(0, 0, cols, rows)
         uImage image;
     } RO;
 

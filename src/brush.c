@@ -10,11 +10,10 @@
 // public
 //
 
-Brush *brush_new(Canvas *canvas, const SelectionCtrl *selectionctrl) {
+Brush *brush_new(Canvas *canvas) {
     Brush *self = rhc_calloc(sizeof *self);
 
     self->canvas_ref = canvas;
-    self->selectionctrl_ref = selectionctrl;
     
     self->brushmode = brushmode_new(self, canvas);
 
@@ -70,7 +69,7 @@ bool brush_draw_pixel(Brush *self, int c, int r) {
     if (!u_image_contains(img, c, r))
         return false;
 
-    Selection *selection = self->selectionctrl_ref->selection;
+    const Selection *selection = self->in.selection_ref;
     if (selection && !selection_contains(selection, c, r))
         return false;
 
@@ -106,7 +105,7 @@ void brush_clear(Brush *self) {
     log_info("brush: clear");
     uImage img = self->canvas_ref->RO.image;
     int layer = self->canvas_ref->current_layer;
-    Selection *selection = self->selectionctrl_ref->selection;
+    const Selection *selection = self->in.selection_ref;
     for (int r = 0; r < img.rows; r++) {
         for (int c = 0; c < img.cols; c++) {
             if (selection && !selection_contains(selection, c, r))
