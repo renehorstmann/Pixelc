@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include "e/input.h"
 #include "r/ro_types.h"
-#include "savestate.h"
 #include "canvas.h"
 #include "brush.h"
 #include "selectionctrl.h"
@@ -21,7 +20,6 @@ struct Toolbar_Tool {
 
 typedef struct Toolbar {
     const Camera_s *camera_ref;
-    SaveState *savestate_ref;
     Canvas *canvas_ref;
     Brush *brush_ref;
     SelectionCtrl *selectionctrl_ref;
@@ -77,7 +75,6 @@ typedef struct Toolbar {
 } Toolbar;
 
 Toolbar *toolbar_new(const Camera_s *camera,
-                     SaveState *savestate,
                      Canvas *canvas,
                      Brush *brush,
                      SelectionCtrl *selectionctrl,

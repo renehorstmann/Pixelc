@@ -17,53 +17,34 @@
 //
 
 
-static void init_render_objects(Canvas *self) {
+static void save_image(const Canvas *self) {
+    char file[128];
+    snprintf(file, sizeof file, "save_file_%i.png", self->L.save_idx);
+    u_image_save_file(self->RO.image, file);
+}
+
+static void load_image(Canvas *self) {
+    char file[128];
+    snprintf(file, sizeof file, "save_file_%i.png", self->L.save_idx);
+    canvas_set_image(self, u_image_new_file(self->RO.image.layers, file));
+}
+
+// updates the ro tex and sizes
+static void update_render_objects(Canvas *self) {
     for (int i = 0; i < self->RO.image.layers; i++) {
         rTexture tex = r_texture_new(self->RO.image.cols, self->RO.image.rows, 1, 1, u_image_layer(self->RO.image, i));
-        self->L.render_objects[i] = ro_single_new(tex);
+        ro_single_set_texture(&self->L.render_objects[i], tex);
+    }
+    
+    u_pose_set_size(&self->L.grid.rect.uv, self->RO.image.cols, self->RO.image.rows);
+    {
+        float w = (float) self->RO.image.cols / (2 * self->L.grid_cols);
+        float h = (float) self->RO.image.rows / (2 * self->L.grid_rows);
+        u_pose_set_size(&self->L.bg.rect.uv, w, h);
     }
 }
 
 
-
-
-static void save_state(SaveState *savestate, void *user_data) {
-    Canvas *self = user_data;
-    log_info("canvas: save_state");
-
-    // costum uImage with data concatenated
-    size_t img_size = sizeof(uImage) + u_image_data_size(self->RO.image);
-    char *data = rhc_malloc(img_size);
-    uImage *img = (uImage *) data;
-    img->data = (uColor_s *) (data + sizeof(uImage));
-    img->cols = self->RO.image.cols;
-    img->rows = self->RO.image.rows;
-    img->layers = self->RO.image.layers;
-    img->allocator = rhc_allocator_new_empty();
-
-    u_image_copy(*img, self->RO.image);
-    savestate_save_data(savestate, img, img_size);
-
-    // costum uImage
-    rhc_free(img);
-}
-
-static void load_state(SaveState *savestate, const void *data, size_t size, void *user_data) {
-    Canvas *self = user_data;
-    log_info("canvas: load_state");
-    // todo: check new layers, rows, cols
-    assume(sizeof(uImage) + u_image_data_size(self->RO.image) == size, "invalid data + size pair");
-
-    u_image_kill(&self->RO.image);
-
-    // costum uImage with data concatenated
-    uImage *img = (uImage *) data;
-    img->data = (uColor_s *) ((char *) data + sizeof(uImage));
-
-    self->RO.image = u_image_new_clone(*img);
-    u_image_save_file(self->RO.image, self->default_image_file);
-    u_image_copy(self->L.prev_image, self->RO.image);
-}
 
 
 //
@@ -71,10 +52,11 @@ static void load_state(SaveState *savestate, const void *data, size_t size, void
 //
 
 
-Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int grid_cols, int grid_rows) {
+Canvas *canvas_new(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     Canvas *self = rhc_calloc(sizeof *self);
 
-    self->savestate_ref = savestate;
+    self->L.grid_cols = grid_cols;
+    self->L.grid_rows = grid_rows;
 
     self->default_image_file = "image.png";
     self->default_import_file = "import.png";
@@ -82,37 +64,38 @@ Canvas *canvas_new(SaveState *savestate, int cols, int rows, int layers, int gri
     assume(layers <= CANVAS_MAX_LAYERS, "too many layers");
     self->alpha = 1.0;
 
-    self->L.save_id = savestate_register(savestate, save_state, load_state, self);
-
     self->RO.pose = mat4_eye();
 
-    self->RO.image = u_image_new_zeros(cols, rows, layers);
     self->current_layer = 0;
 
-    init_render_objects(self);
+    for (int i = 0; i < CANVAS_MAX_LAYERS; i++) {
+        self->L.render_objects[i] = ro_single_new(r_texture_new_invalid());
+    }    
 
     self->L.grid = ro_single_new(r_texture_new_file(1, 1, "res/canvas_grid.png"));
-    u_pose_set_size(&self->L.grid.rect.uv, cols, rows);
-
+    
     uColor_s buf[4];
     buf[0] = buf[3] = u_color_from_hex("#999999");
     buf[1] = buf[2] = u_color_from_hex("#777777");
     rTexture bg_tex = r_texture_new(2, 2, 1, 1, buf);
     self->L.bg = ro_single_new(bg_tex);
+    
+
+    uImage img = u_image_new_zeros(cols, rows, layers);
     {
-        float w = (float) cols / (2 * grid_cols);
-        float h = (float) rows / (2 * grid_rows);
-        u_pose_set_size(&self->L.bg.rect.uv, w, h);
+        uImage load = u_image_new_file(layers, self->default_image_file);
+        if (u_image_valid(load))
+            u_image_copy_top_left(img, load);
+        u_image_kill(&load);
+        
     }
 
-    uImage img = u_image_new_file(layers, self->default_image_file);
-    if (u_image_valid(img)) {
-        u_image_copy_top_left(self->RO.image, img);
-        u_image_kill(&img);
-    }
-
-    self->L.prev_image = u_image_new_clone(self->RO.image);
-
+    self->L.prev_image = u_image_new_clone(img);
+    
+    canvas_set_image(self, img);
+    
+    save_image(self);
+    
     return self;
 }
 
@@ -145,18 +128,66 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
 
 }
 
+void canvas_set_image(Canvas *self, uImage image_sink) {
+    if(!u_image_valid(image_sink))
+        return;
+    log_info("canvas: set_image");
+    
+    u_image_kill(&self->RO.image);
+    self->RO.image = image_sink;
+    
+    update_render_objects(self);
+}
+
 
 void canvas_save(Canvas *self) {
     log_info("canvas: save");
     if (!u_image_equals(self->RO.image, self->L.prev_image)) {
         u_image_copy(self->L.prev_image, self->RO.image);
-        savestate_save(self->savestate_ref);
         u_image_save_file(self->RO.image, self->default_image_file);
+        
+        self->L.save_idx++;
+        if(self->L.save_idx >= CANVAS_MAX_SAVES)
+            self->L.save_idx = 0;
+        if(self->L.save_idx == self->L.save_idx_min) {
+            self->L.save_idx_min++;
+            if(self->L.save_idx_min >= CANVAS_MAX_SAVES)
+                self->L.save_idx_min = 0;
+        }
+        
+        save_image(self);
     }
 }
 
-void canvas_redo_image(Canvas *self) {
-    log_info("canvas: redo_image");
+void canvas_reload(Canvas *self) {
+    log_info("canvas: reload");
     u_image_copy(self->RO.image, self->L.prev_image);
 }
 
+void canvas_undo(Canvas *self) {
+    log_info("canvas: undo %i %i", self->L.save_idx, self->L.save_idx_min);    
+    if(self->L.save_idx == self->L.save_idx_min) {
+        log_info("canvas: undo failed, on min idx");
+        return;
+    }
+    
+    self->L.save_idx--;
+    if(self->L.save_idx < 0)
+        self->L.save_idx = CANVAS_MAX_SAVES - 1;
+        
+    load_image(self);
+}
+
+void canvas_redo(Canvas *self) {
+    log_info("canvas: redo");
+    if(self->L.save_idx == self->L.save_idx_max) {
+        log_info("canvas: redo failed, on max idx");
+        return;
+    }
+    
+    self->L.save_idx++;
+    if(self->L.save_idx >= CANVAS_MAX_SAVES)
+        self->L.save_idx = 0;
+        
+    load_image(self);
+}

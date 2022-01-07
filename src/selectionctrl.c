@@ -134,7 +134,7 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
     self->selection->left = cr.x - self->selection->cols / 2;
     self->selection->top = cr.y - self->selection->rows / 2;
 
-    canvas_redo_image(self->canvas_ref);
+    canvas_reload(self->canvas_ref);
     selection_paste(self->selection, img, layer);
 }
 

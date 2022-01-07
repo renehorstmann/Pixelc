@@ -13,7 +13,6 @@
 #include "palettepresave.h"
 #include "toolbar.h"
 #include "inputctrl.h"
-#include "savestate.h"
 
 #include "textinput.h"
 
@@ -89,7 +88,6 @@
 
 static struct {
     Camera_s *camera;
-    SaveState *savestate;
     Background *background;
     Canvas *canvas;
     Animation *animation;
@@ -110,9 +108,8 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.camera = camera_new();
     camera_update(L.camera, window_size);
 
-    L.savestate = savestate_new();
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
-    L.canvas = canvas_new(L.savestate, COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
+    L.canvas = canvas_new(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
 #ifdef IMAGE_FILE
     L.canvas->default_image_file = IMAGE_FILE;
 #endif
@@ -129,16 +126,13 @@ static void init(eSimple *simple, ivec2 window_size) {
     printf("canvassize: %i %i\n", L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     
-    L.toolbar = toolbar_new(L.camera, L.savestate, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
+    L.toolbar = toolbar_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
     L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar, L.camctrl);
 
     // L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
-
-    // save start frame
-    savestate_save(L.savestate);
 }
 
 // this functions is called either each frame or at a specific update/s time

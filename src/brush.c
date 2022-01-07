@@ -95,7 +95,7 @@ bool brush_draw(Brush *self, int c, int r) {
 void brush_abort_current_draw(Brush *self) {
     log_info("brush: abort_current_draw");
     if (self->L.change) {
-        canvas_redo_image(self->canvas_ref);
+        canvas_reload(self->canvas_ref);
         brushmode_reset(self->brushmode); // sets drawing to false
         self->L.change = false;
     }

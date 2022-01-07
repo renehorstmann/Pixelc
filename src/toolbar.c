@@ -6,14 +6,7 @@
 #include "mathc/sca/int.h"
 #include "mathc/float.h"
 #include "button.h"
-#include "camera.h"
-#include "brush.h"
 #include "brushshape.h"
-#include "canvas.h"
-#include "cameractrl.h"
-#include "animation.h"
-#include "selectionctrl.h"
-#include "savestate.h"
 #include "toolbar.h"
 
 #define LONG_PRESS_TIME 1.0
@@ -74,7 +67,6 @@ static mat4 pose16(const Camera_s *camera, float col, float row) {
 //
 
 Toolbar *toolbar_new(const Camera_s *camera,
-                     SaveState *savestate,
                      Canvas *canvas,
                      Brush *brush,
                      SelectionCtrl *selectionctrl,
@@ -83,7 +75,6 @@ Toolbar *toolbar_new(const Camera_s *camera,
     Toolbar *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
-    self->savestate_ref = savestate;
     self->canvas_ref = canvas;
     self->brush_ref = brush;
     self->selectionctrl_ref = selectionctrl;
@@ -277,7 +268,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.undo->rect, pointer)) {
         log_info("toolbar: undo");
-        savestate_undo(self->savestate_ref);
+        canvas_undo(self->canvas_ref);
     }
 
     if (button_clicked(&self->L.clear->rect, pointer)) {
@@ -289,7 +280,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         log_info("toolbar: import");
         selectionctrl_set_active(self->selectionctrl_ref, false, true);
         if (self->show_selection_ok) {
-            canvas_redo_image(self->canvas_ref);
+            canvas_reload(self->canvas_ref);
         }
         self->show_selection_copy_cut = false;
 
@@ -318,7 +309,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         button_set_pressed(&self->L.selection_cut.rect, false);
 
         if (!pressed && self->show_selection_ok) {
-            canvas_redo_image(self->canvas_ref);
+            canvas_reload(self->canvas_ref);
         }
         self->show_selection_copy_cut = false;
         self->show_selection_ok = false;
@@ -490,7 +481,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         }
 
         if (changed) {
-            canvas_redo_image(self->canvas_ref);
+            canvas_reload(self->canvas_ref);
             selection_paste(self->selectionctrl_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
         }
 
