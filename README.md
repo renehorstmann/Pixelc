@@ -32,6 +32,10 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some update
+  - fix texture artifacts
+    - MIN_FILTER = LINEAR?
+    - CLAMP_TO_BORDER + functions
+    - set the text poses to an integral position
   - read n save userfile (web down/upload)
 - reduce module dependencies / *_ref
 - options menu
