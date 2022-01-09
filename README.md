@@ -37,7 +37,9 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
     - CLAMP_TO_BORDER + functions
     - set the text poses to an integral position
   - read n save userfile (web down/upload)
-- reduce module dependencies / *_ref
+- save file for options
+- camera ctrl not as compile option
+- palette swipe activates multitouch cursor
 - options menu
   - size
   - frames + fps
@@ -47,7 +49,10 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 - buttons are not fixed in position and are in a flow container
 - buttons can be moved and turned on + off in the options menu
   - tooltip / title / text for the button
+- brushshape loaded from file
+- palette loaded from file + display name
 - scale as + interpolation options
+- save in HD
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - VertexColors?
