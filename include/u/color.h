@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "mathc/vec/ucvec4.h"
+#include "mathc/vec/vec3.h"
 #include "mathc/vec/vec4.h"
 #include "rhc/error.h"
 #include "rhc/log.h"

@@ -32,6 +32,8 @@ typedef struct Brush {
     int shape;
     bool shading_active;
     
+    uImage kernel;
+    
     struct {
         const Selection *selection_ref;
     } in;
@@ -52,5 +54,11 @@ bool brush_draw(Brush *self, int c, int r);
 void brush_abort_current_draw(Brush *self);
 
 void brush_clear(Brush *self);
+
+
+// creates the default kernel files
+// sets self->kernel to the first new kernel file
+// resets the config->kernels_size and saves the config
+void brush_reset_kernel_files(Brush *self /*, Config *config */);
 
 #endif //PIXELC_BRUSH_H

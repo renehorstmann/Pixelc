@@ -39,6 +39,8 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
   - read n save userfile (web down/upload)
   - u/json
     - simple json parser + writer
+  - u/color blend
+- dont draw multiple times if pos not changed
 - save file for options
 - camera ctrl not as compile option
 - palette swipe activates multitouch cursor

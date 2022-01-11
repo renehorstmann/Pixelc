@@ -24,4 +24,13 @@ bool brushshape_draw(Brush *brush, int c, int r);
 
 bool brushshape_draw_dither(Brush *brush, int c, int r, bool a);
 
+
+//
+// new
+//
+
+#include "u/image.h"
+
+void brushshape_draw_n(Brush *brush, uImage kernel, int c, int r);
+
 #endif //PIXELC_BRUSHSHAPE_H

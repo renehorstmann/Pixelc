@@ -69,3 +69,14 @@ bool brushshape_draw_dither(Brush *brush, int c, int r, bool a) {
     return changed;
 }
 
+
+//
+// new
+//
+
+void brushshape_draw_n(Brush *brush, uImage kernel, int c, int r) {
+    assume(kernel.layers == 1, "brushshape_draw failed");
+    
+    
+}
+
