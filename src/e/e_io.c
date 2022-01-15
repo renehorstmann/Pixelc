@@ -82,24 +82,44 @@ static void idbfs_save() {
     }
 }
 
+void e_io_savestate_load() {
+    idbfs_mount();
+    idbfs_load();
+}
+
+void e_io_savestate_save() {
+    idbfs_save();
+}
+
+struct eIoSavestateString e_io_savestate_file_path(const char *filename) {
+    struct eIoSavestateString name;
+    if(!savestate_filename_valid(filename)) {
+        memset(name.s, 0, sizeof name);
+        return name;
+    }
+    snprintf(name.s, sizeof name, "savestate/%s", filename);
+    return name;
+}
+
+
 String e_io_savestate_read(const char *filename, bool ascii) {
     if(!savestate_filename_valid(filename))
         return string_new_invalid();
-    char name[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
     idbfs_mount();
     idbfs_load();
-    snprintf(name, sizeof name, "savestate/%s", filename);
-    return file_read(name, ascii);
+    return file_read(
+            e_io_savestate_file_path(filename).s,
+            ascii);
 }
 
 
 bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
-    char name[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
     idbfs_mount();
-    snprintf(name, sizeof name, "savestate/%s", filename);
-    bool ok = file_write(name, content, ascii);
+    bool ok = file_write(
+            e_io_savestate_file_path(filename).s,
+            content, ascii);
     idbfs_save();
     return ok;
 }
@@ -108,41 +128,59 @@ bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
 bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
-    char name[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
     idbfs_mount();
     idbfs_load();
-    snprintf(name, sizeof name, "savestate/%s", filename);
-    bool ok = file_append(name, content, ascii);
+    bool ok = file_append(
+            e_io_savestate_file_path(filename).s,
+            content, ascii);
     idbfs_save();
     return ok;
 }
 
 #else
 
+void e_io_savestate_load() {
+    // noop (just for web)
+}
+
+void e_io_savestate_save() {
+    // noop (just for web)
+}
+
+struct eIoSavestateString e_io_savestate_file_path(const char *filename) {
+    struct eIoSavestateString name;
+    if(!savestate_filename_valid(filename)) {
+        memset(&name, 0, sizeof name);
+        return name;
+    }
+    snprintf(name.s, sizeof name, "savestate_%s", filename);
+    return name;
+}
+
 String e_io_savestate_read(const char *filename, bool ascii) {
     if(!savestate_filename_valid(filename))
         return string_new_invalid();
-    char name[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
-    snprintf(name, sizeof name, "savestate_%s", filename);
-    return file_read(name, ascii);
+    return file_read(
+            e_io_savestate_file_path(filename).s, 
+            ascii);
 }
 
 
 bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
-    char name[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
-    snprintf(name, sizeof name, "savestate_%s", filename);
-    return file_write(name, content, ascii);
+    return file_write(
+            e_io_savestate_file_path(filename).s,
+            content, ascii);
 }
 
 
 bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
-    char name[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
-    snprintf(name, sizeof name, "savestate_%s", filename);
-    return file_append(name, content, ascii);
+    return file_append(
+            e_io_savestate_file_path(filename).s,
+            content, ascii);
 }
 
 

@@ -6,7 +6,6 @@
 #include "mathc/sca/int.h"
 #include "mathc/float.h"
 #include "button.h"
-#include "brushshape.h"
 #include "toolbar.h"
 
 #define LONG_PRESS_TIME 1.0
@@ -109,7 +108,8 @@ Toolbar *toolbar_new(const Camera_s *camera,
 
 
     // shape kernel:
-    self->L.shape = ro_single_new(brushshape_create_kernel_texture(U_COLOR_TRANSPARENT, U_COLOR_WHITE));
+    self->L.shape = ro_single_new(r_texture_new_invalid());
+    self->L.shape.owns_tex = false;
 
     // secondar color:
     self->L.color_bg = ro_single_new(r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));
@@ -159,7 +159,12 @@ void toolbar_update(Toolbar *self, float dtime) {
 
     // shape kernel:
     self->L.shape.rect.pose = pose16(self->camera_ref, -22, 10);  // should be 16x16
-    self->L.shape.rect.sprite.y = self->brush_ref->shape;
+    int shape_w = self->brush_ref->RO.kernel.cols;
+    int shape_h = self->brush_ref->RO.kernel.rows;
+    shape_w = isca_min(shape_w, 16);
+    shape_h = isca_min(shape_h, 16);
+    u_pose_set_size(&self->L.shape.rect.pose, shape_w, shape_h);
+    self->L.shape.tex = self->brush_ref->RO.kernel_tex;
 
     // secondary color:    
     self->L.color_bg.rect.pose = self->L.color_drop.rect.pose = pose16(self->camera_ref, 64, 9);
@@ -203,7 +208,7 @@ void toolbar_update(Toolbar *self, float dtime) {
     if (button_is_pressed(&self->L.shape_minus->rect)) {
         self->L.shape_minus_time += dtime;
         if (self->L.shape_minus_time > LONG_PRESS_TIME) {
-            self->brush_ref->shape = 0;
+            //self->brush_ref->shape = 0;
         }
     } else
         self->L.shape_minus_time = 0;
@@ -211,7 +216,7 @@ void toolbar_update(Toolbar *self, float dtime) {
     if (button_is_pressed(&self->L.shape_plus->rect)) {
         self->L.shape_plus_time += dtime;
         if (self->L.shape_plus_time > LONG_PRESS_TIME) {
-            self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
+            //self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
         }
     } else
         self->L.shape_plus_time = 0;
@@ -366,16 +371,16 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.shape_minus->rect, pointer)) {
         log_info("toolbar: shape_minus");
-        self->brush_ref->shape--;
-        if (self->brush_ref->shape < 0)
-            self->brush_ref->shape = 0;
+        //self->brush_ref->shape--;
+        //if (self->brush_ref->shape < 0)
+        //    self->brush_ref->shape = 0;
     }
 
     if (button_clicked(&self->L.shape_plus->rect, pointer)) {
         log_info("toolbar: shape_plus");
-        self->brush_ref->shape++;
-        if (self->brush_ref->shape >= BRUSH_NUM_SHAPES)
-            self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
+        //self->brush_ref->shape++;
+        //if (self->brush_ref->shape >= BRUSH_NUM_SHAPES)
+        //    self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
     }
 
 

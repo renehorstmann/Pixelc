@@ -29,17 +29,24 @@ typedef struct Brush {
     uColor_s current_color;
     uColor_s secondary_color;
     enum brush_modes mode;
-    int shape;
     bool shading_active;
     
-    uImage kernel;
     
     struct {
         const Selection *selection_ref;
     } in;
     
     struct {
+        uImage kernel;
+        rTexture kernel_tex;
+        int kernel_id;
+        int max_kernels;
+    } RO; // read only
+    
+    struct {
         bool change;
+        
+        char **kernel_files;
     } L;
 } Brush;
 
@@ -47,7 +54,7 @@ Brush *brush_new(Canvas *canvas);
 
 void brush_pointer_event(Brush *self, ePointer_s pointer);
 
-bool brush_draw_pixel(Brush *self, int c, int r);
+bool brush_draw_pixel(Brush *self, int c, int r, uColor_s kernel_color);
 
 bool brush_draw(Brush *self, int c, int r);
 
@@ -55,10 +62,42 @@ void brush_abort_current_draw(Brush *self);
 
 void brush_clear(Brush *self);
 
+// moves ownership of kernel_sink to brush
+void brush_set_kernel(Brush *self, uImage kernel_sink);
+
+// loads a kernel by its id
+void brush_load_kernel(Brush *self, int id);
+
+// saves kernel_sink into the config and calls brush_set_kernel 
+//   (which will take the ownership of kernel_sink)
+// calla brush_save_config
+void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name);
 
 // creates the default kernel files
 // sets self->kernel to the first new kernel file
-// resets the config->kernels_size and saves the config
-void brush_reset_kernel_files(Brush *self /*, Config *config */);
+// also calls brush_save_kernel
+void brush_reset_kernel_files(Brush *self);
+
+// saves the config to the savestate config.json 
+// uses object "brush"
+void brush_save_config(const Brush *self);
+
+// loads the config from the savestate config.json
+// uses object "brush"
+void brush_load_config(Brush *self);
+
+
+//
+// brush_kernel creation, see brush_kernel.c
+//
+
+// returns a !u_image_valid terminated list of default kernels
+// call brush_kernel_kill_defaults to kill the list
+uImage *brush_kernel_defaults_new();
+
+void brush_kernel_defaults_kill(uImage **self_ptr);
+
+
+
 
 #endif //PIXELC_BRUSH_H

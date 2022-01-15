@@ -34,7 +34,7 @@ bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8) {
     while (stack.size > 0) {
         ivec2 p = posstack_pop(&stack);
 
-        if (!brush_draw_pixel(self->brush_ref, p.x, p.y))
+        if (!brush_draw_pixel(self->brush_ref, p.x, p.y, U_COLOR_WHITE))
             continue;
 
         posstack_push(&stack,
@@ -85,7 +85,7 @@ bool brushmode_replace(BrushMode *self, ePointer_s pointer) {
 
     for (int r = 0; r < img.rows; r++) {
         for (int c = 0; c < img.cols; c++) {
-            brush_draw_pixel(self->brush_ref, c, r);
+            brush_draw_pixel(self->brush_ref, c, r, U_COLOR_WHITE);
         }
     }
 

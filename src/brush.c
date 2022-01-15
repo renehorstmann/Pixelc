@@ -1,12 +1,20 @@
 #include <assert.h>
+#include "e/io.h"
+#include "r/texture.h"
 #include "mathc/sca/int.h"
-#include "brushshape.h"
 #include "brush.h"
-
+#include "u/json.h"
 
 //
 // private
 //
+
+enum draw_kernel_mode {
+    DRAW_NORMAL,
+    DRAW_DITHER_A,
+    DRAW_DITHER_B,
+    DRAW_NUM_MODES
+};
 
 static uColor_s blend_color(uColor_s prev, uColor_s kernel, uColor_s color) {
     vec4 p = vec4_cast_from_uchar_1(prev.v);
@@ -22,56 +30,29 @@ static uColor_s blend_color(uColor_s prev, uColor_s kernel, uColor_s color) {
     return ucvec4_cast_from_float_1(b.v);
 }
 
-static bool draw_pixel(Brush *self, int c, int r, uColor_s kernel_color) {
-    uImage img = self->canvas_ref->RO.image;
-    int layer = self->canvas_ref->current_layer;
-    if (!u_image_contains(img, c, r))
-        return false;
 
-    const Selection *selection = self->in.selection_ref;
-    if (selection && !selection_contains(selection, c, r))
-        return false;
-
-    uColor_s *pixel = u_image_pixel(img, c, r, layer);
-    if (self->shading_active) {
-        if (!u_color_equals(*pixel, self->secondary_color))
-            return false;
-    }
-    
-    *pixel = blend_color(*pixel, kernel_color, self->current_color);
-    return true;
-}
-
-static void draw_kernel(Brush *self, int c, int r) {
-   for(int kr=0; kr<self->kernel.rows; kr++) {
-       // 'd'estination
-       int dr = r - self->kernel.rows/2 + kr;
-       for(int kc=0; kc<self->kernel.cols; kc++) {
-           int dc = c - self->kernel.cols/2 + kc;
+static bool draw_kernel(Brush *self, int c, int r, enum draw_kernel_mode mode) {
+   bool changed = false;
+   for(int kr=0; kr<self->RO.kernel.rows; kr++) {
+       // 'd'estination (-0.5 to let even kernels draw more to bottom right, instead of top left)
+       int dr = kr + r - (int) ((self->RO.kernel.rows-0.5)/2);
+       for(int kc=0; kc<self->RO.kernel.cols; kc++) {
+           int dc = kc + c - (int) ((self->RO.kernel.cols-0.5)/2);
+            
+           if(mode == DRAW_DITHER_A || mode == DRAW_DITHER_B) {
+               if ((dc % 2 + dr % 2) % 2 == (mode == DRAW_DITHER_A ? 0 : 1))
+                   continue;
+           }
+               
            
-           uColor_s kernel_color = *u_image_pixel(self->kernel, kc, kr, 0);
+           uColor_s kernel_color = *u_image_pixel(self->RO.kernel, kc, kr, 0);
            
-           draw_pixel(self, dc, dr, kernel_color);
+           changed |= brush_draw_pixel(self, dc, dr, kernel_color);
        } 
    } 
+   return changed;
 }
 
-static void draw_kernel_dither(Brush *self, int c, int r, bool a) {
-   for(int kr=0; kr<self->kernel.rows; kr++) {
-       // 'd'estination
-       int dr = r - self->kernel.rows/2 + kr;
-       for(int kc=0; kc<self->kernel.cols; kc++) {
-           int dc = c - self->kernel.cols/2 + kc;
-           
-           if ((dc % 2 + dr % 2) % 2 == a ? 0 : 1)
-               continue;
-           
-           uColor_s kernel_color = *u_image_pixel(self->kernel, kc, kr, 0);
-           
-           draw_pixel(self, dc, dr, kernel_color);
-       } 
-   } 
-}
 
 
 //
@@ -88,12 +69,15 @@ Brush *brush_new(Canvas *canvas) {
     self->current_color = U_COLOR_TRANSPARENT;
     self->secondary_color = U_COLOR_TRANSPARENT;
     self->mode = BRUSH_MODE_FREE;
-    self->shape = 0;
     self->shading_active = false;
     
-    self->kernel = u_image_new_empty(5, 5, 1);
-    for(int i=0; i<25; i++)
-        *u_image_pixel_index(self->kernel, i, 0) = (uColor_s) {{255, 255, 255, 255*i/25}};
+    self->RO.kernel = u_image_new_empty(1, 1, 1);
+    *u_image_pixel_index(self->RO.kernel, 0, 0) = U_COLOR_WHITE;
+    
+    self->RO.kernel_tex = r_texture_new(
+            self->RO.kernel.cols, 
+            self->RO.kernel.rows,
+            1, 1, self->RO.kernel.data);
     
     return self;
 }
@@ -135,7 +119,7 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
 
 }
 
-bool brush_draw_pixel(Brush *self, int c, int r) {
+bool brush_draw_pixel(Brush *self, int c, int r, uColor_s kernel_color) {
     uImage img = self->canvas_ref->RO.image;
     int layer = self->canvas_ref->current_layer;
     if (!u_image_contains(img, c, r))
@@ -150,34 +134,20 @@ bool brush_draw_pixel(Brush *self, int c, int r) {
         if (!u_color_equals(*pixel, self->secondary_color))
             return false;
     }
-
-    *pixel = self->current_color;
+    
+    *pixel = blend_color(*pixel, kernel_color, self->current_color);
     return true;
 }
 
 
 bool brush_draw(Brush *self, int c, int r) {
-    
-    /*
     if (self->mode == BRUSH_MODE_DITHER) {
-        draw_kernel_dither(self, c, r, true);
-        return true;
+        return draw_kernel(self, c, r, DRAW_DITHER_A);
     }
     if (self->mode == BRUSH_MODE_DITHER2) {
-        draw_kernel_dither(self, c, r, false);
-        return true;
+        return draw_kernel(self, c, r, DRAW_DITHER_B);
     }
-    draw_kernel(self, c, r);
-    return true;
-    //*/
-    
-    //*
-    if (self->mode == BRUSH_MODE_DITHER)
-        return brushshape_draw_dither(self, c, r, true);
-    if (self->mode == BRUSH_MODE_DITHER2)
-        return brushshape_draw_dither(self, c, r, false);
-    return brushshape_draw(self, c, r);
-    //*/
+    return draw_kernel(self, c, r, DRAW_NORMAL);
 }
 
 void brush_abort_current_draw(Brush *self) {
@@ -205,6 +175,193 @@ void brush_clear(Brush *self) {
     canvas_save(self->canvas_ref);
 }
 
-void brush_reset_kernel_files(Brush *self) {
+void brush_set_kernel(Brush *self, uImage kernel_sink) {
+    if(!u_image_valid(kernel_sink)) {
+        log_error("brush: set_kernel failed, invalid");
+        return;
+    }
     
+    log_info("brush: set_kernel");
+    
+    u_image_kill(&self->RO.kernel);
+    self->RO.kernel = kernel_sink;
+    
+    r_texture_kill(&self->RO.kernel_tex);
+    self->RO.kernel_tex = r_texture_new(
+            self->RO.kernel.cols, 
+            self->RO.kernel.rows,
+            1, 1, self->RO.kernel.data);
+}
+
+void brush_load_kernel(Brush *self, int id) {
+    if(id<0 || id>=self->RO.max_kernels) {
+        log_error("brush: load_kernel failed, invalid id: %i/%i", id, self->RO.max_kernels);
+        return;
+    }
+
+    log_info("brush: load_kernel[%i]=%s", id, self->L.kernel_files[id]);
+            
+    // mount and load savestate (needed for web)
+    e_io_savestate_load();
+    
+    self->RO.kernel_id = id;
+    brush_set_kernel(self, 
+            u_image_new_file(1,
+            e_io_savestate_file_path(self->L.kernel_files[id]).s
+            ));
+}
+
+void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name) {
+    // mount and load savestate (needed for web)
+    e_io_savestate_load();
+    
+    u_image_save_file(kernel_sink, e_io_savestate_file_path(name).s);
+    
+    bool found = false;
+    for(int i=0; i<self->RO.max_kernels; i++) {
+        if(strcmp(name, self->L.kernel_files[i]) == 0) {
+            found = true;
+            break;
+        }
+    }
+    
+    if(!found) {
+        size_t len = strlen(name) + 1;
+        char *clone = rhc_malloc(len);
+        memcpy(clone, name, len);
+        self->L.kernel_files = rhc_realloc(self->L.kernel_files, sizeof *self->L.kernel_files * ++self->RO.max_kernels);
+        self->L.kernel_files[self->RO.max_kernels-1] = clone;
+    }
+    
+    // save the savestate files (needed for web)
+    e_io_savestate_save();
+    
+    brush_set_kernel(self, kernel_sink);
+    self->RO.kernel_id = self->RO.max_kernels-1;
+    brush_save_config(self);
+}
+
+
+void brush_reset_kernel_files(Brush *self) {
+    log_info("brush: reset_kernel_files");
+    uImage *kernels = brush_kernel_defaults_new();
+    
+    // mount and load savestate (needed for web)
+    e_io_savestate_load();
+    
+    for(int i=0; i<self->RO.max_kernels; i++)
+        rhc_free(self->L.kernel_files[i]);
+    
+    self->L.kernel_files = rhc_realloc(self->L.kernel_files, sizeof *self->L.kernel_files * 16);
+    
+    int i;
+    for(i=0; u_image_valid(kernels[i]); i++) {
+        assume(i<16, "change max default kernels");
+        char *name = rhc_malloc(32);
+        snprintf(name, 32, "kernel_%i.png", i);
+        u_image_save_file(kernels[i], e_io_savestate_file_path(name).s);
+        
+        self->L.kernel_files[i] = name;
+    }
+    self->RO.max_kernels = i;
+    
+    self->RO.kernel_id = 0;
+    
+    // save the savestate files (needed for web)
+    e_io_savestate_save();
+    
+    brush_set_kernel(self, u_image_new_clone(kernels[0]));
+    
+    brush_kernel_defaults_kill(&kernels);
+    
+    brush_save_config(self);
+}
+
+
+void brush_save_config(const Brush *self) {
+    log_info("brush: save_config");
+    
+    String config_string;
+    uJson *config;
+    
+    config_string = e_io_savestate_read("config.json", true);
+    config = u_json_new_str(config_string.str);
+    string_kill(&config_string);
+    
+    uJson *brush = u_json_append_object(config, "brush");
+    uJson *kernels = u_json_append_array(brush, "kernels");
+    for(char **it = self->L.kernel_files; *it; it++) {
+        u_json_append_string(kernels, NULL, *it);
+    }
+    
+    u_json_append_int(brush, "kernel_id", self->RO.kernel_id);
+    
+    config_string = u_json_to_string(config);
+    e_io_savestate_write("config.json", config_string.str, true);
+    string_kill(&config_string);
+    
+    u_json_kill(&config);
+}
+
+void brush_load_config(Brush *self) {
+    log_info("brush: load_config");
+    
+    uJson *config;
+    bool reset = false;
+    
+    String config_string = e_io_savestate_read("config.json", true);
+    config = u_json_new_str(config_string.str);
+    string_kill(&config_string);
+    
+    uJson *brush = u_json_get_object(config, "brush");
+    uJson *kernels = u_json_get_object(brush, "kernels");
+    uJson *kernel_id = u_json_get_object(brush, "kernel_id");
+    
+    int kernels_size = u_json_get_size(kernels);
+    
+    if(kernels_size <= 0) {
+        reset = true;
+        goto CLEAN_UP;
+    }
+    
+    for(int i=0; i<self->RO.max_kernels; i++)
+        rhc_free(self->L.kernel_files[i]);
+    
+    self->L.kernel_files = rhc_realloc(self->L.kernel_files, sizeof *self->L.kernel_files * kernels_size);
+    
+    self->RO.max_kernels = kernels_size;
+    
+    for(int i=0; i<kernels_size; i++) {
+        const char *file = u_json_get_string(
+                u_json_get_id(kernels, i));
+                
+        if(!file) {
+            reset = true;
+            goto CLEAN_UP;
+        }
+        
+        size_t len = strlen(file) + 1;
+        char *clone = rhc_malloc(len);
+        memcpy(clone, file, len);
+        self->L.kernel_files[i] = clone;
+    }
+    
+    int id;
+    if(!u_json_get_int(kernel_id, &id)) {
+        reset = true;
+        goto CLEAN_UP;
+    }
+    
+    if(id<0 || id>=self->RO.max_kernels) {
+        log_warn("brush: load_config failed, invalid id, setting to 0");
+        id = 0;
+    }
+    
+    brush_load_kernel(self, id);
+    
+    CLEAN_UP:
+    if(reset) {
+        brush_reset_kernel_files(self);
+    }   
+    u_json_kill(&config);
 }

@@ -22,8 +22,8 @@
 
 // canvas size
 //*
-#define COLS 32
-#define ROWS 32
+#define COLS 128
+#define ROWS 128
 #define LAYERS 1
 //*/
 
@@ -133,6 +133,9 @@ static void init(eSimple *simple, ivec2 window_size) {
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
+    
+    
+    brush_load_config(L.brush);
 }
 
 // this functions is called either each frame or at a specific update/s time

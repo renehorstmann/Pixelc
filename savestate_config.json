@@ -1,0 +1,14 @@
+{
+    "brush": {
+        "kernels": [
+            "kernel_0.png",
+            "kernel_1.png",
+            "kernel_2.png",
+            "kernel_3.png",
+            "kernel_4.png",
+            "kernel_5.png",
+            "image.png"
+        ],
+        "kernel_id": 6
+    }
+}
