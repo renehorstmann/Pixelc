@@ -199,7 +199,7 @@ void brush_load_kernel(Brush *self, int id) {
         return;
     }
 
-    log_info("brush: load_kernel[%i]=%s", id, self->L.kernel_files[id]);
+    log_info("brush: load_kernel[%i] = %s", id, self->L.kernel_files[id]);
             
     // mount and load savestate (needed for web)
     e_io_savestate_load();
@@ -209,6 +209,8 @@ void brush_load_kernel(Brush *self, int id) {
             u_image_new_file(1,
             e_io_savestate_file_path(self->L.kernel_files[id]).s
             ));
+            
+    brush_save_config(self);
 }
 
 void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name) {
@@ -290,8 +292,8 @@ void brush_save_config(const Brush *self) {
     
     uJson *brush = u_json_append_object(config, "brush");
     uJson *kernels = u_json_append_array(brush, "kernels");
-    for(char **it = self->L.kernel_files; *it; it++) {
-        u_json_append_string(kernels, NULL, *it);
+    for(int i=0; i<self->RO.max_kernels; i++) {
+        u_json_append_string(kernels, NULL, self->L.kernel_files[i]);
     }
     
     u_json_append_int(brush, "kernel_id", self->RO.kernel_id);

@@ -365,17 +365,20 @@ uJson *u_json_new_empty() {
 }
 
 uJson *u_json_new_str(Str_s str_to_parse) {
-	if(str_empty(str_to_parse))
-	    return NULL;
+	if(str_empty(str_to_parse)) {
+	    log_warn("u_json: load failed, str invalid, returning empty uJson");
+	    return u_json_new_empty();
+	}
 	uJson *root = u_json_new_empty();
 	if(!parse_r(root, &str_to_parse, "root")) {
+		log_warn("u_json: load failed, returning empty uJson");
 		u_json_kill(&root);
-		return NULL;
+		return u_json_new_empty();
 	}
 	if(root->arr_size != 1) {
-		log_error("u_json: failed, multiple root elements");
+		log_warn("u_json: load failed, multiple root elements, returning empty uJson");
 		u_json_kill(&root);
-		return NULL;
+		return u_json_new_empty();
 	}
 	uJson *self = root->data_arr;
 	rhc_free(root);
@@ -392,7 +395,7 @@ uJson *u_json_new_file(const char *file) {
 void u_json_kill(uJson **self_ptr) {
 	uJson *self = *self_ptr;
 	if(!self)
-		return;
+	    return;
 	json_kill_r(self);
 	rhc_free(self);
 	*self_ptr = NULL;

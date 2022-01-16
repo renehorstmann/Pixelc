@@ -208,7 +208,7 @@ void toolbar_update(Toolbar *self, float dtime) {
     if (button_is_pressed(&self->L.shape_minus->rect)) {
         self->L.shape_minus_time += dtime;
         if (self->L.shape_minus_time > LONG_PRESS_TIME) {
-            //self->brush_ref->shape = 0;
+            brush_load_kernel(self->brush_ref, 0);
         }
     } else
         self->L.shape_minus_time = 0;
@@ -216,7 +216,7 @@ void toolbar_update(Toolbar *self, float dtime) {
     if (button_is_pressed(&self->L.shape_plus->rect)) {
         self->L.shape_plus_time += dtime;
         if (self->L.shape_plus_time > LONG_PRESS_TIME) {
-            //self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
+            brush_load_kernel(self->brush_ref, self->brush_ref->RO.max_kernels-1);
         }
     } else
         self->L.shape_plus_time = 0;
@@ -371,16 +371,20 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.shape_minus->rect, pointer)) {
         log_info("toolbar: shape_minus");
-        //self->brush_ref->shape--;
-        //if (self->brush_ref->shape < 0)
-        //    self->brush_ref->shape = 0;
+        int shape = self->brush_ref->RO.kernel_id;
+        shape--;
+        if (shape < 0)
+            shape = 0;
+        brush_load_kernel(self->brush_ref, shape);
     }
 
     if (button_clicked(&self->L.shape_plus->rect, pointer)) {
         log_info("toolbar: shape_plus");
-        //self->brush_ref->shape++;
-        //if (self->brush_ref->shape >= BRUSH_NUM_SHAPES)
-        //    self->brush_ref->shape = BRUSH_NUM_SHAPES - 1;
+        int shape = self->brush_ref->RO.kernel_id;
+        shape++;
+        if (shape >= self->brush_ref->RO.max_kernels)
+            shape = self->brush_ref->RO.max_kernels-1;
+        brush_load_kernel(self->brush_ref, shape);
     }
 
 

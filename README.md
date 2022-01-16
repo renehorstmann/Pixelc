@@ -32,7 +32,6 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some update
-  - json append, name already exists?
   - e_io combine load into mount
   - e_io name as namespace (web may use the files on multiple games)
   - fix texture artifacts
@@ -41,6 +40,8 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
     - set the text poses to an integral position
   - custom index.html
   - file up n download
+- dither draws kernels next to each other
+- dither inverts the kernel (white - kernel color)
 - dont draw multiple times if pos not changed
 - config
   - each module may load and save config.json
