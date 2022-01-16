@@ -161,9 +161,9 @@ void toolbar_update(Toolbar *self, float dtime) {
     self->L.shape.rect.pose = pose16(self->camera_ref, -22, 10);  // should be 16x16
     int shape_w = self->brush_ref->RO.kernel.cols;
     int shape_h = self->brush_ref->RO.kernel.rows;
-    shape_w = isca_min(shape_w, 16);
-    shape_h = isca_min(shape_h, 16);
-    u_pose_set_size(&self->L.shape.rect.pose, shape_w, shape_h);
+    shape_w = isca_min(shape_w, 8);
+    shape_h = isca_min(shape_h, 8);
+    u_pose_set_size(&self->L.shape.rect.pose, shape_w*2, shape_h*2);
     self->L.shape.tex = self->brush_ref->RO.kernel_tex;
 
     // secondary color:    

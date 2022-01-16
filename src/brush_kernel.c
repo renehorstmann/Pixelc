@@ -21,8 +21,19 @@ uImage kernel_1() {
     return self;
 }
 
-// plus 3x3
+// dither 2x2
 uImage kernel_2() {
+    uImage self = u_image_new_empty(2, 2, 1);
+    for(int r=0; r<2; r++) {
+        for(int c=0; c<2; c++) {
+            *u_image_pixel(self, c, r, 0) = c%2==r%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+        }
+    }
+    return self;
+}
+
+// plus 3x3
+uImage kernel_3() {
     uImage self = u_image_new_zeros(3, 3, 1);
     for(int i=0; i<3; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
@@ -32,15 +43,23 @@ uImage kernel_2() {
 }
 
 // square 3x3
-uImage kernel_3() {
+uImage kernel_4() {
     uImage self = u_image_new_empty(3, 3, 1);
     for(int i=0; i<3*3; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
     return self;
 }
 
+// dither 3x3
+uImage kernel_5() {
+    uImage self = u_image_new_empty(3, 3, 1);
+    for(int i=0; i<3*3; i++)
+        *u_image_pixel_index(self, i, 0) = i%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+    return self;
+}
+
 // ball 4*4
-uImage kernel_4() {
+uImage kernel_6() {
     uImage self = u_image_new_zeros(4, 4, 1);
     for(int i=0; i<4; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
@@ -52,10 +71,39 @@ uImage kernel_4() {
 }
 
 // square 4x4
-uImage kernel_5() {
+uImage kernel_7() {
     uImage self = u_image_new_empty(4, 4, 1);
     for(int i=0; i<4*4; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
+    return self;
+}
+
+// dither 4x4
+uImage kernel_8() {
+    uImage self = u_image_new_empty(4, 4, 1);
+    for(int r=0; r<4; r++) {
+        for(int c=0; c<4; c++) {
+            *u_image_pixel(self, c, r, 0) = c%2==r%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+        }
+    }
+    return self;
+}
+
+// dither wide 4x4
+uImage kernel_9() {
+    uImage self = u_image_new_empty(4, 4, 1);
+    for(int r=0; r<4; r++) {
+        for(int c=0; c<4; c++) {
+            *u_image_pixel(self, c, r, 0) = c%2==(r%4>=2)? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+        }
+    }
+    return self;
+}
+
+// dither high 4x4
+uImage kernel_10() {
+    uImage self = kernel_9(); // dither wide
+    u_image_rotate(&self, true);
     return self;
 }
 
@@ -66,7 +114,7 @@ uImage kernel_5() {
 
 
 uImage *brush_kernel_defaults_new() {
-    uImage *self = rhc_calloc(sizeof *self * (6+1));
+    uImage *self = rhc_calloc(sizeof *self * (16));
     uImage *it = self;
     
     *it++ = kernel_0();
@@ -75,6 +123,11 @@ uImage *brush_kernel_defaults_new() {
     *it++ = kernel_3();
     *it++ = kernel_4();
     *it++ = kernel_5();
+    *it++ = kernel_6();
+    *it++ = kernel_7();
+    *it++ = kernel_8();
+    *it++ = kernel_9();
+    *it++ = kernel_10();
     
     *it = u_image_new_invalid();
     return self;
