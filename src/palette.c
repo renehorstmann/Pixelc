@@ -59,6 +59,8 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
 
     self->camera_ref = camera;
     self->brush_ref = brush;
+    
+    self->ro_color = R_COLOR_WHITE;
 
     self->L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
@@ -105,7 +107,7 @@ void palette_update(Palette *self, float dtime) {
         else
             col = R_COLOR_TRANSPARENT;
 
-        self->L.palette_ro.rects[i].color = col;
+        self->L.palette_ro.rects[i].color = vec4_scale_vec(col, self->ro_color);
 
 
         // background sprite
@@ -185,3 +187,4 @@ void palette_set_color(Palette *self, int index) {
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[index].pose;
     self->L.last_selected = index;
 }
+

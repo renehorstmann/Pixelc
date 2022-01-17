@@ -55,6 +55,8 @@ static void update_render_objects(Canvas *self) {
 Canvas *canvas_new(int cols, int rows, int layers, int grid_cols, int grid_rows) {
     Canvas *self = rhc_calloc(sizeof *self);
 
+    self->ro_color = R_COLOR_WHITE;
+
     self->L.grid_cols = grid_cols;
     self->L.grid_rows = grid_rows;
 
@@ -108,6 +110,8 @@ void canvas_update(Canvas *self, float dtime) {
 
         // set pose
         self->L.render_objects[i].rect.pose = self->RO.pose;
+        
+        self->L.render_objects[i].rect.color = self->ro_color;
     }
 
     self->L.grid.rect.pose = self->RO.pose;
@@ -135,6 +139,9 @@ void canvas_set_image(Canvas *self, uImage image_sink) {
     
     u_image_kill(&self->RO.image);
     self->RO.image = image_sink;
+    
+    u_image_kill(&self->L.prev_image);
+    self->L.prev_image = u_image_new_clone(image_sink);
     
     update_render_objects(self);
 }

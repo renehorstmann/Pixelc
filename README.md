@@ -40,7 +40,6 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
     - set the text poses to an integral position
   - custom index.html
   - file up n download
-- dont draw multiple times if pos not changed
 - config
   - each module may load and save config.json
   - each module uses its name as an object
@@ -56,14 +55,11 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 - buttons are not fixed in position and are in a flow container
 - buttons can be moved and turned on + off in the options menu
   - tooltip / title / text for the button
-- brushshape loaded from file
 - palette loaded from file (png) + display name
 - scale as + interpolation options
 - save in HD
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
-- VertexColors?
-  - white to color like the palette
 - background image option?
 
 

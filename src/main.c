@@ -48,7 +48,7 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1.0
-#define PLAY_FRAMES 2
+#define PLAY_FRAMES 1
 #define PLAY_FPS 2.0
 
 // uncomment the used palette:
@@ -136,6 +136,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     
     
     brush_load_config(L.brush);
+    
 }
 
 // this functions is called either each frame or at a specific update/s time

@@ -14,6 +14,8 @@ typedef struct {
     const Camera_s *camera_ref;
     Brush *brush_ref;
 
+    vec4 ro_color; // render object color (default R_COLOR_WHITE)
+
     struct {
         uColor_s palette[PALETTE_MAX];
         int palette_size;
@@ -41,5 +43,6 @@ int palette_get_color(const Palette *self);
 void palette_set_color(Palette *self, int index);
 
 void palette_set_colors(Palette *self, const uColor_s *palette, int size);
+
 
 #endif //PIXELC_PALETTE_H

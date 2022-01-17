@@ -10,6 +10,8 @@
 #define CANVAS_MAX_SAVES 128
 
 typedef struct {
+    vec4 ro_color;
+    
     int current_layer;
     bool show_grid;
     float alpha;
@@ -63,6 +65,10 @@ void canvas_undo(Canvas *self);
 
 // redos the undo (loads the next saved image, if available)
 void canvas_redo(Canvas *self);
+
+// sets the render object color for vertex color effects
+// default = R_COLOR_WHITE
+void canvas_set_ro_color(Canvas *self, vec4 color);
 
 
 #endif //PIXELC_CANVAS_H
