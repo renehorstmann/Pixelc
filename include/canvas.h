@@ -33,8 +33,8 @@ typedef struct {
         RoSingle bg;
         RoSingle grid;
         
-        int grid_rows;
         int grid_cols;
+        int grid_rows;
 
         int save_idx;
         int save_idx_max;
@@ -70,5 +70,12 @@ void canvas_redo(Canvas *self);
 // default = R_COLOR_WHITE
 void canvas_set_ro_color(Canvas *self, vec4 color);
 
+// saves the config to the savestate config.json 
+// uses object "canvas"
+void canvas_save_config(const Canvas *self);
+
+// loads the config from the savestate config.json
+// uses object "canvas"
+void canvas_load_config(Canvas *self);
 
 #endif //PIXELC_CANVAS_H

@@ -3,6 +3,8 @@
 #include "e/input.h"
 #include "r/r.h"
 #include "u/pose.h"
+#include "u/json.h"
+#include "e/io.h"
 #include "rhc/alloc.h"
 #include "brush.h"
 #include "palette.h"
@@ -26,7 +28,7 @@ static int palette_cols(const Palette *self) {
 
 static bool pos_in_palette(const Palette *self, vec2 pos) {
     int cols = palette_cols(self);
-    int rows = 1 + self->L.palette_size / cols;
+    int rows = 1 + self->RO.palette_size / cols;
     int size = rows * COLOR_DROP_SIZE;
     if (camera_is_portrait_mode(self->camera_ref)) {
         return pos.y <= self->camera_ref->RO.bottom + size;
@@ -86,7 +88,7 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
 
 void palette_update(Palette *self, float dtime) {
     int cols = palette_cols(self);
-    int last_row = (self->L.palette_size - 1) / cols;
+    int last_row = (self->RO.palette_size - 1) / cols;
     for (int i = 0; i < PALETTE_MAX; i++) {
         int r = i / cols;
         int c = i % cols;
@@ -102,8 +104,8 @@ void palette_update(Palette *self, float dtime) {
 
         // color
         vec4 col;
-        if (i < self->L.palette_size)
-            col = u_color_to_vec4(self->L.palette[i]);
+        if (i < self->RO.palette_size)
+            col = u_color_to_vec4(*u_image_pixel_index(self->RO.palette, i, 0));
         else
             col = R_COLOR_TRANSPARENT;
 
@@ -112,7 +114,7 @@ void palette_update(Palette *self, float dtime) {
 
         // background sprite
         {
-            float u = i < self->L.palette_size ? 0 : 1;
+            float u = i < self->RO.palette_size ? 0 : 1;
             float v = r < last_row ? 1 : 0;
             self->L.background_ro.rects[i].sprite = (vec2) {{u, v}};
         }
@@ -154,7 +156,7 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return true;
 
-    for (int i = 0; i < self->L.palette_size; i++) {
+    for (int i = 0; i < self->RO.palette_size; i++) {
         if (u_pose_contains(self->L.palette_ro.rects[i].pose, pointer.pos)) {
             palette_set_color(self, i);
             return true;
@@ -166,25 +168,222 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
 
 float palette_get_hud_size(const Palette *self) {
     int cols = palette_cols(self);
-    int rows = 1 + self->L.palette_size / cols;
+    int rows = 1 + self->RO.palette_size / cols;
     return rows * COLOR_DROP_SIZE;
 }
-
-void palette_set_colors(Palette *self, const uColor_s *palette, int size) {
-    assert(size < PALETTE_MAX);
-    memcpy(self->L.palette, palette, sizeof(uColor_s) * size);
-    self->L.palette_size = size;
-    palette_set_color(self, 0);
-}
-
 
 int palette_get_color(const Palette *self) {
     return self->L.last_selected;
 }
 
 void palette_set_color(Palette *self, int index) {
-    self->brush_ref->current_color = self->L.palette[index];
+    if(index<0 || index>=self->RO.palette_size) {
+        log_error("palette: set_color failed, invalid index (%i/%i)", 
+                index, self->RO.palette_size);
+        return;
+    }
+    self->brush_ref->current_color = *u_image_pixel_index(self->RO.palette, index, 0);
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[index].pose;
     self->L.last_selected = index;
 }
 
+void palette_set_colors(Palette *self, const uColor_s *palette, int size) {
+    uImage p = u_image_new_empty(size, 1, 1);
+    memcpy(p.data, palette, sizeof *palette * size);
+    palette_set_palette(self, p, NULL);
+}
+
+
+void palette_set_palette(Palette *self, uImage palette_sink, const char *name) {
+    if(!u_image_valid(palette_sink)) {
+        log_error("palette: set_palette failed, invalid");
+        return;
+    } 
+    
+    int size = palette_sink.cols * palette_sink.rows;
+    
+    if(size > PALETTE_MAX || palette_sink.layers != 1) {
+        log_error("palette: set_palette failed, to large, or multiple layers (%i/%i)", 
+                size, PALETTE_MAX);
+        u_image_kill(&palette_sink);
+        return;
+    }
+    log_info("palette: set_palette");
+    u_image_kill(&self->RO.palette);
+    self->RO.palette = palette_sink;
+    self->RO.palette_size = size;
+    self->RO.palette_name = name? name : "custom palette";
+    palette_set_color(self, 0);
+}
+
+void palette_load_palette(Palette *self, int id) {
+    if(id<0 || id>=self->RO.max_palettes) {
+        log_error("palette: load_palette failed, invalid id: %i/%i", id, self->RO.max_palettes);
+        return;
+    }
+
+    log_info("palette: load_palette[%i] = %s", id, self->L.palette_files[id]);
+            
+    // mount and load savestate (needed for web)
+    e_io_savestate_load();
+    
+    self->RO.palette_id = id;
+    palette_set_palette(self, 
+            u_image_new_file(1,
+            e_io_savestate_file_path(self->L.palette_files[id]).s
+            ), self->L.palette_files[id]);
+            
+    palette_save_config(self);
+}
+
+void palette_append_file(Palette *self, uImage palette_sink, const char *name) {
+    log_info("palette: append_file: %s", name);
+    // mount and load savestate (needed for web)
+    e_io_savestate_load();
+    
+    u_image_save_file(palette_sink, e_io_savestate_file_path(name).s);
+    
+    int idx = -1;
+    for(int i=0; i<self->RO.max_palettes; i++) {
+        if(strcmp(name, self->L.palette_files[i]) == 0) {
+            idx = i;
+            break;
+        }
+    }
+    
+    if(idx==-1) {
+        size_t len = strlen(name) + 1;
+        char *clone = rhc_malloc(len);
+        memcpy(clone, name, len);
+        self->L.palette_files = rhc_realloc(self->L.palette_files, sizeof *self->L.palette_files * ++self->RO.max_palettes);
+        idx = self->RO.max_palettes-1;
+        self->L.palette_files[idx] = clone;
+    }
+    
+    // save the savestate files (needed for web)
+    e_io_savestate_save();
+    
+    palette_set_palette(self, palette_sink, self->L.palette_files[idx]);
+    self->RO.palette_id = idx;
+    palette_save_config(self);
+}
+
+void palette_reset_palette_files(Palette *self) {
+    log_info("palette: reset_palette_files");
+    uImage *palettes = palette_defaults_new();
+    
+    // mount and load savestate (needed for web)
+    e_io_savestate_load();
+    
+    for(int i=0; i<self->RO.max_palettes; i++)
+        rhc_free(self->L.palette_files[i]);
+    
+    self->L.palette_files = rhc_realloc(self->L.palette_files, sizeof *self->L.palette_files * 16);
+    
+    int i;
+    for(i=0; u_image_valid(palettes[i]); i++) {
+        assume(i<16, "change max default palettes");
+        char *name = palette_defaults_name_on_heap(i);
+        u_image_save_file(palettes[i], e_io_savestate_file_path(name).s);
+        
+        self->L.palette_files[i] = name;
+    }
+    self->RO.max_palettes = i;
+    
+    self->RO.palette_id = 0;
+    
+    // save the savestate files (needed for web)
+    e_io_savestate_save();
+    
+    palette_set_palette(self, u_image_new_clone(palettes[0]), self->L.palette_files[i]);
+    
+    palette_defaults_kill(&palettes);
+    
+    palette_save_config(self);
+}
+
+void palette_save_config(const Palette *self) {
+    log_info("palette: save_config");
+    
+    String config_string;
+    uJson *config;
+    
+    config_string = e_io_savestate_read("config.json", true);
+    config = u_json_new_str(config_string.str);
+    string_kill(&config_string);
+    
+    uJson *palette = u_json_append_object(config, "palette");
+    uJson *palette_files = u_json_append_array(palette, "palette_files");
+    for(int i=0; i<self->RO.max_palettes; i++) {
+        u_json_append_string(palette_files, NULL, self->L.palette_files[i]);
+    }
+    
+    u_json_append_int(palette, "palette_id", self->RO.palette_id);
+    
+    config_string = u_json_to_string(config);
+    e_io_savestate_write("config.json", config_string.str, true);
+    string_kill(&config_string);
+    
+    u_json_kill(&config);
+}
+
+void palette_load_config(Palette *self) {
+    log_info("palette: load_config");
+    
+    uJson *config;
+    bool reset = false;
+    
+    String config_string = e_io_savestate_read("config.json", true);
+    config = u_json_new_str(config_string.str);
+    string_kill(&config_string);
+    
+    uJson *palette = u_json_get_object(config, "palette");
+    uJson *palette_files = u_json_get_object(palette, "palette_files");
+    
+    int palettes_size = u_json_get_size(palette_files);
+    
+    if(palettes_size <= 0) {
+        reset = true;
+        goto CLEAN_UP;
+    }
+    
+    for(int i=0; i<self->RO.max_palettes; i++)
+        rhc_free(self->L.palette_files[i]);
+    
+    self->L.palette_files = rhc_realloc(self->L.palette_files, sizeof *self->L.palette_files * palettes_size);
+    
+    self->RO.max_palettes = palettes_size;
+    
+    for(int i=0; i<palettes_size; i++) {
+        const char *file = u_json_get_id_string(palette_files, i);
+                
+        if(!file) {
+            reset = true;
+            goto CLEAN_UP;
+        }
+        
+        size_t len = strlen(file) + 1;
+        char *clone = rhc_malloc(len);
+        memcpy(clone, file, len);
+        self->L.palette_files[i] = clone;
+    }
+    
+    int id;
+    if(!u_json_get_object_int(palette, "palette_id", &id)) {
+        reset = true;
+        goto CLEAN_UP;
+    }
+    
+    if(id<0 || id>=self->RO.max_palettes) {
+        log_warn("palette: load_config failed, invalid id, setting to 0");
+        id = 0;
+    }
+    
+    palette_load_palette(self, id);
+    
+    CLEAN_UP:
+    if(reset) {
+        palette_reset_palette_files(self);
+    }   
+    u_json_kill(&config);
+}

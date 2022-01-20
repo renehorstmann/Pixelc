@@ -7,14 +7,14 @@
 // 
 
 // dot
-uImage kernel_0() {
+static uImage kernel_0() {
     uImage self = u_image_new_empty(1, 1, 1);
     *u_image_pixel(self, 0, 0, 0) = U_COLOR_WHITE;
     return self;
 }
 
 // square 2x2
-uImage kernel_1() {
+static uImage kernel_1() {
     uImage self = u_image_new_empty(2, 2, 1);
     for(int i=0; i<2*2; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
@@ -22,7 +22,7 @@ uImage kernel_1() {
 }
 
 // dither 2x2
-uImage kernel_2() {
+static uImage kernel_2() {
     uImage self = u_image_new_empty(2, 2, 1);
     for(int r=0; r<2; r++) {
         for(int c=0; c<2; c++) {
@@ -33,7 +33,7 @@ uImage kernel_2() {
 }
 
 // plus 3x3
-uImage kernel_3() {
+static uImage kernel_3() {
     uImage self = u_image_new_zeros(3, 3, 1);
     for(int i=0; i<3; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
@@ -43,7 +43,7 @@ uImage kernel_3() {
 }
 
 // square 3x3
-uImage kernel_4() {
+static uImage kernel_4() {
     uImage self = u_image_new_empty(3, 3, 1);
     for(int i=0; i<3*3; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
@@ -51,7 +51,7 @@ uImage kernel_4() {
 }
 
 // dither 3x3
-uImage kernel_5() {
+static uImage kernel_5() {
     uImage self = u_image_new_empty(3, 3, 1);
     for(int i=0; i<3*3; i++)
         *u_image_pixel_index(self, i, 0) = i%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
@@ -59,7 +59,7 @@ uImage kernel_5() {
 }
 
 // ball 4*4
-uImage kernel_6() {
+static uImage kernel_6() {
     uImage self = u_image_new_zeros(4, 4, 1);
     for(int i=0; i<4; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
@@ -71,7 +71,7 @@ uImage kernel_6() {
 }
 
 // square 4x4
-uImage kernel_7() {
+static uImage kernel_7() {
     uImage self = u_image_new_empty(4, 4, 1);
     for(int i=0; i<4*4; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
@@ -79,7 +79,7 @@ uImage kernel_7() {
 }
 
 // dither 4x4
-uImage kernel_8() {
+static uImage kernel_8() {
     uImage self = u_image_new_empty(4, 4, 1);
     for(int r=0; r<4; r++) {
         for(int c=0; c<4; c++) {
@@ -90,7 +90,7 @@ uImage kernel_8() {
 }
 
 // dither wide 4x4
-uImage kernel_9() {
+static uImage kernel_9() {
     uImage self = u_image_new_empty(4, 4, 1);
     for(int r=0; r<4; r++) {
         for(int c=0; c<4; c++) {
@@ -101,7 +101,7 @@ uImage kernel_9() {
 }
 
 // dither high 4x4
-uImage kernel_10() {
+static uImage kernel_10() {
     uImage self = kernel_9(); // dither wide
     u_image_rotate(&self, true);
     return self;

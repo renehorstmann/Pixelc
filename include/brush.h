@@ -70,7 +70,7 @@ void brush_load_kernel(Brush *self, int id);
 
 // saves kernel_sink into the config and calls brush_set_kernel 
 //   (which will take the ownership of kernel_sink)
-// calla brush_save_config
+// calls brush_save_config
 void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name);
 
 // creates the default kernel files
@@ -88,7 +88,7 @@ void brush_load_config(Brush *self);
 
 
 //
-// brush_kernel creation, see brush_kernel.c
+// brush_kernel creation, see brush_kernel_defaults.c
 //
 
 // returns a !u_image_valid terminated list of default kernels

@@ -5,6 +5,8 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "u/image.h"
+#include "u/json.h"
+#include "e/io.h"
 #include "mathc/mat/float.h"
 
 #include "palette.h"
@@ -138,9 +140,9 @@ void canvas_set_image(Canvas *self, uImage image_sink) {
     log_info("canvas: set_image");
     
     u_image_kill(&self->RO.image);
-    self->RO.image = image_sink;
-    
     u_image_kill(&self->L.prev_image);
+    
+    self->RO.image = image_sink;
     self->L.prev_image = u_image_new_clone(image_sink);
     
     update_render_objects(self);
@@ -197,4 +199,59 @@ void canvas_redo(Canvas *self) {
         self->L.save_idx = 0;
         
     load_image(self);
+}
+
+void canvas_save_config(const Canvas *self) {
+    log_info("canvas: save_config");
+    
+    String config_string;
+    uJson *config;
+    
+    config_string = e_io_savestate_read("config.json", true);
+    config = u_json_new_str(config_string.str);
+    string_kill(&config_string);
+    
+    uJson *canvas = u_json_append_object(config, "canvas");
+    
+    u_json_append_int(canvas, "cols", self->RO.image.cols);
+    u_json_append_int(canvas, "rows", self->RO.image.rows);
+    u_json_append_int(canvas, "layers", self->RO.image.layers);
+    u_json_append_int(canvas, "grid_cols", self->L.grid_cols);
+    u_json_append_int(canvas, "grid_rows", self->L.grid_rows);
+    
+    config_string = u_json_to_string(config);
+    e_io_savestate_write("config.json", config_string.str, true);
+    string_kill(&config_string);
+    
+    u_json_kill(&config);
+}
+
+void canvas_load_config(Canvas *self) {
+    log_info("canvas: load_config");
+    
+    uJson *config;
+    
+    String config_string = e_io_savestate_read("config.json", true);
+    config = u_json_new_str(config_string.str);
+    string_kill(&config_string);
+    
+    uJson *canvas = u_json_get_object(config, "canvas");
+    int cols, rows, layers;
+    if(u_json_get_object_int(canvas, "cols", &cols)
+        && u_json_get_object_int(canvas, "rows", &rows)
+        && u_json_get_object_int(canvas, "layers", &layers)) {
+        
+        // todo
+    }
+    
+    int grid_cols, grid_rows;
+    if(u_json_get_object_int(canvas, "grid_cols", &grid_cols)
+        && u_json_get_object_int(canvas, "grid_rows", &grid_rows)) {
+        self->L.grid_cols = grid_cols;
+        self->L.grid_rows = grid_rows;
+    }
+    
+    update_render_objects(self);
+    
+    u_json_kill(&config);
 }

@@ -17,9 +17,9 @@ enum draw_kernel_mode {
 };
 
 static uColor_s blend_color(uColor_s prev, uColor_s kernel, uColor_s color) {
-    vec4 p = vec4_cast_from_uchar_1(prev.v);
-    vec4 k = vec4_cast_from_uchar_1(kernel.v);
-    vec4 c = vec4_cast_from_uchar_1(color.v);
+    vec4 p = u_color_to_vec4(prev);
+    vec4 k = u_color_to_vec4(kernel);
+    vec4 c = u_color_to_vec4(color);
       
     // kernel * color for each channel
     vec4 kc = vec4_scale_vec(k, c);
@@ -27,7 +27,7 @@ static uColor_s blend_color(uColor_s prev, uColor_s kernel, uColor_s color) {
     // kernel sets the resulting opacity
     vec4 b = vec4_mix(p, kc, k.a);
     
-    return ucvec4_cast_from_float_1(b.v);
+    return u_color_from_vec4(b);
 }
 
 
@@ -218,6 +218,7 @@ void brush_load_kernel(Brush *self, int id) {
 }
 
 void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name) {
+    log_info("brush: append_file: %s", name);
     // mount and load savestate (needed for web)
     e_io_savestate_load();
     
@@ -295,9 +296,9 @@ void brush_save_config(const Brush *self) {
     string_kill(&config_string);
     
     uJson *brush = u_json_append_object(config, "brush");
-    uJson *kernels = u_json_append_array(brush, "kernels");
+    uJson *kernel_files = u_json_append_array(brush, "kernel_files");
     for(int i=0; i<self->RO.max_kernels; i++) {
-        u_json_append_string(kernels, NULL, self->L.kernel_files[i]);
+        u_json_append_string(kernel_files, NULL, self->L.kernel_files[i]);
     }
     
     u_json_append_int(brush, "kernel_id", self->RO.kernel_id);
@@ -320,10 +321,9 @@ void brush_load_config(Brush *self) {
     string_kill(&config_string);
     
     uJson *brush = u_json_get_object(config, "brush");
-    uJson *kernels = u_json_get_object(brush, "kernels");
-    uJson *kernel_id = u_json_get_object(brush, "kernel_id");
+    uJson *kernel_files = u_json_get_object(brush, "kernel_files");
     
-    int kernels_size = u_json_get_size(kernels);
+    int kernels_size = u_json_get_size(kernel_files);
     
     if(kernels_size <= 0) {
         reset = true;
@@ -338,8 +338,7 @@ void brush_load_config(Brush *self) {
     self->RO.max_kernels = kernels_size;
     
     for(int i=0; i<kernels_size; i++) {
-        const char *file = u_json_get_string(
-                u_json_get_id(kernels, i));
+        const char *file = u_json_get_id_string(kernel_files, i);
                 
         if(!file) {
             reset = true;
@@ -353,7 +352,7 @@ void brush_load_config(Brush *self) {
     }
     
     int id;
-    if(!u_json_get_int(kernel_id, &id)) {
+    if(!u_json_get_object_int(brush, "kernel_id", &id)) {
         reset = true;
         goto CLEAN_UP;
     }

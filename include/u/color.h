@@ -27,6 +27,11 @@ static vec4 u_color_to_vec4(uColor_s color) {
     return vec4_cast_from_uchar_1(color.v);
 }
 
+// casts a vec4 to a color from the range [0:1]
+static uColor_s u_color_from_vec4(vec4 color) {
+    return ucvec4_cast_from_float_1(color.v);
+}
+
 // creates a color from a hex string
 static uColor_s u_color_from_hex(const char *hex_string) {
     uColor_s c = {0};
