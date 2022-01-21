@@ -50,4 +50,10 @@ void r_texture2d_filter_linear(rTexture2D self);
 // sets the rendering interpolation to nearest (pixelart)
 void r_texture2d_filter_nearest(rTexture2D self);
 
+// sets the texture wrap mode to repeat, so that the texture will be repeated, if uv is reset
+void r_texture2d_wrap_repeat(rTexture2D self);
+
+// sets the texture wrap mode to clamp, so that the border pixels will be repeated, if uv is reset (default)
+void r_texture2d_wrap_clamp(rTexture2D self);
+
 #endif //R_TEXTURE2D_H

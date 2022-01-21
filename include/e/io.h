@@ -10,6 +10,16 @@
 
 #define E_IO_SAVESTATE_MAX_FILENAME_LENGTH 128
 
+typedef void (*eIoFileUploadCallback)(const char *file, bool ascii, void *user_data);
+
+// web: offer the given file as download
+void e_io_offer_file_as_download(const char *file);
+
+// web: opens a file dialog to upload a file
+//      on success, callback is called
+//      should be called after a pointer event, or the browser may discard the file dialog
+void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallback callback, void *user_data);
+
 
 // web: mount and load IndexedDB files
 void e_io_savestate_load();
@@ -19,8 +29,8 @@ void e_io_savestate_save();
 
 
 struct eIoSavestateString {
-    // Additional 16 bytes for the path
-    char s[16 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
+    // Additional 64 bytes for the path (+title for web)
+    char s[64 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
 };
 
 // creates a savestate file path to load and save with default FILE's
@@ -56,6 +66,13 @@ bool e_io_savestate_write(const char *filename, Str_s content, bool ascii);
 // returns false on error
 bool e_io_savestate_append(const char *filename, Str_s content, bool ascii);
 
+
+// write a user file
+// web will just save the file in the working dir and offer it as a download
+// others create userfile_<filename>
+// filename must not include directories (/)
+// returns false on error
+bool e_io_userfile_write(const char *filename, bool ascii);
 
 
 #endif //E_IO_H

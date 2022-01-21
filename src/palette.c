@@ -63,6 +63,7 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
     self->brush_ref = brush;
     
     self->ro_color = R_COLOR_WHITE;
+    self->include_transparent_at_set_colors = true;
 
     self->L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
@@ -79,7 +80,7 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
                 {128, 128, 128, 255},
                 {255, 255, 255, 255}
         };
-        palette_set_colors(self, palette, 4);
+        palette_set_colors(self, palette, 4, NULL);
     }
 
     return self;
@@ -105,7 +106,7 @@ void palette_update(Palette *self, float dtime) {
         // color
         vec4 col;
         if (i < self->RO.palette_size)
-            col = u_color_to_vec4(*u_image_pixel_index(self->RO.palette, i, 0));
+            col = u_color_to_vec4(self->RO.palette[i]);
         else
             col = R_COLOR_TRANSPARENT;
 
@@ -182,38 +183,55 @@ void palette_set_color(Palette *self, int index) {
                 index, self->RO.palette_size);
         return;
     }
-    self->brush_ref->current_color = *u_image_pixel_index(self->RO.palette, index, 0);
+    self->brush_ref->current_color = self->RO.palette[index];
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[index].pose;
     self->L.last_selected = index;
 }
 
-void palette_set_colors(Palette *self, const uColor_s *palette, int size) {
-    uImage p = u_image_new_empty(size, 1, 1);
-    memcpy(p.data, palette, sizeof *palette * size);
-    palette_set_palette(self, p, NULL);
+void palette_set_colors(Palette *self, const uColor_s *palette, int size, const char *name_ref) {
+    log_info("palette: set_colors: %s", name_ref);
+    assume(size>0, "palette set_colors failed");
+    
+    self->RO.palette_size = 0;
+    
+    if(self->include_transparent_at_set_colors) {
+        self->RO.palette[self->RO.palette_size++] = U_COLOR_TRANSPARENT;
+    }
+    
+    // copy unique colors
+    for(int i=0; i<size && self->RO.palette_size<PALETTE_MAX; i++) {
+        bool found = false;
+        for(int j=0; j<self->RO.palette_size; j++) {
+            if(u_color_equals(palette[i], self->RO.palette[j])) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            self->RO.palette[self->RO.palette_size++] = palette[i];
+        }
+    }
+    
+    palette_set_color(self, 0);
+    self->RO.palette_name = name_ref? name_ref : "custom palette";
 }
 
 
-void palette_set_palette(Palette *self, uImage palette_sink, const char *name) {
-    if(!u_image_valid(palette_sink)) {
+void palette_set_palette(Palette *self, uImage palette, const char *name_ref) {
+    if(!u_image_valid(palette)) {
         log_error("palette: set_palette failed, invalid");
         return;
     } 
     
-    int size = palette_sink.cols * palette_sink.rows;
+    int size = palette.cols * palette.rows;
     
-    if(size > PALETTE_MAX || palette_sink.layers != 1) {
+    if(size > PALETTE_MAX || palette.layers != 1) {
         log_error("palette: set_palette failed, to large, or multiple layers (%i/%i)", 
                 size, PALETTE_MAX);
-        u_image_kill(&palette_sink);
         return;
     }
-    log_info("palette: set_palette");
-    u_image_kill(&self->RO.palette);
-    self->RO.palette = palette_sink;
-    self->RO.palette_size = size;
-    self->RO.palette_name = name? name : "custom palette";
-    palette_set_color(self, 0);
+    
+    palette_set_colors(self, palette.data, size, name_ref);
 }
 
 void palette_load_palette(Palette *self, int id) {
@@ -227,21 +245,25 @@ void palette_load_palette(Palette *self, int id) {
     // mount and load savestate (needed for web)
     e_io_savestate_load();
     
-    self->RO.palette_id = id;
-    palette_set_palette(self, 
-            u_image_new_file(1,
+    uImage palette = u_image_new_file(1,
             e_io_savestate_file_path(self->L.palette_files[id]).s
-            ), self->L.palette_files[id]);
+            );
+    
+    self->RO.palette_id = id;
+    palette_set_palette(self, palette,
+            self->L.palette_files[id]);
             
+    u_image_kill(&palette);        
+    
     palette_save_config(self);
 }
 
-void palette_append_file(Palette *self, uImage palette_sink, const char *name) {
+void palette_append_file(Palette *self, uImage palette, const char *name) {
     log_info("palette: append_file: %s", name);
     // mount and load savestate (needed for web)
     e_io_savestate_load();
     
-    u_image_save_file(palette_sink, e_io_savestate_file_path(name).s);
+    u_image_save_file(palette, e_io_savestate_file_path(name).s);
     
     int idx = -1;
     for(int i=0; i<self->RO.max_palettes; i++) {
@@ -263,7 +285,7 @@ void palette_append_file(Palette *self, uImage palette_sink, const char *name) {
     // save the savestate files (needed for web)
     e_io_savestate_save();
     
-    palette_set_palette(self, palette_sink, self->L.palette_files[idx]);
+    palette_set_palette(self, palette, self->L.palette_files[idx]);
     self->RO.palette_id = idx;
     palette_save_config(self);
 }
@@ -295,7 +317,7 @@ void palette_reset_palette_files(Palette *self) {
     // save the savestate files (needed for web)
     e_io_savestate_save();
     
-    palette_set_palette(self, u_image_new_clone(palettes[0]), self->L.palette_files[i]);
+    palette_set_palette(self, palettes[0], self->L.palette_files[0]);
     
     palette_defaults_kill(&palettes);
     

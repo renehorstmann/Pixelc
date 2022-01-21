@@ -75,11 +75,9 @@ rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int spr
              self.sprites.x * self.sprites.y,
              0, GL_RGBA, GL_UNSIGNED_BYTE, opt_buffer);
 
-    // GL_REPEAT is already default...
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     r_texture_filter_nearest(self);
+    r_texture_wrap_clamp(self);
     
     // NULL safe free
     rhc_free(tmp_buffer);
@@ -168,8 +166,27 @@ void r_texture_filter_nearest(rTexture self) {
     if(!r_texture_valid(self))
         return;
     glBindTexture(GL_TEXTURE_2D_ARRAY, self.tex);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     r_render_error_check("r_texture_filter_nearest");
 }
 
+void r_texture_wrap_repeat(rTexture self) {
+    r_render_error_check("r_texture_wrap_repeatBEGIN");
+    if(!r_texture_valid(self))
+        return;
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self.tex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    r_render_error_check("r_texture_wrap_repeat");
+}
+
+void r_texture_wrap_clamp(rTexture self) {
+    r_render_error_check("r_texture_wrap_clampBEGIN");
+    if(!r_texture_valid(self))
+        return;
+    glBindTexture(GL_TEXTURE_2D_ARRAY, self.tex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    r_render_error_check("r_texture_wrap_clamp");
+}

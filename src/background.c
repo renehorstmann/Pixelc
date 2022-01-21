@@ -27,7 +27,10 @@ Background *background_new(uColor_s a, uColor_s b) {
     buf[0] = buf[3] = a;
     buf[1] = buf[2] = b;
 
-    self->L.ro = ro_single_new(r_texture_new(2, 2, 1, 1, buf));
+    rTexture tex = r_texture_new(2, 2, 1, 1, buf);
+    r_texture_wrap_repeat(tex);
+    self->L.ro = ro_single_new(tex);
+    
     return self;
 }
 

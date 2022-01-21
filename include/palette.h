@@ -16,8 +16,10 @@ typedef struct {
 
     vec4 ro_color; // render object color (default R_COLOR_WHITE)
     
+    bool include_transparent_at_set_colors;
+    
     struct {
-        uImage palette;
+        uColor_s palette[PALETTE_MAX];
         int palette_size;
         int palette_id;
         const char *palette_name;
@@ -51,10 +53,10 @@ int palette_get_color(const Palette *self);
 void palette_set_color(Palette *self, int index);
 
 // creates an uImage and calls palette_set_palette
-void palette_set_colors(Palette *self, const uColor_s *palette, int size);
+void palette_set_colors(Palette *self, const uColor_s *palette, int size, const char *name_ref);
 
-// moves ownership of palette_sink to palette
-void palette_set_palette(Palette *self, uImage palette_sink, const char *name);
+// calls palette_set_colors with the unique colors of palette
+void palette_set_palette(Palette *self, uImage palette, const char *name_ref);
 
 // loads a palette by its id
 void palette_load_palette(Palette *self, int id);
@@ -62,7 +64,7 @@ void palette_load_palette(Palette *self, int id);
 // saves palette_sink into the config and calls palette_set_palette
 //   (which will take the ownership of palette_sink)
 // calls palette_save_config
-void palette_append_file(Palette *self, uImage palette_sink, const char *name);
+void palette_append_file(Palette *self, uImage palette, const char *name);
 
 // creates the default palette files
 // sets the palette to the first file

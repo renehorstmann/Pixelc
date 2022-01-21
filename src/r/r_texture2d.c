@@ -21,11 +21,9 @@ rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffe
              self.size.x, self.size.y, 
              0, GL_RGBA, GL_UNSIGNED_BYTE, opt_buffer);
 
-    // GL_REPEAT is already default...
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
     r_texture2d_filter_nearest(self);
+    r_texture2d_wrap_clamp(self);
+
     r_render_error_check("r_texture2d_new");
     return self;
 }
@@ -108,8 +106,28 @@ void r_texture2d_filter_nearest(rTexture2D self) {
     if(!r_texture2d_valid(self))
         return;
     glBindTexture(GL_TEXTURE_2D, self.tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     r_render_error_check("r_texture2d_filter_nearest");
+}
+
+void r_texture2d_wrap_repeat(rTexture2D self) {
+    r_render_error_check("r_texture2d_wrap_repeatBEGIN");
+    if(!r_texture2d_valid(self))
+        return;
+    glBindTexture(GL_TEXTURE_2D, self.tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    r_render_error_check("r_texture2d_wrap_repeat");
+}
+
+void r_texture2d_wrap_clamp(rTexture2D self) {
+    r_render_error_check("r_texture2d_wrap_clampBEGIN");
+    if(!r_texture2d_valid(self))
+        return;
+    glBindTexture(GL_TEXTURE_2D, self.tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    r_render_error_check("r_texture2d_wrap_clamp");
 }
 

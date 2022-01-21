@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>some</title>
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icon180.png">
+    <link rel="shortcut icon" href="icon196.png" sizes="196x196">
+
+    <style>
+        #canvas {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: block;
+            border: 0px none;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+
+<input id="file_uploader" type="file" style="opacity: 0"/>
+<input id="file_uploader_png" type="file" accept="image/png" style="opacity: 0"/>
+<input id="file_uploader_txt" type="file" accept="text/plain" style="opacity: 0"/>
+<input id="file_uploader_json" type="file" accept="application/json" style="opacity: 0"/>
+
+<script type='text/javascript'>
+    function set_exit_failure_error_msg() {
+        var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">Potato Browsers are not supported!</h1><p style="color:silver;">Full WebGL2.0 is needed!</p></body></html>';
+        document.open();
+        document.write(newContent);
+        document.close();
+    }
+
+    function offer_file_as_download(filename) {
+        try {
+            var mime = "application/octet-stream";
+
+            filename_lower = filename.toLowerCase();
+            if (filename_lower.endsWith(".png"))
+                mime = "image/png";
+            else if (filename_lower.endsWith(".txt"))
+                mime = "text/plain";
+            else if (filename_lower.endsWith(".json"))
+                mime = "application/json";
+
+            let content = Module.FS.readFile(filename);
+            console.log(`Offering download of "${filename}", with ${content.length} bytes...`);
+
+            var a = document.createElement('a');
+            a.download = filename;
+            a.href = URL.createObjectURL(new Blob([content], {type: mime}));
+            a.style.display = 'none';
+
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            }, 2000);
+        } catch (e) {
+            console.log('offering file download failed for file: ', filename);
+        }
+    }
+
+    var file_upload_filename = 'none.txt'
+    var file_upload_is_ascii = false;
+
+    function handle_file_upload(evt) {
+        console.log('got a file event upload for: ' + file_upload_filename + ' is_ascii: ' + file_upload_is_ascii);
+        try {
+            var files = evt.target.files; // FileList object
+
+            var fr = new FileReader();
+            fr.onload = function () {
+                var data = fr.result;
+                var mode = 'wb';
+                if (file_upload_is_ascii)
+                    mode = 'w';
+                var stream = FS.open(file_upload_filename, mode);
+                var data_bytes = new Uint8Array(data);
+                FS.write(stream, data_bytes, 0, data_bytes.length, 0);
+                FS.close(stream);
+                ccall('e_io_file_upload_done', 'v', ['string', 'boolean'],
+                    [file_upload_filename, file_upload_is_ascii]);
+            };
+            fr.readAsArrayBuffer(files[0]);
+        } catch (e) {
+            console.log('file event failed for upload for: ' + file_upload_filename + ' is_ascii: ' + file_upload_is_ascii);
+        }
+    }
+
+    file_uploader = document.getElementById('file_uploader');
+    file_uploader_png = document.getElementById('file_uploader_png');
+    file_uploader_txt = document.getElementById('file_uploader_txt');
+    file_uploader_png = document.getElementById('file_uploader_json');
+
+    file_uploader.addEventListener('change', handle_file_upload, false);
+    file_uploader_png.addEventListener('change', handle_file_upload, false);
+    file_uploader_txt.addEventListener('change', handle_file_upload, false);
+    file_uploader_png.addEventListener('change', handle_file_upload, false);
+
+    function ask_for_file_upload(filename, as_ascii) {
+        // Check for the various File API support.
+        if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+            alert('The File APIs are not fully supported in this browser.');
+            return;
+        }
+
+        file_upload_filename = filename;
+        file_upload_is_ascii = as_ascii;
+
+        filename_lower = filename.toLowerCase();
+        file_uploader = document.getElementById('file_uploader');
+        if (filename_lower.endsWith(".png"))
+            file_uploader = document.getElementById('file_uploader_png');
+        else if (filename_lower.endsWith(".txt"))
+            file_uploader = document.getElementById('file_uploader_txt');
+        else if (filename_lower.endsWith(".json"))
+            file_uploader = document.getElementById('file_uploader_json');
+
+        file_uploader.click();
+    }
+
+    var Module = {
+        canvas: (function () {
+            var canvas = document.getElementById('canvas');
+            canvas.addEventListener("webglcontextlost", function (e) {
+                alert('WebGL context lost. You will need to reload the page.');
+                e.preventDefault();
+            }, false);
+
+            return canvas;
+        })()
+    };
+    window.onerror = function (event) {
+        set_exit_failure_error_msg();
+    };
+
+
+</script>
+<script async type="text/javascript" src="index.js"></script>
+</body>
+</html>
+
+

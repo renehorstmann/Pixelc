@@ -12,7 +12,7 @@ static void palettepresave_grayscale(Palette *self) {
         uint8_t val = (i - 1) * 255 / 8;
         palette[i] = (uColor_s) {val, val, val, 255};
     }
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 static void palettepresave_grayscale_alpha(Palette *self) {
@@ -26,7 +26,7 @@ static void palettepresave_grayscale_alpha(Palette *self) {
             palette[i + r * 10] = (uColor_s) {val, val, val, alpha};
         }
     }
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 static void palettepresave_pixilmatt(Palette *self) {
@@ -77,7 +77,7 @@ static void palettepresave_pixilmatt(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 static void palettepresave_slso8(Palette *self) {
@@ -100,7 +100,7 @@ static void palettepresave_slso8(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 
@@ -119,7 +119,7 @@ static void palettepresave_gameboy(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 
@@ -166,7 +166,7 @@ static void palettepresave_endesga32(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 
@@ -245,7 +245,7 @@ static void palettepresave_endesga64(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 
@@ -315,7 +315,7 @@ static void palettepresave_nes(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 
@@ -394,7 +394,7 @@ static void palettepresave_aap64(Palette *self) {
         palette[i] = u_color_from_hex(hex[i]);
     }
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 static void palettepresave_refrection_values(Palette *self) {
@@ -415,7 +415,7 @@ static void palettepresave_refrection_values(Palette *self) {
 
     int size = sizeof(palette) / sizeof(uColor_s);
 
-    palette_set_colors(self, palette, size);
+    palette_set_colors(self, palette, size, NULL);
 }
 
 #endif //PIXELC_PALETTEPRESAVE_H

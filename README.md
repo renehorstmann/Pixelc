@@ -18,6 +18,24 @@ Palette, canvas size, animation size can be configured in code (main.c).
 
 ![example_image](example.jpg)
 
+## Compiling for Web
+
+Using Emscripten:
+
+```sh
+mkdir web && cp index.html web && cp icon/* web && cd web
+```
+
+```sh
+emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -s FULL_ES3=1 -s EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' -s EXPORTED_RUNTIME_METHODS=FS -s SDL2_IMAGE_FORMATS='["png"]'  --preload-file ../res -s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1 -s FETCH=1 -lidbfs.js -DOPTION_GLES -DOPTION_SDL -DOPTION_TTF -DOPTION_FETCH ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -o index.js
+```
+
+test the website:
+```sh
+python3 -m http.server --bind localhost  # [port]
+```
+
+
 ## Without Cmake
 
 Instead of cmake, the following call to gcc may work, too.
@@ -32,14 +50,9 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some update
-  - e_io combine load into mount
-  - e_io name as namespace (web may use the files on multiple games)
-  - fix texture artifacts
-    - MIN_FILTER = LINEAR?
-    - CLAMP_TO_BORDER + functions
-    - set the text poses to an integral position
-  - custom index.html
-  - file up n download
+  - a better png importer
+    - not only 32bitPP and alpha...
+      - at least without alpha == 24bitPP
 - config
   - each module may load and save config.json
   - each module uses its name as an object

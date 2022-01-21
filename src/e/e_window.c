@@ -18,6 +18,7 @@
 
 void e_window_handle_window_event_(const SDL_Event *event);
 
+const char *e_window_get_title();
 
 //
 // private
@@ -29,6 +30,8 @@ typedef struct {
 } RegPause;
  
 struct eWindow{
+    char title[32];
+
     SDL_Window *window;
     SDL_GLContext gl_context;
     ivec2 size;
@@ -51,6 +54,7 @@ static bool singleton_created;
 //
 //
 //
+
 
 static void check_resume() {
     SDL_Event event;
@@ -127,6 +131,10 @@ void e_window_handle_window_event_(const SDL_Event *event) {
     }
 }
 
+const char *e_window_get_title() {
+    return singleton.title;
+}
+
 //
 // public
 //
@@ -137,6 +145,9 @@ eWindow *e_window_new(const char *title) {
     assume(!singleton_created, "e_window_new should be called only onve");
     singleton_created = true;
 
+    assume(strlen(title) < sizeof singleton.title, "e_window_new title to long: %i/%i",
+           strlen(title), sizeof singleton.title);
+    strcpy(singleton.title, title);
     
 #ifdef NDEBUG
     rhc_log_set_min_level(RHC_LOG_WARN);
@@ -311,7 +322,7 @@ void e_window_set_vsync(const eWindow *self, bool activate) {
         log_info("e_window_set_vsync: applied vsync");
         return;
     }
-    log_error("e_window_set_vsync: failed to turn on vsync");
+    log_info("e_window_set_vsync: failed to turn on vsync");
 }
 
 void e_window_set_screen_mode(const eWindow *self, enum e_window_screen_modes mode) {

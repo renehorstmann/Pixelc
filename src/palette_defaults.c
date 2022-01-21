@@ -6,17 +6,54 @@
 // private
 // 
 
-// grayscale
+static const char *name_0 = "grayscale.png";
 static uImage palette_0() {
     uImage self = u_image_new_empty(10, 1, 1);
-    *u_image_pixel_index(self, 0, 0) =  U_COLOR_TRANSPARENT;
-    for (int i = 1; i <= 9; i++) {
-        uint8_t val = (i - 1) * 255 / 8;
-       * u_image_pixel_index(self, i, 0) = (uColor_s) {val, val, val, 255};
+    for (int i = 0; i < self.cols; i++) {
+        uint8_t val = i * 255 / (self.cols-1);
+        *u_image_pixel(self, i, 0, 0) = (uColor_s) {val, val, val, 255};
     }
     return self;
 }
-static const char *name_0 = "grayscale.png";
+
+
+static const char *name_1 = "grayscale_alpha.png";
+static uImage palette_1() {
+    uImage self = u_image_new_empty(10, 4, 1);
+    for(int r=0; r<self.rows; r++) {
+        for (int i = 0; i < self.cols; i++) {
+            uint8_t val = i * 255 / (self.cols-1);
+            *u_image_pixel(self, i, r, 0) = (uColor_s) {val, val, val, (r+1)*255/(self.rows)};
+        }
+    }
+    return self;
+}
+
+
+static const char *name_2 = "endesga-32.png";
+static uImage palette_2() {
+    return u_image_new_file(1, "res/palettes/endesga-32-1x.png");
+}
+
+static const char *name_3 = "resurrect-64.png";
+static uImage palette_3() {
+    return u_image_new_file(1, "res/palettes/resurrect-64-1x.png");
+}
+
+static const char *name_4 = "pear36.png";
+static uImage palette_4() {
+    return u_image_new_file(1, "res/palettes/pear36-1x.png");
+}
+
+static const char *name_5 = "aap-64.png";
+static uImage palette_5() {
+    return u_image_new_file(1, "res/palettes/aap-64-1x.png");
+}
+
+static const char *name_6 = "lospec500.png";
+static uImage palette_6() {
+    return u_image_new_file(1, "res/palettes/lospec500-1x.png");
+}
 
 
 //
@@ -28,8 +65,13 @@ uImage *palette_defaults_new() {
     uImage *self = rhc_calloc(sizeof *self * (16));
     uImage *it = self;
     
-    *it++ = palette_0();
-   
+    *it++ = palette_0(); 
+    *it++ = palette_1();
+    *it++ = palette_2();
+    *it++ = palette_3();
+    *it++ = palette_4();
+    *it++ = palette_5();
+    *it++ = palette_6();
     
     *it = u_image_new_invalid();
     return self;
@@ -46,9 +88,21 @@ void palette_defaults_kill(uImage **self_ptr) {
 }
 
 char *palette_defaults_name_on_heap(int id) {
-    assume(id>=0 && id<1, "wtf?");
-    char *name = rhc_malloc(32);
+    assume(id>=0 && id<7, "wtf?");
+    char *name = rhc_calloc(32);
     if(id==0)
         strcpy(name, name_0);
+    if(id==1)
+        strcpy(name, name_1);
+    if(id==2)
+        strcpy(name, name_2);
+    if(id==3)
+        strcpy(name, name_3);
+    if(id==4)
+        strcpy(name, name_4);
+    if(id==5)
+        strcpy(name, name_5);
+    if(id==6)
+        strcpy(name, name_6);
     return name;
 }

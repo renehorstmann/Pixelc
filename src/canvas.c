@@ -76,12 +76,15 @@ Canvas *canvas_new(int cols, int rows, int layers, int grid_cols, int grid_rows)
         self->L.render_objects[i] = ro_single_new(r_texture_new_invalid());
     }    
 
-    self->L.grid = ro_single_new(r_texture_new_file(1, 1, "res/canvas_grid.png"));
+    rTexture grid_tex = r_texture_new_file(1, 1, "res/canvas_grid.png");
+    r_texture_wrap_repeat(grid_tex);
+    self->L.grid = ro_single_new(grid_tex);
     
     uColor_s buf[4];
     buf[0] = buf[3] = u_color_from_hex("#999999");
     buf[1] = buf[2] = u_color_from_hex("#777777");
     rTexture bg_tex = r_texture_new(2, 2, 1, 1, buf);
+    r_texture_wrap_repeat(bg_tex);
     self->L.bg = ro_single_new(bg_tex);
     
 

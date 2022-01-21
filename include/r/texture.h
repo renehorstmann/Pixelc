@@ -45,7 +45,13 @@ void r_texture_set(rTexture self, const void *buffer);
 // sets the rendering interpolation to linear (images)
 void r_texture_filter_linear(rTexture self);
 
-// sets the rendering interpolation to nearest (pixelart)
+// sets the rendering interpolation to nearest (pixelart) (default)
 void r_texture_filter_nearest(rTexture self);
+
+// sets the texture wrap mode to repeat, so that the texture will be repeated, if uv is reset
+void r_texture_wrap_repeat(rTexture self);
+
+// sets the texture wrap mode to clamp, so that the border pixels will be repeated, if uv is reset (default)
+void r_texture_wrap_clamp(rTexture self);
 
 #endif //R_TEXTURE_H
