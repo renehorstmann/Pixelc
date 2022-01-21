@@ -55,6 +55,54 @@ static uImage palette_6() {
     return u_image_new_file(1, "res/palettes/lospec500-1x.png");
 }
 
+static const char *name_7 = "pixilmatt.png";
+static uImage palette_7() {
+    uImage self = u_image_new_empty(37, 1, 1);
+    const char *hex[37] = {
+            "#ffffff",
+            "#000000",
+            "#99c2db",
+            "#5d8bb3",
+            "#4d6a94",
+            "#4c5d7a",
+            "#357985",
+            "#4c8f82",
+            "#78b392",
+            "#b5e0ba",
+            "#dfeded",
+            "#c6dbde",
+            "#a7b8c2",
+            "#728794",
+            "#4e4d5c",
+            "#5c4d4d",
+            "#997d76",
+            "#c7b198",
+            "#dfd3c3",
+            "#f0ece2",
+            "#e6a3a3",
+            "#995c95",
+            "#5a526b",
+            "#3d3957",
+            "#391154",
+            "#5b106e",
+            "#911d55",
+            "#bf2651",
+            "#f54f4f",
+            "#ff8766",
+            "#ffac7f",
+            "#ffd3a3",
+            "#fafac3",
+            "#e6cf8a",
+            "#d6a57a",
+            "#b3785d",
+            "#9c4f41"
+    };
+    for (int i = 0; i < 38; i++) {
+        *u_image_pixel(self, i, 0, 0) = u_color_from_hex(hex[i]);
+    }
+    return self;
+}
+
 
 //
 // public
@@ -72,6 +120,7 @@ uImage *palette_defaults_new() {
     *it++ = palette_4();
     *it++ = palette_5();
     *it++ = palette_6();
+    *it++ = palette_7();
     
     *it = u_image_new_invalid();
     return self;
@@ -104,5 +153,7 @@ char *palette_defaults_name_on_heap(int id) {
         strcpy(name, name_5);
     if(id==6)
         strcpy(name, name_6);
+    if(id==7)
+        strcpy(name, name_7);
     return name;
 }
