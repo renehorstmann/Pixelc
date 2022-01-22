@@ -21,14 +21,17 @@
 
 static void save_image(const Canvas *self) {
     char file[128];
-    snprintf(file, sizeof file, "save_file_%i.png", self->L.save_idx);
-    u_image_save_file(self->RO.image, file);
+    snprintf(file, sizeof file, "image_%i.png", self->L.save_idx);
+    u_image_save_file(self->RO.image,
+            e_io_savestate_file_path(file).s);
+    e_io_savestate_save();
 }
 
 static void load_image(Canvas *self) {
     char file[128];
-    snprintf(file, sizeof file, "save_file_%i.png", self->L.save_idx);
-    canvas_set_image(self, u_image_new_file(self->RO.image.layers, file));
+    snprintf(file, sizeof file, "image_%i.png", self->L.save_idx);
+    canvas_set_image(self, u_image_new_file(self->RO.image.layers, 
+            e_io_savestate_file_path(file).s));
 }
 
 // updates the ro tex and sizes
@@ -207,12 +210,8 @@ void canvas_redo(Canvas *self) {
 void canvas_save_config(const Canvas *self) {
     log_info("canvas: save_config");
     
-    String config_string;
-    uJson *config;
-    
-    config_string = e_io_savestate_read("config.json", true);
-    config = u_json_new_str(config_string.str);
-    string_kill(&config_string);
+    uJson *config = u_json_new_file(
+            e_io_savestate_file_path("config.json").s);
     
     uJson *canvas = u_json_append_object(config, "canvas");
     
@@ -221,10 +220,13 @@ void canvas_save_config(const Canvas *self) {
     u_json_append_int(canvas, "layers", self->RO.image.layers);
     u_json_append_int(canvas, "grid_cols", self->L.grid_cols);
     u_json_append_int(canvas, "grid_rows", self->L.grid_rows);
+    u_json_append_int(canvas, "save_idx", self->L.save_idx);
+    u_json_append_int(canvas, "save_idx_min", self->L.save_idx_min);
+    u_json_append_int(canvas, "save_idx_max", self->L.save_idx_max);
     
-    config_string = u_json_to_string(config);
-    e_io_savestate_write("config.json", config_string.str, true);
-    string_kill(&config_string);
+    u_json_save_file(config,
+                       e_io_savestate_file_path("config.json").s);
+    e_io_savestate_save();
     
     u_json_kill(&config);
 }
@@ -232,11 +234,8 @@ void canvas_save_config(const Canvas *self) {
 void canvas_load_config(Canvas *self) {
     log_info("canvas: load_config");
     
-    uJson *config;
-    
-    String config_string = e_io_savestate_read("config.json", true);
-    config = u_json_new_str(config_string.str);
-    string_kill(&config_string);
+    uJson *config = u_json_new_file(
+            e_io_savestate_file_path("config.json").s);
     
     uJson *canvas = u_json_get_object(config, "canvas");
     int cols, rows, layers;
@@ -249,9 +248,20 @@ void canvas_load_config(Canvas *self) {
     
     int grid_cols, grid_rows;
     if(u_json_get_object_int(canvas, "grid_cols", &grid_cols)
-        && u_json_get_object_int(canvas, "grid_rows", &grid_rows)) {
+            && u_json_get_object_int(canvas, "grid_rows", &grid_rows)) {
         self->L.grid_cols = grid_cols;
         self->L.grid_rows = grid_rows;
+    }
+    
+    int save_idx, save_idx_min, save_idx_max;
+    if(u_json_get_object_int(canvas, "save_idx", &save_idx)
+            && u_json_get_object_int(canvas, "save_idx_min", &save_idx_min)
+            && u_json_get_object_int(canvas, "save_idx_max", &save_idx_max)) {
+        self->L.save_idx = save_idx;
+        self->L.save_idx_min = save_idx_min;
+        self->L.save_idx_max = save_idx_max;
+        
+        load_image(self);
     }
     
     update_render_objects(self);

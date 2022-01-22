@@ -294,9 +294,6 @@ void palette_reset_palette_files(Palette *self) {
     log_info("palette: reset_palette_files");
     uImage *palettes = palette_defaults_new();
     
-    // mount and load savestate (needed for web)
-    e_io_savestate_load();
-    
     for(int i=0; i<self->RO.max_palettes; i++)
         rhc_free(self->L.palette_files[i]);
     
@@ -327,12 +324,8 @@ void palette_reset_palette_files(Palette *self) {
 void palette_save_config(const Palette *self) {
     log_info("palette: save_config");
     
-    String config_string;
-    uJson *config;
-    
-    config_string = e_io_savestate_read("config.json", true);
-    config = u_json_new_str(config_string.str);
-    string_kill(&config_string);
+    uJson *config = u_json_new_file(
+            e_io_savestate_file_path("config.json").s);
     
     uJson *palette = u_json_append_object(config, "palette");
     uJson *palette_files = u_json_append_array(palette, "palette_files");
@@ -342,9 +335,9 @@ void palette_save_config(const Palette *self) {
     
     u_json_append_int(palette, "palette_id", self->RO.palette_id);
     
-    config_string = u_json_to_string(config);
-    e_io_savestate_write("config.json", config_string.str, true);
-    string_kill(&config_string);
+    u_json_save_file(config,
+                       e_io_savestate_file_path("config.json").s);
+    e_io_savestate_save();
     
     u_json_kill(&config);
 }
@@ -352,12 +345,11 @@ void palette_save_config(const Palette *self) {
 void palette_load_config(Palette *self) {
     log_info("palette: load_config");
     
-    uJson *config;
     bool reset = false;
     
-    String config_string = e_io_savestate_read("config.json", true);
-    config = u_json_new_str(config_string.str);
-    string_kill(&config_string);
+    uJson *config = u_json_new_file(
+            e_io_savestate_file_path("config.json").s);
+    
     
     uJson *palette = u_json_get_object(config, "palette");
     uJson *palette_files = u_json_get_object(palette, "palette_files");

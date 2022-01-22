@@ -49,6 +49,7 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 ```
 
 ## Todo
+- brush kernel + palette names pre module (savestate_kernel_kernel0.png)
 - canvas
   - save as savestate file each time on change  
 - brush dither position wrong    

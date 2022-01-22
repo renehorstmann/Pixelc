@@ -253,9 +253,6 @@ void brush_reset_kernel_files(Brush *self) {
     log_info("brush: reset_kernel_files");
     uImage *kernels = brush_kernel_defaults_new();
     
-    // mount and load savestate (needed for web)
-    e_io_savestate_load();
-    
     for(int i=0; i<self->RO.max_kernels; i++)
         rhc_free(self->L.kernel_files[i]);
     
@@ -288,12 +285,8 @@ void brush_reset_kernel_files(Brush *self) {
 void brush_save_config(const Brush *self) {
     log_info("brush: save_config");
     
-    String config_string;
-    uJson *config;
-    
-    config_string = e_io_savestate_read("config.json", true);
-    config = u_json_new_str(config_string.str);
-    string_kill(&config_string);
+    uJson *config = u_json_new_file(
+            e_io_savestate_file_path("config.json").s);
     
     uJson *brush = u_json_append_object(config, "brush");
     uJson *kernel_files = u_json_append_array(brush, "kernel_files");
@@ -303,9 +296,9 @@ void brush_save_config(const Brush *self) {
     
     u_json_append_int(brush, "kernel_id", self->RO.kernel_id);
     
-    config_string = u_json_to_string(config);
-    e_io_savestate_write("config.json", config_string.str, true);
-    string_kill(&config_string);
+    u_json_save_file(config,
+                       e_io_savestate_file_path("config.json").s);
+    e_io_savestate_save();
     
     u_json_kill(&config);
 }
@@ -313,12 +306,10 @@ void brush_save_config(const Brush *self) {
 void brush_load_config(Brush *self) {
     log_info("brush: load_config");
     
-    uJson *config;
     bool reset = false;
     
-    String config_string = e_io_savestate_read("config.json", true);
-    config = u_json_new_str(config_string.str);
-    string_kill(&config_string);
+    uJson *config = u_json_new_file(
+            e_io_savestate_file_path("config.json").s);
     
     uJson *brush = u_json_get_object(config, "brush");
     uJson *kernel_files = u_json_get_object(brush, "kernel_files");
