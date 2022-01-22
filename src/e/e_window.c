@@ -20,6 +20,8 @@ void e_window_handle_window_event_(const SDL_Event *event);
 
 const char *e_window_get_title();
 
+void e_io_savestate_load();
+
 //
 // private
 //
@@ -226,6 +228,9 @@ eWindow *e_window_new(const char *title) {
 #endif
 
     SDL_GetWindowSize(singleton.window, &singleton.size.x, &singleton.size.y);
+    
+    // call protected function to let web load indexDB database
+    e_io_savestate_load();
 
     return &singleton;
 }

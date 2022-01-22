@@ -49,8 +49,6 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 ```
 
 ## Todo
-- some update
-  - e io mount call protected and on window new
 - canvas
   - save as savestate file each time on change  
 - brush dither position wrong    
