@@ -97,7 +97,7 @@ static uImage palette_7() {
             "#b3785d",
             "#9c4f41"
     };
-    for (int i = 0; i < 38; i++) {
+    for (int i = 0; i < 37; i++) {
         *u_image_pixel(self, i, 0, 0) = u_color_from_hex(hex[i]);
     }
     return self;
@@ -137,7 +137,7 @@ void palette_defaults_kill(uImage **self_ptr) {
 }
 
 char *palette_defaults_name_on_heap(int id) {
-    assume(id>=0 && id<7, "wtf?");
+    assume(id>=0 && id<8, "wtf?");
     char *name = rhc_calloc(32);
     if(id==0)
         strcpy(name, name_0);

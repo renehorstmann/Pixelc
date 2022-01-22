@@ -8,7 +8,7 @@
 // private
 //
 
-static SDL_Surface *load_buffer(void *data, int cols, int rows) {
+static SDL_Surface *to_sdl_surface(uImage img) {
     // Set up the pixel format color masks for RGB(A) byte arrays.
     Uint32 rmask, gmask, bmask, amask;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -24,12 +24,11 @@ static SDL_Surface *load_buffer(void *data, int cols, int rows) {
 #endif
 
     int depth = 32;
-    int pitch = 4 * cols;
+    int pitch = 4 * img.cols;
 
-    SDL_Surface *surf = SDL_CreateRGBSurfaceFrom(data, cols, rows, depth, pitch, rmask, gmask, bmask, amask);
+    SDL_Surface *surf = SDL_CreateRGBSurfaceFrom((void*) img.data, img.cols, img.rows * img.layers, depth, pitch, rmask, gmask, bmask, amask);
     return surf;
 }
-
 
 //
 // public
@@ -69,34 +68,60 @@ uImage u_image_new_clone_a(uImage from, Allocator_i a) {
     return self;
 }
 
-uImage u_image_new_file_a(int layers, const char *file, Allocator_i a) {
+uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Allocator_i a) {
     assume(layers > 0, "A single layer needed");
+    if (surface->h % layers != 0) {
+        rhc_error = "load image from sdl surface failed";
+        log_warn("u_image_new_sdl_surface_a failed: rows %% layers != 0");
+        return u_image_new_invalid();
+    }
+    
+    int cols = surface->w;
+    int rows = surface->h / layers;
+    uImage self = u_image_new_invalid();
+    
+    SDL_PixelFormat *sf = surface->format;
+    SDL_PixelFormat *df = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32); 
+    
+    SDL_Surface *cast = NULL;
+    
+    // check if the format equals the needed
+    //    and convert it otherwise
+    if(sf->BitsPerPixel != df->BitsPerPixel
+            || sf->Rmask != df->Rmask
+            || sf->Gmask != df->Gmask
+            || sf->Bmask != df->Bmask
+            || sf->Amask != df->Amask) {
+        cast = SDL_ConvertSurface(surface, df, 0); 
+        surface = cast;
+    }
+    
+    if(surface->pitch != cols * 4) {
+        log_error("u_image_new_sdl_surface_a failed: pitch must be == cols*4");
+        goto CLEANUP;
+    }
+    
+    // create image with the surface data
+    self = u_image_new_empty_a(cols, rows, layers, a);
+    memcpy(self.data, surface->pixels, u_image_data_size(self));
+    
+    CLEANUP:
+    SDL_FreeFormat(df);
+    SDL_FreeSurface(cast);
+    return self;
+}
+
+uImage u_image_new_file_a(int layers, const char *file, Allocator_i a) {
     uImage self = u_image_new_invalid_a(a);
-    SDL_Surface *img = IMG_Load(file);
-    if (!img) {
+    SDL_Surface *surface = IMG_Load(file);
+    if (!surface) {
         rhc_error = "load image file failed";
         log_warn("u_image_new_file_a failed: failed: %s (%s)", IMG_GetError(), file);
-        goto CLEAN_UP;
-    }
-    SDL_PixelFormat *f = img->format;
-    if (f->BitsPerPixel != 32 || f->Amask == 0) {
-        rhc_error = "load image file failed";
-        log_warn("u_image_new_file_a failed: 8bpp and alpha needed (%s)", file);
-        goto CLEAN_UP;
+    } else {
+        self = u_image_new_sdl_surface_a(layers, surface, a);
     }
 
-    if (img->h % layers != 0) {
-        rhc_error = "load image file failed";
-        log_warn("u_image_new_file_a failed: rows %% layers != 0 (%s)", file);
-        goto CLEAN_UP;
-    }
-
-    self = u_image_new_empty_a(img->w, img->h / layers, layers, a);
-    if (u_image_valid(self))
-        memcpy(self.data, img->pixels, u_image_data_size(self));
-
-    CLEAN_UP:
-    SDL_FreeSurface(img);
+    SDL_FreeSurface(surface);
     return self;
 }
 
@@ -112,14 +137,14 @@ bool u_image_save_file(uImage self, const char *file) {
         log_error("u_image_save_file failed: invalid (%s)", file);
         return false;
     }
-    SDL_Surface *img = load_buffer((void *) self.data, self.cols, self.rows * self.layers);
-    if (!img) {
+    SDL_Surface *surf = to_sdl_surface(self);
+    if (!surf) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file failed: sdl buffer failed: %s", SDL_GetError());
         return false;
     }
-    int ret = IMG_SavePNG(img, file);
-    SDL_FreeSurface(img);
+    int ret = IMG_SavePNG(surf, file);
+    SDL_FreeSurface(surf);
     if (ret) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file: failed: %s (%s)", IMG_GetError(), file);

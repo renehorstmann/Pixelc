@@ -5,6 +5,8 @@
 #include "color.h"
 
 
+struct SDL_Surface;
+
 // Image class
 typedef struct {
     uColor_s *data;
@@ -54,6 +56,16 @@ static uImage u_image_new_clone(uImage from) {
                                rhc_allocator_new());
 }
 
+// copy a SDL_Surface into a new image with a costum allocator
+uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Allocator_i a);
+
+
+// copy a SDL_Surface into a new image
+static uImage u_image_new_sdl_surface(int layers, struct SDL_Surface *surface) {
+    return u_image_new_sdl_surface_a(layers, surface,
+            rhc_allocator_new());
+}
+
 // loads an image from a file (.png) with a costum allocator
 uImage u_image_new_file_a(int layers, const char *file, Allocator_i a);
 
@@ -62,7 +74,6 @@ static uImage u_image_new_file(int layers, const char *file) {
     return u_image_new_file_a(layers, file,
                               rhc_allocator_new());
 }
-
 
 void u_image_kill(uImage *self);
 
