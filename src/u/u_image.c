@@ -4,31 +4,7 @@
 #include "mathc/sca/int.h"
 #include "u/image.h"
 
-//
-// private
-//
 
-static SDL_Surface *to_sdl_surface(uImage img) {
-    // Set up the pixel format color masks for RGB(A) byte arrays.
-    Uint32 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    rmask = 0xff000000;
-    gmask = 0x00ff0000
-    bmask = 0x0000ff00;
-    amask = 0x000000ff;
-#else // little endian, like x86
-    rmask = 0x000000ff;
-    gmask = 0x0000ff00;
-    bmask = 0x00ff0000;
-    amask = 0xff000000;
-#endif
-
-    int depth = 32;
-    int pitch = 4 * img.cols;
-
-    SDL_Surface *surf = SDL_CreateRGBSurfaceFrom((void*) img.data, img.cols, img.rows * img.layers, depth, pitch, rmask, gmask, bmask, amask);
-    return surf;
-}
 
 //
 // public
@@ -131,20 +107,35 @@ void u_image_kill(uImage *self) {
     *self = u_image_new_invalid_a(self->allocator);
 }
 
+// creates an SDL_Surface from the image
+struct SDL_Surface *u_image_to_sdl_surface(uImage self) {
+    SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom((void*) self.data, 
+            self.cols, 
+            self.rows * self.layers, 
+            32, self.cols * 4, 
+            format->Rmask, 
+            format->Gmask, 
+            format->Bmask, 
+            format->Amask);
+    SDL_FreeFormat(format);
+    return surface;
+}
+
 bool u_image_save_file(uImage self, const char *file) {
     if (!u_image_valid(self)) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file failed: invalid (%s)", file);
         return false;
     }
-    SDL_Surface *surf = to_sdl_surface(self);
-    if (!surf) {
+    SDL_Surface *surface = u_image_to_sdl_surface(self);
+    if (!surface) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file failed: sdl buffer failed: %s", SDL_GetError());
         return false;
     }
-    int ret = IMG_SavePNG(surf, file);
-    SDL_FreeSurface(surf);
+    int ret = IMG_SavePNG(surface, file);
+    SDL_FreeSurface(surface);
     if (ret) {
         rhc_error = "image save file failed";
         log_error("u_image_save_file: failed: %s (%s)", IMG_GetError(), file);

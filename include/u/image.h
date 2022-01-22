@@ -77,6 +77,10 @@ static uImage u_image_new_file(int layers, const char *file) {
 
 void u_image_kill(uImage *self);
 
+
+// creates an SDL_Surface from the image
+struct SDL_Surface *u_image_to_sdl_surface(uImage self);
+
 // saves the image to a file (.png)
 bool u_image_save_file(uImage self, const char *file);
 

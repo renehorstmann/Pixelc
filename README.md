@@ -50,9 +50,10 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some update
-  - a better png importer
-    - not only 32bitPP and alpha...
-      - at least without alpha == 24bitPP
+  - e io mount call protected and on window new
+- canvas
+  - save as savestate file each time on change  
+- brush dither position wrong    
 - config
   - each module may load and save config.json
   - each module uses its name as an object

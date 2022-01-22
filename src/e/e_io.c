@@ -71,23 +71,13 @@ void e_io_idbfs_synced() {
 }
 
 static void idbfs_save() {
-    L.synced = false;
-    
-    // false = load file system from idbfs
+    // false = save file system from idbfs
     EM_ASM(
         e_io_idbfs_synced = false;
         FS.syncfs(false, function (err) {
             assert(!err);
-            e_io_idbfs_synced = true;
         });
     );
-    // sleep a ms until synced to get a synchronous call
-    while(!L.synced) {
-        EM_ASM(
-            if(e_io_idbfs_synced) { ccall('e_io_idbfs_synced', 'v'); }
-        );
-        emscripten_sleep(1);
-    }
 }
 
 
