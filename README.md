@@ -49,8 +49,22 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 ```
 
 ## Todo
-- brush kernel + palette names pre module (savestate_kernel_kernel0.png)
+- some
+  - camera left right bottom top as int (ceil)
+  - update swarm and santasdayoff
+  - u/container.h
+    - stack
+      - all items are in a single column or row
+    - grid?
+      - each item has a grid position and grid size
+    - flow
+      - the items are row or column major ordered
+    - each item has a size
+    - the containers determine the top left pos
+- some_examples
+  - flow container example with hsv colors and different sizes
 - canvas
+  - redo
   - save as savestate file each time on change  
 - brush dither position wrong    
 - config

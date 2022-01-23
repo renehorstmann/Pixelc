@@ -139,6 +139,8 @@ static void init(eSimple *simple, ivec2 window_size) {
     palette_load_config(L.palette);
     
     palette_load_palette(L.palette, 5);
+    
+    canvas_load_config(L.canvas);
 }
 
 // this functions is called either each frame or at a specific update/s time

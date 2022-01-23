@@ -241,12 +241,12 @@ void palette_load_palette(Palette *self, int id) {
     }
 
     log_info("palette: load_palette[%i] = %s", id, self->L.palette_files[id]);
-            
-    // mount and load savestate (needed for web)
-    e_io_savestate_load();
+     
+    char file[256];
+    snprintf(file, sizeof file, "palette_%s", self->L.palette_files[id]);       
     
     uImage palette = u_image_new_file(1,
-            e_io_savestate_file_path(self->L.palette_files[id]).s
+            e_io_savestate_file_path(file).s
             );
     
     self->RO.palette_id = id;
@@ -260,8 +260,6 @@ void palette_load_palette(Palette *self, int id) {
 
 void palette_append_file(Palette *self, uImage palette, const char *name) {
     log_info("palette: append_file: %s", name);
-    // mount and load savestate (needed for web)
-    e_io_savestate_load();
     
     u_image_save_file(palette, e_io_savestate_file_path(name).s);
     
@@ -303,7 +301,9 @@ void palette_reset_palette_files(Palette *self) {
     for(i=0; u_image_valid(palettes[i]); i++) {
         assume(i<16, "change max default palettes");
         char *name = palette_defaults_name_on_heap(i);
-        u_image_save_file(palettes[i], e_io_savestate_file_path(name).s);
+        char file[256];
+        snprintf(file, sizeof file, "palette_%s", name);
+        u_image_save_file(palettes[i], e_io_savestate_file_path(file).s);
         
         self->L.palette_files[i] = name;
     }

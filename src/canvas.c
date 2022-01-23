@@ -25,6 +25,7 @@ static void save_image(const Canvas *self) {
     u_image_save_file(self->RO.image,
             e_io_savestate_file_path(file).s);
     e_io_savestate_save();
+    canvas_save_config(self);
 }
 
 static void load_image(Canvas *self) {
@@ -214,6 +215,8 @@ void canvas_save_config(const Canvas *self) {
             e_io_savestate_file_path("config.json").s);
     
     uJson *canvas = u_json_append_object(config, "canvas");
+    
+    printf("idminmax %i %i %i\n", self->L.save_idx, self->L.save_idx_min, self->L.save_idx_max);
     
     u_json_append_int(canvas, "cols", self->RO.image.cols);
     u_json_append_int(canvas, "rows", self->RO.image.rows);

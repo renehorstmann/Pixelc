@@ -205,13 +205,12 @@ void brush_load_kernel(Brush *self, int id) {
 
     log_info("brush: load_kernel[%i] = %s", id, self->L.kernel_files[id]);
             
-    // mount and load savestate (needed for web)
-    e_io_savestate_load();
-    
+    char file[256];
+    snprintf(file, sizeof file, "kernel_%s", self->L.kernel_files[id]);
     self->RO.kernel_id = id;
     brush_set_kernel(self, 
             u_image_new_file(1,
-            e_io_savestate_file_path(self->L.kernel_files[id]).s
+            e_io_savestate_file_path(file).s
             ));
             
     brush_save_config(self);
@@ -219,8 +218,6 @@ void brush_load_kernel(Brush *self, int id) {
 
 void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name) {
     log_info("brush: append_file: %s", name);
-    // mount and load savestate (needed for web)
-    e_io_savestate_load();
     
     u_image_save_file(kernel_sink, e_io_savestate_file_path(name).s);
     
@@ -262,8 +259,10 @@ void brush_reset_kernel_files(Brush *self) {
     for(i=0; u_image_valid(kernels[i]); i++) {
         assume(i<16, "change max default kernels");
         char *name = rhc_malloc(32);
-        snprintf(name, 32, "kernel_%i.png", i);
-        u_image_save_file(kernels[i], e_io_savestate_file_path(name).s);
+        snprintf(name, 32, "default_%i.png", i);
+        char file[32];
+        snprintf(file, 32, "kernel_%s", name);
+        u_image_save_file(kernels[i], e_io_savestate_file_path(file).s);
         
         self->L.kernel_files[i] = name;
     }
