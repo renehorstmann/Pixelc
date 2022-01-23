@@ -50,7 +50,8 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some
-  - camera left right bottom top as int (ceil)
+  - new camera module
+    - left right bottom top as int (ceil)
   - update swarm and santasdayoff
   - u/container.h
     - stack
