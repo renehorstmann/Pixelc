@@ -82,10 +82,10 @@ static void idbfs_save() {
 
 
 // protected function
-void e_io_file_upload_done(const char *file, bool ascii) {
+void e_io_file_upload_done(const char *file, bool ascii, const char *user_file_name) {
     if(strcmp(file, L.file_upload.file) == 0 && ascii == L.file_upload.ascii && L.file_upload.cb) {
         log_info("file upload done for: %s, ascii: %i", file, ascii);
-        L.file_upload.cb(L.file_upload.file, L.file_upload.ascii, L.file_upload.ud);
+        L.file_upload.cb(L.file_upload.file, L.file_upload.ascii, user_file_name, L.file_upload.ud);
     } else {
         log_error("file upload done for: %s, ascii: %i, but invalid configuration"
                   "(wrong file, or ascii or callback NULL)", file, ascii);

@@ -12,7 +12,7 @@
 
 // callback for file uploads, only called on success
 // file and ascii must not be checked and are the same as for e_io_ask_for_file_upload
-typedef void (*eIoFileUploadCallback)(const char *file, bool ascii, void *user_data);
+typedef void (*eIoFileUploadCallback)(const char *file, bool ascii, const char *user_file_name, void *user_data);
 
 
 // web: offer the given file as download

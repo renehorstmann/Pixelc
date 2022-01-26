@@ -22,7 +22,7 @@
 
 // canvas size
 //*
-#define COLS 32
+#define COLS 16
 #define ROWS 32
 #define LAYERS 1
 //*/
@@ -48,8 +48,8 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1.0
-#define PLAY_FRAMES 1
-#define PLAY_FPS 2.0
+#define PLAY_FRAMES 4
+#define PLAY_FPS 6.0
 
 // uncomment the used palette:
 // #define PALETTE grayscale
@@ -105,8 +105,10 @@ static struct {
 static void init(eSimple *simple, ivec2 window_size) {
 
     // init systems
-    L.camera = camera_new();
+    L.camera = rhc_calloc(sizeof *L.camera);
+    *L.camera = camera_new();
     camera_update(L.camera, window_size);
+    printf("%i %i %i %i\n", L.camera->RO.left, L.camera->RO.right, L.camera->RO.top, L.camera->RO.bottom);
 
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
     L.canvas = canvas_new(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
@@ -147,8 +149,7 @@ static void init(eSimple *simple, ivec2 window_size) {
 static void update(eSimple *simple, ivec2 window_size, float dtime) {
     // simulate
     camera_update(L.camera, window_size);
-    camera_update(L.camera, window_size);
-
+    
     background_update(L.background, L.camera, dtime);
 
     //*

@@ -3,13 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>some</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <title>Pixelc</title>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="icon180.png">
     <link rel="shortcut icon" href="icon196.png" sizes="196x196">
 
     <style>
+
+        /* The emscripten opengl canvas */
         #canvas {
             position: absolute;
             top: 0px;
@@ -22,16 +26,61 @@
             border: 0px none;
             background-color: black;
         }
+
+        /* The background of modal windows */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: hidden;
+            background-color: rgb(0, 0, 0); /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        }
+
+        /* Modal content/box */
+        .modal_content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        /* The modal window close button */
+        .modal_content_close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .modal_content_close:hover,
+        .modal_content_close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
 <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
 
-<input id="file_uploader" type="file" style="opacity: 0"/>
-<input id="file_uploader_png" type="file" accept="image/png" style="opacity: 0"/>
-<input id="file_uploader_txt" type="file" accept="text/plain" style="opacity: 0"/>
-<input id="file_uploader_json" type="file" accept="application/json" style="opacity: 0"/>
+<div id="modal_window_file" class="modal">
+    <div class="modal_content">
+        <span class="modal_content_close">&times;</span>
+        <p>File upload:</p>
+        <input id="file_uploader" type="file"/>
+        <input id="file_uploader_png" type="file" accept="image/png"/>
+        <input id="file_uploader_txt" type="file" accept="text/plain"/>
+        <input id="file_uploader_json" type="file" accept="application/json"/>
+    </div>
+</div>
+
 
 <script type='text/javascript'>
     function set_exit_failure_error_msg() {
@@ -80,18 +129,24 @@
         try {
             var files = evt.target.files; // FileList object
 
+            console.log('file upload name: ' + files[0].name);
+
             var fr = new FileReader();
             fr.onload = function () {
                 var data = fr.result;
-                var mode = 'wb';
-                if (file_upload_is_ascii)
-                    mode = 'w';
-                var stream = FS.open(file_upload_filename, mode);
+                var stream = FS.open(file_upload_filename, 'w');
                 var data_bytes = new Uint8Array(data);
                 FS.write(stream, data_bytes, 0, data_bytes.length, 0);
                 FS.close(stream);
-                ccall('e_io_file_upload_done', 'v', ['string', 'boolean'],
-                    [file_upload_filename, file_upload_is_ascii]);
+
+                // close the modal window
+                modal_file = document.getElementById("modal_window_file");
+                modal_file.style.display = "none";
+
+                // call done
+                ccall('e_io_file_upload_done', 'v', ['string', 'boolean', 'string'],
+                    [file_upload_filename, file_upload_is_ascii, files[0].name],
+                    {async: true});
             };
             fr.readAsArrayBuffer(files[0]);
         } catch (e) {
@@ -102,12 +157,12 @@
     file_uploader = document.getElementById('file_uploader');
     file_uploader_png = document.getElementById('file_uploader_png');
     file_uploader_txt = document.getElementById('file_uploader_txt');
-    file_uploader_png = document.getElementById('file_uploader_json');
+    file_uploader_json = document.getElementById('file_uploader_json');
 
     file_uploader.addEventListener('change', handle_file_upload, false);
     file_uploader_png.addEventListener('change', handle_file_upload, false);
     file_uploader_txt.addEventListener('change', handle_file_upload, false);
-    file_uploader_png.addEventListener('change', handle_file_upload, false);
+    file_uploader_json.addEventListener('change', handle_file_upload, false);
 
     function ask_for_file_upload(filename, as_ascii) {
         // Check for the various File API support.
@@ -116,19 +171,51 @@
             return;
         }
 
+        console.log(`Ask for file upload for "${filename}"`);
+
         file_upload_filename = filename;
         file_upload_is_ascii = as_ascii;
 
-        filename_lower = filename.toLowerCase();
-        file_uploader = document.getElementById('file_uploader');
-        if (filename_lower.endsWith(".png"))
-            file_uploader = document.getElementById('file_uploader_png');
-        else if (filename_lower.endsWith(".txt"))
-            file_uploader = document.getElementById('file_uploader_txt');
-        else if (filename_lower.endsWith(".json"))
-            file_uploader = document.getElementById('file_uploader_json');
 
-        file_uploader.click();
+        file_uploader = document.getElementById('file_uploader');
+        file_uploader_png = document.getElementById('file_uploader_png');
+        file_uploader_txt = document.getElementById('file_uploader_txt');
+        file_uploader_json = document.getElementById('file_uploader_json');
+
+        file_uploader.style.display = "none";
+        file_uploader_png.style.display = "none";
+        file_uploader_txt.style.display = "none";
+        file_uploader_json.style.display = "none";
+
+        filename_lower = filename.toLowerCase();
+        if (filename_lower.endsWith(".png"))
+            file_uploader_png.style.display = "block";
+        else if (filename_lower.endsWith(".txt"))
+            file_uploader_txt.style.display = "block";
+        else if (filename_lower.endsWith(".json"))
+            file_uploader_json.style.display = "block";
+        else
+            file_uploader.style.display = "block";
+
+        // open modal box
+        modal_file = document.getElementById("modal_window_file");
+        modal_file.style.display = "block";
+    }
+
+    // Get the all modal windows and its close buttons
+    var modal_file = document.getElementById("modal_window_file");
+    var modal_file_close = document.getElementsByClassName("modal_content_close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    modal_file_close.onclick = function () {
+        modal_file.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal_file) {
+            modal_file.style.display = "none";
+        }
     }
 
     var Module = {

@@ -50,9 +50,8 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some
-  - new camera module
-    - left right bottom top as int (ceil)
   - update swarm and santasdayoff
+  - camera set pos pixel perfect (like JumpHare)
   - u/container.h
     - stack
       - all items are in a single column or row
