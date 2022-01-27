@@ -51,22 +51,9 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 ## Todo
 - some
   - update swarm and santasdayoff
-  - camera set pos pixel perfect (like JumpHare)
-  - u/container.h
-    - stack
-      - all items are in a single column or row
-    - grid?
-      - each item has a grid position and grid size
-    - flow
-      - the items are row or column major ordered
-    - each item has a size
-    - the containers determine the top left pos
-- some_examples
-  - flow container example with hsv colors and different sizes
 - canvas
   - redo
   - save as savestate file each time on change  
-- brush dither position wrong    
 - config
   - each module may load and save config.json
   - each module uses its name as an object
@@ -82,7 +69,7 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 - buttons are not fixed in position and are in a flow container
 - buttons can be moved and turned on + off in the options menu
   - tooltip / title / text for the button
-- palette loaded from file (png) + display name
+- palette displays name on change
 - scale as + interpolation options
 - save in HD
 - combine layers and save them to combined.png

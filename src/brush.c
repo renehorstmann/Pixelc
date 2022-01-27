@@ -33,17 +33,20 @@ static uColor_s blend_color(uColor_s prev, uColor_s kernel, uColor_s color) {
 
 static bool draw_kernel(Brush *self, int c, int r, enum draw_kernel_mode mode) {
    
+   int kernel_offset_col = -(self->RO.kernel.cols-0.5)/2;
+   int kernel_offset_row = -(self->RO.kernel.rows-0.5)/2;
+   
    if(mode == DRAW_DITHER_A || mode == DRAW_DITHER_B) {
-       c = c/self->RO.kernel.cols * self->RO.kernel.cols;
-       r = r/self->RO.kernel.rows * self->RO.kernel.rows;
+       c = (c-kernel_offset_col)/self->RO.kernel.cols * self->RO.kernel.cols;
+       r = (r-kernel_offset_row)/self->RO.kernel.rows * self->RO.kernel.rows;
    }
    
    bool changed = false;
    for(int kr=0; kr<self->RO.kernel.rows; kr++) {
        // 'd'estination (-0.5 to let even kernels draw more to bottom right, instead of top left)
-       int dr = kr + r - (int) ((self->RO.kernel.rows-0.5)/2);
+       int dr = kr + r + kernel_offset_row;
        for(int kc=0; kc<self->RO.kernel.cols; kc++) {
-           int dc = kc + c - (int) ((self->RO.kernel.cols-0.5)/2);
+           int dc = kc + c + kernel_offset_col;
            
            uColor_s kernel_color = *u_image_pixel(self->RO.kernel, kc, kr, 0);
            
