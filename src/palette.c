@@ -64,6 +64,7 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
     
     self->ro_color = R_COLOR_WHITE;
     self->include_transparent_at_set_colors = true;
+    self->auto_save_config = true;
 
     self->L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
@@ -254,8 +255,9 @@ void palette_load_palette(Palette *self, int id) {
             self->L.palette_files[id]);
             
     u_image_kill(&palette);        
-    
-    palette_save_config(self);
+   
+    if(self->auto_save_config)
+        palette_save_config(self);
 }
 
 void palette_append_file(Palette *self, uImage palette, const char *name) {
@@ -285,7 +287,8 @@ void palette_append_file(Palette *self, uImage palette, const char *name) {
     
     palette_set_palette(self, palette, self->L.palette_files[idx]);
     self->RO.palette_id = idx;
-    palette_save_config(self);
+    if(self->auto_save_config)
+        palette_save_config(self);
 }
 
 void palette_reset_palette_files(Palette *self) {
@@ -318,7 +321,8 @@ void palette_reset_palette_files(Palette *self) {
     
     palette_defaults_kill(&palettes);
     
-    palette_save_config(self);
+    if(self->auto_save_config)
+        palette_save_config(self);
 }
 
 void palette_save_config(const Palette *self) {

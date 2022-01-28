@@ -25,7 +25,6 @@ static void save_image(const Canvas *self) {
     u_image_save_file(self->RO.image,
             e_io_savestate_file_path(file).s);
     e_io_savestate_save();
-    canvas_save_config(self);
 }
 
 static void load_image(Canvas *self) {
@@ -58,24 +57,20 @@ static void update_render_objects(Canvas *self) {
 //
 
 
-Canvas *canvas_new(int cols, int rows, int layers, int grid_cols, int grid_rows) {
+Canvas *canvas_new() {
     Canvas *self = rhc_calloc(sizeof *self);
 
     self->ro_color = R_COLOR_WHITE;
-
-    self->L.grid_cols = grid_cols;
-    self->L.grid_rows = grid_rows;
-
-    self->default_image_file = "image.png";
-    self->default_import_file = "import.png";
-
-    assume(layers <= CANVAS_MAX_LAYERS, "too many layers");
+    
     self->alpha = 1.0;
-
+    self->import_file = "import.png";
+    self->auto_save_config = true;
+    
     self->RO.pose = mat4_eye();
-
-    self->current_layer = 0;
-
+    
+    self->L.grid_cols = 8;
+    self->L.grid_rows = 8;
+    
     for (int i = 0; i < CANVAS_MAX_LAYERS; i++) {
         self->L.render_objects[i] = ro_single_new(r_texture_new_invalid());
     }    
@@ -91,21 +86,8 @@ Canvas *canvas_new(int cols, int rows, int layers, int grid_cols, int grid_rows)
     r_texture_wrap_repeat(bg_tex);
     self->L.bg = ro_single_new(bg_tex);
     
-
-    uImage img = u_image_new_zeros(cols, rows, layers);
-    {
-        uImage load = u_image_new_file(layers, self->default_image_file);
-        if (u_image_valid(load))
-            u_image_copy_top_left(img, load);
-        u_image_kill(&load);
-        
-    }
-
-    self->L.prev_image = u_image_new_clone(img);
-    
+    uImage img = u_image_new_zeros(32, 32, 1);
     canvas_set_image(self, img);
-    
-    save_image(self);
     
     return self;
 }
@@ -142,8 +124,10 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
 }
 
 void canvas_set_image(Canvas *self, uImage image_sink) {
-    if(!u_image_valid(image_sink))
+    if(!u_image_valid(image_sink)) {
+        log_warn("canvas: set_image failed, invalid img");
         return;
+    }
     log_info("canvas: set_image");
     
     u_image_kill(&self->RO.image);
@@ -158,21 +142,27 @@ void canvas_set_image(Canvas *self, uImage image_sink) {
 
 void canvas_save(Canvas *self) {
     log_info("canvas: save");
-    if (!u_image_equals(self->RO.image, self->L.prev_image)) {
-        u_image_copy(self->L.prev_image, self->RO.image);
-        u_image_save_file(self->RO.image, self->default_image_file);
-        
-        self->L.save_idx++;
-        if(self->L.save_idx >= CANVAS_MAX_SAVES)
-            self->L.save_idx = 0;
-        if(self->L.save_idx == self->L.save_idx_min) {
-            self->L.save_idx_min++;
-            if(self->L.save_idx_min >= CANVAS_MAX_SAVES)
-                self->L.save_idx_min = 0;
-        }
-        
-        save_image(self);
+    if (u_image_equals(self->RO.image, self->L.prev_image)) {
+        log_info("canvas: save failed, not changed");
+        return;
     }
+    
+    u_image_copy(self->L.prev_image, self->RO.image);
+    self->L.save_idx++;
+    if(self->L.save_idx > self->L.save_idx_max) {
+        self->L.save_idx_max++;
+        self->L.save_idx_max%=CANVAS_MAX_SAVES;
+    }
+    self->L.save_idx%=CANVAS_MAX_SAVES;
+    if(self->L.save_idx == self->L.save_idx_min) {
+        self->L.save_idx_min++;
+        self->L.save_idx_min%=CANVAS_MAX_SAVES;
+    }    
+    
+    save_image(self);
+    
+    if(self->auto_save_config)
+        canvas_save_config(self);
 }
 
 void canvas_reload(Canvas *self) {
@@ -181,7 +171,7 @@ void canvas_reload(Canvas *self) {
 }
 
 void canvas_undo(Canvas *self) {
-    log_info("canvas: undo %i %i", self->L.save_idx, self->L.save_idx_min);    
+    log_info("canvas: undo");    
     if(self->L.save_idx == self->L.save_idx_min) {
         log_info("canvas: undo failed, on min idx");
         return;
@@ -192,6 +182,9 @@ void canvas_undo(Canvas *self) {
         self->L.save_idx = CANVAS_MAX_SAVES - 1;
         
     load_image(self);
+    
+    if(self->auto_save_config)
+        canvas_save_config(self);
 }
 
 void canvas_redo(Canvas *self) {
@@ -202,10 +195,12 @@ void canvas_redo(Canvas *self) {
     }
     
     self->L.save_idx++;
-    if(self->L.save_idx >= CANVAS_MAX_SAVES)
-        self->L.save_idx = 0;
-        
+    self->L.save_idx %= CANVAS_MAX_SAVES;
+    
     load_image(self);
+    
+    if(self->auto_save_config)
+        canvas_save_config(self);
 }
 
 void canvas_save_config(const Canvas *self) {
@@ -216,10 +211,6 @@ void canvas_save_config(const Canvas *self) {
     
     uJson *canvas = u_json_append_object(config, "canvas");
     
-    printf("idminmax %i %i %i\n", self->L.save_idx, self->L.save_idx_min, self->L.save_idx_max);
-    
-    u_json_append_int(canvas, "cols", self->RO.image.cols);
-    u_json_append_int(canvas, "rows", self->RO.image.rows);
     u_json_append_int(canvas, "layers", self->RO.image.layers);
     u_json_append_int(canvas, "grid_cols", self->L.grid_cols);
     u_json_append_int(canvas, "grid_rows", self->L.grid_rows);
@@ -241,10 +232,8 @@ void canvas_load_config(Canvas *self) {
             e_io_savestate_file_path("config.json").s);
     
     uJson *canvas = u_json_get_object(config, "canvas");
-    int cols, rows, layers;
-    if(u_json_get_object_int(canvas, "cols", &cols)
-        && u_json_get_object_int(canvas, "rows", &rows)
-        && u_json_get_object_int(canvas, "layers", &layers)) {
+    int layers;
+    if(u_json_get_object_int(canvas, "layers", &layers)) {
         
         // todo
     }
@@ -265,6 +254,9 @@ void canvas_load_config(Canvas *self) {
         self->L.save_idx_max = save_idx_max;
         
         load_image(self);
+    } else {
+        log_info("canvas: load_config failed, saving the empty image as index 0");
+        save_image(self);
     }
     
     update_render_objects(self);

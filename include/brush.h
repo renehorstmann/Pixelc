@@ -30,7 +30,7 @@ typedef struct Brush {
     uColor_s secondary_color;
     enum brush_modes mode;
     bool shading_active;
-    
+    bool auto_save_config;
     
     struct {
         const Selection *selection_ref;

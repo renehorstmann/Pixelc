@@ -111,7 +111,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     printf("%i %i %i %i\n", L.camera->RO.left, L.camera->RO.right, L.camera->RO.top, L.camera->RO.bottom);
 
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
-    L.canvas = canvas_new(COLS, ROWS, LAYERS, GRID_COLS, GRID_ROWS);
+    L.canvas = canvas_new();
 #ifdef IMAGE_FILE
     L.canvas->default_image_file = IMAGE_FILE;
 #endif

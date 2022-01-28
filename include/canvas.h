@@ -15,9 +15,9 @@ typedef struct {
     int current_layer;
     bool show_grid;
     float alpha;
-    const char *default_image_file;
-    const char *default_import_file;
+    const char *import_file;
     
+    bool auto_save_config;
     
     // read only
     struct {
@@ -43,7 +43,7 @@ typedef struct {
     } L;
 } Canvas;
 
-Canvas *canvas_new(int cols, int rows, int layers, int grid_cols, int grid_rows);
+Canvas *canvas_new();
 
 void canvas_update(Canvas *self, float dtime);
 
@@ -54,10 +54,11 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat);
 // canvas will take the ownership of image_sink
 void canvas_set_image(Canvas *self, uImage image_sink);
 
-// saves an image (for undo and redo)
+// saves an image (for reload, undo and redo)
 void canvas_save(Canvas *self);
 
 // reloads the last saved image (for aborting a draw operation)
+// uses the uImage L.prev_image in memory
 void canvas_reload(Canvas *self);
 
 // reloads the last saved image

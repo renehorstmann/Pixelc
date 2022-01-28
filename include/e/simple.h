@@ -34,11 +34,23 @@ struct eSimple {
     eInput *input;
     eGui *gui;
     rRender *render;
-    
+
     e_simple_update_fn update_fn;
     e_simple_render_fn render_fn;
     
     void *user_data;
+
+    struct {
+        // the following values are smoothed:
+        // current frames per second (1/render_dtime)
+        float fps;
+        // current load in % for the update call per frame
+        float load_update;
+        // current load in % for the render call per frame
+        float load_render;
+        // current load in % per frame
+        float load;
+    } out;
 };
 
 // call this function once in the main function

@@ -5,7 +5,9 @@
 #include "rhc/alloc.h"
 
 #include "e/simple.h"
+#include "mathc/sca/float.h"
 
+#define OUT_SMOOTH_ALPHA 0.025
 
 static struct {
     eSimple super;
@@ -20,6 +22,12 @@ static void init_loop(float delta_time);
 
 static void main_loop(float delta_time);
 
+// float out. fps, load*
+static float smooth_out_value(float old_value, float new_value) {
+    if(isnan(new_value) || isinf(new_value))
+        return old_value;
+    return sca_mix(old_value, new_value, OUT_SMOOTH_ALPHA);
+}
 
 void e_simple_start(const char *title, const char *author, float startup_block_time, float updates_per_seconds,
                     e_simple_init_fn init_fn,
@@ -74,6 +82,11 @@ static void init_loop(float delta_time) {
 }
 
 static void main_loop(float delta_time) {
+    float load_delta_time;
+    Uint32 load_start_time = SDL_GetTicks();
+
+    L.super.out.fps = smooth_out_value(L.super.out.fps, 1/delta_time);
+
     ivec2 window_size = e_window_get_size(L.super.window);
 
 
@@ -91,6 +104,10 @@ static void main_loop(float delta_time) {
         }
     }
 
+    Uint32 load_update_time = SDL_GetTicks();
+    load_delta_time = (load_update_time - load_start_time) / 1000.0f;
+    L.super.out.load_update = sca_min(1, smooth_out_value(L.super.out.load_update, load_delta_time / delta_time));
+
     // render
     r_render_begin_frame(L.super.render, window_size);
 
@@ -101,4 +118,10 @@ static void main_loop(float delta_time) {
 
     // swap buffers
     r_render_end_frame(L.super.render);
+
+    Uint32 load_render_time = SDL_GetTicks();
+    load_delta_time = (load_render_time - load_update_time) / 1000.0f;
+    L.super.out.load_render = sca_min(1, smooth_out_value(L.super.out.load_render, load_delta_time / delta_time));
+    load_delta_time = (load_render_time - load_start_time) / 1000.0f;
+    L.super.out.load = sca_min(1, smooth_out_value(L.super.out.load, load_delta_time / delta_time));
 }

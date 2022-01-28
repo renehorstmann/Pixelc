@@ -17,6 +17,7 @@ typedef struct {
     vec4 ro_color; // render object color (default R_COLOR_WHITE)
     
     bool include_transparent_at_set_colors;
+    bool auto_save_config;
     
     struct {
         uColor_s palette[PALETTE_MAX];

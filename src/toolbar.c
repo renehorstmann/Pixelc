@@ -289,7 +289,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         }
         self->show_selection_copy_cut = false;
 
-        uImage img = u_image_new_file(1, self->canvas_ref->default_import_file);
+        uImage img = u_image_new_file(1, self->canvas_ref->import_file);
         button_set_pressed(&self->L.selection->rect, u_image_valid(img));
         self->show_selection_ok = u_image_valid(img);
 

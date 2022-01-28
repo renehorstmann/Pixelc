@@ -50,28 +50,32 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
 
 ## Todo
 - some
+  - uImage
+    - scale as + interpolation options
+    - merge layers (single or all)
   - update swarm and santasdayoff
-- canvas
-  - redo
-  - save as savestate file each time on change  
-- config
-  - each module may load and save config.json
-  - each module uses its name as an object
-  - on error: remove the item and reset
 - camera ctrl not as compile option
 - palette swipe activates multitouch cursor
+- palette displays name on change
+- tool abtraction:
+  - list of active tools
+  - render in container flow
+  - tooltip title text
 - options menu
   - size
   - frames + fps
   - palette? or swipe on palette
-  - save as?
+  - save as
+  - save in HD
   - import from?
-- buttons are not fixed in position and are in a flow container
-- buttons can be moved and turned on + off in the options menu
-  - tooltip / title / text for the button
-- palette displays name on change
-- scale as + interpolation options
-- save in HD
+  - import kernel
+  - import palette
+  - tool sub menu
+    - in container stack
+    - shows tooltip, etc.
+    - turn on / off
+    - change position (move up / down)
+
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - background image option?

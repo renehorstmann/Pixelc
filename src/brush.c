@@ -77,6 +77,7 @@ Brush *brush_new(Canvas *canvas) {
     self->secondary_color = U_COLOR_TRANSPARENT;
     self->mode = BRUSH_MODE_FREE;
     self->shading_active = false;
+    self->auto_save_config = true;
     
     self->RO.kernel = u_image_new_empty(1, 1, 1);
     *u_image_pixel_index(self->RO.kernel, 0, 0) = U_COLOR_WHITE;
@@ -215,8 +216,9 @@ void brush_load_kernel(Brush *self, int id) {
             u_image_new_file(1,
             e_io_savestate_file_path(file).s
             ));
-            
-    brush_save_config(self);
+    
+    if(self->auto_save_config)
+        brush_save_config(self);
 }
 
 void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name) {
@@ -245,7 +247,8 @@ void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name) {
     
     brush_set_kernel(self, kernel_sink);
     self->RO.kernel_id = self->RO.max_kernels-1;
-    brush_save_config(self);
+    if(self->auto_save_config)
+        brush_save_config(self);
 }
 
 
@@ -280,7 +283,8 @@ void brush_reset_kernel_files(Brush *self) {
     
     brush_kernel_defaults_kill(&kernels);
     
-    brush_save_config(self);
+    if(self->auto_save_config)
+        brush_save_config(self);
 }
 
 
