@@ -147,6 +147,9 @@ void canvas_save(Canvas *self) {
         return;
     }
     
+    // todo: remove...
+    u_image_save_file(self->RO.image, "image.png");
+    
     u_image_copy(self->L.prev_image, self->RO.image);
     self->L.save_idx++;
     if(self->L.save_idx > self->L.save_idx_max) {
