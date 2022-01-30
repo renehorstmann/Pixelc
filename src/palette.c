@@ -66,6 +66,8 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
     self->include_transparent_at_set_colors = true;
     self->auto_save_config = true;
 
+    self->L.current_pressed = -1;
+
     self->L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
     self->L.background_ro = ro_batch_new(PALETTE_MAX + MAX_ROWS,
@@ -155,14 +157,28 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
     if (!pos_in_palette(self, pointer.pos.xy))
         return false;
 
-    if (pointer.action != E_POINTER_DOWN)
-        return true;
+    if (pointer.action == E_POINTER_DOWN) {
 
-    for (int i = 0; i < self->RO.palette_size; i++) {
-        if (u_pose_contains(self->L.palette_ro.rects[i].pose, pointer.pos)) {
-            palette_set_color(self, i);
-            return true;
+        for (int i = 0; i < self->RO.palette_size; i++) {
+            if (u_pose_aa_contains(self->L.palette_ro.rects[i].pose, pointer.pos.xy)) {
+                self->L.current_pressed = i;
+                return true;
+            }
         }
+        
+        self->L.current_pressed = -1;
+        return true;
+    }
+    
+    if(self->L.current_pressed!=-1 
+            && !u_pose_aa_contains(self->L.palette_ro.rects[self->L.current_pressed].pose,
+                    pointer.pos.xy)) {
+        self->L.current_pressed = -1;
+    }
+    
+    if(self->L.current_pressed!=-1 && pointer.action == E_POINTER_UP) {
+        palette_set_color(self, self->L.current_pressed);
+        self->L.current_pressed = -1;
     }
 
     return true;

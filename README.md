@@ -67,6 +67,7 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
   - update swarm and santasdayoff
 - camera ctrl not as compile option
 - palette swipe activates multitouch cursor
+- palette long swipe to change palette
 - palette change color on not moved click instead of press
 - palette displays name on change
 - tool abtraction:

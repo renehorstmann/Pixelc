@@ -33,6 +33,7 @@ typedef struct {
         RoBatch background_ro;
         int last_selected;
         float last_camera_width, last_camera_height;
+        int current_pressed;
         
         char **palette_files;
     } L;
