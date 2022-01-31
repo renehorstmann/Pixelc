@@ -72,6 +72,11 @@ static mat4 u_pose_new_aa(float l, float t, float w, float h) {
     return u_pose_new(l + w / 2, t - h / 2, w, h);
 }
 
+// new axis aligned pose from left top to bottom right (left, right, bottom, top)
+static mat4 u_pose_new_aa_lrbt(float l, float r, float b, float t) {
+    return u_pose_new_aa(l, t, r-l, t-b);
+}
+
 static mat4 u_pose_new_hidden() {
     return u_pose_new(FLT_MAX, FLT_MAX, 1, 1);
 }
@@ -251,6 +256,11 @@ static void u_pose_aa_set_bottom(mat4 *p, float b) {
 // only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
     u_pose_set(p, l + w / 2, t - w / 2, w, h, 0);
+}
+
+// only safe to call for a not rotated pose (axis aligned)
+static void u_pose_aa_set_lrbt(mat4 *p, float l, float r, float b, float t) {
+    u_pose_aa_set(p, l, t, r-l, t-b);
 }
 
 // returns true if pos is within the pose ranges

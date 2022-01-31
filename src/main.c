@@ -13,6 +13,7 @@
 #include "palettepresave.h"
 #include "toolbar.h"
 #include "inputctrl.h"
+#include "multitouchcursor.h"
 
 #include "textinput.h"
 
@@ -97,6 +98,7 @@ static struct {
     CameraCtrl *camctrl;
     Toolbar *toolbar;
     InputCtrl *inputctrl;
+    MultiTouchCursor *mtc;
     
     TextInput *textinput;
 } L;
@@ -129,8 +131,12 @@ static void init(eSimple *simple, ivec2 window_size) {
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     
     L.toolbar = toolbar_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
-    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar, L.camctrl);
+    
+     
+    L.mtc = multitouchcursor_new(L.brush, L.palette);
 
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar, L.camctrl, L.mtc);
+   
     // L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
 
     // calls "palettepresave_PALETTE(L.palette);"
@@ -172,6 +178,9 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     }
     
     toolbar_update(L.toolbar, dtime);
+    
+    multitouchcursor_update(L.mtc, dtime, L.camera);
+    
     //*/
 
     //textinput_update(L.textinput, dtime);
@@ -188,6 +197,7 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     animation_render(L.animation, camera_mat);
     canvas_render(L.canvas, cam_mat);
     selectionctrl_render(L.selectionctrl, cam_mat);
+    multitouchcursor_render(L.mtc, camera_mat);
     palette_render(L.palette, camera_mat);
     toolbar_render(L.toolbar, camera_mat);
     //*/

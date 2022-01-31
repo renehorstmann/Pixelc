@@ -267,7 +267,8 @@ void toolbar_render(Toolbar *self, const mat4 *camera_mat) {
 
 // return true if the pointer was used (indicate event done)
 bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
-    if (!pos_in_toolbar(self, pointer.pos.xy))
+    if (pointer.action!=E_POINTER_UP 
+            && !pos_in_toolbar(self, pointer.pos.xy))
         return false;
 
 

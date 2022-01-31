@@ -23,6 +23,9 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     bool go = true;
     bool set_go = pointer.action == E_POINTER_UP;
 
+    if (multitouchcursor_pointer_event(self->mtc_ref, hud_pointer)) 
+        go = set_go;
+
     if (toolbar_pointer_event(self->toolbar_ref, hud_pointer))
         go = set_go;
 
@@ -46,7 +49,8 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 
 InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const Camera_s *canvascam,
                          Palette *palette, Brush *brush, 
-                         SelectionCtrl *selectionctrl, Toolbar *toolbar, CameraCtrl *canvascamctrl) {
+                         SelectionCtrl *selectionctrl, Toolbar *toolbar, CameraCtrl *canvascamctrl,
+                         MultiTouchCursor *mtc) {
     InputCtrl *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
@@ -56,6 +60,7 @@ InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const Camera_s *
     self->selectionctrl_ref = selectionctrl;
     self->toolbar_ref = toolbar;
     self->canvascamctrl_ref = canvascamctrl;
+    self->mtc_ref = mtc;
 
     e_input_register_pointer_event(input, pointer_event, self);
 
