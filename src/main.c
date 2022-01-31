@@ -22,8 +22,8 @@
 
 // canvas size
 //*
-#define COLS 16
-#define ROWS 32
+#define COLS 128
+#define ROWS 8
 #define LAYERS 1
 //*/
 
@@ -48,7 +48,7 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1.0
-#define PLAY_FRAMES 4
+#define PLAY_FRAMES 1
 #define PLAY_FPS 6.0
 
 // uncomment the used palette:
@@ -139,10 +139,11 @@ static void init(eSimple *simple, ivec2 window_size) {
     
     brush_load_config(L.brush);
     palette_load_config(L.palette);
-    
-    palette_load_palette(L.palette, 5);
-    
     canvas_load_config(L.canvas);
+    
+    uImage img = u_image_new_empty(32, 32, 1);
+    u_image_copy_top_left(img, L.canvas->RO.image);
+    canvas_set_image(L.canvas, img);
 }
 
 // this functions is called either each frame or at a specific update/s time

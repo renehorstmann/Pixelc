@@ -31,9 +31,18 @@ typedef struct {
         RoBatch palette_ro;
         RoSingle select_ro;
         RoBatch background_ro;
+        
+        RoSingle info_bg;
+        RoText info;
+        int info_x_offset;
+        float info_time;
+        
         int last_selected;
-        float last_camera_width, last_camera_height;
         int current_pressed;
+        
+        // long swipe from side to side to load the next palette
+        vec2 change_swipe_start;
+        float change_swipe_time;
         
         char **palette_files;
     } L;
@@ -53,6 +62,10 @@ float palette_get_hud_size(const Palette *self);
 int palette_get_color(const Palette *self);
 
 void palette_set_color(Palette *self, int index);
+
+// displays info above the palette for a few seconds
+// pass NULL to hide it immediately
+void palette_set_info(Palette *self, const char *info);
 
 // creates an uImage and calls palette_set_palette
 void palette_set_colors(Palette *self, const uColor_s *palette, int size, const char *name_ref);

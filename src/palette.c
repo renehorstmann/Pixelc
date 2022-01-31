@@ -6,12 +6,17 @@
 #include "u/json.h"
 #include "e/io.h"
 #include "rhc/alloc.h"
-#include "brush.h"
+#include "mathc/float.h"
 #include "palette.h"
 
 #define COLOR_DROP_SIZE 16.0f
 #define MAX_ROWS 10
 
+#define CHANGE_SWIPE_MAX_TIME 0.5
+#define CHANGE_SWIPE_MIN_DISTANCE 80
+
+#define INFO_STATIC_TIME 0.5
+#define INFO_TIME 1.5
 
 //
 // private
@@ -74,6 +79,10 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
                                          r_texture_new_file(2, 2, "res/palette_background.png"));
 
     self->L.select_ro = ro_single_new(r_texture_new_file(1, 1, "res/palette_select.png"));
+    
+    
+    self->L.info_bg = ro_single_new(r_texture_new_file(1, 1, "res/palette_info_bg.png"));
+    self->L.info = ro_text_new_font55(20);
 
     // default palette:
     {
@@ -91,6 +100,9 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
 
 
 void palette_update(Palette *self, float dtime) {
+    if(self->L.change_swipe_time>=0)
+        self->L.change_swipe_time-=dtime;
+    
     int cols = palette_cols(self);
     int last_row = (self->RO.palette_size - 1) / cols;
     for (int i = 0; i < PALETTE_MAX; i++) {
@@ -144,9 +156,48 @@ void palette_update(Palette *self, float dtime) {
     }
 
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[self->L.last_selected].pose;
+    
+    // info
+    if(self->L.info_time>=0) {
+        self->L.info_time -= dtime;
+    
+        float pos = 4;
+        if(self->L.info_time<INFO_STATIC_TIME) {
+            pos = sca_mix(-4, 4, self->L.info_time/INFO_STATIC_TIME);
+        }
+        
+        pos += palette_get_hud_size(self);
+        
+        if(camera_is_portrait_mode(self->camera_ref)) {
+            pos += self->camera_ref->RO.bottom;
+            
+            self->L.info_bg.rect.pose = u_pose_new(
+                    0, pos, 128, 8);
+                    
+            pos += 2;
+            self->L.info.pose = u_pose_new(
+                    self->L.info_x_offset, pos, 
+                    1, 1);
+                    
+        } else {
+            pos = self->camera_ref->RO.right - pos;
+            
+            self->L.info_bg.rect.pose = u_pose_new_angle(
+                    pos, 0, 128, 8, M_PI_2);
+            
+            pos -= 2;
+            self->L.info.pose = u_pose_new_angle(
+                    pos, self->L.info_x_offset, 
+                    1, 1, M_PI_2);
+        }
+    }
 }
 
 void palette_render(Palette *self, const mat4 *camera_mat) {
+    if(self->L.info_time>=0) {
+        ro_single_render(&self->L.info_bg, camera_mat);
+        ro_text_render(&self->L.info, camera_mat);
+    }
     ro_batch_render(&self->L.background_ro, camera_mat, true);
     ro_batch_render(&self->L.palette_ro, camera_mat, true);
     ro_single_render(&self->L.select_ro, camera_mat);
@@ -158,6 +209,9 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         return false;
 
     if (pointer.action == E_POINTER_DOWN) {
+        
+        self->L.change_swipe_start = pointer.pos.xy;
+        self->L.change_swipe_time = CHANGE_SWIPE_MAX_TIME;
 
         for (int i = 0; i < self->RO.palette_size; i++) {
             if (u_pose_aa_contains(self->L.palette_ro.rects[i].pose, pointer.pos.xy)) {
@@ -180,13 +234,34 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         palette_set_color(self, self->L.current_pressed);
         self->L.current_pressed = -1;
     }
+    
+    if(self->L.change_swipe_time>=0 && pointer.action == E_POINTER_MOVE) {
+        float diff;
+        if(camera_is_portrait_mode(self->camera_ref)) {
+            diff = pointer.pos.x - self->L.change_swipe_start.x;
+        } else {
+            diff = pointer.pos.y - self->L.change_swipe_start.y;
+        }
+        if(diff>CHANGE_SWIPE_MIN_DISTANCE) {
+            int id = self->RO.palette_id+1;
+            id %= self->RO.max_palettes;
+            palette_load_palette(self, id);
+            self->L.change_swipe_time = -1;
+        } else if(diff<=-CHANGE_SWIPE_MIN_DISTANCE) {
+            int id = self->RO.palette_id-1;
+            if(id<0)
+                id = self->RO.max_palettes-1;
+            palette_load_palette(self, id);
+            self->L.change_swipe_time = -1;
+        }
+    }
 
     return true;
 }
 
 float palette_get_hud_size(const Palette *self) {
     int cols = palette_cols(self);
-    int rows = 1 + self->RO.palette_size / cols;
+    int rows = 1 + (self->RO.palette_size-1) / cols;
     return rows * COLOR_DROP_SIZE;
 }
 
@@ -203,6 +278,17 @@ void palette_set_color(Palette *self, int index) {
     self->brush_ref->current_color = self->RO.palette[index];
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[index].pose;
     self->L.last_selected = index;
+}
+
+void palette_set_info(Palette *self, const char *info) {
+    if(!info) {
+        // hide it immediately
+        self->L.info_time = -1;
+        return;
+    }
+    vec2 size = ro_text_set_text(&self->L.info, info);
+    self->L.info_x_offset = (int) -sca_ceil(size.x/2);
+    self->L.info_time = INFO_TIME;
 }
 
 void palette_set_colors(Palette *self, const uColor_s *palette, int size, const char *name_ref) {
@@ -231,6 +317,8 @@ void palette_set_colors(Palette *self, const uColor_s *palette, int size, const 
     
     palette_set_color(self, 0);
     self->RO.palette_name = name_ref? name_ref : "custom palette";
+    
+    palette_set_info(self, self->RO.palette_name);
 }
 
 
@@ -262,13 +350,21 @@ void palette_load_palette(Palette *self, int id) {
     char file[256];
     snprintf(file, sizeof file, "palette_%s", self->L.palette_files[id]);       
     
+    char name[32];
+    snprintf(name, sizeof name, "%s", self->L.palette_files[id]);
+    
+    // name to lower and without .png
+    Str_s name_s = strc(name);
+    name_s = str_tolower(name_s);
+    name_s = str_eat_back_str(name_s, strc(".png"));
+    name_s.data[name_s.size] = '\0';
+    
     uImage palette = u_image_new_file(1,
             e_io_savestate_file_path(file).s
             );
     
     self->RO.palette_id = id;
-    palette_set_palette(self, palette,
-            self->L.palette_files[id]);
+    palette_set_palette(self, palette, name);
             
     u_image_kill(&palette);        
    
