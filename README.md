@@ -66,8 +66,7 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
     - merge layers (single or all)
   - update swarm and santasdayoff
 - camera ctrl not as compile option
-- palette swipe activates multitouch cursor
-- palette displays name on change
+- palette swipe up activates multitouch cursor
 - tool abtraction:
   - list of active tools
   - render in container flow
