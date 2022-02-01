@@ -169,7 +169,6 @@ void canvas_save(Canvas *self) {
 }
 
 void canvas_reload(Canvas *self) {
-    log_info("canvas: reload");
     u_image_copy(self->RO.image, self->L.prev_image);
 }
 

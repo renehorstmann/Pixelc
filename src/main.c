@@ -133,7 +133,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.toolbar = toolbar_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
     
      
-    L.mtc = multitouchcursor_new(L.brush, L.palette);
+    L.mtc = multitouchcursor_new(L.camera, L.brush, L.palette);
 
     L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar, L.camctrl, L.mtc);
    
@@ -179,7 +179,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     
     toolbar_update(L.toolbar, dtime);
     
-    multitouchcursor_update(L.mtc, dtime, L.camera);
+    multitouchcursor_update(L.mtc, dtime);
     
     //*/
 

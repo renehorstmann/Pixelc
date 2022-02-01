@@ -3,25 +3,32 @@
 
 #include "e/input.h"
 #include "r/ro_types.h"
+#include "camera.h"
 #include "brush.h"
 #include "palette.h"
 
 typedef struct {
+    const Camera_s *cam_ref;
     Brush *brush_ref;
     Palette *palette_ref;
+
+    vec4 pos;
+    bool active;
     
     struct {
         RoBatch cursor;
-        vec2 pos;
+        vec2 start_pos;
+        bool start;
+        bool pressed;
     } L;
 } MultiTouchCursor;
 
 
-MultiTouchCursor *multitouchcursor_new(Brush *brush, Palette *palette);
+MultiTouchCursor *multitouchcursor_new(const Camera_s *cam, Brush *brush, Palette *palette);
 
 void multitouchcursor_kill(MultiTouchCursor **self_ptr);
 
-void multitouchcursor_update(MultiTouchCursor *self, float dtime, const Camera_s *cam);
+void multitouchcursor_update(MultiTouchCursor *self, float dtime);
 
 void multitouchcursor_render(const MultiTouchCursor *self, const mat4 *cam_mat);
 

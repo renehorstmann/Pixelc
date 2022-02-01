@@ -23,10 +23,11 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     bool go = true;
     bool set_go = pointer.action == E_POINTER_UP;
 
-    if (multitouchcursor_pointer_event(self->mtc_ref, hud_pointer)) 
+
+    if (go && multitouchcursor_pointer_event(self->mtc_ref, hud_pointer)) 
         go = set_go;
 
-    if (toolbar_pointer_event(self->toolbar_ref, hud_pointer))
+    if (go && toolbar_pointer_event(self->toolbar_ref, hud_pointer))
         go = set_go;
 
     if (go && palette_pointer_event(self->palette_ref, hud_pointer))

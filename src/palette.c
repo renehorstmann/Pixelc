@@ -31,16 +31,6 @@ static int palette_cols(const Palette *self) {
     return (int) floorf(camera_height(self->camera_ref) / COLOR_DROP_SIZE);
 }
 
-static bool pos_in_palette(const Palette *self, vec2 pos) {
-    int cols = palette_cols(self);
-    int rows = 1 + self->RO.palette_size / cols;
-    int size = rows * COLOR_DROP_SIZE;
-    if (camera_is_portrait_mode(self->camera_ref)) {
-        return pos.y <= self->camera_ref->RO.bottom + size;
-    }
-    return pos.x >= self->camera_ref->RO.right - size;
-}
-
 
 static mat4 setup_palette_color_pose(const Palette *self, int r, int c) {
     mat4 pose = mat4_eye();
@@ -205,7 +195,7 @@ void palette_render(Palette *self, const mat4 *camera_mat) {
 
 
 bool palette_pointer_event(Palette *self, ePointer_s pointer) {
-    if (!pos_in_palette(self, pointer.pos.xy))
+    if (!palette_contains_pos(self, pointer.pos.xy))
         return false;
 
     if (pointer.action == E_POINTER_DOWN) {
@@ -214,7 +204,8 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         self->L.change_swipe_time = CHANGE_SWIPE_MAX_TIME;
 
         for (int i = 0; i < self->RO.palette_size; i++) {
-            if (u_pose_aa_contains(self->L.palette_ro.rects[i].pose, pointer.pos.xy)) {
+            // pose will be rotated in landscape mode (so do not use _aa_)!
+            if (u_pose_contains(self->L.palette_ro.rects[i].pose, pointer.pos)) {
                 self->L.current_pressed = i;
                 return true;
             }
@@ -224,9 +215,10 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         return true;
     }
     
-    if(self->L.current_pressed!=-1 
-            && !u_pose_aa_contains(self->L.palette_ro.rects[self->L.current_pressed].pose,
-                    pointer.pos.xy)) {
+    if(self->L.current_pressed!=-1
+            // pose will be rotated in landscape mode (so do not use _aa_)!
+            && !u_pose_contains(self->L.palette_ro.rects[self->L.current_pressed].pose,
+                    pointer.pos)) {
         self->L.current_pressed = -1;
     }
     
@@ -263,6 +255,16 @@ float palette_get_hud_size(const Palette *self) {
     int cols = palette_cols(self);
     int rows = 1 + (self->RO.palette_size-1) / cols;
     return rows * COLOR_DROP_SIZE;
+}
+
+bool palette_contains_pos(const Palette *self, vec2 pos) {
+    int cols = palette_cols(self);
+    int rows = 1 + self->RO.palette_size / cols;
+    int size = rows * COLOR_DROP_SIZE;
+    if (camera_is_portrait_mode(self->camera_ref)) {
+        return pos.y <= self->camera_ref->RO.bottom + size;
+    }
+    return pos.x >= self->camera_ref->RO.right - size;
 }
 
 int palette_get_color(const Palette *self) {

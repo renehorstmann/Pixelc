@@ -64,9 +64,6 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
   - uImage
     - scale as + interpolation options
     - merge layers (single or all)
-  - update swarm and santasdayoff
-- camera ctrl not as compile option
-- palette swipe up activates multitouch cursor
 - tool abtraction:
   - list of active tools
   - render in container flow
@@ -86,6 +83,10 @@ gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/
     - turn on / off
     - change position (move up / down)
 
+- onion skinning (show last animation frames alpha blended in the background)
+- tiles
+  - file containing tile names?
+  - direct draw mode, in which you can select a tile in the canvas and directly draw changes there
 - combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - background image option?

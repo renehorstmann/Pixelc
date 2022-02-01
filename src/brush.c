@@ -2,6 +2,7 @@
 #include "e/io.h"
 #include "r/texture.h"
 #include "mathc/sca/int.h"
+#include "mathc/sca/uchar.h"
 #include "brush.h"
 #include "u/json.h"
 
@@ -77,7 +78,10 @@ Brush *brush_new(Canvas *canvas) {
     self->secondary_color = U_COLOR_TRANSPARENT;
     self->mode = BRUSH_MODE_FREE;
     self->shading_active = false;
+    self->render_hover_preview = true;
     self->auto_save_config = true;
+
+    self->L.hovering = true;
     
     self->RO.kernel = u_image_new_empty(1, 1, 1);
     *u_image_pixel_index(self->RO.kernel, 0, 0) = U_COLOR_WHITE;
@@ -93,6 +97,26 @@ Brush *brush_new(Canvas *canvas) {
 void brush_pointer_event(Brush *self, ePointer_s pointer) {
     if (pointer.id != 0)
         return;
+
+    if(pointer.action == E_POINTER_DOWN)
+        self->L.hovering = false;
+
+
+    if(self->L.hovering && self->L.hovering_change)
+        canvas_reload(self->canvas_ref);
+    
+
+    if(self->L.hovering && pointer.action == E_POINTER_MOVE) {
+        switch (self->mode) {
+            case BRUSH_MODE_FREE:
+            case BRUSH_MODE_DITHER:
+            case BRUSH_MODE_DITHER2:
+            case BRUSH_MODE_DOT:
+                pointer.action = E_POINTER_DOWN;
+            default:
+                break;
+        }
+    }
 
     bool change = false;
     switch (self->mode) {
@@ -117,6 +141,11 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
             log_wtf("brush unknown mode");
     }
 
+    self->L.hovering_change = change;
+
+    if(self->L.hovering)
+        return;
+
     if (change)
         self->L.change = true;
 
@@ -125,6 +154,8 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
         canvas_save(self->canvas_ref);
     }
 
+    if(self->render_hover_preview && pointer.action == E_POINTER_UP)
+        self->L.hovering = true;
 }
 
 bool brush_draw_pixel(Brush *self, int c, int r, uColor_s kernel_color) {
@@ -142,7 +173,7 @@ bool brush_draw_pixel(Brush *self, int c, int r, uColor_s kernel_color) {
         if (!u_color_equals(*pixel, self->secondary_color))
             return false;
     }
-    
+
     *pixel = blend_color(*pixel, kernel_color, self->current_color);
     return true;
 }
@@ -160,7 +191,7 @@ bool brush_draw(Brush *self, int c, int r) {
 
 void brush_abort_current_draw(Brush *self) {
     log_info("brush: abort_current_draw");
-    if (self->L.change) {
+    if (self->L.change || (self->L.hovering && self->L.hovering_change)) {
         canvas_reload(self->canvas_ref);
         brushmode_reset(self->brushmode); // sets drawing to false
         self->L.change = false;

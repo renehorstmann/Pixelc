@@ -6,31 +6,33 @@
 #include "camera.h"
 #include "brush.h"
 
-#define CAMERA_CONTROL_WHEEL_ZOOM_FACTOR 1.1
-#define CAMERA_CONTROL_SMOOTH_ALPHA 0.5
 
 typedef struct {
+    eInput *input_ref;
     Camera_s *camera_ref;
     Brush *brush_ref;
+
+    // turn this mode true, to let every pointer just move the camera
+    bool move_mode;
 
     struct {
         vec2 pos;
         float size;
 
         vec2 pos0;
-
         vec2 move0;
 
-#ifdef OPTION_TOUCH
         float size0;
         vec2 touch[2];
         bvec2 touching;
         float distance0;
+        float distance;
         bool touched;
-#else
-        vec2 pointer_pos;
-        bool moving;
-#endif
+
+        struct {
+            vec2 pointer_pos;
+            bool moving;
+        } cursor;
 
     } L;
 } CameraCtrl;

@@ -59,6 +59,8 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer);
 
 float palette_get_hud_size(const Palette *self);
 
+bool palette_contains_pos(const Palette *self, vec2 pos);
+
 int palette_get_color(const Palette *self);
 
 void palette_set_color(Palette *self, int index);

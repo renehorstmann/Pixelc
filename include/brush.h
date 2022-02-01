@@ -30,6 +30,7 @@ typedef struct Brush {
     uColor_s secondary_color;
     enum brush_modes mode;
     bool shading_active;
+    bool render_hover_preview;
     bool auto_save_config;
     
     struct {
@@ -44,6 +45,8 @@ typedef struct Brush {
     } RO; // read only
     
     struct {
+        bool hovering;
+        bool hovering_change;
         bool change;
         
         char **kernel_files;
