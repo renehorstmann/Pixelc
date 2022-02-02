@@ -12,52 +12,51 @@ Lots of features are missing in the web demo! (Loading, Saving, options like siz
 ## Status:
 Ready to draw.
 Saves after each tip on the screen to image.png.
-Loads image.png at start, if available.
 An import button can load import.png as selection, if available.
 Palette, canvas size, animation size can be configured in code (main.c).
 
 ![example_image](example.jpg)
 
+## Install and run on Desktop
+Have a look at the section of [some](https://github.com/renehorstmann/some)
+
+
 ## Compiling for Web
+Using Emscripten https://emscripten.org/
+Tested under Ubuntu and WSL Ubuntu.
+You should have already cloned the project and `cd` to that dir:
 
-Using Emscripten:
-
+- Create a sub directory to compile the website
 ```sh
 mkdir web && cp index.html web && cp icon/* web && cd web
 ```
 
+- Copy all resources, because emscripten may not be able to use `../res`
+```sh
+cp -r ../res .
+```
+
+- Compile
 ```sh
 emcc -O3 \
 -I../include/ \
--s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -s FULL_ES3=1 -s \
+-s USE_SDL=2 -s USE_SDL_IMAGE=2 -s FULL_ES3=1 -s \
 EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 -s EXPORTED_RUNTIME_METHODS=FS \
 -s SDL2_IMAGE_FORMATS='["png"]' \
 --preload-file ./res \
--s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1 -s FETCH=1 \
+-s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1  \
 -lidbfs.js \
--DOPTION_GLES -DOPTION_SDL -DOPTION_TTF -DOPTION_FETCH \
+-DOPTION_GLES -DOPTION_SDL \
 ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c \
 -o index.js
 ```
 
-test the website:
+- Test the website (open a browser and call localhost:8000)
 ```sh
 python3 -m http.server --bind localhost  # [port]
 ```
 
-
-## Without Cmake
-
-Instead of cmake, the following call to gcc may work, too.
-
-```sh
-mkdir build && cd build
-
-cp -r ../res .
-
-gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/ $(sdl2-config --cflags --libs) -lSDL2_image -lglew32 -lopengl32 -lglu32 -DOPTION_GLEW -DOPTION_SDL -o pixelc
-```
 
 ## Todo
 - some

@@ -26,6 +26,18 @@
             background-color: black;
         }
 
+        /* The startup texts... (like downloading) font size according to viewport size */
+        .startup_text {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            font-size: 4vmin;
+            color: lightgray;
+            overflow: hidden;
+        }
+
         /* The background of modal windows */
         .modal {
             display: none; /* Hidden by default */
@@ -49,11 +61,16 @@
             width: 80%; /* Could be more or less, depending on screen size */
         }
 
-        /* The modal window close button */
+        /* Set the used font size according to the viewport size */
+        .modal_font {
+            font-size: 4vmin;
+        }
+
+        /* The modal window close button (also font size according to the viewport size) */
         .modal_content_close {
             color: #aaa;
             float: right;
-            font-size: 28px;
+            font-size: 6vmin;
             font-weight: bold;
         }
 
@@ -63,6 +80,8 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+
     </style>
 </head>
 <body>
@@ -72,17 +91,21 @@
 <div id="modal_window_file" class="modal">
     <div class="modal_content">
         <span class="modal_content_close">&times;</span>
-        <p>File upload:</p>
-        <input id="file_uploader" type="file"/>
-        <input id="file_uploader_png" type="file" accept="image/png"/>
-        <input id="file_uploader_txt" type="file" accept="text/plain"/>
-        <input id="file_uploader_json" type="file" accept="application/json"/>
+        <p class="modal_font">File upload: (please dont zoom in)</p>
+        <input class="modal_font" id="file_uploader" type="file"/>
+        <input class="modal_font" id="file_uploader_png" type="file" accept="image/png"/>
+        <input class="modal_font" id="file_uploader_txt" type="file" accept="text/plain"/>
+        <input class="modal_font" id="file_uploader_json" type="file" accept="application/json"/>
     </div>
 </div>
+
+<p class="startup_text"></p>
 
 
 <script type='text/javascript'>
 
+    // called from the engine on error
+    // startup check or assume fails
     function set_exit_failure_error_msg() {
         var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">Potato Browsers are not supported!</h1><p style="color:silver;">Full WebGL2.0 is needed!</p></body></html>';
         document.open();
@@ -90,6 +113,7 @@
         document.close();
     }
 
+    // called from the engine to offer a download file
     function offer_file_as_download(filename) {
         try {
             var mime = "application/octet-stream";
@@ -121,6 +145,9 @@
         }
     }
 
+    //
+    // local file upload stuff, see ask_for_file_upload below
+    //
     var file_upload_filename = 'none.txt'
     var file_upload_is_ascii = false;
 
@@ -164,6 +191,7 @@
     file_uploader_txt.addEventListener('change', handle_file_upload, false);
     file_uploader_json.addEventListener('change', handle_file_upload, false);
 
+    // called from the engine to ask for a file upload
     function ask_for_file_upload(filename, as_ascii) {
         // Check for the various File API support.
         if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
@@ -202,7 +230,7 @@
         modal_file.style.display = "block";
     }
 
-    // Get the all modal windows and its close buttons
+    // Get the all file modal windows and its close buttons
     var modal_file = document.getElementById("modal_window_file");
     var modal_file_close = document.getElementsByClassName("modal_content_close")[0];
 
@@ -218,6 +246,7 @@
         }
     }
 
+    // emscripten module
     var Module = {
         canvas: (function () {
             var canvas = document.getElementById('canvas');
@@ -227,7 +256,17 @@
             }, false);
 
             return canvas;
-        })()
+        })(),
+        setStatus: function(text) {
+            console.log("Module::setStatus: "+ text);
+            var startup_text = document.getElementsByClassName("startup_text")[0];
+            if(!text) {
+                startup_text.style.display = "none";
+            } else {
+                startup_text.style.display = "block";
+                startup_text.innerHTML = text;
+            }
+        },
     };
     window.onerror = function (event) {
         set_exit_failure_error_msg();
