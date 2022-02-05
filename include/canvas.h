@@ -79,4 +79,13 @@ void canvas_save_config(const Canvas *self);
 // uses object "canvas"
 void canvas_load_config(Canvas *self);
 
+
+static bool canvas_undo_available(const Canvas *self) {
+    return self->L.save_idx != self->L.save_idx_min;
+}
+
+static bool canvas_redo_available(const Canvas *self) {
+    return self->L.save_idx != self->L.save_idx_max;
+}
+
 #endif //PIXELC_CANVAS_H

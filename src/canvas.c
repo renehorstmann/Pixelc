@@ -9,8 +9,6 @@
 #include "e/io.h"
 #include "mathc/mat/float.h"
 
-#include "palette.h"
-#include "toolbar.h"
 #include "canvas.h"
 
 
@@ -152,10 +150,7 @@ void canvas_save(Canvas *self) {
     
     u_image_copy(self->L.prev_image, self->RO.image);
     self->L.save_idx++;
-    if(self->L.save_idx > self->L.save_idx_max) {
-        self->L.save_idx_max++;
-        self->L.save_idx_max%=CANVAS_MAX_SAVES;
-    }
+    self->L.save_idx_max = self->L.save_idx;
     self->L.save_idx%=CANVAS_MAX_SAVES;
     if(self->L.save_idx == self->L.save_idx_min) {
         self->L.save_idx_min++;

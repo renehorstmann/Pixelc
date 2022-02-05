@@ -59,6 +59,7 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
+- tool button active != is active?
 - some
   - uImage
     - scale as + interpolation options
@@ -70,7 +71,6 @@ python3 -m http.server --bind localhost  # [port]
 - options menu
   - size
   - frames + fps
-  - palette? or swipe on palette
   - save as
   - save in HD
   - import from?

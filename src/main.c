@@ -11,11 +11,10 @@
 #include "cameractrl.h"
 #include "palette.h"
 #include "palettepresave.h"
+#include "toolbar_old.h"
 #include "toolbar.h"
 #include "inputctrl.h"
 #include "multitouchcursor.h"
-
-#include "textinput.h"
 
 //
 // options
@@ -96,11 +95,11 @@ static struct {
     Brush *brush;
     Palette *palette;
     CameraCtrl *camctrl;
+    ToolbarOld *toolbar_old;
     Toolbar *toolbar;
     InputCtrl *inputctrl;
     MultiTouchCursor *mtc;
     
-    TextInput *textinput;
 } L;
 
 // this function will be called at the start of the app
@@ -130,14 +129,12 @@ static void init(eSimple *simple, ivec2 window_size) {
     printf("canvassize: %i %i\n", L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     
-    L.toolbar = toolbar_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
-    
+    L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
+    L.toolbar = toolbar_new(L.camera, L.canvas, L.brush, L.palette);
      
     L.mtc = multitouchcursor_new(L.camera, L.brush, L.palette);
 
-    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar, L.camctrl, L.mtc);
-   
-    // L.textinput = textinput_new(simple->input, L.camera, "Your name:", 0);
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar_old, L.toolbar, L.camctrl, L.mtc);
 
     // calls "palettepresave_PALETTE(L.palette);"
     PalettePresave(PALETTE)(L.palette);
@@ -147,7 +144,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     palette_load_config(L.palette);
     canvas_load_config(L.canvas);
     
-    uImage img = u_image_new_empty(32, 32, 1);
+    uImage img = u_image_new_empty(32, 16, 1);
     u_image_copy_top_left(img, L.canvas->RO.image);
     canvas_set_image(L.canvas, img);
 }
@@ -169,40 +166,36 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     
     if(L.selectionctrl->out.show_copy_cut) {
         L.selectionctrl->out.show_copy_cut = false;
-        L.toolbar->show_selection_copy_cut = true;
+        L.toolbar_old->show_selection_copy_cut = true;
     }
     if(L.selectionctrl->out.show_ok) {
         L.selectionctrl->out.show_ok = false;
-        L.toolbar->show_selection_ok = true;
-        L.toolbar->show_selection_copy_cut = false;
+        L.toolbar_old->show_selection_ok = true;
+        L.toolbar_old->show_selection_copy_cut = false;
     }
     
+    //toolbar_old_update(L.toolbar_old, dtime);
     toolbar_update(L.toolbar, dtime);
     
     multitouchcursor_update(L.mtc, dtime);
     
-    //*/
-
-    //textinput_update(L.textinput, dtime);
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
 static void render(eSimple *simple, ivec2 window_size, float dtime) {
-    const mat4 *camera_mat = &L.camera->matrices.p;
-    const mat4 *cam_mat = &L.camera->matrices.vp;
+    const mat4 *hud_cam = &L.camera->matrices.p;
+    const mat4 *canvas_cam = &L.camera->matrices.vp;
 
-    background_render(L.background, camera_mat);
+    background_render(L.background, hud_cam);
 
-    //*
-    animation_render(L.animation, camera_mat);
-    canvas_render(L.canvas, cam_mat);
-    selectionctrl_render(L.selectionctrl, cam_mat);
-    multitouchcursor_render(L.mtc, camera_mat);
-    palette_render(L.palette, camera_mat);
-    toolbar_render(L.toolbar, camera_mat);
-    //*/
-
-    //textinput_render(L.textinput, camera_mat);
+    
+    animation_render(L.animation, hud_cam);
+    canvas_render(L.canvas, canvas_cam);
+    selectionctrl_render(L.selectionctrl, canvas_cam);
+    multitouchcursor_render(L.mtc, hud_cam);
+    palette_render(L.palette, hud_cam);
+    //toolbar_old_render(L.toolbar_old, hud_cam);
+    toolbar_render(L.toolbar, hud_cam);
 }
 
 int main(int argc, char **argv) {

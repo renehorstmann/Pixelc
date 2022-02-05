@@ -27,8 +27,15 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     if (go && multitouchcursor_pointer_event(self->mtc_ref, hud_pointer)) 
         go = set_go;
 
+    //*
     if (go && toolbar_pointer_event(self->toolbar_ref, hud_pointer))
         go = set_go;
+    //*/
+
+    /*
+    if (go && toolbar_old_pointer_event(self->toolbar_old_ref, hud_pointer))
+        go = set_go;
+    //*/
 
     if (go && palette_pointer_event(self->palette_ref, hud_pointer))
         go = set_go;
@@ -48,10 +55,17 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 // public
 //
 
-InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const Camera_s *canvascam,
-                         Palette *palette, Brush *brush, 
-                         SelectionCtrl *selectionctrl, Toolbar *toolbar, CameraCtrl *canvascamctrl,
-                         MultiTouchCursor *mtc) {
+InputCtrl *inputctrl_new(
+        eInput *input, 
+        const Camera_s *camera, 
+        const Camera_s *canvascam,
+        Palette *palette, 
+        Brush *brush, 
+        SelectionCtrl *selectionctrl, 
+        ToolbarOld *toolbar_old, 
+        Toolbar *toolbar,
+        CameraCtrl *canvascamctrl,
+        MultiTouchCursor *mtc) {
     InputCtrl *self = rhc_calloc(sizeof *self);
 
     self->camera_ref = camera;
@@ -59,6 +73,7 @@ InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const Camera_s *
     self->palette_ref = palette;
     self->brush_ref = brush;
     self->selectionctrl_ref = selectionctrl;
+    self->toolbar_old_ref = toolbar_old;
     self->toolbar_ref = toolbar;
     self->canvascamctrl_ref = canvascamctrl;
     self->mtc_ref = mtc;

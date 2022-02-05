@@ -7,6 +7,7 @@
 #include "brush.h"
 #include "selectionctrl.h"
 #include "cameractrl.h"
+#include "toolbar_old.h"
 #include "toolbar.h"
 #include "multitouchcursor.h"
 
@@ -16,13 +17,21 @@ typedef struct {
     Palette *palette_ref;
     Brush *brush_ref;
     SelectionCtrl *selectionctrl_ref;
+    ToolbarOld *toolbar_old_ref;
     Toolbar *toolbar_ref;
     CameraCtrl *canvascamctrl_ref;
     MultiTouchCursor *mtc_ref;
 } InputCtrl;
 
-InputCtrl *inputctrl_new(eInput *input, const Camera_s *camera, const Camera_s *canvascam,
-                         Palette *palette, Brush *brush, 
-                         SelectionCtrl *selectionctrl, Toolbar *toolbar, CameraCtrl *canvascamctrl, MultiTouchCursor *mtc);
+InputCtrl *inputctrl_new(eInput *input, 
+        const Camera_s *camera, 
+        const Camera_s *canvascam,
+        Palette *palette, 
+        Brush *brush, 
+        SelectionCtrl *selectionctrl, 
+        ToolbarOld *toolbar_old,
+        Toolbar *toolnar,
+        CameraCtrl *canvascamctrl, 
+        MultiTouchCursor *mtc);
 
 #endif //PIXELC_INPUT_H
