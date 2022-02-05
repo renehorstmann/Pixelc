@@ -74,5 +74,6 @@ Tool *tool_button_new(const char *name,
 
 Tool *tool_new_undo();
 Tool *tool_new_redo();
+Tool *tool_new_import();
 
 #endif //PIXELC_TOOL_H

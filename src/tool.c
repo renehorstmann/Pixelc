@@ -72,6 +72,7 @@ Tool *tool_button_new(const char *name,
     
     self->super.pointer_event = pointer_event;
     
+    self->active = true;
     self->opt_is_active = opt_is_active;
  
     self->padding_lrbt = vec4_set(1);
@@ -115,8 +116,25 @@ static bool tool_redo_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 Tool *tool_new_redo() {
     return tool_button_new("redo", 
             "redos the undone canvas changes", 
-            "res/button_undo.png", 
+            "res/button_redo.png", 
             tool_redo_pe,
             tool_redo_is_a);
 }
 
+static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(self->active && button_clicked(&self->ro.rect, pointer)) {
+        uImage img = u_image_new_file(1, "import.png");
+        if(!u_image_valid(img))
+            return;
+        canvas_set_image(refs.canvas, img);
+        canvas_save(refs.canvas);
+    } 
+}
+Tool *tool_new_import() {
+    return tool_button_new("import", 
+            "loads import.png as selection", 
+            "res/button_import.png", 
+            tool_import_pe,
+            NULL);
+}

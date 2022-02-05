@@ -18,12 +18,14 @@ Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
     
     self->all[0] = tool_new_undo();
     self->all[1] = tool_new_redo();
+    self->all[2] = tool_new_import();
+    
     
     memcpy(self->active, self->all, sizeof *self->all * 32);
     
-    self->all_len = self->active_len = 2;
+    self->all_len = self->active_len = 3;
     
-    self->container = u_container_new(2, cam->RO.left, cam->RO.top);
+    self->container = u_container_new(3, cam->RO.left, cam->RO.top);
     
     return self;
 }
