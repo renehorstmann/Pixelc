@@ -29,7 +29,8 @@ static void load_image(Canvas *self) {
     char file[128];
     snprintf(file, sizeof file, "image_%i.png", self->L.save_idx);
     canvas_set_image(self, u_image_new_file(self->RO.image.layers, 
-            e_io_savestate_file_path(file).s));
+            e_io_savestate_file_path(file).s),
+            false);
 }
 
 // updates the ro tex and sizes
@@ -85,7 +86,7 @@ Canvas *canvas_new() {
     self->L.bg = ro_single_new(bg_tex);
     
     uImage img = u_image_new_zeros(32, 32, 1);
-    canvas_set_image(self, img);
+    canvas_set_image(self, img, false);
     
     return self;
 }
@@ -121,7 +122,7 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
 
 }
 
-void canvas_set_image(Canvas *self, uImage image_sink) {
+void canvas_set_image(Canvas *self, uImage image_sink, bool save) {
     if(!u_image_valid(image_sink)) {
         log_warn("canvas: set_image failed, invalid img");
         return;
@@ -129,9 +130,13 @@ void canvas_set_image(Canvas *self, uImage image_sink) {
     log_info("canvas: set_image");
     
     u_image_kill(&self->RO.image);
-    u_image_kill(&self->L.prev_image);
-    
     self->RO.image = image_sink;
+    
+    // save before cloning into orev.
+    if(save)
+        canvas_save(self);
+        
+    u_image_kill(&self->L.prev_image);
     self->L.prev_image = u_image_new_clone(image_sink);
     
     update_render_objects(self);

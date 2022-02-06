@@ -127,7 +127,7 @@ static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs
         uImage img = u_image_new_file(1, "import.png");
         if(!u_image_valid(img))
             return;
-        canvas_set_image(refs.canvas, img);
+        canvas_set_image(refs.canvas, img, true);
         canvas_save(refs.canvas);
     } 
 }

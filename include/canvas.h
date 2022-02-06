@@ -52,9 +52,10 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat);
 
 // sets a new image for the canvas
 // canvas will take the ownership of image_sink
-void canvas_set_image(Canvas *self, uImage image_sink);
+void canvas_set_image(Canvas *self, uImage image_sink, bool save);
 
 // saves an image (for reload, undo and redo)
+// only saves if the image changed
 void canvas_save(Canvas *self);
 
 // reloads the last saved image (for aborting a draw operation)

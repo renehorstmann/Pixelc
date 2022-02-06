@@ -59,10 +59,8 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- canvas set image + canvas save not working
-  - sets prev to image...?
-  - import does not save
-  - load config, etc. should not save...
+- selection / additional toolbar?
+- toolbar baackgrounds?
 - selection grabbing instead of set center, if in the selection
 - imort should import as selection
 - some

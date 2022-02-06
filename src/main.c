@@ -146,7 +146,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     
     uImage img = u_image_new_empty(32, 16, 1);
     u_image_copy_top_left(img, L.canvas->RO.image);
-    canvas_set_image(L.canvas, img);
+    canvas_set_image(L.canvas, img, false);
 }
 
 // this functions is called either each frame or at a specific update/s time
