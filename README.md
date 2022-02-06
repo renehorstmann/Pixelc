@@ -59,7 +59,14 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- tool button active != is active?
+- container pos union
+- container on integer positions flag
+- canvas set image + canvas save not working
+  - sets prev to image...?
+  - import does not save
+  - load config, etc. should not save...
+- selection grabbing instead of set center, if in the selection
+- imort should import as selection
 - some
   - uImage
     - scale as + interpolation options

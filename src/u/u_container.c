@@ -10,6 +10,7 @@ uContainer u_container_new(int num, float left, float top) {
     uContainer self = {0};
     self.items = rhc_calloc(sizeof *self.items * num);
     self.num = num;
+    self.on_integer_positions = true;
     self.left = left;
     self.top = top;
     self.max_size = (vec2) {{FLT_MAX, FLT_MAX}};
@@ -64,11 +65,17 @@ bool u_container_update(uContainer *self) {
             item->out.col = self->out.cols;
             item->out.row = self->out.rows++;
             pos_y += item->size.y;
-
+            
             if (max_x < item->size.x) {
                 max_x = item->size.x;
             }
             remaining_y -= item->size.y;
+            
+            if(self->on_integer_positions) {
+                pos_y = sca_ceil(pos_y);
+                max_x = sca_ceil(max_x);
+                remaining_y = sca_floor(remaining_y);
+            }
         }
         self->out.cols++;
         remaining_x = self->max_size.x - max_x;
@@ -100,6 +107,12 @@ bool u_container_update(uContainer *self) {
                 max_y = item->size.y;
             }
             remaining_x -= item->size.x;
+            
+            if(self->on_integer_positions) {
+                pos_x = sca_ceil(pos_x);
+                max_y = sca_ceil(max_y);
+                remaining_x = sca_floor(remaining_x);
+            }
         }
         self->out.rows++;
         remaining_y = self->max_size.y - max_y;
@@ -143,6 +156,11 @@ bool u_container_update(uContainer *self) {
 
             if (self->out.rows < row) {
                 self->out.rows = row;
+            }
+            
+            if(self->on_integer_positions) {
+                pos_y = sca_ceil(pos_y);
+                max_x = sca_ceil(max_x);
             }
         }
 
@@ -193,6 +211,11 @@ bool u_container_update(uContainer *self) {
 
             if (self->out.cols < col) {
                 self->out.cols = col;
+            }
+            
+            if(self->on_integer_positions) {
+                pos_x = sca_ceil(pos_x);
+                max_y = sca_ceil(max_y);
             }
         }
 

@@ -53,6 +53,10 @@ typedef struct {
     enum u_container_align align_width;
     enum u_container_align align_height;
     
+    // true (default): ceils the item sizes
+    //        so left and top are integers
+    bool on_integer_positions;
+    
     vec2 max_size;
     float left, top;
     
