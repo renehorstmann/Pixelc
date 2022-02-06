@@ -59,8 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- container pos union
-- container on integer positions flag
 - canvas set image + canvas save not working
   - sets prev to image...?
   - import does not save
