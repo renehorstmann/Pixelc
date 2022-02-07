@@ -59,8 +59,8 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
+- toolbar baackgrounds
 - selection / additional toolbar?
-- toolbar baackgrounds?
 - selection grabbing instead of set center, if in the selection
 - imort should import as selection
 - some

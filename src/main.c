@@ -10,7 +10,6 @@
 #include "selectionctrl.h"
 #include "cameractrl.h"
 #include "palette.h"
-#include "palettepresave.h"
 #include "toolbar_old.h"
 #include "toolbar.h"
 #include "inputctrl.h"
@@ -22,8 +21,8 @@
 
 // canvas size
 //*
-#define COLS 128
-#define ROWS 8
+#define COLS 32
+#define ROWS 16
 #define LAYERS 1
 //*/
 
@@ -51,39 +50,23 @@
 #define PLAY_FRAMES 1
 #define PLAY_FPS 6.0
 
-// uncomment the used palette:
-// #define PALETTE grayscale
-// #define PALETTE grayscale_alpha
-// #define PALETTE pixilmatt
-// #define PALETTE slso8
-// #define PALETTE gameboy
-// #define PALETTE endesga32
-// #define PALETTE endesga64
-// #define PALETTE nes
-#define PALETTE aap64
-
-//#define PALETTE refrection_values
-
 
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
 
+#define TB_ACTIVE_BG_A "#9999bb"
+#define TB_ACTIVE_BG_B "#888888"
+#define TB_SECONDARY_BG_A "#bb9999"
+#define TB_SECONDARY_BG_B "#888888"
+#define TB_SELECTION_BG_A "#99bb99"
+#define TB_SELECTION_BG_B "#888888"
+
 #define GRID_COLS 8
 #define GRID_ROWS 8
-
-
-// uncomment to change the file locations:
-// #define IMAGE_FILE "../JumpHare/res/tiles/tile_02.png"
-// #define IMPORT_FILE "res/button_dot.png"
 
 //
 // end of options
 //
-
-
-// macro to call palettepresave_PALETTE()
-#define Cat(a, b) a ## b
-#define PalettePresave(pal) Cat(palettepresave_, pal)
 
 
 static struct {
@@ -99,7 +82,7 @@ static struct {
     Toolbar *toolbar;
     InputCtrl *inputctrl;
     MultiTouchCursor *mtc;
-    
+
 } L;
 
 // this function will be called at the start of the app
@@ -113,38 +96,38 @@ static void init(eSimple *simple, ivec2 window_size) {
 
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
     L.canvas = canvas_new();
-#ifdef IMAGE_FILE
-    L.canvas->default_image_file = IMAGE_FILE;
-#endif
-#ifdef IMPORT_FILE
-    L.canvas->default_import_file = IMPORT_FILE;
-#endif
 
     L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     L.selectionctrl = selectionctrl_new(L.canvas);
     L.brush = brush_new(L.canvas);
     L.palette = palette_new(L.camera, L.brush);
-    
+
     L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
     printf("canvassize: %i %i\n", L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
-    
+
     L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
-    L.toolbar = toolbar_new(L.camera, L.canvas, L.brush, L.palette);
-     
+    L.toolbar = toolbar_new(L.camera, L.canvas,
+                            L.brush, L.palette,
+                            u_color_from_hex(TB_ACTIVE_BG_A),
+                            u_color_from_hex(TB_ACTIVE_BG_B),
+                            u_color_from_hex(TB_SECONDARY_BG_A),
+                            u_color_from_hex(TB_SECONDARY_BG_B),
+                            u_color_from_hex(TB_SELECTION_BG_A),
+                            u_color_from_hex(TB_SELECTION_BG_B)
+    );
+
     L.mtc = multitouchcursor_new(L.camera, L.brush, L.palette);
 
-    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar_old, L.toolbar, L.camctrl, L.mtc);
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar_old,
+                                L.toolbar, L.camctrl, L.mtc);
 
-    // calls "palettepresave_PALETTE(L.palette);"
-    PalettePresave(PALETTE)(L.palette);
-    
-    
+
     brush_load_config(L.brush);
     palette_load_config(L.palette);
     canvas_load_config(L.canvas);
-    
-    uImage img = u_image_new_empty(32, 16, 1);
+
+    uImage img = u_image_new_empty(COLS, ROWS, LAYERS);
     u_image_copy_top_left(img, L.canvas->RO.image);
     canvas_set_image(L.canvas, img, false);
 }
@@ -153,32 +136,32 @@ static void init(eSimple *simple, ivec2 window_size) {
 static void update(eSimple *simple, ivec2 window_size, float dtime) {
     // simulate
     camera_update(L.camera, window_size);
-    
+
     background_update(L.background, L.camera, dtime);
 
     //*
     canvas_update(L.canvas, dtime);
     palette_update(L.palette, dtime);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), dtime);
-    
+
     selectionctrl_update(L.selectionctrl, dtime);
     L.brush->in.selection_ref = L.selectionctrl->selection;
-    
-    if(L.selectionctrl->out.show_copy_cut) {
+
+    if (L.selectionctrl->out.show_copy_cut) {
         L.selectionctrl->out.show_copy_cut = false;
         L.toolbar_old->show_selection_copy_cut = true;
     }
-    if(L.selectionctrl->out.show_ok) {
+    if (L.selectionctrl->out.show_ok) {
         L.selectionctrl->out.show_ok = false;
         L.toolbar_old->show_selection_ok = true;
         L.toolbar_old->show_selection_copy_cut = false;
     }
-    
+
     //toolbar_old_update(L.toolbar_old, dtime);
     toolbar_update(L.toolbar, dtime);
-    
+
     multitouchcursor_update(L.mtc, dtime);
-    
+
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
@@ -188,7 +171,7 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
 
     background_render(L.background, hud_cam);
 
-    
+
     animation_render(L.animation, hud_cam);
     canvas_render(L.canvas, canvas_cam);
     selectionctrl_render(L.selectionctrl, canvas_cam);

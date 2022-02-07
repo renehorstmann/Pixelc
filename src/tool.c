@@ -41,9 +41,7 @@ static void tool_button_update(Tool *super, float dtime, ToolRefs refs) {
 }
 
 static void tool_button_render(const struct Tool *super, const mat4 *cam_mat) {
-    puts("hej");
     ToolButton *self = (ToolButton*) super;
-    
     ro_single_render(&self->ro, cam_mat);
 }
 
