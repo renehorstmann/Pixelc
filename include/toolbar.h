@@ -6,8 +6,8 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 3
-#define TOLLBAR_SELECTION_TOOLS_LEN 10
+#define TOOLBAR_TOOLS_LEN 4
+#define TOLLBAR_SELECTION_SET_TOOLS_LEN 3
 
 typedef struct {
     Tool **tools;
@@ -31,26 +31,22 @@ typedef struct {
             Tool *undo;
             Tool *redo;
             Tool *import;
+            Tool *selection;
         } tools;
     };
     
     union {
-        Tool *all_selection_tools[TOOLBAR_TOOLS_LEN];
+        Tool *all_selection_set_tools[TOLLBAR_SELECTION_SET_TOOLS_LEN];
         struct {
             Tool *move;
             Tool *cut;
             Tool *copy;
-            Tool *rot_left;
-            Tool *rot_right;
-            Tool *mirror_h;
-            Tool *mirror_v;
-            Tool *blend;
-            Tool *paste;
-            Tool *ok;
-        } selection_tools;
+        } selection_set_tools;
     };
 
     struct {
+        enum selectionctrl_mode last_selectionctrl_mode;
+        
         uColor_s active_bg_a, active_bg_b;
         uColor_s secondary_bg_a, secondary_bg_b;
         uColor_s selection_bg_a, selection_bg_b;
@@ -60,6 +56,7 @@ typedef struct {
 
 Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
         Brush *brush, Palette *palette, 
+        SelectionCtrl *selectionctrl,
         uColor_s active_bg_a, uColor_s active_bg_b,
         uColor_s secondary_bg_a, uColor_s secondary_bg_b,
         uColor_s selection_bg_a, uColor_s selection_bg_b);
@@ -75,9 +72,5 @@ float toolbar_size(const Toolbar *self);
 
 // returns true if pos is within the toolbar
 bool toolbar_contains(const Toolbar *self, vec2 pos);
-
-void toolbar_show_selection(Toolbar *self);
-
-void toolbar_hide_selection(Toolbar *self);
 
 #endif //PIXELC_TOOLBAR_H

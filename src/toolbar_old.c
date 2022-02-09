@@ -284,7 +284,7 @@ bool toolbar_old_pointer_event(ToolbarOld *self, ePointer_s pointer) {
 
     if (button_clicked(&self->L.import->rect, pointer)) {
         log_info("toolbar_old: import");
-        selectionctrl_set_active(self->selectionctrl_ref, false, true);
+        selectionctrl_stop(self->selectionctrl_ref);
         if (self->show_selection_ok) {
             canvas_reload(self->canvas_ref);
         }
@@ -296,13 +296,12 @@ bool toolbar_old_pointer_event(ToolbarOld *self, ePointer_s pointer) {
 
 
         if (u_image_valid(img)) {
-            selection_kill(&self->selectionctrl_ref->selection);
+            selectionctrl_acquire(self->selectionctrl_ref);
             self->selectionctrl_ref->selection = selection_new(0, 0, img.cols, img.rows);
             selection_copy(self->selectionctrl_ref->selection, img, 0);
             selection_paste(self->selectionctrl_ref->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
             u_image_kill(&img);
             self->selectionctrl_ref->mode = SELECTIONCTRL_PASTE;
-            selectionctrl_set_active(self->selectionctrl_ref, true, false);
         }
         log_trace("toolbar_old: import finished");
     }
@@ -310,7 +309,10 @@ bool toolbar_old_pointer_event(ToolbarOld *self, ePointer_s pointer) {
     if (button_toggled(&self->L.selection->rect, pointer)) {
         log_info("toolbar_old: selection");
         bool pressed = button_is_pressed(&self->L.selection->rect);
-        selectionctrl_set_active(self->selectionctrl_ref, pressed, true);
+        if(pressed)
+            selectionctrl_acquire(self->selectionctrl_ref);
+        else 
+            selectionctrl_stop(self->selectionctrl_ref);
         button_set_pressed(&self->L.selection_copy.rect, false);
         button_set_pressed(&self->L.selection_cut.rect, false);
 
@@ -503,7 +505,7 @@ bool toolbar_old_pointer_event(ToolbarOld *self, ePointer_s pointer) {
         if (button_clicked(&self->L.selection_ok.rect, pointer)) {
             log_info("toolbar_old: selection_ok");
             canvas_save(self->canvas_ref);
-            selectionctrl_set_active(self->selectionctrl_ref, false, true);
+            selectionctrl_stop(self->selectionctrl_ref);
             self->show_selection_ok = false;
             button_set_pressed(&self->L.selection->rect, false);
         }

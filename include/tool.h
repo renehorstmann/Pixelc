@@ -7,6 +7,7 @@
 #include "canvas.h"
 #include "brush.h"
 #include "palette.h"
+#include "selectionctrl.h"
 
 #define TOOL_NAME_LEN 16
 #define TOOL_TIP_LEN 128
@@ -17,6 +18,7 @@ typedef struct {
     Canvas *canvas;
     Brush *brush;
     Palette *palette;
+    SelectionCtrl *selectionctrl;
 } ToolRefs;
 
 
@@ -75,5 +77,8 @@ Tool *tool_button_new(const char *name,
 Tool *tool_new_undo();
 Tool *tool_new_redo();
 Tool *tool_new_import();
+Tool *tool_new_selection();
+
+Tool *tool_new_selection_set_move();
 
 #endif //PIXELC_TOOL_H

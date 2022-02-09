@@ -8,6 +8,8 @@
 
 enum selectionctrl_mode {
     SELECTIONCTRL_NONE,
+    SELECTIONCTRL_ACQUIRE,
+    SELECTIONCTRL_SET,
     SELECTIONCTRL_COPY,
     SELECTIONCTRL_CUT,
     SELECTIONCTRL_PASTE,
@@ -30,8 +32,6 @@ typedef struct {
     struct {
         RoBatch border;
         
-        bool active;
-        bool set;
         bool moving;
         ivec2 pos;
     } L;
@@ -47,8 +47,9 @@ void selectionctrl_render(const SelectionCtrl *self, const mat4 *cam_mat);
 
 bool selectionctrl_pointer_event(SelectionCtrl *self, ePointer_s pointer);
 
-void selectionctrl_set_active(SelectionCtrl *self, bool active, bool reset);
+void selectionctrl_stop(SelectionCtrl *self);
 
+void selectionctrl_acquire(SelectionCtrl *self);
 
 
 

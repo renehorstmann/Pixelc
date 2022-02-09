@@ -60,7 +60,7 @@ static void setup_selection(SelectionCtrl *self, ePointer_s pointer) {
     uImage img = self->canvas_ref->RO.image;
 
     if (self->selection && pointer.action == E_POINTER_UP) {
-        self->L.set = true;
+        self->mode = SELECTIONCTRL_SET;
         return;
     }
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
@@ -177,29 +177,29 @@ void selectionctrl_render(const SelectionCtrl *self, const mat4 *cam_mat) {
 }
 
 bool selectionctrl_pointer_event(SelectionCtrl *self, ePointer_s pointer) {
-    if (self->L.active) {
-        if (!self->L.set) {
-            setup_selection(self, pointer);
-            return true;
-        }
+    if (self->mode == SELECTIONCTRL_NONE)
+        return false;
+        
+    if (self->mode == SELECTIONCTRL_ACQUIRE)
+        setup_selection(self, pointer);
+    else
+        move_selection(self, pointer);
+    return true;
+}
 
-        if (self->mode != SELECTIONCTRL_NONE) {
-            move_selection(self, pointer);
-            return true;
-        }
-    }
-    return false;
+void selectionctrl_stop(SelectionCtrl *self) {
+    log_info("selectionctrl stop");
+    self->L.pos = (ivec2) {{-1, -1}};
+    selection_kill(&self->selection);
+    self->mode = SELECTIONCTRL_NONE;
+}
+
+void selectionctrl_acquire(SelectionCtrl *self) {
+    log_info("selectionctrl acquire");
+    selectionctrl_stop(self);
+    self->mode = SELECTIONCTRL_ACQUIRE;
 }
 
 
-void selectionctrl_set_active(SelectionCtrl *self, bool active, bool reset) {
-    log_info("selectionctrl: set_active : %i %i", active, reset);
-    self->L.active = active;
-    if (reset) {
-        self->L.set = false;
-        self->L.pos = (ivec2) {{-1, -1}};
-        selection_kill(&self->selection);
-        self->mode = SELECTIONCTRL_NONE;
-    }
-}
+
 

@@ -106,9 +106,10 @@ static void init(eSimple *simple, ivec2 window_size) {
     printf("canvassize: %i %i\n", L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
 
-    L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
+    //L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
     L.toolbar = toolbar_new(L.camera, L.canvas,
                             L.brush, L.palette,
+                            L.selectionctrl,
                             u_color_from_hex(TB_ACTIVE_BG_A),
                             u_color_from_hex(TB_ACTIVE_BG_B),
                             u_color_from_hex(TB_SECONDARY_BG_A),

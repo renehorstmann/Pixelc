@@ -4,6 +4,7 @@
 #include "rhc/alloc.h"
 #include "rhc/log.h"
 #include "mathc/float.h"
+#include "mathc/uchar.h"
 #include "toolbar.h"
 
 static bool toolbar_container_valid(const ToolbarContainer *self) {
@@ -27,6 +28,7 @@ static ToolbarContainer toolbar_container_new(Tool **tools, int tools_len, uColo
     rTexture tex = r_texture_new(2, 2, 1, 1, buf);
     r_texture_wrap_repeat(tex);
     self.bg = ro_single_new(tex);
+    
     return self;
 }
 
@@ -94,7 +96,7 @@ static void toolbar_container_render(const ToolbarContainer *self, const mat4 *c
 }
 
 // returns true if pos is within the toolbar
-bool toolbar_container_contains(const ToolbarContainer *self, vec2 pos) {
+static bool toolbar_container_contains(const ToolbarContainer *self, vec2 pos) {
     if(!toolbar_container_valid(self))
         return false;
     return u_pose_aa_contains(u_pose_new_aa(
@@ -125,23 +127,51 @@ float toolbar_constainer_size(const ToolbarContainer *self, const Camera_s *cam)
     return camera_is_portrait_mode(cam) ? self->container.out.size.y: self->container.out.size.x;
 }
 
+static void hide_selection(Toolbar *self) {
+    log_info("toolbar: hide_selection");
+    toolbar_container_kill(&self->selection);
+}
 
+static void show_selection_set(Toolbar *self) {
+    log_info("toolbar: show_selection_set");
+    toolbar_container_kill(&self->selection);
+    self->selection = toolbar_container_new((Tool*[]) {self->selection_set_tools.move}, 1,
+                                            self->L.selection_bg_a, self->L.selection_bg_b);
+    
+    
+}
+
+static void show_selection_move(Toolbar *self) {
+    log_info("toolbar: show_selection_move");
+    toolbar_container_kill(&self->selection);
+    self->selection = toolbar_container_new((Tool*[]) {self->tools.redo}, 1,
+                                            self->L.selection_bg_a, self->L.selection_bg_b);
+}
+
+
+//
+// public
+//
 
 Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
                      Brush *brush, Palette *palette,
+                     SelectionCtrl *selectionctrl,
                      uColor_s active_bg_a, uColor_s active_bg_b,
                      uColor_s secondary_bg_a, uColor_s secondary_bg_b,
                      uColor_s selection_bg_a, uColor_s selection_bg_b) {
     Toolbar *self = rhc_calloc(sizeof *self);
 
     self->refs = (ToolRefs) {
-            cam, canvas, brush, palette
+            cam, canvas, brush, palette, selectionctrl
     };
 
 
     self->tools.undo = tool_new_undo();
     self->tools.redo = tool_new_redo();
     self->tools.import = tool_new_import();
+    self->tools.selection = tool_new_selection();
+
+    self->selection_set_tools.move = tool_new_selection_set_move();
 
     self->L.active_bg_a = active_bg_a;
     self->L.active_bg_b = active_bg_b;
@@ -151,12 +181,32 @@ Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
     self->L.selection_bg_b = selection_bg_b;
 
     self->active = toolbar_container_new(self->all_tools, TOOLBAR_TOOLS_LEN, active_bg_a, active_bg_b);
-    toolbar_show_selection(self);
-
+    
     return self;
 }
 
 void toolbar_update(Toolbar *self, float dtime) {
+    enum selectionctrl_mode sc_mode = self->refs.selectionctrl->mode;
+    if(sc_mode != self->L.last_selectionctrl_mode) {
+        self->L.last_selectionctrl_mode = sc_mode;
+        switch(sc_mode) {
+        case SELECTIONCTRL_NONE:
+        case SELECTIONCTRL_ACQUIRE:
+            hide_selection(self);
+            break;
+        case SELECTIONCTRL_SET:
+            show_selection_set(self);
+            break;
+        case SELECTIONCTRL_COPY:
+        case SELECTIONCTRL_CUT:
+        case SELECTIONCTRL_PASTE:
+            show_selection_move(self);
+            break;
+        default:
+            break;
+        }
+    }
+    
     float start_pos = 0;
     toolbar_container_update(&self->active, start_pos, dtime, self->refs);
     start_pos += toolbar_constainer_size(&self->active, self->refs.cam);
@@ -206,12 +256,3 @@ bool toolbar_contains(const Toolbar *self, vec2 pos) {
 }
 
 
-void toolbar_show_selection(Toolbar *self) {
-    toolbar_container_kill(&self->selection);
-//    self->selection = toolbar_container_new((Tool*[]) {self->all[0]}, 1,
-//                                            self->L.selection_bg_a, self->L.selection_bg_b);
-}
-
-void toolbar_hide_selection(Toolbar *self) {
-    toolbar_container_kill(&self->selection);
-}
