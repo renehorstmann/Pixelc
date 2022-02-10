@@ -21,6 +21,7 @@ static ToolbarContainer toolbar_container_new(Tool **tools, int tools_len, uColo
     memcpy(self.tools, tools, sizeof *tools * tools_len);
     self.tools_len = tools_len;
     self.container = u_container_new(tools_len, 0, 0);
+    self.align = U_CONTAINER_ALIGN_START;
 
     uColor_s buf[4];
     buf[0] = buf[3] = bg_a;
@@ -51,9 +52,13 @@ static void toolbar_container_update(ToolbarContainer *self, float start_pos, fl
     if (camera_is_portrait_mode(refs.cam)) {
         self->container.top -= start_pos;
         self->container.mode = U_CONTAINER_MODE_FREE_H;
+        self->container.align_width = self->align;
+        self->container.align_height = U_CONTAINER_ALIGN_START;
     } else {
         self->container.left += start_pos;
         self->container.mode = U_CONTAINER_MODE_FREE_V;
+        self->container.align_width = U_CONTAINER_ALIGN_START;
+        self->container.align_height = self->align;
     }
 
     for (int i = 0; i < self->tools_len; i++) {
@@ -83,7 +88,7 @@ static void toolbar_container_update(ToolbarContainer *self, float start_pos, fl
         bg_h = camera_height(refs.cam);
     }
     self->bg.rect.pose = u_pose_new_aa(self->container.left, self->container.top, bg_w, bg_h);
-    u_pose_set_size(&self->bg.rect.uv, bg_w / 2, bg_h / 2);
+    self->bg.rect.uv = u_pose_new(0, 0, bg_w / 2, bg_h / 2);
 }
 
 static void toolbar_container_render(const ToolbarContainer *self, const mat4 *cam_mat) {
@@ -100,8 +105,8 @@ static bool toolbar_container_contains(const ToolbarContainer *self, vec2 pos) {
     if(!toolbar_container_valid(self))
         return false;
     return u_pose_aa_contains(u_pose_new_aa(
-            self->container.left,
-            self->container.top,
+            self->container.out.left,
+            self->container.out.top,
             self->container.out.size.x,
             self->container.out.size.y), pos);
 }
@@ -137,7 +142,7 @@ static void show_selection_set(Toolbar *self) {
     toolbar_container_kill(&self->selection);
     self->selection = toolbar_container_new((Tool*[]) {self->selection_set_tools.move}, 1,
                                             self->L.selection_bg_a, self->L.selection_bg_b);
-    
+    self->selection.align = U_CONTAINER_ALIGN_CENTER;
     
 }
 
@@ -181,7 +186,6 @@ Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
     self->L.selection_bg_b = selection_bg_b;
 
     self->active = toolbar_container_new(self->all_tools, TOOLBAR_TOOLS_LEN, active_bg_a, active_bg_b);
-    
     return self;
 }
 

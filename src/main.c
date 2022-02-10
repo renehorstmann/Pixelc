@@ -92,7 +92,6 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.camera = rhc_calloc(sizeof *L.camera);
     *L.camera = camera_new();
     camera_update(L.camera, window_size);
-    printf("%i %i %i %i\n", L.camera->RO.left, L.camera->RO.right, L.camera->RO.top, L.camera->RO.bottom);
 
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
     L.canvas = canvas_new();
@@ -103,7 +102,6 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.palette = palette_new(L.camera, L.brush);
 
     L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
-    printf("canvassize: %i %i\n", L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
 
     //L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
@@ -140,7 +138,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
 
     background_update(L.background, L.camera, dtime);
 
-    //*
+
     canvas_update(L.canvas, dtime);
     palette_update(L.palette, dtime);
     animation_update(L.animation, L.camera, palette_get_hud_size(L.palette), dtime);
@@ -148,6 +146,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     selectionctrl_update(L.selectionctrl, dtime);
     L.brush->in.selection_ref = L.selectionctrl->selection;
 
+    /*
     if (L.selectionctrl->out.show_copy_cut) {
         L.selectionctrl->out.show_copy_cut = false;
         L.toolbar_old->show_selection_copy_cut = true;
@@ -157,6 +156,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
         L.toolbar_old->show_selection_ok = true;
         L.toolbar_old->show_selection_copy_cut = false;
     }
+    */
 
     //toolbar_old_update(L.toolbar_old, dtime);
     toolbar_update(L.toolbar, dtime);
@@ -187,5 +187,6 @@ int main(int argc, char **argv) {
                    0.0f,   // startup block time (the time in which "Horsimann" is displayed at startup)
                    0,      // updates/s, <=0 to turn off and use fps
                    init, update, render);
+
     return 0;
 }

@@ -14,6 +14,7 @@ typedef struct {
     int tools_len;
     
     uContainer container;
+    enum u_container_align align;
     
     RoSingle bg;
 } ToolbarContainer;

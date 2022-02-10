@@ -9,6 +9,7 @@ project(pixelc C)
 # OPTION_SOCKET         to use rhc sockets
 # OPTION_TTF            to use ro_ttftext
 # OPTION_GYRO           if gyro sensor is available
+# OPTION_SANITIZER      use sanitizer checks for debugging
 # -not used- OPTION_GL_ERROR       if set, functions use r_render_check_error (heavy op, if summed up)
 #
 # NDEBUG                is used at a few points, too
@@ -18,8 +19,9 @@ project(pixelc C)
 
 set(CMAKE_C_STANDARD 11)
 
-#set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} -march=native)  # march=native for best performance
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces")
+
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/include
@@ -40,7 +42,7 @@ add_executable(pixelc ${SRCS})
 if (MINGW)
     message("Platform: Windows MinGW")
     set(PLATFORM_MINGW true)
-else()
+else ()
     find_library(GL_LIB GL)
     find_library(GLES_LIB GLESv3)
     if (GL_LIB)
@@ -49,10 +51,10 @@ else()
     elseif (GLES_LIB)
         message("Platform: Mobile")
         set(PLATFORM_MOBILE true)
-    else()
+    else ()
         message(FATAL_ERROR "Platform: unknown, neither GL nor GLES found!")
-    endif()
-endif()
+    endif ()
+endif ()
 
 
 # all platforms:
@@ -87,12 +89,18 @@ if (PLATFORM_MINGW)
             ${GLEW_LIB}
             ${GLU_LIB}
             )
-endif()
+endif ()
 
 
 # unix
 if (PLATFORM_UNIX)
     message("Setup Unix")
+
+    # using sanitizer
+    add_definitions(-DOPTION_SANITIZER)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+    set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+
     find_package(SDL2 REQUIRED)
     find_library(SDL2_IMAGE_LIBRARIES SDL2_image REQUIRED)
     find_library(SDL2_NET_LIBRARIES SDL2_net REQUIRED)
@@ -109,7 +117,7 @@ if (PLATFORM_UNIX)
             ${SDL2_TTF_LIBRARIES}
             ${CURL_LIBRARIES}
             ${GL_LIB}
-    )
+            )
 
     # not necessary in unix
     find_library(GLEW_LIB GLEW)
@@ -117,7 +125,7 @@ if (PLATFORM_UNIX)
         add_definitions(-DOPTION_GLEW)
         target_link_libraries(pixelc ${GLEW_LIB})
     endif ()
-endif()
+endif ()
 
 
 # mobile
@@ -145,9 +153,8 @@ if (PLATFORM_MOBILE)
             ${SDL2_TTF_LIBRARIES}
             ${CURL_LIBRARIES}
             ${GLES_LIB}
-    )
-endif()
-
+            )
+endif ()
 
 # res
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res

@@ -33,6 +33,12 @@ void e_simple_start(const char *title, const char *author, float startup_block_t
                     e_simple_init_fn init_fn,
                     e_simple_update_fn update_fn,
                     e_simple_render_fn render_fn) {
+#ifdef NDEBUG
+    rhc_log_set_min_level(RHC_LOG_WARN);
+#else
+    rhc_log_set_min_level(RHC_LOG_TRACE);
+#endif
+
     log_info(title);
     log_info("e_simple_start");
 
@@ -63,6 +69,7 @@ void e_simple_start(const char *title, const char *author, float startup_block_t
 
     // start the main loop, blocking call
     e_window_main_loop(L.super.window, init_loop);
+
 
     // clean up
     r_render_kill(&L.super.render);

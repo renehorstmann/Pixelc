@@ -113,12 +113,10 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
-    if (self->mode != SELECTIONCTRL_PASTE) {
+    if (self->mode == SELECTIONCTRL_COPY
+            || self->mode == SELECTIONCTRL_CUT) {
         if (!u_image_contains(img, cr.x, cr.y))
             return;
-
-        assert(self->mode == SELECTIONCTRL_COPY
-               || self->mode == SELECTIONCTRL_CUT);
 
         if (self->mode == SELECTIONCTRL_COPY)
             selection_copy(self->selection, img, layer);
@@ -177,7 +175,8 @@ void selectionctrl_render(const SelectionCtrl *self, const mat4 *cam_mat) {
 }
 
 bool selectionctrl_pointer_event(SelectionCtrl *self, ePointer_s pointer) {
-    if (self->mode == SELECTIONCTRL_NONE)
+    if (self->mode == SELECTIONCTRL_NONE
+            || self->mode == SELECTIONCTRL_SET)
         return false;
         
     if (self->mode == SELECTIONCTRL_ACQUIRE)

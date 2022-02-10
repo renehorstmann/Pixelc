@@ -117,7 +117,7 @@ void e_window_handle_window_event_(const SDL_Event *event) {
         return;
     }
     if(event->type == SDL_WINDOWEVENT) {
-        log_window_event(event);
+//        log_window_event(event);
         switch (event->window.event) {
 //        case SDL_WINDOWEVENT_SHOWN:
 //        case SDL_WINDOWEVENT_RESTORED:
@@ -150,12 +150,6 @@ eWindow *e_window_new(const char *title) {
     assume(strlen(title) < sizeof singleton.title, "e_window_new title to long: %i/%i",
            strlen(title), sizeof singleton.title);
     strcpy(singleton.title, title);
-    
-#ifdef NDEBUG
-    rhc_log_set_min_level(RHC_LOG_WARN);
-#else
-    rhc_log_set_min_level(RHC_LOG_TRACE);
-#endif
 
     if (SDL_Init(E_SDL_INIT_FLAGS) != 0) {
         log_error("e_window_new: SDL_Init failed: %s", SDL_GetError());
@@ -281,6 +275,23 @@ void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
 #endif
 
 
+#ifdef OPTION_SANITIZER
+    // only in debug mode (so not not debug == debug)
+#ifndef NDEBUG
+    // checks for memory leaks
+    // if not done manually, it will be called at program end
+    //      some SDL (or ports) may have some memory leaks
+    //      so we call it before shutting them down to see our own mistakes
+    log_info("e_window_kill: sanitizer leak check...");
+    int __lsan_do_recoverable_leak_check(void);
+    int leaks = __lsan_do_recoverable_leak_check();
+    if(leaks)
+        log_error("e_window_kill: sanitizer leak check done, got %i leaks!", leaks);
+    else
+        log_info("e_window_kill: sanitizer leak check done, without leaks", leaks);
+#endif
+#endif
+
     SDL_DestroyWindow(singleton.window);
 #ifdef OPTION_TTF
     TTF_Quit();
@@ -379,55 +390,55 @@ static void log_window_event(const SDL_Event *event) {
     if (event->type == SDL_WINDOWEVENT){
         switch (event->window.event) {
         case SDL_WINDOWEVENT_SHOWN:
-            log_info("eWindow %d shown", event->window.windowID);
+            log_trace("eWindow %d shown", event->window.windowID);
             break;       
         case SDL_WINDOWEVENT_HIDDEN:
-            log_info("eWindow %d hidden", event->window.windowID);
+            log_trace("eWindow %d hidden", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            log_info("eWindow %d exposed", event->window.windowID);
+            log_trace("eWindow %d exposed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MOVED:
-            log_info("eWindow %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_trace("eWindow %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            log_info("eWindow %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_trace("eWindow %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
-            log_info("eWindow %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_trace("eWindow %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            log_info("eWindow %d minimized", event->window.windowID);
+            log_trace("eWindow %d minimized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            log_info("eWindow %d maximized", event->window.windowID);
+            log_trace("eWindow %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            log_info("eWindow %d restored", event->window.windowID);
+            log_trace("eWindow %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            log_info("Mouse entered window %d", event->window.windowID);
+            log_trace("Mouse entered window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            log_info("Mouse left window %d", event->window.windowID);
+            log_trace("Mouse left window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            log_info("eWindow %d gained keyboard focus", event->window.windowID);
+            log_trace("eWindow %d gained keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            log_info("eWindow %d lost keyboard focus", event->window.windowID);
+            log_trace("eWindow %d lost keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            log_info("eWindow %d closed", event->window.windowID);
+            log_trace("eWindow %d closed", event->window.windowID);
             break;
 #if SDL_VERSION_ATLEAST(2, 0, 5) 
-            case SDL_WINDOWEVENT_TAKE_FOCUS : log_info("eWindow %d is offered a focus", event->window.windowID);
+            case SDL_WINDOWEVENT_TAKE_FOCUS : log_trace("eWindow %d is offered a focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIT_TEST:
-            log_info("eWindow %d has a special hit test", event->window.windowID);
+            log_trace("eWindow %d has a special hit test", event->window.windowID);
             break;
 #endif 
-            default : log_info("eWindow %d got unknown event %d", event->window.windowID, event->window.event);
+            default : log_trace("eWindow %d got unknown event %d", event->window.windowID, event->window.event);
             break;
         }
     }

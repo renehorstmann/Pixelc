@@ -17,9 +17,11 @@
 //
 
 
+_Static_assert(CANVAS_MAX_SAVES<=999, "see save / load image");
+
 static void save_image(const Canvas *self) {
     char file[128];
-    snprintf(file, sizeof file, "image_%i.png", self->L.save_idx);
+    snprintf(file, sizeof file, "image_%03i.png", self->L.save_idx);
     u_image_save_file(self->RO.image,
             e_io_savestate_file_path(file).s);
     e_io_savestate_save();
@@ -27,7 +29,7 @@ static void save_image(const Canvas *self) {
 
 static void load_image(Canvas *self) {
     char file[128];
-    snprintf(file, sizeof file, "image_%i.png", self->L.save_idx);
+    snprintf(file, sizeof file, "image_%03i.png", self->L.save_idx);
     canvas_set_image(self, u_image_new_file(self->RO.image.layers, 
             e_io_savestate_file_path(file).s),
             false);

@@ -64,7 +64,7 @@ bool r_render_error_check_impl_(const char *opt_tag);
 // checks for opengl errors and displays them
 static void r_render_error_check(const char *opt_tag) {
 #ifdef NDEBUG
-    return
+    return;
 #endif
 #ifdef OPTION_GL_ERROR
     r_render_error_check_impl_(const char *opt_tag);
