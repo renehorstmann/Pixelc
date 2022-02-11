@@ -148,8 +148,10 @@ static void tool_selection_pe(struct Tool *super, ePointer_s pointer, ToolRefs r
     bool pressed = button_is_pressed(&self->ro.rect);
     if(pressed)
         selectionctrl_acquire(refs.selectionctrl);
-    else 
+    else {
         selectionctrl_stop(refs.selectionctrl);
+        canvas_reload(refs.canvas);
+    }
     
 }
 static bool tool_selection_is_a(struct Tool *super, float dtime, ToolRefs refs) {

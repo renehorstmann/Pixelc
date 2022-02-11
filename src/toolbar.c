@@ -140,8 +140,11 @@ static void hide_selection(Toolbar *self) {
 static void show_selection_set(Toolbar *self) {
     log_info("toolbar: show_selection_set");
     toolbar_container_kill(&self->selection);
-    self->selection = toolbar_container_new((Tool*[]) {self->selection_set_tools.move}, 1,
-                                            self->L.selection_bg_a, self->L.selection_bg_b);
+    self->selection = toolbar_container_new(
+            self->all_selection_set_tools,
+            TOOLBAR_SELECTION_SET_TOOLS_LEN,
+            self->L.selection_bg_a, 
+            self->L.selection_bg_b);
     self->selection.align = U_CONTAINER_ALIGN_CENTER;
     
 }
@@ -177,6 +180,8 @@ Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
     self->tools.selection = tool_new_selection();
 
     self->selection_set_tools.move = tool_new_selection_set_move();
+    self->selection_set_tools.copy = tool_new_selection_set_copy();
+    self->selection_set_tools.cut = tool_new_selection_set_cut();
 
     self->L.active_bg_a = active_bg_a;
     self->L.active_bg_b = active_bg_b;
@@ -199,10 +204,10 @@ void toolbar_update(Toolbar *self, float dtime) {
             hide_selection(self);
             break;
         case SELECTIONCTRL_SET:
-            show_selection_set(self);
-            break;
         case SELECTIONCTRL_COPY:
         case SELECTIONCTRL_CUT:
+            show_selection_set(self);
+            break;
         case SELECTIONCTRL_PASTE:
             show_selection_move(self);
             break;

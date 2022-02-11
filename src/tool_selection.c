@@ -71,7 +71,7 @@ static void set_move_update(Tool *super, float dtime, ToolRefs refs) {
         l[7] = 19;
         t[7] = -21;
 
-        super->size.x = 70;
+        super->size.x = 70+16;
         super->size.y = 38;
     } else {
         // left
@@ -99,7 +99,7 @@ static void set_move_update(Tool *super, float dtime, ToolRefs refs) {
         t[7] = -53;
 
         super->size.x = 38;
-        super->size.y = 70;
+        super->size.y = 70+16;
     }
 
     for(int i=0;i<8;i++) {
@@ -183,4 +183,62 @@ Tool *tool_new_selection_set_move() {
     self->super.pointer_event = set_move_pe;
 
     return (Tool*) self;
+}
+
+static void set_copy_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = button_is_pressed(&self->ro.rect);
+        if (pressed) {
+            refs.selectionctrl->mode = SELECTIONCTRL_COPY;
+        } else {
+            refs.selectionctrl->mode = SELECTIONCTRL_SET;
+        }
+    } 
+}
+static bool set_copy_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    button_set_pressed(&self->ro.rect, refs.selectionctrl->mode == SELECTIONCTRL_COPY);
+    // always active
+    return true;
+}      
+Tool *tool_new_selection_set_copy() {
+    return tool_button_new("selection copy", 
+            "copies the selection", 
+            "res/button_copy.png", 
+            set_copy_pe,
+            set_copy_is_a);
+}
+
+static void set_cut_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = button_is_pressed(&self->ro.rect);
+        if (pressed) {
+            refs.selectionctrl->mode = SELECTIONCTRL_CUT;
+        } else {
+            refs.selectionctrl->mode = SELECTIONCTRL_SET;
+        }
+    } 
+}
+static bool set_cut_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    button_set_pressed(&self->ro.rect, refs.selectionctrl->mode == SELECTIONCTRL_CUT);
+    // always active
+    return true;
+}      
+Tool *tool_new_selection_set_cut() {
+    return tool_button_new("selection cut", 
+            "cuts the selection", 
+            "res/button_cut.png", 
+            set_cut_pe,
+            set_cut_is_a);
+}
+
+
+Tool *tool_new_selection_move_copy() {
+    
+}
+Tool *tool_new_selection_move_ok() {
+    
 }

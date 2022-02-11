@@ -7,7 +7,7 @@
 #include "tool.h"
 
 #define TOOLBAR_TOOLS_LEN 4
-#define TOLLBAR_SELECTION_SET_TOOLS_LEN 3
+#define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 
 typedef struct {
     Tool **tools;
@@ -37,7 +37,7 @@ typedef struct {
     };
     
     union {
-        Tool *all_selection_set_tools[TOLLBAR_SELECTION_SET_TOOLS_LEN];
+        Tool *all_selection_set_tools[TOOLBAR_SELECTION_SET_TOOLS_LEN];
         struct {
             Tool *move;
             Tool *cut;

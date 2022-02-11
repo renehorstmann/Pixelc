@@ -80,5 +80,11 @@ Tool *tool_new_import();
 Tool *tool_new_selection();
 
 Tool *tool_new_selection_set_move();
+Tool *tool_new_selection_set_copy();
+Tool *tool_new_selection_set_cut();
+
+Tool *tool_new_selection_move_copy();
+Tool *tool_new_selection_move_ok();
+
 
 #endif //PIXELC_TOOL_H
