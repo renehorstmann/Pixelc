@@ -235,10 +235,31 @@ Tool *tool_new_selection_set_cut() {
             set_cut_is_a);
 }
 
-
-Tool *tool_new_selection_move_copy() {
-    
+static void paste_copy_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_clicked(&self->ro.rect, pointer)) {
+        canvas_save(refs.canvas);
+    } 
 }
-Tool *tool_new_selection_move_ok() {
-    
+Tool *tool_new_selection_paste_copy() {
+    return tool_button_new("selection copy", 
+            "copies the current selection paste", 
+            "res/button_copy.png", 
+            paste_copy_pe,
+            NULL);
+}
+
+static void paste_ok_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_clicked(&self->ro.rect, pointer)) {
+        canvas_save(refs.canvas);
+        selectionctrl_stop(refs.selectionctrl);
+    } 
+}
+Tool *tool_new_selection_paste_ok() {
+    return tool_button_new("selection copy", 
+            "copies the current selection paste and stops the selection mode", 
+            "res/button_ok.png", 
+            paste_ok_pe,
+            NULL);
 }

@@ -152,8 +152,12 @@ static void show_selection_set(Toolbar *self) {
 static void show_selection_move(Toolbar *self) {
     log_info("toolbar: show_selection_move");
     toolbar_container_kill(&self->selection);
-    self->selection = toolbar_container_new((Tool*[]) {self->tools.redo}, 1,
-                                            self->L.selection_bg_a, self->L.selection_bg_b);
+    self->selection = toolbar_container_new(
+            self->all_selection_paste_tools,
+            TOOLBAR_SELECTION_PASTE_TOOLS_LEN,
+            self->L.selection_bg_a, 
+            self->L.selection_bg_b);
+    self->selection.align = U_CONTAINER_ALIGN_CENTER;
 }
 
 
@@ -182,6 +186,9 @@ Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
     self->selection_set_tools.move = tool_new_selection_set_move();
     self->selection_set_tools.copy = tool_new_selection_set_copy();
     self->selection_set_tools.cut = tool_new_selection_set_cut();
+    
+    self->selection_paste_tools.copy = tool_new_selection_paste_copy();
+    self->selection_paste_tools.ok = tool_new_selection_paste_ok();
 
     self->L.active_bg_a = active_bg_a;
     self->L.active_bg_b = active_bg_b;

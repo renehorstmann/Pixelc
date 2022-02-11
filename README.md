@@ -59,17 +59,10 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- toolbar selection bg color bug?
-- toolbar selection align center?
-- selection tool buttons
-  - set
-    - cpy
-    - cut
-  - move
+- selecrion tools
+  - paste
     - rot mirror collection
     - blend
-    - cpy
-    - ok
 - selection grabbing instead of set center, if in the selection
 - imort should import as selection
 - some

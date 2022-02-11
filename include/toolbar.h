@@ -8,6 +8,8 @@
 
 #define TOOLBAR_TOOLS_LEN 4
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
+#define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 2
+
 
 typedef struct {
     Tool **tools;
@@ -43,6 +45,14 @@ typedef struct {
             Tool *cut;
             Tool *copy;
         } selection_set_tools;
+    };
+    
+    union {
+        Tool *all_selection_paste_tools[TOOLBAR_SELECTION_PASTE_TOOLS_LEN];
+        struct {
+            Tool *copy;
+            Tool *ok;
+        } selection_paste_tools;
     };
 
     struct {
