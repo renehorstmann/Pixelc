@@ -195,6 +195,9 @@ typedef struct {
     Tool super;
     RoSingle kernel;
     RoSingle minus, plus;
+    int last_kernel_id;
+    float long_press_time;
+    int pressed;
 } ToolKernel;
 
 
@@ -210,21 +213,55 @@ static void tool_kernel_kill(Tool **super_ptr) {
 }
 static void tool_kernel_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolKernel *self = (ToolKernel*) super;
-    int shape = refs.brush->RO.kernel_id;
-    if(shape>0 && button_clicked(&self->minus.rect, pointer)) {
+    int k = refs.brush->RO.kernel_id;
+    if(button_clicked(&self->minus.rect, pointer)
+            && k>0) {
         
-        log_info("tool kernel_minus: %i", shape-1);
-        brush_load_kernel(refs.brush, shape-1);
+        log_info("tool kernel_minus: %i", k-1);
+        brush_load_kernel(refs.brush, k-1);
     }
-    if(shape<refs.brush->RO.max_kernels-1 && button_clicked(&self->plus.rect, pointer)) {
+    if(button_clicked(&self->plus.rect, pointer)
+            && k<refs.brush->RO.max_kernels-1) {
         
-        log_info("tool kernel_plus: %i", shape+1);
-        brush_load_kernel(refs.brush, shape+1);
+        log_info("tool kernel_plus: %i", k+1);
+        brush_load_kernel(refs.brush, k+1);
     }
+    
+    // long press
+    if(u_pose_aa_contains(self->minus.rect.pose, pointer.pos.xy)) {
+        if(pointer.action == E_POINTER_DOWN) {
+            self->pressed = 1;
+            self->long_press_time = TOOL_LONG_PRESS_TIME;
+        }
+        if(self->pressed != 1)
+            self->pressed = 0;
+    } else if(u_pose_aa_contains(self->plus.rect.pose, pointer.pos.xy)){
+        if(pointer.action == E_POINTER_DOWN) {
+            self->pressed = 2;
+            self->long_press_time = TOOL_LONG_PRESS_TIME;
+        }
+        if(self->pressed != 2)
+            self->pressed = 0;
+    } else {
+        self->pressed = 0;
+    }
+    if(pointer.action == E_POINTER_UP)
+        self->pressed = 0;
 }
 static void tool_kernel_update(struct Tool *super, float dtime, ToolRefs refs) {
     ToolKernel *self = (ToolKernel*) super;
     
+    int k = refs.brush->RO.kernel_id;
+    if(self->last_kernel_id == 0 && k>0)
+        button_set_pressed(&self->minus.rect, false);
+    if(self->last_kernel_id == refs.brush->RO.max_kernels-1 && k<self->last_kernel_id)
+        button_set_pressed(&self->minus.rect, false);
+    self->last_kernel_id = k;
+        
+    if(k==0)
+        button_set_pressed(&self->minus.rect, true);
+    if(k==refs.brush->RO.max_kernels-1)
+        button_set_pressed(&self->plus.rect, true);
     
     self->kernel.tex = refs.brush->RO.kernel_tex;
     
@@ -259,6 +296,20 @@ static void tool_kernel_update(struct Tool *super, float dtime, ToolRefs refs) {
     u_pose_aa_set_left(&self->plus.rect.pose, l[2] + super->in.pos.x);
     u_pose_aa_set_top(&self->plus.rect.pose, t[2] + super->in.pos.y);
     
+    // check long pressed
+    if(self->pressed && self->long_press_time>0) {
+        self->long_press_time -= dtime;
+        if(self->long_press_time <= 0) {
+            if(self->pressed == 1) {
+                log_info("tool kernel_minus long press");
+                brush_load_kernel(refs.brush, 0);
+            } else if(self->pressed == 2) {
+                log_info("tool kernel_plus long press");
+                brush_load_kernel(refs.brush, refs.brush->RO.max_kernels-1);
+            }
+            self->pressed = 0;
+        }
+    }
 }
 static void tool_kernel_render(const struct Tool *super, const mat4 *cam_mat) {
     const ToolKernel *self = (const ToolKernel*) super;

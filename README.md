@@ -66,9 +66,6 @@ python3 -m http.server --bind localhost  # [port]
   - nes
   - more top of lospec
 - tools
-  - kernel
-    - activate 
-    - long press
   - modes
     - free
     - dot

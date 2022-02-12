@@ -13,16 +13,8 @@ static uImage kernel_0() {
     return self;
 }
 
-// square 2x2
-static uImage kernel_1() {
-    uImage self = u_image_new_empty(2, 2, 1);
-    for(int i=0; i<2*2; i++)
-        *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
-    return self;
-}
-
 // dither 2x2
-static uImage kernel_2() {
+static uImage kernel_1() {
     uImage self = u_image_new_empty(2, 2, 1);
     for(int r=0; r<2; r++) {
         for(int c=0; c<2; c++) {
@@ -32,8 +24,25 @@ static uImage kernel_2() {
     return self;
 }
 
-// plus 3x3
+// square 2x2
+static uImage kernel_2() {
+    uImage self = u_image_new_empty(2, 2, 1);
+    for(int i=0; i<2*2; i++)
+        *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
+    return self;
+}
+
+// dither 3x3
 static uImage kernel_3() {
+    uImage self = u_image_new_empty(3, 3, 1);
+    for(int i=0; i<3*3; i++)
+        *u_image_pixel_index(self, i, 0) = i%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+    return self;
+}
+
+
+// plus 3x3
+static uImage kernel_4() {
     uImage self = u_image_new_zeros(3, 3, 1);
     for(int i=0; i<3; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
@@ -42,44 +51,18 @@ static uImage kernel_3() {
     return self;
 }
 
-// square 3x3
-static uImage kernel_4() {
-    uImage self = u_image_new_empty(3, 3, 1);
-    for(int i=0; i<3*3; i++)
-        *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
-    return self;
-}
 
-// dither 3x3
+// square 3x3
 static uImage kernel_5() {
     uImage self = u_image_new_empty(3, 3, 1);
     for(int i=0; i<3*3; i++)
-        *u_image_pixel_index(self, i, 0) = i%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
-    return self;
-}
-
-// ball 4*4
-static uImage kernel_6() {
-    uImage self = u_image_new_zeros(4, 4, 1);
-    for(int i=0; i<4; i++) {
-        *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
-        *u_image_pixel(self, i, 2, 0) = U_COLOR_WHITE;
-        *u_image_pixel(self, 1, i, 0) = U_COLOR_WHITE;
-        *u_image_pixel(self, 2, i, 0) = U_COLOR_WHITE;
-    }
-    return self;
-}
-
-// square 4x4
-static uImage kernel_7() {
-    uImage self = u_image_new_empty(4, 4, 1);
-    for(int i=0; i<4*4; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
     return self;
 }
 
+
 // dither 4x4
-static uImage kernel_8() {
+static uImage kernel_6() {
     uImage self = u_image_new_empty(4, 4, 1);
     for(int r=0; r<4; r++) {
         for(int c=0; c<4; c++) {
@@ -90,7 +73,7 @@ static uImage kernel_8() {
 }
 
 // dither wide 4x4
-static uImage kernel_9() {
+static uImage kernel_7() {
     uImage self = u_image_new_empty(4, 4, 1);
     for(int r=0; r<4; r++) {
         for(int c=0; c<4; c++) {
@@ -101,11 +84,33 @@ static uImage kernel_9() {
 }
 
 // dither high 4x4
-static uImage kernel_10() {
-    uImage self = kernel_9(); // dither wide
+static uImage kernel_8() {
+    uImage self = kernel_7(); // dither wide
     u_image_rotate(&self, true);
     return self;
 }
+
+// ball 4*4
+static uImage kernel_9() {
+    uImage self = u_image_new_zeros(4, 4, 1);
+    for(int i=0; i<4; i++) {
+        *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
+        *u_image_pixel(self, i, 2, 0) = U_COLOR_WHITE;
+        *u_image_pixel(self, 1, i, 0) = U_COLOR_WHITE;
+        *u_image_pixel(self, 2, i, 0) = U_COLOR_WHITE;
+    }
+    return self;
+}
+
+
+// square 4x4
+static uImage kernel_10() {
+    uImage self = u_image_new_empty(4, 4, 1);
+    for(int i=0; i<4*4; i++)
+        *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
+    return self;
+}
+
 
 
 //
