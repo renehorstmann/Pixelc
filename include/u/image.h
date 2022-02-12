@@ -12,67 +12,67 @@ typedef struct {
     uColor_s *data;
     int cols, rows;
     int layers;
-    Allocator_i allocator;
+    Allocator_i a;
 } uImage;
 
 static bool u_image_valid(uImage self) {
     return self.cols > 0 && self.rows > 0
            && self.layers > 0
-           && allocator_valid(self.allocator);
+           && allocator_valid(self.a);
 }
 
 static uImage u_image_new_invalid_a(Allocator_i a) {
-    return (uImage) {.allocator = a};
+    return (uImage) {.a = a};
 }
 
 static uImage u_image_new_invalid() {
-    return u_image_new_invalid_a(rhc_allocator_new());
+    return u_image_new_invalid_a(allocator_new());
 }
 
-// creates a new empty image with a costum allocator
+// creates a new empty image with a costum a
 uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a);
 
 // creates a new empty image
 static uImage u_image_new_empty(int cols, int rows, int layers) {
     return u_image_new_empty_a(cols, rows, layers,
-                               rhc_allocator_new());
+                               allocator_new());
 }
 
-// creates a new image with all values set to 0 with a costum allocator
+// creates a new image with all values set to 0 with a costum a
 uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_i a);
 
 // creates a new image with all values set to 0
 static uImage u_image_new_zeros(int cols, int rows, int layers) {
     return u_image_new_zeros_a(cols, rows, layers,
-                               rhc_allocator_new());
+                               allocator_new());
 }
 
-// clones an image with a costum allocator
+// clones an image with a costum a
 uImage u_image_new_clone_a(uImage from, Allocator_i a);
 
 // clones an image
 static uImage u_image_new_clone(uImage from) {
     return u_image_new_clone_a(from,
-                               rhc_allocator_new());
+                               allocator_new());
 }
 
-// copy a SDL_Surface into a new image with a costum allocator
+// copy a SDL_Surface into a new image with a costum a
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Allocator_i a);
 
 
 // copy a SDL_Surface into a new image
 static uImage u_image_new_sdl_surface(int layers, struct SDL_Surface *surface) {
     return u_image_new_sdl_surface_a(layers, surface,
-            rhc_allocator_new());
+            allocator_new());
 }
 
-// loads an image from a file (.png) with a costum allocator
+// loads an image from a file (.png) with a costum a
 uImage u_image_new_file_a(int layers, const char *file, Allocator_i a);
 
 // loads an image from a file (.png)
 static uImage u_image_new_file(int layers, const char *file) {
     return u_image_new_file_a(layers, file,
-                              rhc_allocator_new());
+                              allocator_new());
 }
 
 void u_image_kill(uImage *self);

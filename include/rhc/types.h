@@ -10,15 +10,15 @@
 // Types
 //
 
-// virtual allocator interface, see alloc.h
+// virtual a interface, see alloc.h
 typedef struct Allocator_i {
     void *user_data;
 
-    // virtual functions
-    void *(*malloc)(struct Allocator_i self, size_t size);
-    void *(*calloc)(struct Allocator_i self, size_t size);
-    void *(*realloc)(struct Allocator_i self, void *memory, size_t size);
-    void (*free)(struct Allocator_i self, void *memory);
+    // virtual function
+    // if memory is NULL -> malloc
+    // if size it NULL -> free
+    // should be ok to pass NULL, 0, *
+    void *(*realloc)(void *memory, size_t size, void *user_data);
 } Allocator_i;
 
 // virtual stream interface, see stream.h
@@ -75,9 +75,13 @@ typedef struct {
 //
 
 
-// returns true if the allocator seems to be valid
+// returns true if the a seems to be valid
 static bool allocator_valid(Allocator_i a) {
-    return a.malloc && a.realloc && a.free;  // vfunctions available?
+    return a.realloc;  // vfunction available?
+}
+
+static Allocator_i allocator_new_invalid() {
+    return (Allocator_i) {0};
 }
 
 static bool stream_valid(Stream_i s) {
@@ -107,7 +111,7 @@ static bool strarray_valid(StrArray self) {
 // kills the str array
 static void strarray_kill(StrArray *self) {
     if(strarray_valid(*self))
-        self->allocator.free(self->allocator, self->array);
+        self->allocator.realloc(self->array, 0, self->allocator.user_data);
     self->array = NULL;
     self->size = 0;
 }
@@ -120,7 +124,7 @@ static bool string_valid(String self) {
 // kills the string
 static void string_kill(String *self) {
     if(string_valid(*self))
-        self->allocator.free(self->allocator, self->data);
+        self->allocator.realloc(self->data, 0, self->allocator.user_data);
     self->data = NULL;
     self->size = 0;
     self->capacity = 0;

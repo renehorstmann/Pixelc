@@ -1,7 +1,7 @@
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "mathc/sca/int.h"
+#include "mathc/int.h"
 #include "selectionctrl.h"
 
 //
@@ -99,19 +99,27 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
     uImage img = self->canvas_ref->RO.image;
     int layer = self->canvas_ref->current_layer;
 
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+
     if (pointer.action == E_POINTER_UP) {
         self->L.moving = false;
         return;
     }
     if (pointer.action == E_POINTER_DOWN) {
         self->L.moving = true;
+        if(!selection_contains(self->selection, cr.x, cr.y)) {
+            // touched outside the selection, so pushing the selection center into that position
+            self->selection->left = cr.x - self->selection->cols / 2;
+            self->selection->top = cr.y - self->selection->rows / 2;
+        }
+        self->L.move_start_selection_lt = (ivec2) {{self->selection->left, self->selection->top}};
+        self->L.move_start_position = cr;
     }
 
     if (!self->L.moving) {
         return;
     }
 
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
     if (self->mode == SELECTIONCTRL_COPY
             || self->mode == SELECTIONCTRL_CUT) {
@@ -129,8 +137,9 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
         self->out.show_ok = true;
     }
 
-    self->selection->left = cr.x - self->selection->cols / 2;
-    self->selection->top = cr.y - self->selection->rows / 2;
+    ivec2 grab_diff = ivec2_sub_vec(cr, self->L.move_start_position);
+    self->selection->left = self->L.move_start_selection_lt.x + grab_diff.x;
+    self->selection->top = self->L.move_start_selection_lt.y + grab_diff.y;
 
     canvas_reload(self->canvas_ref);
     selection_paste(self->selection, img, layer);
@@ -195,10 +204,20 @@ void selectionctrl_stop(SelectionCtrl *self) {
 
 void selectionctrl_acquire(SelectionCtrl *self) {
     log_info("selectionctrl acquire");
-    selectionctrl_stop(self);
+    self->L.pos = (ivec2) {{-1, -1}};
+    selection_kill(&self->selection);
     self->mode = SELECTIONCTRL_ACQUIRE;
 }
 
-
+void selectionctrl_paste_image(SelectionCtrl *self, uImage img) {
+    log_info("selectionctrl paste_image");
+    self->L.pos = (ivec2) {{-1, -1}};
+    selection_kill(&self->selection);
+    self->selection = selection_new(0, 0, img.cols, img.rows);
+    selection_copy(self->selection, img, 0);
+    canvas_reload(self->canvas_ref);
+    selection_paste(self->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
+    self->mode = SELECTIONCTRL_PASTE;
+}
 
 

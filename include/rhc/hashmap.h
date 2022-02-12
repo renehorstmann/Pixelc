@@ -99,7 +99,7 @@ static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
 
 // Foo foo_new_a(size_t approx_size, Allocator_i a)
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t approx_size, Allocator_i a) {
-    assume(allocator_valid(a), "allocator needs to be valid");
+    assume(allocator_valid(a), "a needs to be valid");
     CLASS self = {
             a.malloc(a, approx_size * sizeof(ITEM *)),
             approx_size,
@@ -137,7 +137,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid)() {
 static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
     // valid
     if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
-        self->allocator.free(self->allocator, self->map);
+        allocator_free(self->allocator, self->map);
     }
     // new_invalid_a
     *self = RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(self->allocator);
@@ -158,7 +158,7 @@ static TYPE *RHC_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
     
     // if item not found, create a new one
     if(!(*item)) {
-        *item = (ITEM *) self->allocator.malloc(self->allocator, sizeof(ITEM));
+        *item = (ITEM *) allocator_malloc(self->allocator, sizeof(ITEM));
         assume(*item, "hashmap failed: to allocate a new item");
         memset(*item, 0, sizeof(ITEM));
         (*item)->key = KEY_CLONE_FN(key, self->allocator);
@@ -191,7 +191,7 @@ void RHC_NAME_CONCAT2(FN_NAME, _remove)(CLASS *self, KEY key) {
     ITEM *kill = *item;
     *item = (*item)->next;
     KEY_KILL_FN(kill->key, self->allocator);
-    self->allocator.free(self->allocator, kill);
+    allocator_free(self->allocator, kill);
 }
 
 // FooIter_s foo_iter_new(Foo *self)

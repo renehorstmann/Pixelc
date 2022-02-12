@@ -6,9 +6,9 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 4
+#define TOOLBAR_TOOLS_LEN 11
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
-#define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 2
+#define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
 
 typedef struct {
@@ -31,10 +31,17 @@ typedef struct {
     union {
         Tool *all_tools[TOOLBAR_TOOLS_LEN];
         struct {
+            Tool *clear;
             Tool *undo;
             Tool *redo;
             Tool *import;
             Tool *selection;
+            Tool *kernel;
+            Tool *secondary_color;
+            Tool *shading;
+            Tool *camera;
+            Tool *grid;
+            Tool *preview;
         } tools;
     };
     
@@ -50,6 +57,11 @@ typedef struct {
     union {
         Tool *all_selection_paste_tools[TOOLBAR_SELECTION_PASTE_TOOLS_LEN];
         struct {
+            Tool *rotate_l;
+            Tool *rotate_r;
+            Tool *mirror_v;
+            Tool *mirror_h;
+            Tool *blend;
             Tool *copy;
             Tool *ok;
         } selection_paste_tools;
@@ -65,9 +77,12 @@ typedef struct {
 } Toolbar;
 
 
-Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
+Toolbar *toolbar_new(Camera_s *cam, 
+        CameraCtrl *camctrl,
+        Canvas *canvas,
         Brush *brush, Palette *palette, 
         SelectionCtrl *selectionctrl,
+        Animation *animation,
         uColor_s active_bg_a, uColor_s active_bg_b,
         uColor_s secondary_bg_a, uColor_s secondary_bg_b,
         uColor_s selection_bg_a, uColor_s selection_bg_b);

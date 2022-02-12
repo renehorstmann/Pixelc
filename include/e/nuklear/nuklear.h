@@ -129,7 +129,7 @@
 /// ### Constants
 /// Define                          | Description
 /// --------------------------------|---------------------------------------
-/// NK_BUFFER_DEFAULT_INITIAL_SIZE  | Initial buffer size allocated by all buffers while using the default allocator functions included by defining NK_INCLUDE_DEFAULT_ALLOCATOR. If you don't want to allocate the default 4k memory then redefine it.
+/// NK_BUFFER_DEFAULT_INITIAL_SIZE  | Initial buffer size allocated by all buffers while using the default a functions included by defining NK_INCLUDE_DEFAULT_ALLOCATOR. If you don't want to allocate the default 4k memory then redefine it.
 /// NK_MAX_NUMBER_BUFFER            | Maximum buffer size for the conversion buffer between float and string Under normal circumstances this should be more than sufficient.
 /// NK_INPUT_MAX                    | Defines the max number of bytes which can be added as text input in one frame. Under normal circumstances this should be more than sufficient.
 ///
@@ -539,7 +539,7 @@ enum nk_symbol_type {
 /// --------------------|-------------------------------------------------------
 /// __nk_init_default__ | Initializes context with standard library memory allocation (malloc,free)
 /// __nk_init_fixed__   | Initializes context from single fixed size memory block
-/// __nk_init__         | Initializes context with memory allocator callbacks for alloc and free
+/// __nk_init__         | Initializes context with memory a callbacks for alloc and free
 /// __nk_init_custom__  | Initializes context from two buffers. One for draw commands the other for window/panel/table allocations
 /// __nk_clear__        | Called at the end of the frame to reset and prepare the context for the next frame
 /// __nk_free__         | Shutdown and free all memory allocated inside the context
@@ -547,7 +547,7 @@ enum nk_symbol_type {
  */
 #ifdef NK_INCLUDE_DEFAULT_ALLOCATOR
 /*/// #### nk_init_default
-/// Initializes a `nk_context` struct with a default standard library allocator.
+/// Initializes a `nk_context` struct with a default standard library a.
 /// Should be used if you don't want to be bothered with memory management in nuklear.
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
@@ -600,7 +600,7 @@ NK_API int nk_init_fixed(struct nk_context*, void *memory, nk_size size, const s
 /// Parameter   | Description
 /// ------------|---------------------------------------------------------------
 /// __ctx__     | Must point to an either stack or heap allocated `nk_context` struct
-/// __alloc__   | Must point to a previously allocated memory allocator
+/// __alloc__   | Must point to a previously allocated memory a
 /// __font__    | Must point to a previously initialized font handle for more info look at font documentation
 ///
 /// Returns either `false(0)` on failure or `true(1)` on success.
@@ -4085,8 +4085,8 @@ NK_API void nk_font_atlas_clear(struct nk_font_atlas*);
     If you don't want to think about how much memory the library should allocate
     at all time or have a very dynamic UI with unpredictable memory consumption
     habits but still want control over memory allocation you can use the dynamic
-    allocator based API. The allocator consists of two callbacks for allocating
-    and freeing memory and optional userdata so you can plugin your own allocator.
+    a based API. The a consists of two callbacks for allocating
+    and freeing memory and optional userdata so you can plugin your own a.
 
     The final and easiest way can be used by defining
     NK_INCLUDE_DEFAULT_ALLOCATOR which uses the standard library memory
@@ -4123,7 +4123,7 @@ struct nk_buffer {
     struct nk_buffer_marker marker[NK_BUFFER_MAX];
     /* buffer marker to free a buffer to a certain offset */
     struct nk_allocator pool;
-    /* allocator callback for dynamic buffers */
+    /* a callback for dynamic buffers */
     enum nk_allocation_type type;
     /* memory management type */
     struct nk_memory memory;
@@ -4234,7 +4234,7 @@ NK_API int nk_str_len_char(struct nk_str*);
  *
  * The final way is using a dynamically growing nk_text_edit struct, which
  * has both a default version if you don't care where memory comes from and an
- * allocator version if you do. While the text editor is quite powerful for its
+ * a version if you do. While the text editor is quite powerful for its
  * complexity I would not recommend editing gigabytes of data with it.
  * It is rather designed for uses cases which make sense for a GUI library not for
  * an full blown text editor.
@@ -11217,7 +11217,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /*         crashproof on bad data */
 /*         hinting? (no longer patented) */
 /*         cleartype-style AA? */
-/*         optimize: use simple memory allocator for intermediates */
+/*         optimize: use simple memory a for intermediates */
 /*         optimize: build edge-list directly from curves */
 /*         optimize: rasterize directly from curves? */
 /*  */
@@ -18655,7 +18655,7 @@ nk_init_custom(struct nk_context *ctx, struct nk_buffer *cmds,
         /* take memory from buffer and alloc fixed pool */
         nk_pool_init_fixed(&ctx->pool, pool->memory.ptr, pool->memory.size);
     } else {
-        /* create dynamic pool from buffer allocator */
+        /* create dynamic pool from buffer a */
         struct nk_allocator *alloc = &pool->pool;
         nk_pool_init(&ctx->pool, alloc, NK_POOL_DEFAULT_CAPACITY);
     }

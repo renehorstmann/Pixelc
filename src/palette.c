@@ -145,7 +145,10 @@ void palette_update(Palette *self, float dtime) {
         }
     }
 
-    self->L.select_ro.rect.pose = self->L.palette_ro.rects[self->L.last_selected].pose;
+    if(self->L.custom_select_active)
+        self->L.select_ro.rect.pose = self->L.custom_select_pose;
+    else
+        self->L.select_ro.rect.pose = self->L.palette_ro.rects[self->L.last_selected].pose;
     
     // info
     if(self->L.info_time>=0) {
@@ -278,8 +281,16 @@ void palette_set_color(Palette *self, int index) {
         return;
     }
     self->brush_ref->current_color = self->RO.palette[index];
+    self->brush_ref->secondary_as_current = false;
     self->L.select_ro.rect.pose = self->L.palette_ro.rects[index].pose;
     self->L.last_selected = index;
+    self->L.custom_select_active = false;
+}
+
+void palette_set_custom_select(Palette *self, mat4 select_pose) {
+    self->L.custom_select_pose = select_pose;
+    self->L.custom_select_active = true;
+    self->L.last_selected = -1;
 }
 
 void palette_set_info(Palette *self, const char *info) {

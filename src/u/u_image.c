@@ -20,7 +20,7 @@ uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a) {
     }
 
     uImage self =
-            {a.malloc(a, data_size),
+            {allocator_malloc(a, data_size),
              cols, rows, layers,
              a};
     if (!u_image_valid(self))
@@ -103,8 +103,8 @@ uImage u_image_new_file_a(int layers, const char *file, Allocator_i a) {
 
 void u_image_kill(uImage *self) {
     if (u_image_valid(*self))
-        self->allocator.free(self->allocator, self->data);
-    *self = u_image_new_invalid_a(self->allocator);
+        allocator_free(self->a, self->data);
+    *self = u_image_new_invalid_a(self->a);
 }
 
 // creates an SDL_Surface from the image
@@ -194,7 +194,7 @@ void u_image_rotate(uImage *self, bool right) {
     if (!u_image_valid(*self))
         return;
 
-    uImage tmp = u_image_new_clone_a(*self, self->allocator);
+    uImage tmp = u_image_new_clone_a(*self, self->a);
     if (!u_image_valid(tmp))
         return;
 

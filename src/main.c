@@ -105,9 +105,13 @@ static void init(eSimple *simple, ivec2 window_size) {
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
 
     //L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
-    L.toolbar = toolbar_new(L.camera, L.canvas,
-                            L.brush, L.palette,
+    L.toolbar = toolbar_new(L.camera, 
+                            L.camctrl,
+                            L.canvas,
+                            L.brush, 
+                            L.palette,
                             L.selectionctrl,
+                            L.animation,
                             u_color_from_hex(TB_ACTIVE_BG_A),
                             u_color_from_hex(TB_ACTIVE_BG_B),
                             u_color_from_hex(TB_SECONDARY_BG_A),
@@ -177,9 +181,9 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     canvas_render(L.canvas, canvas_cam);
     selectionctrl_render(L.selectionctrl, canvas_cam);
     multitouchcursor_render(L.mtc, hud_cam);
+    toolbar_render(L.toolbar, hud_cam);
     palette_render(L.palette, hud_cam);
     //toolbar_old_render(L.toolbar_old, hud_cam);
-    toolbar_render(L.toolbar, hud_cam);
 }
 
 int main(int argc, char **argv) {

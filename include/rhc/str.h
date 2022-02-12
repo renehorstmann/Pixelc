@@ -81,10 +81,10 @@ static void str_as_c(char *out_c_string, Str_s s) {
 
 // returns a new allocated buffer with str as cstring
 static char *str_as_new_c_a(Str_s s, Allocator_i a) {
-    assume(allocator_valid(a), "allocator needs to be valid");
+    assume(allocator_valid(a), "a needs to be valid");
     if(!str_valid(s))
         return NULL;
-    char *buffer = a.malloc(a, s.size+1);
+    char *buffer = allocator_malloc(a, s.size+1);
     if(!buffer)
         return NULL;
     str_as_c(buffer, s);
@@ -188,7 +188,7 @@ static int str_split(Str_s *splits, int max, Str_s s, char split) {
 // returns a str array, based on s, containing all non empty splits between each split (allocated version)
 static StrArray str_split_allocated(Str_s s, char split, Allocator_i a) {
     StrArray res = {.allocator = a};
-    assume(allocator_valid(a), "allocator needs to be valid");
+    assume(allocator_valid(a), "a needs to be valid");
     for (;;) {
         s = str_lstrip(s, split);
         if (str_empty(s))
@@ -196,7 +196,7 @@ static StrArray str_split_allocated(Str_s s, char split, Allocator_i a) {
         Str_s item = str_next_split(s, split);
         s.data += item.size;
         s.size -= item.size;
-        Str_s *array = a.realloc(a, res.array, sizeof(Str_s) * (res.size+1));
+        Str_s *array = allocator_realloc(a, res.array, sizeof(Str_s) * (res.size+1));
         if(!array) {
             log_warn("str_split_allocated failed: to realloc");
             return res;
@@ -211,14 +211,14 @@ static ssize_t str_find_first(Str_s s, char find) {
     if(str_empty(s))
         return -1;
     if (find==' ') {
-        for(ssize_t i=0; i<s.size; i++) {
+        for(size_t i=0; i<s.size; i++) {
             if(isspace(s.data[i]))
-                return i;
+                return (ssize_t) i;
         }
     } else {
-        for(ssize_t i=0; i<s.size; i++) {
+        for(size_t i=0; i<s.size; i++) {
             if(s.data[i] == find)
-                return i;
+                return (ssize_t) i;
         }
     }
     return -1;
@@ -230,14 +230,14 @@ static ssize_t str_find_last(Str_s s, char find) {
     if(str_empty(s))
         return -1;
     if (find==' ') {
-        for(ssize_t i=s.size-1; i>=0; i--) {
-            if(isspace(s.data[i]))
-                return i;
+        for(size_t i=s.size; i>0; i--) {
+            if(isspace(s.data[i-1]))
+                return (ssize_t) i-1;
         }
     } else {
-        for(ssize_t i=s.size-1; i>=0; i--) {
-            if(s.data[i] == find)
-                return i;
+        for(size_t i=s.size; i>0; i--) {
+            if(s.data[i-1] == find)
+                return (ssize_t) i-1;
         }
     }
     return -1;
@@ -250,7 +250,7 @@ static ssize_t str_find_first_str(Str_s s, Str_s find) {
         return -1;
     for(size_t i=0; i<s.size-find.size; i++) {
         if(str_equals(find, (Str_s) {s.data+i, find.size}))
-            return i;
+            return (ssize_t) i;
     }
     return -1;
 }
@@ -260,9 +260,9 @@ static ssize_t str_find_last_str(Str_s s, Str_s find) {
     // invalid safe
     if(find.size > s.size)
         return -1;
-    for(ssize_t i=(ssize_t) s.size-find.size-1; i>=0; i--) {
-        if(str_equals(find, (Str_s) {s.data+i, find.size}))
-            return i;
+    for(size_t i=s.size-find.size; i>0; i--) {
+        if(str_equals(find, (Str_s) {s.data+i-1, find.size}))
+            return (ssize_t) i;
     }
     return -1;
 }
@@ -272,17 +272,17 @@ static ssize_t str_find_first_set(Str_s s, const char *char_set) {
     for(size_t i=0; i<s.size; i++) {
         for (const char *c = char_set; *c != 0; c++) {
             if ((*c == ' ' && isspace(s.data[i])) || *c == s.data[i])
-                return i;
+                return (ssize_t) i;
         }
     }
     return -1;
 }
 // returns the index of the first found char of multiple_chars in str, or -1 if nothing found
 static ssize_t str_find_last_set(Str_s s, const char *char_set) {
-    for(ssize_t i=(ssize_t) s.size-1; i>=0; i--) {
+    for(size_t i=s.size; i>0; i--) {
         for (const char *c = char_set; *c != 0; c++) {
-            if ((*c == ' ' && isspace(s.data[i])) || *c == s.data[i])
-                return i;
+            if ((*c == ' ' && isspace(s.data[i-1])) || *c == s.data[i-1])
+                return (ssize_t) i-1;
         }
     }
     return -1;

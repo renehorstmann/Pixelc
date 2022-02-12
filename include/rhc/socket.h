@@ -10,7 +10,7 @@
 
 typedef struct {
     Stream_i stream;
-    Allocator_i allocator;
+    Allocator_i a;
     char impl_storage[RHC_SOCKET_STORAGE_SIZE];
 } Socket;
 

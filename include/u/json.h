@@ -21,17 +21,38 @@ enum u_json_types {
 
 
 // creates a new empty root json element (object type)
-uJson *u_json_new_empty();
+// Allocator version
+uJson *u_json_new_empty_a(Allocator_i a);
+
+// creates a new empty root json element (object type)
+static uJson *u_json_new_empty() {
+    return u_json_new_empty_a(RHC_DEFAULT_ALLOCATOR);
+}
 
 
 // parses a json str into the uJson hierarchy
 // returns u_json_new_empty on failure (check with u_json_empty)
-uJson *u_json_new_str(Str_s str_to_parse);
+// Allocator version
+uJson *u_json_new_str_a(Str_s str_to_parse, Allocator_i a);
+
+// parses a json str into the uJson hierarchy
+// returns u_json_new_empty on failure (check with u_json_empty)
+static uJson *u_json_new_str(Str_s str_to_parse) {
+    return u_json_new_str_a(str_to_parse, RHC_DEFAULT_ALLOCATOR);
+}
 
 // loads a json file
 // calls u_json_new_empty
 // returns u_json_new_empty on failure (check with u_json_empty)
-uJson *u_json_new_file(const char *file);
+// Allocator version
+uJson *u_json_new_file_a(const char *file, Allocator_i a);
+
+// loads a json file
+// calls u_json_new_empty
+// returns u_json_new_empty on failure (check with u_json_empty)
+static uJson *u_json_new_file(const char *file) {
+    return u_json_new_file_a(file, RHC_DEFAULT_ALLOCATOR);
+}
 
 
 // kills self and recursivly all childs
@@ -43,6 +64,11 @@ bool u_json_empty(const uJson *self);
 
 
 // creates a string from the uJson hierarchy (recursivly)
+// custom a for the result string
+String u_json_to_string_a(const uJson *self, Allocator_i a);
+
+// creates a string from the uJson hierarchy (recursivly)
+// uses uJsons a
 String u_json_to_string(const uJson *self);
 
 // saves to a json file

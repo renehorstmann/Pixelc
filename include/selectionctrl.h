@@ -34,6 +34,8 @@ typedef struct {
         
         bool moving;
         ivec2 pos;
+        ivec2 move_start_selection_lt;
+        ivec2 move_start_position;
     } L;
 } SelectionCtrl;
 
@@ -51,6 +53,7 @@ void selectionctrl_stop(SelectionCtrl *self);
 
 void selectionctrl_acquire(SelectionCtrl *self);
 
+void selectionctrl_paste_image(SelectionCtrl *self, uImage img);
 
 
 #endif //PIXELC_SELECTIONCTRL_H

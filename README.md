@@ -59,20 +59,31 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- selecrion tools
-  - paste
-    - rot mirror collection
-    - blend
-- selection grabbing instead of set center, if in the selection
-- imort should import as selection
+- toolbar bg?
+- landscape bug
+- palettes
+  - game boy
+  - nes
+  - more top of lospec
+- tools
+  - kernel
+    - activate 
+    - long press
+  - modes
+    - free
+    - dot
+    - dither
+    - dither inv
+    - fill 4
+    - fill 8
+    - replace
+- redraw buttons
+  - modes in different bg color, so they match
+  - dither inv
 - some
   - uImage
     - scale as + interpolation options
     - merge layers (single or all)
-- tool abtraction:
-  - list of active tools
-  - render in container flow
-  - tooltip title text
 - options menu
   - size
   - frames + fps

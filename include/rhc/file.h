@@ -8,7 +8,7 @@
 
 typedef struct {
     Stream_i stream;
-    Allocator_i allocator;
+    Allocator_i a;
     char impl_storage[RHC_FILE_STORAGE_SIZE];
 } RhcFile;
 
@@ -68,13 +68,19 @@ static String file_read(const char *file, bool ascii) {
 //
 
 // reads in a full file into the returned String
-#define file_read_a rhc_file_read_a
+static String file_read_a(const char *file, bool ascii, Allocator_i a) {
+    return rhc_file_read_a(file, ascii, a);
+}
 
 // writes a file and returns false on error
-#define file_write rhc_file_write
+static bool file_write(const char *file, Str_s content, bool ascii) {
+    return rhc_file_write(file, content, ascii);
+}
 
 // appends to a file and returns false on error
-#define file_append rhc_file_append
+static bool file_append(const char *file, Str_s content, bool ascii) {
+    return rhc_file_append(file, content, ascii);
+}
 
 
 #endif //RHC_FILE_H

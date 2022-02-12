@@ -21,22 +21,24 @@ struct uJson {
 	};
 	int arr_size; // only for arr and obj
 	enum u_json_types type;
+
+	Allocator_i a;
 };
 
 
 static void json_kill_r(uJson *self) {
-	rhc_free(self->name);
+	allocator_free(self->a, self->name);
 	switch(self->type) {
 	case U_JSON_TYPE_NUM:
 	case U_JSON_TYPE_STRING:
-		rhc_free(self->data_str);
+		allocator_free(self->a, self->data_str);
 		break;
 	case U_JSON_TYPE_ARRAY:
 	case U_JSON_TYPE_OBJECT:
 		for(int i=0; i<self->arr_size; i++) {
 			json_kill_r(&self->data_arr[i]);
 		}
-		rhc_free(self->data_arr);
+			allocator_free(self->a, self->data_arr);
 		break;
 	default:
 		break;
@@ -55,11 +57,12 @@ static uJson *append_child(uJson *self, const char *name) {
 	    child = old_child;
 	} else {
 	    // append
-	    self->data_arr = rhc_realloc(self->data_arr, sizeof *self->data_arr * ++self->arr_size);
+	    self->data_arr = allocator_realloc(self->a, self->data_arr, sizeof *self->data_arr * ++self->arr_size);
 	child = &self->data_arr[self->arr_size-1];    
 	}
 	
 	*child = (uJson) {0};
+	child->a = self->a;
 	
 	// copy name if self is an object (not an array)
 	if(self->type == U_JSON_TYPE_OBJECT) {
@@ -71,7 +74,7 @@ static uJson *append_child(uJson *self, const char *name) {
 static String use_escapes(Str_s str) {
     String s = string_new(str.size);
     
-    for(int i=0; i<str.size; i++) {
+    for(size_t i=0; i<str.size; i++) {
         if(str.data[i] != '\\') {
             string_push(&s, str.data[i]);
             continue;
@@ -107,7 +110,7 @@ static String use_escapes(Str_s str) {
 static String create_escapes(Str_s str) {
     String s = string_new(str.size);
     
-    for(int i=0; i<str.size; i++) {
+    for(size_t i=0; i<str.size; i++) {
         switch (str.data[i]) {
         case '\n':
              string_append(&s, strc("\\n"));
@@ -194,7 +197,7 @@ static void stringify_r(const uJson *self, String *string, int indent_lvl) {
 	}
 }
 
-static char *eat_string_to_heap(Str_s *remaining) {
+static char *eat_string_to_heap(Str_s *remaining, Allocator_i a) {
 	// must begin with " and end with " (not \")
 	*remaining = str_eat(*remaining, 1);
 	size_t len = 0;
@@ -208,7 +211,7 @@ static char *eat_string_to_heap(Str_s *remaining) {
 	
 	// todo parse escape stuff
 	
-	char *str = rhc_malloc(len+1);
+	char *str = allocator_malloc(a, len+1);
 	memcpy(str, remaining->data, len);
 	str[len] = '\0';
 	*remaining = str_eat(*remaining, len+1);
@@ -223,13 +226,13 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
 	case '\"':
 		// string
 		{
-			char *str = eat_string_to_heap(remaining);
+			char *str = eat_string_to_heap(remaining, self->a);
 			if(!str)
 				return false;
 		    String s = use_escapes(strc(str));
 			u_json_append_string(self, child_name, s.data);
 			string_kill(&s);
-			rhc_free(str);
+			allocator_free(self->a, str);
 		}
 		break;
 	case 'n':
@@ -300,7 +303,7 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
 					*remaining = str_eat(*remaining, 1);
 					break;
 				}
-				char *name = eat_string_to_heap(remaining);
+				char *name = eat_string_to_heap(remaining, self->a);
 				if(!name) {
 					log_error("u_json: failed to parse object");
 					return false;
@@ -308,13 +311,13 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
 				*remaining = str_lstrip(*remaining, ' ');
 				*remaining = str_eat_str(*remaining, strc(":"));
 				if(!str_valid(*remaining)) {
-					rhc_free(name);
+					allocator_free(self->a, name);
 					log_error("u_json: failed to parse object");
 					return false;
 				}
 				
 				bool parse_ok = parse_r(obj, remaining, name);
-				rhc_free(name);
+				allocator_free(self->a, name);
 				if(!parse_ok) {
 					log_error("u_json: failed to parse object");
 					return false;
@@ -342,9 +345,9 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
 				log_error("u_json: failed to parse num");
 				return false;
 			}
-			char *num_str = str_as_new_c((Str_s) {remaining->data, num});
+			char *num_str = str_as_new_c_a((Str_s) {remaining->data, num}, self->a);
 			u_json_append_num(self, child_name, num_str);
-			rhc_free(num_str);
+			allocator_free(self->a, num_str);
 			*remaining = str_eat(*remaining, num);
 		}
 		break;
@@ -358,34 +361,35 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
 //
 
 
-uJson *u_json_new_empty() {
-	uJson *self = rhc_calloc(sizeof *self);
+uJson *u_json_new_empty_a(Allocator_i a) {
+	uJson *self = allocator_calloc(a, sizeof *self);
+	self->a = a;
 	self->type = U_JSON_TYPE_OBJECT;
 	return self;
 }
 
-uJson *u_json_new_str(Str_s str_to_parse) {
+uJson *u_json_new_str_a(Str_s str_to_parse, Allocator_i a) {
 	if(str_empty(str_to_parse)) {
 	    log_warn("u_json: load failed, str invalid, returning empty uJson");
-	    return u_json_new_empty();
+	    return u_json_new_empty_a(a);
 	}
-	uJson *root = u_json_new_empty();
+	uJson *root = u_json_new_empty_a(a);
 	if(!parse_r(root, &str_to_parse, "root")) {
 		log_warn("u_json: load failed, returning empty uJson");
 		u_json_kill(&root);
-		return u_json_new_empty();
+		return u_json_new_empty_a(a);
 	}
 	if(root->arr_size != 1) {
 		log_warn("u_json: load failed, multiple root elements, returning empty uJson");
 		u_json_kill(&root);
-		return u_json_new_empty();
+		return u_json_new_empty_a(a);
 	}
 	uJson *self = root->data_arr;
-	rhc_free(root);
+	allocator_free(a, root);
 	return self;
 }
 
-uJson *u_json_new_file(const char *file) {
+uJson *u_json_new_file_a(const char *file, Allocator_i a) {
 	String s = file_read(file, true);
 	uJson *self = u_json_new_str(s.str);
 	string_kill(&s);
@@ -397,7 +401,7 @@ void u_json_kill(uJson **self_ptr) {
 	if(!self)
 	    return;
 	json_kill_r(self);
-	rhc_free(self);
+	allocator_free(self->a, self);
 	*self_ptr = NULL;
 }
 
@@ -409,10 +413,18 @@ bool u_json_empty(const uJson *self) {
     return false;
 }
 
+String u_json_to_string_a(const uJson *self, Allocator_i a) {
+	if(!self)
+		return string_new_invalid();
+	String s = string_new_a(128, a);
+	stringify_r(self, &s, 0);
+	return s;
+}
+
 String u_json_to_string(const uJson *self) {
 	if(!self)
 		return string_new_invalid();
-	String s = string_new(128);
+	String s = string_new_a(128, self->a);
 	stringify_r(self, &s, 0);
 	return s;
 }
@@ -421,7 +433,7 @@ bool u_json_save_file(const uJson *self, const char *file) {
 	if(!self)
 		return false;
 	String s = u_json_to_string(self);
-	bool ok = rhc_file_write(file, s.str, true);
+	bool ok = file_write(file, s.str, true);
 	string_kill(&s);
 	return ok;
 }
@@ -523,7 +535,7 @@ void u_json_set_name(uJson *self, const char *name) {
     if(!self)
         return;
     size_t len = strlen(name) +1;
-	self->name = rhc_realloc(self->name, len);
+	self->name = allocator_realloc(self->a, self->name, len);
     memcpy(self->name, name, len);
 }
 
@@ -542,7 +554,7 @@ bool u_json_set_num(uJson *self, const char *value) {
         return false;
     }
     size_t len = strlen(value) +1;
-	self->data_str = rhc_realloc(self->data_str, len);
+	self->data_str = allocator_realloc(self->a, self->data_str, len);
     memcpy(self->data_str, value, len);
     return true;
 }
@@ -553,7 +565,7 @@ bool u_json_set_string(uJson *self, const char *value) {
         return false;
     }
     size_t len = strlen(value) +1;
-	self->data_str = rhc_realloc(self->data_str, len);
+	self->data_str = allocator_realloc(self->a, self->data_str, len);
     memcpy(self->data_str, value, len);
     return true;
 }
@@ -613,7 +625,7 @@ uJson *u_json_append_num(uJson *self, const char *name, const char *value) {
 	if(!child)
 	    return NULL;
 	child->type = U_JSON_TYPE_NUM;
-	child->data_str = rhc_malloc(num+1);
+	child->data_str = allocator_malloc(self->a, num+1);
 	memcpy(child->data_str, value, num);
     child->data_str[num] = '\0';	
 	return child;
@@ -629,7 +641,7 @@ uJson *u_json_append_string(uJson *self, const char *name, const char *value) {
 	    return NULL;
 	child->type = U_JSON_TYPE_STRING;
 	size_t len = strlen(value) +1;
-	child->data_str = rhc_malloc(len);
+	child->data_str = allocator_malloc(self->a, len);
 	memcpy(child->data_str, value, len);
 	return child;
 }

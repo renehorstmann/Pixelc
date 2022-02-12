@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <float.h> // FLT_MAX
+#include <rhc/alloc.h>
 #include "mathc/types/float.h"
 
 
@@ -66,6 +67,8 @@ typedef struct {
         int cols, rows;
         int items_placed;
     } out;
+
+    Allocator_i a;
 } uContainer;
 
 
@@ -81,14 +84,18 @@ static void u_container_item_set_invalid(uContainerItem_s *self) {
 }
 
 static bool u_container_valid(uContainer self) {
-    return self.items && self.num>0;
+    return self.items && self.num>0 && allocator_valid(self.a);
 }
 
 static uContainer u_container_new_invalid() {
     return (uContainer) {0};
 }
 
-uContainer u_container_new(int num, float left, float top);
+uContainer u_container_new_a(int num, float left, float top, Allocator_i a);
+
+static uContainer u_container_new(int num, float left, float top) {
+    return u_container_new_a(num, left, top, RHC_DEFAULT_ALLOCATOR);
+}
 
 void u_container_kill(uContainer *self);
 

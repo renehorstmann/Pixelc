@@ -38,7 +38,7 @@ static size_t socket_recv(Stream_i stream, void *msg, size_t size) {
         impl->so = NULL;
         return 0;
     }
-    assert(n <= size);
+    assert((size_t) n <= size);
     return (size_t) n;
 }
 
@@ -57,7 +57,7 @@ static size_t socket_send(Stream_i stream, const void *msg, size_t size) {
         impl->so = NULL;
         return 0;
     }
-    assert(n <= size);
+    assert((size_t) n <= size);
     return (size_t) n;
 }
 
@@ -120,9 +120,9 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
 
     SDLSocket *impl = (SDLSocket *) self->impl_storage;
 
-    Socket *client = a.calloc(a, sizeof *client);
+    Socket *client = allocator_calloc(a, sizeof *client);
     client->stream = socket_create_stream(client);
-    client->allocator = a;
+    client->a = a;
     SDLSocket *client_impl = (SDLSocket *) client->impl_storage;
 
     for(;;) {
@@ -135,7 +135,7 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
     if(!rhc_socket_valid(client)) {
         log_error("rhc_socketserver_accept failed, killing the server");
         rhc_socketserver_kill(self);
-        a.free(a, client);
+        allocator_free(a, client);
         return rhc_socket_new_invalid();
     }
 
@@ -161,9 +161,9 @@ Socket *rhc_socket_new_invalid() {
 }
 
 Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
-    Socket *self = a.calloc(a, sizeof *self);
+    Socket *self = allocator_calloc(a, sizeof *self);
     self->stream = socket_create_stream(self);
-    self->allocator = a;
+    self->a = a;
     SDLSocket *impl = (SDLSocket *) self->impl_storage;
 
     IPaddress ip;
@@ -179,7 +179,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
     if(!rhc_socket_valid(self)) {
         log_error("rhc_socket_new failed to create the connection");
         rhc_error = "rhc_socket_new failed";
-        a.free(a, self);
+        allocator_free(a, self);
         return rhc_socket_new_invalid();
     }
 
@@ -198,7 +198,7 @@ void rhc_socket_kill(Socket **self_ptr) {
         return;
     SDLSocket *impl = (SDLSocket *) self->impl_storage;
     SDLNet_TCP_Close(impl->so);
-    self->allocator.free(self->allocator, self);
+    allocator_free(self->a, self);
     *self_ptr = NULL;
 }
 #else
@@ -232,7 +232,7 @@ static size_t socket_recv(Stream_i stream, void *msg, size_t size) {
         impl->so = -1;
         return 0;
     }
-    assert(n <= size);
+    assert((size_t) n <= size);
     return (size_t) n;
 }
 
@@ -250,7 +250,7 @@ static size_t socket_send(Stream_i stream, const void *msg, size_t size) {
         impl->so = -1;
         return 0;
     }
-    assert(n <= size);
+    assert((size_t) n <= size);
     return (size_t) n;
 }
 
@@ -352,9 +352,9 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
 
     UnixSocket *impl = (UnixSocket *) self->impl_storage;
 
-    Socket *client = a.calloc(a, sizeof *client);
+    Socket *client = allocator_calloc(a, sizeof *client);
     client->stream = socket_create_stream(client);
-    client->allocator = a;
+    client->a = a;
     UnixSocket *client_impl = (UnixSocket *) client->impl_storage;
 
     struct sockaddr_storage addr;
@@ -364,7 +364,7 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
     if(!rhc_socket_valid(client)) {
         log_error("rhc_socketserver_accept failed, killing the server");
         rhc_socketserver_kill(self);
-        a.free(a, client);
+        allocator_free(a, client);
         return rhc_socket_new_invalid();
     }
 
@@ -386,9 +386,9 @@ Socket *rhc_socket_new_invalid() {
 }
 
 Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
-    Socket *self = a.calloc(a, sizeof *self);
+    Socket *self = allocator_calloc(a, sizeof *self);
     self->stream = socket_create_stream(self);
-    self->allocator = a;
+    self->a = a;
     UnixSocket *impl = (UnixSocket *) self->impl_storage;
 
     if(!address)
@@ -409,7 +409,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
         if (status != 0) {
             log_error("rhc_socket_new failed: getaddrinfo error: %s\n", gai_strerror(status));
             rhc_error = "rhc_socket_new failed";
-            a.free(a, self);
+            allocator_free(a, self);
             return rhc_socket_new_invalid();
         }
 
@@ -433,7 +433,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
     if(!rhc_socket_valid(self)) {
         log_error("rhc_socket_new failed to create the connection");
         rhc_error = "rhc_socket_new failed";
-        a.free(a, self);
+        allocator_free(a, self);
         return rhc_socket_new_invalid();
     }
     return self;
@@ -445,7 +445,7 @@ void rhc_socket_kill(Socket **self_ptr) {
         return;
     UnixSocket *impl = (UnixSocket *) self->impl_storage;
     close(impl->so);
-    self->allocator.free(self->allocator, self);
+    allocator_free(self->a, self);
     *self_ptr = NULL;
 }
 #endif //unix
@@ -611,9 +611,9 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
 
     UnixSocket *impl = (UnixSocket *) self->impl_storage;
 
-    Socket *client = a.calloc(a, sizeof *client);
+    Socket *client = allocator_calloc(a, sizeof *client);
     client->stream = socket_create_stream(client);
-    client->allocator = a;
+    client->a = a;
     UnixSocket *client_impl = (UnixSocket *) client->impl_storage;
 
     struct sockaddr_storage addr;
@@ -623,7 +623,7 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
     if(!rhc_socket_valid(client)) {
         log_error("rhc_socketserver_accept failed, killing the server");
         rhc_socketserver_kill(self);
-        a.free(a, client);
+        allocator_free(a, client);
         return rhc_socket_new_invalid();
     }
 
@@ -645,9 +645,9 @@ Socket *rhc_socket_new_invalid() {
 }
 
 Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
-    Socket *self = a.calloc(a, sizeof *self);
+    Socket *self = allocator_calloc(a, sizeof *self);
     self->stream = socket_create_stream(self);
-    self->allocator = a;
+    self->a = a;
     UnixSocket *impl = (UnixSocket *) self->impl_storage;
 
     if(!address)
@@ -681,7 +681,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
         if (status != 0) {
             log_error("rhc_socket_new failed: getaddrinfo error: %s\n", gai_strerror(status));
             rhc_error = "rhc_socket_new failed";
-            a.free(a, self);
+            allocator_free(a, self);
             return rhc_socket_new_invalid();
         }
 
@@ -705,7 +705,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
     if(!rhc_socket_valid(self)) {
         log_error("rhc_socket_new failed to create the connection");
         rhc_error = "rhc_socket_new failed";
-        a.free(a, self);
+        allocator_free(a, self);
         return rhc_socket_new_invalid();
     }
     return self;
@@ -717,7 +717,7 @@ void rhc_socket_kill(Socket **self_ptr) {
         return;
     UnixSocket *impl = (UnixSocket *) self->impl_storage;
     closesocket(impl->so);
-    self->allocator.free(self->allocator, self);
+    allocator_free(self->a, self);
     *self_ptr = NULL;
 }
 #endif //WIN32

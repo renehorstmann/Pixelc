@@ -18,6 +18,8 @@ struct uFetch {
     bool error;
     
     bool fetch_completed;
+
+    Allocator_i a;
 };
 
 static void ems_fetch_success(emscripten_fetch_t *fetch) {
@@ -54,11 +56,12 @@ static void ems_fetch_error(emscripten_fetch_t *fetch) {
 }
 
 
-uFetch *u_fetch_new_get(const char *url) {
+uFetch *u_fetch_new_get_a(const char *url, Allocator_i a) {
     log_trace("u_fetch_new_get: %s", url);
     
-    uFetch *self = rhc_calloc(sizeof *self);
-    self->data = string_new(128);
+    uFetch *self = allocator_calloc(a, sizeof *self);
+    self->a = a;
+    self->data = string_new_a(128, a);
     
     emscripten_fetch_attr_t attr;
     
@@ -75,11 +78,12 @@ uFetch *u_fetch_new_get(const char *url) {
     return self;
 }
 
-uFetch *u_fetch_new_post(const char *url, Str_s data) {
+uFetch *u_fetch_new_post_a(const char *url, Str_s data, Allocator_i a) {
     log_trace("u_fetch_new_post: %s", url);
     
-    uFetch *self = rhc_calloc(sizeof *self);
-    self->data = string_new_clone(data);
+    uFetch *self = allocator_calloc(a, sizeof *self);
+    self->a = a;
+    self->data = string_new_clone_a(data, a);
    
     emscripten_fetch_attr_t attr;
     
@@ -107,7 +111,7 @@ void u_fetch_kill(uFetch **self_ptr) {
         emscripten_fetch_close(self->fetch);
     }
     string_kill(&self->data);
-    rhc_free(self);
+    allocator_free(self->a, self);
     *self_ptr = NULL;
 }
 
@@ -145,6 +149,8 @@ struct uFetch {
     bool error;
     
     bool fetch_completed;
+
+    Allocator_i a;
 };
 
 static size_t response_writer(void *ptr, size_t size, size_t nmemb, void *ud) {
@@ -176,7 +182,7 @@ static int request_thread(void *ud) {
         curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, post_data.size);
 	    
 	}
-	self->data = string_new(128);
+	self->data = string_new_a(128, self->a);
 
     CURLcode perform_res = curl_easy_perform(curl);
 
@@ -199,12 +205,13 @@ static int request_thread(void *ud) {
 	return 0;
 }
 
-uFetch *u_fetch_new_get(const char *url) {
+uFetch *u_fetch_new_get_a(const char *url, Allocator_i a) {
     log_trace("u_fetch_new_get: %s", url);
     
-    uFetch *self = rhc_calloc(sizeof *self);
+    uFetch *self = allocator_calloc(a, sizeof *self);
+    self->a = a;
     
-    self->url = string_new_clone(strc(url));
+    self->url = string_new_clone_a(strc(url), a);
     self->data = string_new_invalid();
     
     self->lock = SDL_CreateMutex();
@@ -213,13 +220,14 @@ uFetch *u_fetch_new_get(const char *url) {
     return self;
 }
 
-uFetch *u_fetch_new_post(const char *url, Str_s data) {
+uFetch *u_fetch_new_post_a(const char *url, Str_s data, Allocator_i a) {
     log_trace("u_fetch_new_post: %s", url);
     
-    uFetch *self = rhc_calloc(sizeof *self);
+    uFetch *self = allocator_calloc(a, sizeof *self);
+    self->a = a;
     
-    self->url = string_new_clone(strc(url));
-    self->data = string_new_clone(data);
+    self->url = string_new_clone_a(strc(url), a);
+    self->data = string_new_clone_a(data, a);
     
     self->lock = SDL_CreateMutex();
     SDL_CreateThread(request_thread, "u_fetch_request", self);
@@ -234,7 +242,7 @@ void u_fetch_kill(uFetch **self_ptr) {
         return;
     string_kill(&self->url);
     SDL_DestroyMutex(self->lock);
-    rhc_free(self);
+    allocator_free(self->a,self);
     *self_ptr = NULL;
 }
 

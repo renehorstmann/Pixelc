@@ -278,17 +278,21 @@ void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
 #ifdef OPTION_SANITIZER
     // only in debug mode (so not not debug == debug)
 #ifndef NDEBUG
-    // checks for memory leaks
-    // if not done manually, it will be called at program end
-    //      some SDL (or ports) may have some memory leaks
-    //      so we call it before shutting them down to see our own mistakes
-    log_info("e_window_kill: sanitizer leak check...");
+    void __lsan_do_leak_check();
     int __lsan_do_recoverable_leak_check(void);
+
+    // checks for memory leaks
+    log_info("e_window_kill: sanitizer leak check...");
     int leaks = __lsan_do_recoverable_leak_check();
     if(leaks)
         log_error("e_window_kill: sanitizer leak check done, got %i leaks!", leaks);
     else
         log_info("e_window_kill: sanitizer leak check done, without leaks", leaks);
+
+    // this call also checks for leaks, but than it doesnt check at program end
+    //      some SDL (or ports) may have some memory leaks
+    //      so we call it before shutting them down to see our own mistakes
+    __lsan_do_leak_check();
 #endif
 #endif
 

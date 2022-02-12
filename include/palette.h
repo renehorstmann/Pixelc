@@ -43,6 +43,9 @@ typedef struct {
         // long swipe from side to side to load the next palette
         vec2 change_swipe_start;
         float change_swipe_time;
+
+        mat4 custom_select_pose;
+        bool custom_select_active;
         
         char **palette_files;
     } L;
@@ -61,9 +64,13 @@ float palette_get_hud_size(const Palette *self);
 
 bool palette_contains_pos(const Palette *self, vec2 pos);
 
+// may return -1, if custom color is selected
 int palette_get_color(const Palette *self);
 
 void palette_set_color(Palette *self, int index);
+
+// sets the "select" render object to the given pose
+void palette_set_custom_select(Palette *self, mat4 select_pose);
 
 // displays info above the palette for a few seconds
 // pass NULL to hide it immediately

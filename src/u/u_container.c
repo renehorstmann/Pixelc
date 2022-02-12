@@ -6,9 +6,10 @@
 #include "u/container.h"
 
 
-uContainer u_container_new(int num, float left, float top) {
+uContainer u_container_new_a(int num, float left, float top, Allocator_i a) {
     uContainer self = {0};
-    self.items = rhc_calloc(sizeof *self.items * num);
+    self.a = a;
+    self.items = allocator_calloc(a, sizeof *self.items * num);
     self.num = num;
     self.on_integer_positions = true;
     self.left = left;
@@ -18,12 +19,12 @@ uContainer u_container_new(int num, float left, float top) {
 }
 
 void u_container_kill(uContainer *self) {
-    rhc_free(self->items);
+    allocator_free(self->a, self->items);
     *self = u_container_new_invalid();
 }
 
 void u_container_set_num(uContainer *self, int num) {
-    self->items = rhc_realloc(self->items, sizeof *self->items * num);
+    self->items = allocator_realloc(self->a, self->items, sizeof *self->items * num);
     for (int i = self->num; i < num; i++)
         self->items[i] = (uContainerItem_s) {0};
     self->num = num;
@@ -244,6 +245,12 @@ bool u_container_update(uContainer *self) {
         int rows = self->mode == U_CONTAINER_MODE_FREE_V ? size_list[item->out.col] : self->out.rows;
         float rem_x = self->mode == U_CONTAINER_MODE_FREE_H ? remaining_list[item->out.row] : remaining_x;
         float rem_y = self->mode == U_CONTAINER_MODE_FREE_V ? remaining_list[item->out.col] : remaining_y;
+        float rem_x_half = rem_x/2;
+        float rem_y_half = rem_y/2;
+        if(self->on_integer_positions) {
+            rem_x_half = sca_floor(rem_x_half);
+            rem_y_half = sca_ceil(rem_y_half);
+        }
 
         switch (self->align_width) {
             case U_CONTAINER_ALIGN_START:
@@ -253,7 +260,7 @@ bool u_container_update(uContainer *self) {
                 item->out.left += self->left + rem_x;
                 break;
             case U_CONTAINER_ALIGN_CENTER:
-                item->out.left += self->left + rem_x / 2;
+                item->out.left += self->left + rem_x_half;
                 break;
             case U_CONTAINER_ALIGN_BLOCK:
                 item->out.left += self->left + (item->out.col * rem_x) / isca_max(1, cols - 1);
@@ -271,7 +278,7 @@ bool u_container_update(uContainer *self) {
                 item->out.top += self->top - rem_y;
                 break;
             case U_CONTAINER_ALIGN_CENTER:
-                item->out.top += self->top - rem_y / 2;
+                item->out.top += self->top - rem_y_half;
                 break;
             case U_CONTAINER_ALIGN_BLOCK:
                 item->out.top += self->top - (item->out.row * rem_y) / isca_max(1, rows - 1);
@@ -343,6 +350,10 @@ bool u_container_update(uContainer *self) {
             break;
     }
 
+    if(self->on_integer_positions) {
+        self->out.left = sca_floor(self->out.left);
+        self->out.top = sca_ceil(self->out.top);
+    }
 
     return placed_all;
 }

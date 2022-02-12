@@ -29,6 +29,7 @@ typedef struct Brush {
     uColor_s current_color;
     uColor_s secondary_color;
     enum brush_modes mode;
+    bool secondary_as_current;
     bool shading_active;
     bool render_hover_preview;
     bool auto_save_config;

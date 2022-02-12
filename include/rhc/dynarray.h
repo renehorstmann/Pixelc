@@ -65,9 +65,9 @@ static bool RHC_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
 
 // Foo foo_new_a(size_t start_capacity, Allocator_i a)
 static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t start_capacity, Allocator_i a) {
-    assume(allocator_valid(a), "allocator needs to be valid");
+    assume(allocator_valid(a), "a needs to be valid");
     CLASS self = {
-            a.malloc(a, start_capacity * sizeof(TYPE)),
+            allocator_malloc(a, start_capacity * sizeof(TYPE)),
             0,
             start_capacity,
             a
@@ -121,7 +121,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone)(TYPE *to_clone, size_t n) {
 static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
     // valid
     if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
-        self->allocator.free(self->allocator, self->array);
+        allocator_free(self->allocator, self->array);
     }
     // new_invalid_a
     *self = RHC_NAME_CONCAT2(FN_NAME, _new_invalid_a)(self->allocator);
@@ -133,7 +133,7 @@ static void RHC_NAME_CONCAT2(FN_NAME, _set_capacity)(CLASS *self, size_t capacit
     if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self))
         return;
 
-    void *array = self->allocator.realloc(self->allocator, self->array, capacity * sizeof(TYPE));
+    void *array = allocator_realloc(self->allocator, self->array, capacity * sizeof(TYPE));
     if(!array) {
         // kill
         rhc_error = "dynarray_set_capacity failed";

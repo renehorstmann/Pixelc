@@ -20,8 +20,7 @@ bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8) {
     if (!u_image_contains(img, cr.x, cr.y))
         return false;
 
-    self->brush_ref->secondary_color = *u_image_pixel(img, cr.x, cr.y, layer);
-    if (u_color_equals(self->brush_ref->current_color, self->brush_ref->secondary_color))
+    if (u_color_equals(self->brush_ref->current_color, *u_image_pixel(img, cr.x, cr.y, layer)))
         return false;
 
     bool shading_was_active = self->brush_ref->shading_active;
@@ -76,8 +75,7 @@ bool brushmode_replace(BrushMode *self, ePointer_s pointer) {
     if (!u_image_contains(img, cr.x, cr.y))
         return false;
 
-    self->brush_ref->secondary_color = *u_image_pixel(img, cr.x, cr.y, layer);
-    if (u_color_equals(self->brush_ref->current_color, self->brush_ref->secondary_color))
+    if (u_color_equals(self->brush_ref->current_color, *u_image_pixel(img, cr.x, cr.y, layer)))
         return false;
 
     bool shading_was_active = self->brush_ref->shading_active;

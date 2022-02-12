@@ -87,7 +87,11 @@ static void toolbar_container_update(ToolbarContainer *self, float start_pos, fl
         bg_w = self->container.out.size.x;
         bg_h = camera_height(refs.cam);
     }
-    self->bg.rect.pose = u_pose_new_aa(self->container.left, self->container.top, bg_w, bg_h);
+
+
+    bg_w = self->container.out.size.x;
+    bg_h = self->container.out.size.y;
+    self->bg.rect.pose = u_pose_new_aa(self->container.out.left, self->container.out.top, bg_w, bg_h);
     self->bg.rect.uv = u_pose_new(0, 0, bg_w / 2, bg_h / 2);
 }
 
@@ -165,28 +169,43 @@ static void show_selection_move(Toolbar *self) {
 // public
 //
 
-Toolbar *toolbar_new(Camera_s *cam, Canvas *canvas,
-                     Brush *brush, Palette *palette,
+Toolbar *toolbar_new(Camera_s *cam, 
+                     CameraCtrl *camctrl,
+                     Canvas *canvas,
+                     Brush *brush, 
+                     Palette *palette,
                      SelectionCtrl *selectionctrl,
+                     Animation *animation,
                      uColor_s active_bg_a, uColor_s active_bg_b,
                      uColor_s secondary_bg_a, uColor_s secondary_bg_b,
                      uColor_s selection_bg_a, uColor_s selection_bg_b) {
     Toolbar *self = rhc_calloc(sizeof *self);
 
     self->refs = (ToolRefs) {
-            cam, canvas, brush, palette, selectionctrl
+            cam, camctrl, canvas, brush, palette, selectionctrl, animation
     };
 
-
+    self->tools.clear = tool_new_clear();
     self->tools.undo = tool_new_undo();
     self->tools.redo = tool_new_redo();
     self->tools.import = tool_new_import();
     self->tools.selection = tool_new_selection();
+    self->tools.kernel = tool_new_kernel();
+    self->tools.secondary_color = tool_new_secondary_color();
+    self->tools.shading = tool_new_shading();
+    self->tools.camera = tool_new_camera();
+    self->tools.grid = tool_new_grid();
+    self->tools.preview = tool_new_preview();
 
     self->selection_set_tools.move = tool_new_selection_set_move();
     self->selection_set_tools.copy = tool_new_selection_set_copy();
     self->selection_set_tools.cut = tool_new_selection_set_cut();
     
+    self->selection_paste_tools.rotate_l = tool_new_selection_paste_rotate_l();
+    self->selection_paste_tools.rotate_r = tool_new_selection_paste_rotate_r();
+    self->selection_paste_tools.mirror_v = tool_new_selection_paste_mirror_v();
+    self->selection_paste_tools.mirror_h = tool_new_selection_paste_mirror_h();
+    self->selection_paste_tools.blend = tool_new_selection_paste_blend();
     self->selection_paste_tools.copy = tool_new_selection_paste_copy();
     self->selection_paste_tools.ok = tool_new_selection_paste_ok();
 

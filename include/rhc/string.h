@@ -13,9 +13,9 @@ static String string_new_invalid_a(Allocator_i a);
 
 // allocated start_capacity + 1 (null)
 static String string_new_a(size_t start_capacity, Allocator_i a) {
-    assume(allocator_valid(a), "allocator needs to be valid");
+    assume(allocator_valid(a), "a needs to be valid");
     String self = {
-            .str.data = a.malloc(a, start_capacity + 1),
+            .str.data = allocator_malloc(a, start_capacity + 1),
             .str.size = 0,
             .capacity = start_capacity,
             .allocator = a
@@ -38,7 +38,7 @@ static String string_new_invalid_a(Allocator_i a) {
     return self;
 }
 
-// new empty invalid string with the default allocator
+// new empty invalid string with the default a
 static String string_new_invalid() {
     String self = {0};
     self.allocator = RHC_DEFAULT_ALLOCATOR;
@@ -85,14 +85,14 @@ static String string_new_replace(Str_s to_replace, Str_s old, Str_s replacement)
 // concatenates all strs
 static String string_new_cat_a(Str_s *strs, int n, Allocator_i a) {
     size_t size = 0;
-    for(size_t i=0; i<n; i++) {
+    for(int i=0; i<n; i++) {
         size += str_empty(strs[i])? 0 : strs[i].size;
     }
     String res = string_new_a(size, a);
     if(!string_valid(res))
         return res;
 
-    for(size_t i=0; i<n; i++) {
+    for(int i=0; i<n; i++) {
         if(!str_empty(strs[i])) {
             str_cpy(strs[i], (Str_s) {res.data + res.size, strs[i].size});
             res.size += strs[i].size;
@@ -111,7 +111,7 @@ static void string_set_capacity(String *self, size_t capacity) {
     if(!string_valid(*self))
         return;
 
-    void *data = self->allocator.realloc(self->allocator, self->data, capacity + 1);
+    void *data = allocator_realloc(self->allocator, self->data, capacity + 1);
     if(!data) {
         string_kill(self);
         return;
