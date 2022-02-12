@@ -77,6 +77,10 @@ python3 -m http.server --bind localhost  # [port]
 - redraw buttons
   - modes in different bg color, so they match
   - dither inv
+- preview
+  - instead of animation
+  - how to animate
+  - frame times?
 - some
   - uImage
     - scale as + interpolation options
