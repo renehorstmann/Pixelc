@@ -10,7 +10,6 @@
 #include "selectionctrl.h"
 #include "cameractrl.h"
 #include "palette.h"
-#include "toolbar_old.h"
 #include "toolbar.h"
 #include "inputctrl.h"
 #include "multitouchcursor.h"
@@ -78,7 +77,6 @@ static struct {
     Brush *brush;
     Palette *palette;
     CameraCtrl *camctrl;
-    ToolbarOld *toolbar_old;
     Toolbar *toolbar;
     InputCtrl *inputctrl;
     MultiTouchCursor *mtc;
@@ -104,7 +102,6 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
 
-    //L.toolbar_old = toolbar_old_new(L.camera, L.canvas, L.brush, L.selectionctrl, L.camctrl, L.animation);
     L.toolbar = toolbar_new(L.camera, 
                             L.camctrl,
                             L.canvas,
@@ -122,7 +119,7 @@ static void init(eSimple *simple, ivec2 window_size) {
 
     L.mtc = multitouchcursor_new(L.camera, L.brush, L.palette);
 
-    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl, L.toolbar_old,
+    L.inputctrl = inputctrl_new(simple->input, L.camera, L.camera, L.palette, L.brush, L.selectionctrl,
                                 L.toolbar, L.camctrl, L.mtc);
 
 
@@ -150,23 +147,9 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     selectionctrl_update(L.selectionctrl, dtime);
     L.brush->in.selection_ref = L.selectionctrl->selection;
 
-    /*
-    if (L.selectionctrl->out.show_copy_cut) {
-        L.selectionctrl->out.show_copy_cut = false;
-        L.toolbar_old->show_selection_copy_cut = true;
-    }
-    if (L.selectionctrl->out.show_ok) {
-        L.selectionctrl->out.show_ok = false;
-        L.toolbar_old->show_selection_ok = true;
-        L.toolbar_old->show_selection_copy_cut = false;
-    }
-    */
-
-    //toolbar_old_update(L.toolbar_old, dtime);
     toolbar_update(L.toolbar, dtime);
 
     multitouchcursor_update(L.mtc, dtime);
-
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
@@ -183,7 +166,6 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     multitouchcursor_render(L.mtc, hud_cam);
     toolbar_render(L.toolbar, hud_cam);
     palette_render(L.palette, hud_cam);
-    //toolbar_old_render(L.toolbar_old, hud_cam);
 }
 
 int main(int argc, char **argv) {

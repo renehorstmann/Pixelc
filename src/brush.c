@@ -12,8 +12,8 @@
 
 enum draw_kernel_mode {
     DRAW_NORMAL,
-    DRAW_DITHER_A,
-    DRAW_DITHER_B,
+    DRAW_DITHER,
+    DRAW_DITHER_INV,
     DRAW_NUM_MODES
 };
 
@@ -37,7 +37,7 @@ static bool draw_kernel(Brush *self, int c, int r, enum draw_kernel_mode mode) {
    int kernel_offset_col = -(self->RO.kernel.cols-0.5)/2;
    int kernel_offset_row = -(self->RO.kernel.rows-0.5)/2;
    
-   if(mode == DRAW_DITHER_A || mode == DRAW_DITHER_B) {
+   if(mode == DRAW_DITHER || mode == DRAW_DITHER_INV) {
        c = (c-kernel_offset_col)/self->RO.kernel.cols * self->RO.kernel.cols;
        r = (r-kernel_offset_row)/self->RO.kernel.rows * self->RO.kernel.rows;
    }
@@ -51,7 +51,7 @@ static bool draw_kernel(Brush *self, int c, int r, enum draw_kernel_mode mode) {
            
            uColor_s kernel_color = *u_image_pixel(self->RO.kernel, kc, kr, 0);
            
-           if(mode == DRAW_DITHER_B) {
+           if(mode == DRAW_DITHER_INV) {
                kernel_color = ucvec4_sub_vec(U_COLOR_WHITE, kernel_color);
            }
            
@@ -110,7 +110,7 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
         switch (self->mode) {
             case BRUSH_MODE_FREE:
             case BRUSH_MODE_DITHER:
-            case BRUSH_MODE_DITHER2:
+            case BRUSH_MODE_DITHER_INV:
             case BRUSH_MODE_DOT:
                 pointer.action = E_POINTER_DOWN;
             default:
@@ -122,7 +122,7 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
     switch (self->mode) {
         case BRUSH_MODE_FREE:
         case BRUSH_MODE_DITHER:
-        case BRUSH_MODE_DITHER2:
+        case BRUSH_MODE_DITHER_INV:
             change = brushmode_free(self->brushmode, pointer);
             break;
         case BRUSH_MODE_DOT:
@@ -181,10 +181,10 @@ bool brush_draw_pixel(Brush *self, int c, int r, uColor_s kernel_color) {
 
 bool brush_draw(Brush *self, int c, int r) {
     if (self->mode == BRUSH_MODE_DITHER) {
-        return draw_kernel(self, c, r, DRAW_DITHER_A);
+        return draw_kernel(self, c, r, DRAW_DITHER);
     }
-    if (self->mode == BRUSH_MODE_DITHER2) {
-        return draw_kernel(self, c, r, DRAW_DITHER_B);
+    if (self->mode == BRUSH_MODE_DITHER_INV) {
+        return draw_kernel(self, c, r, DRAW_DITHER_INV);
     }
     return draw_kernel(self, c, r, DRAW_NORMAL);
 }

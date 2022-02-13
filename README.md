@@ -77,6 +77,7 @@ python3 -m http.server --bind localhost  # [port]
 - redraw buttons
   - modes in different bg color, so they match
   - dither inv
+- color picker mode (tip on canvas to change secondary color)
 - preview
   - instead of animation
   - how to animate

@@ -6,7 +6,7 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 11
+#define TOOLBAR_TOOLS_LEN 18
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -42,6 +42,14 @@ typedef struct {
             Tool *camera;
             Tool *grid;
             Tool *preview;
+            
+            Tool *mode_free;
+            Tool *mode_dot;
+            Tool *mode_dither;
+            Tool *mode_dither_inv;
+            Tool *mode_fill;
+            Tool *mode_fill8;
+            Tool *mode_replace;
         } tools;
     };
     

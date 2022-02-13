@@ -196,6 +196,15 @@ Toolbar *toolbar_new(Camera_s *cam,
     self->tools.camera = tool_new_camera();
     self->tools.grid = tool_new_grid();
     self->tools.preview = tool_new_preview();
+    
+    self->tools.mode_free = tool_new_mode_free();
+    self->tools.mode_dot = tool_new_mode_dot();
+    self->tools.mode_dither = tool_new_mode_dither();
+    self->tools.mode_dither_inv = tool_new_mode_dither_inv();
+    self->tools.mode_fill = tool_new_mode_fill();
+    self->tools.mode_fill8 = tool_new_mode_fill8();
+    self->tools.mode_replace = tool_new_mode_replace();
+
 
     self->selection_set_tools.move = tool_new_selection_set_move();
     self->selection_set_tools.copy = tool_new_selection_set_copy();
