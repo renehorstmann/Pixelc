@@ -238,14 +238,15 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
             diff = pointer.pos.y - self->L.change_swipe_start.y;
         }
         if(diff>CHANGE_SWIPE_MIN_DISTANCE) {
-            int id = self->RO.palette_id+1;
-            id %= self->RO.max_palettes;
-            palette_load_palette(self, id);
-            self->L.change_swipe_time = -1;
-        } else if(diff<=-CHANGE_SWIPE_MIN_DISTANCE) {
             int id = self->RO.palette_id-1;
             if(id<0)
                 id = self->RO.max_palettes-1;
+            palette_load_palette(self, id);
+            self->L.change_swipe_time = -1;
+            
+        } else if(diff<=-CHANGE_SWIPE_MIN_DISTANCE) {
+            int id = self->RO.palette_id+1;
+            id %= self->RO.max_palettes;
             palette_load_palette(self, id);
             self->L.change_swipe_time = -1;
         }

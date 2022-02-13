@@ -55,8 +55,14 @@ static uImage palette_6() {
     return u_image_new_file(1, "res/palettes/lospec500-1x.png");
 }
 
-static const char *name_7 = "pixilmatt.png";
+static const char *name_7 = "vinik24.png";
 static uImage palette_7() {
+    return u_image_new_file(1, "res/palettes/vinik24-1x.png");
+}
+
+
+static const char *name_999 = "pixilmatt.png";
+static uImage palette_999() {
     uImage self = u_image_new_empty(37, 1, 1);
     const char *hex[37] = {
             "#ffffff",
@@ -122,6 +128,8 @@ uImage *palette_defaults_new() {
     *it++ = palette_6();
     *it++ = palette_7();
     
+    *it++ = palette_999();
+        
     *it = u_image_new_invalid();
     return self;
 }
@@ -137,7 +145,7 @@ void palette_defaults_kill(uImage **self_ptr) {
 }
 
 char *palette_defaults_name_on_heap(int id) {
-    assume(id>=0 && id<8, "wtf?");
+    assume(id>=0 && id<9, "wtf?");
     char *name = rhc_calloc(32);
     if(id==0)
         strcpy(name, name_0);
@@ -155,5 +163,7 @@ char *palette_defaults_name_on_heap(int id) {
         strcpy(name, name_6);
     if(id==7)
         strcpy(name, name_7);
+    if(id==8)
+        strcpy(name, name_999);
     return name;
 }
