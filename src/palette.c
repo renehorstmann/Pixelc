@@ -424,11 +424,11 @@ void palette_reset_palette_files(Palette *self) {
     for(int i=0; i<self->RO.max_palettes; i++)
         rhc_free(self->L.palette_files[i]);
     
-    self->L.palette_files = rhc_realloc(self->L.palette_files, sizeof *self->L.palette_files * 16);
+    self->L.palette_files = rhc_realloc(self->L.palette_files, sizeof *self->L.palette_files * 32);
     
     int i;
     for(i=0; u_image_valid(palettes[i]); i++) {
-        assume(i<16, "change max default palettes");
+        assume(i<32, "change max default palettes");
         char *name = palette_defaults_name_on_heap(i);
         char file[256];
         snprintf(file, sizeof file, "palette_%s", name);

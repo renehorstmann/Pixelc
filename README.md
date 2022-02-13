@@ -61,10 +61,6 @@ python3 -m http.server --bind localhost  # [port]
 ## Todo
 - toolbar bg?
 - landscape bug
-- palettes
-  - game boy
-  - nes
-  - more top of lospec
 - preview
   - instead of animation
   - how to animate
