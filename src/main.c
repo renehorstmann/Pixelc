@@ -148,7 +148,6 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     L.brush->in.selection_ref = L.selectionctrl->selection;
 
     toolbar_update(L.toolbar, dtime);
-
     multitouchcursor_update(L.mtc, dtime);
 }
 
