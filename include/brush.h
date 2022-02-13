@@ -10,6 +10,7 @@
 struct Toolbar;
 
 enum brush_modes {
+    BRUSH_MODE_NONE,
     BRUSH_MODE_FREE,
     BRUSH_MODE_DOT,
     BRUSH_MODE_DITHER,
@@ -17,6 +18,7 @@ enum brush_modes {
     BRUSH_MODE_FILL,
     BRUSH_MODE_FILL8,
     BRUSH_MODE_REPLACE,
+    BRUSH_MODE_PIPETTE,
     BRUSH_NUM_MODES
 };
 

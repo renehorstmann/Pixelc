@@ -9,6 +9,28 @@
 #include "tool.h"
 
 
+static void none_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_pressed(&self->ro.rect, pointer)) {
+        log_info("tool mode none");
+        refs.brush->mode = BRUSH_MODE_NONE;
+    } 
+}
+static bool none_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, refs.brush->mode == BRUSH_MODE_NONE);
+    // always active
+    return true;
+}      
+Tool *tool_new_mode_none() {
+    return tool_button_new("none", 
+            "does nothing on the canvas", 
+            "res/button_cross.png", 
+            none_pe,
+            none_is_a);
+}
+
+
 static void free_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
     if(button_pressed(&self->ro.rect, pointer)) {
@@ -158,4 +180,25 @@ Tool *tool_new_mode_replace() {
             "res/button_replace.png", 
             replace_pe,
             replace_is_a);
+}
+
+static void pipette_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_pressed(&self->ro.rect, pointer)) {
+        log_info("tool mode pipette");
+        refs.brush->mode = BRUSH_MODE_PIPETTE;
+    } 
+}
+static bool pipette_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, refs.brush->mode == BRUSH_MODE_PIPETTE);
+    // always active
+    return true;
+}      
+Tool *tool_new_mode_pipette() {
+    return tool_button_new("pipette", 
+            "select a color on the canvas as secondary color", 
+            "res/button_pipette.png", 
+            pipette_pe,
+            pipette_is_a);
 }

@@ -65,7 +65,6 @@ python3 -m http.server --bind localhost  # [port]
   - game boy
   - nes
   - more top of lospec
-- color picker mode (tip on canvas to change secondary color)
 - preview
   - instead of animation
   - how to animate

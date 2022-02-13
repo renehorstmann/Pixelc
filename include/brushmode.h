@@ -27,6 +27,8 @@ bool brushmode_free(BrushMode *self, ePointer_s pointer);
 
 bool brushmode_free_line(BrushMode *self, ePointer_s pointer);
 
+void brushmode_pipette(BrushMode *self, ePointer_s pointer);
+
 bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8);
 
 bool brushmode_replace(BrushMode *self, ePointer_s pointer);

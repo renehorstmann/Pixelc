@@ -120,6 +120,8 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
 
     bool change = false;
     switch (self->mode) {
+        case BRUSH_MODE_NONE:
+            break;
         case BRUSH_MODE_FREE:
         case BRUSH_MODE_DITHER:
         case BRUSH_MODE_DITHER_INV:
@@ -136,6 +138,9 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
             break;
         case BRUSH_MODE_REPLACE:
             change = brushmode_replace(self->brushmode, pointer);
+            break;
+        case BRUSH_MODE_PIPETTE:
+            brushmode_pipette(self->brushmode, pointer);
             break;
         default:
             log_wtf("brush unknown mode");

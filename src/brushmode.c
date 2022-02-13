@@ -97,3 +97,17 @@ bool brushmode_free_line(BrushMode *self, ePointer_s pointer) {
     self->L.last = cr;
     return changed;
 }
+
+
+void brushmode_pipette(BrushMode *self, ePointer_s pointer) {
+    if (pointer.action != E_POINTER_DOWN)
+        return;
+
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    uImage img = self->canvas_ref->RO.image;
+    
+    if(!u_image_contains(img, cr.x, cr.y))
+        return;
+        
+    self->brush_ref->secondary_color = *u_image_pixel(img, cr.x, cr.y, self->canvas_ref->current_layer);
+}
