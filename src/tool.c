@@ -8,6 +8,8 @@
 #include "button.h"
 #include "tool.h"
 
+#include "tooltip.h"
+
 static void tool_button_kill(Tool **super_ptr) {
     ToolButton *self = (ToolButton*) *super_ptr;
     if(!self)
@@ -87,6 +89,37 @@ Tool *tool_button_new(const char *name,
 //  
 
 
+static void tool_tooltip_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(!button_toggled(&self->ro.rect, pointer))
+        return;
+    
+    // only passed if button state toggled
+    bool pressed = button_is_pressed(&self->ro.rect);
+    if(pressed) {
+        log_info("tool tooltip start");
+        tooltip_set(refs.tooltip, "tooltip", "click on a tool\nto get its tip");
+    } else {
+        log_info("tool tooltip stop");
+        refs.tooltip->active = false;
+    }
+    
+}
+static bool tool_tooltip_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    button_set_pressed(&self->ro.rect, refs.tooltip->active);
+    // always active
+    return true;
+}      
+Tool *tool_new_tooltip() {
+    return tool_button_new("tooltip", 
+            "click on a tool\nto get its tip", 
+            "res/button_tooltip.png", 
+            tool_tooltip_pe,
+            tool_tooltip_is_a);
+}
+
+
 static void tool_clear_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
     if(self->active && button_clicked(&self->ro.rect, pointer)) {
@@ -96,7 +129,7 @@ static void tool_clear_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs)
 }
 Tool *tool_new_clear() {
     return tool_button_new("clear", 
-            "resets the canvas or selection to transparent", 
+            "resets the canvas\nor selection\nto transparent", 
             "res/button_clear.png", 
             tool_clear_pe,
             NULL);
@@ -115,7 +148,7 @@ static bool tool_undo_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_undo() {
     return tool_button_new("undo", 
-            "undos the last canvas changes", 
+            "undos the last\ncanvas changes", 
             "res/button_undo.png", 
             tool_undo_pe,
             tool_undo_is_a);
@@ -135,7 +168,7 @@ static bool tool_redo_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_redo() {
     return tool_button_new("redo", 
-            "redos the undone canvas changes", 
+            "redos the undone\ncanvas changes", 
             "res/button_redo.png", 
             tool_redo_pe,
             tool_redo_is_a);
@@ -154,7 +187,7 @@ static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs
 }
 Tool *tool_new_import() {
     return tool_button_new("import", 
-            "loads import.png as selection", 
+            "loads import.png\nas selection", 
             "res/button_import.png", 
             tool_import_pe,
             NULL);
@@ -185,7 +218,7 @@ static bool tool_selection_is_a(struct Tool *super, float dtime, ToolRefs refs) 
 }      
 Tool *tool_new_selection() {
     return tool_button_new("selection", 
-            "toggle a canvas selection", 
+            "toggle a\ncanvas selection", 
             "res/button_selection.png", 
             tool_selection_pe,
             tool_selection_is_a);
@@ -334,7 +367,7 @@ Tool *tool_new_kernel() {
     self->plus.rect.pose = u_pose_new(0, 0, 16, 16);
     
     snprintf(self->super.name, TOOL_NAME_LEN, "kernel");
-    snprintf(self->super.tip, TOOL_TIP_LEN, "select a kernel / stamp");
+    snprintf(self->super.tip, TOOL_TIP_LEN, "select a \nkernel / stamp");
 
     self->super.kill = tool_kernel_kill;
     self->super.update = tool_kernel_update;
@@ -428,7 +461,7 @@ Tool *tool_new_secondary_color() {
     self->color_drop.rect.pose = self->bg.rect.pose;
 
     snprintf(self->super.name, TOOL_NAME_LEN, "secondary color");
-    snprintf(self->super.tip, TOOL_TIP_LEN, "tip to use / hold to set");
+    snprintf(self->super.tip, TOOL_TIP_LEN, "tip to use\n\nhold to set");
 
     self->super.size = vec2_cast_from_int(self->bg.tex.sprite_size.v);
 
@@ -460,7 +493,7 @@ static bool tool_shading_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_shading() {
     return tool_button_new("shading", 
-            "only paint above the secondary color", 
+            "only paint above\nthe secondary color", 
             "res/button_shade.png", 
             tool_shading_pe,
             tool_shading_is_a);
@@ -502,7 +535,7 @@ static bool tool_grid_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_grid() {
     return tool_button_new("grid", 
-            "enables and disables a pixel grid", 
+            "enables and disables\na pixel grid", 
             "res/button_grid.png", 
             tool_grid_pe,
             tool_grid_is_a);
@@ -526,7 +559,7 @@ static bool tool_preview_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_preview() {
     return tool_button_new("preview", 
-            "shows the animated preview", 
+            "shows the\nanimated preview", 
             "res/button_play.png", 
             tool_preview_pe,
             tool_preview_is_a);

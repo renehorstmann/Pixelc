@@ -177,7 +177,7 @@ Tool *tool_new_selection_set_move() {
     }
 
     snprintf(self->super.name, TOOL_NAME_LEN, "move");
-    snprintf(self->super.tip, TOOL_TIP_LEN, "move the selection borders");
+    snprintf(self->super.tip, TOOL_TIP_LEN, "move the\nselection borders");
 
     self->super.kill = move_kill;
     self->super.update = move_update;
@@ -208,7 +208,7 @@ static bool copy_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }
 Tool *tool_new_selection_set_copy() {
     return tool_button_new("copy",
-            "copies the selection",
+            "copies\nthe selection",
             "res/button_copy.png",
             copy_pe,
             copy_is_a);
@@ -235,7 +235,7 @@ static bool cut_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }
 Tool *tool_new_selection_set_cut() {
     return tool_button_new("cut",
-            "cuts the selection",
+            "cuts\nthe selection",
             "res/button_cut.png",
             cut_pe,
             cut_is_a);

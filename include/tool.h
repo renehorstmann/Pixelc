@@ -17,6 +17,8 @@
 #define TOOL_BUTTON_ADDITIONAL_DATA_SIZE 64
 #define TOOL_LONG_PRESS_TIME 0.75
 
+struct Tooltip;
+
 typedef struct {
     Camera_s *cam;
     CameraCtrl *camctrl;
@@ -25,6 +27,7 @@ typedef struct {
     Palette *palette;
     SelectionCtrl *selectionctrl;
     Animation *animation;
+    struct Tooltip *tooltip;
 } ToolRefs;
 
 
@@ -81,6 +84,7 @@ Tool *tool_button_new(const char *name,
 // tool list
 //
 
+Tool *tool_new_tooltip();
 Tool *tool_new_clear();
 Tool *tool_new_undo();
 Tool *tool_new_redo();

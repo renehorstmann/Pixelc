@@ -24,7 +24,7 @@ static bool none_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_none() {
     return tool_button_new("none", 
-            "does nothing on the canvas", 
+            "does nothing\non the canvas", 
             "res/button_cross.png", 
             none_pe,
             none_is_a);
@@ -46,7 +46,7 @@ static bool free_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_free() {
     return tool_button_new("free", 
-            "draw free on the canvas", 
+            "draw free\non the canvas", 
             "res/button_free.png", 
             free_pe,
             free_is_a);
@@ -90,7 +90,7 @@ static bool dither_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_dither() {
     return tool_button_new("dither", 
-            "draws in a grid for dithering", 
+            "draws in a grid\nfor dithering", 
             "res/button_dither.png", 
             dither_pe,
             dither_is_a);
@@ -111,7 +111,7 @@ static bool dither_inv_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_dither_inv() {
     return tool_button_new("dither inverted", 
-            "draws the inverted kernel in a grid for dithering", 
+            "draws the\ninverted kernel\nin a grid\nfor dithering", 
             "res/button_dither_inv.png", 
             dither_inv_pe,
             dither_inv_is_a);
@@ -133,7 +133,7 @@ static bool fill_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_fill() {
     return tool_button_new("fill", 
-            "fills a touched color with mode4", 
+            "fills a\ntouched color\nwith mode4", 
             "res/button_fill.png", 
             fill_pe,
             fill_is_a);
@@ -154,7 +154,7 @@ static bool fill8_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_fill8() {
     return tool_button_new("fill8", 
-            "fills a touched color with mode8", 
+            "fills a\ntouched color\nwith mode8", 
             "res/button_fill8.png", 
             fill8_pe,
             fill8_is_a);
@@ -176,7 +176,7 @@ static bool replace_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_replace() {
     return tool_button_new("replace", 
-            "replaces the touched color", 
+            "replaces the\ntouched color", 
             "res/button_replace.png", 
             replace_pe,
             replace_is_a);
@@ -197,7 +197,7 @@ static bool pipette_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_pipette() {
     return tool_button_new("pipette", 
-            "select a color on the canvas as secondary color", 
+            "select a color\non the canvas\nas secondary color", 
             "res/button_pipette.png", 
             pipette_pe,
             pipette_is_a);

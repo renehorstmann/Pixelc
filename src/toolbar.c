@@ -115,6 +115,21 @@ static bool toolbar_container_contains(const ToolbarContainer *self, vec2 pos) {
             self->container.out.size.y), pos);
 }
 
+// returns NULL if not found
+static Tool *toolbar_container_get_tool_by_pos(const ToolbarContainer *self, vec2 pos) {
+    if(!toolbar_container_contains(self, pos))
+        return NULL;
+    for(int i=0; i<self->tools_len; i++) {
+        Tool *t = self->tools[i];
+        if(pos.x>=t->in.pos.x 
+                && pos.y<=t->in.pos.y
+                && pos.x<=t->in.pos.x+t->size.x
+                && pos.y>=t->in.pos.y-t->size.y)
+            return t;
+    }
+    return NULL;
+}
+
 // returns toolbar_contains(pointer.pos.xy)
 static bool toolbar_container_pointer_event(ToolbarContainer *self, ePointer_s pointer, ToolRefs refs) {
     if(!toolbar_container_valid(self))
@@ -176,15 +191,17 @@ Toolbar *toolbar_new(Camera_s *cam,
                      Palette *palette,
                      SelectionCtrl *selectionctrl,
                      Animation *animation,
+                     struct Tooltip *tooltip,
                      uColor_s active_bg_a, uColor_s active_bg_b,
                      uColor_s secondary_bg_a, uColor_s secondary_bg_b,
                      uColor_s selection_bg_a, uColor_s selection_bg_b) {
     Toolbar *self = rhc_calloc(sizeof *self);
 
     self->refs = (ToolRefs) {
-            cam, camctrl, canvas, brush, palette, selectionctrl, animation
+            cam, camctrl, canvas, brush, palette, selectionctrl, animation, tooltip
     };
 
+    self->tools.tooltip = tool_new_tooltip();
     self->tools.clear = tool_new_clear();
     self->tools.undo = tool_new_undo();
     self->tools.redo = tool_new_redo();
@@ -295,11 +312,23 @@ float toolbar_size(const Toolbar *self) {
             + toolbar_constainer_size(&self->selection, self->refs.cam);
 }
 
-// returns true if pos is within the toolbar
 bool toolbar_contains(const Toolbar *self, vec2 pos) {
     return toolbar_container_contains(&self->active, pos)
             || toolbar_container_contains(&self->secondary, pos)
             || toolbar_container_contains(&self->selection, pos);
 }
 
+Tool *toolbar_get_tool_by_pos(const Toolbar *self, vec2 pos) {
+    Tool *t;
+    t = toolbar_container_get_tool_by_pos(&self->active, pos);
+    if(t)
+        return t;
+        
+    t = toolbar_container_get_tool_by_pos(&self->secondary, pos);
+    if(t)
+        return t;
+        
+    t = toolbar_container_get_tool_by_pos(&self->selection, pos);
+    return t;
+}
 

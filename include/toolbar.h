@@ -6,7 +6,7 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 20
+#define TOOLBAR_TOOLS_LEN 21
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -31,6 +31,7 @@ typedef struct {
     union {
         Tool *all_tools[TOOLBAR_TOOLS_LEN];
         struct {
+            Tool *tooltip;
             Tool *clear;
             Tool *undo;
             Tool *redo;
@@ -93,6 +94,7 @@ Toolbar *toolbar_new(Camera_s *cam,
         Brush *brush, Palette *palette, 
         SelectionCtrl *selectionctrl,
         Animation *animation,
+        struct Tooltip *tooltip,
         uColor_s active_bg_a, uColor_s active_bg_b,
         uColor_s secondary_bg_a, uColor_s secondary_bg_b,
         uColor_s selection_bg_a, uColor_s selection_bg_b);
@@ -108,5 +110,7 @@ float toolbar_size(const Toolbar *self);
 
 // returns true if pos is within the toolbar
 bool toolbar_contains(const Toolbar *self, vec2 pos);
+// returns NULL if not found
+Tool *toolbar_get_tool_by_pos(const Toolbar *self, vec2 pos);
 
 #endif //PIXELC_TOOLBAR_H
