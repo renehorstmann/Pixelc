@@ -18,15 +18,14 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     ePointer_s c_pointer = pointer;
     c_pointer.pos = mat4_mul_vec(self->camera_ref->matrices.v_p_inv, pointer.pos);
 
-
-    // only UP in all cases
-    bool go = true;
-    bool set_go = pointer.action == E_POINTER_UP;
-
     if (tooltip_pointer_event(self->tooltip_ref, hud_pointer)) {
         // always return here, so the tools are not toggles
         return;
     }
+
+    // only UP in all cases
+    bool go = true;
+    bool set_go = pointer.action == E_POINTER_UP;
 
     if (go && multitouchcursor_pointer_event(self->mtc_ref, hud_pointer)) 
         go = set_go;

@@ -66,7 +66,10 @@ bool tooltip_pointer_event(Tooltip *self, ePointer_s pointer) {
     
     Tool *tool = toolbar_get_tool_by_pos(self->toolbar_ref, pointer.pos.xy);
     
-    if(!tool || strcmp(tool->name, "tooltip")==0)
+    if(!tool)
+        return true;
+    
+    if(strcmp(tool->name, "tooltip")==0)
         return false;
     
     tooltip_set(self, tool->name, tool->tip);
