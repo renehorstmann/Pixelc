@@ -20,8 +20,8 @@
 
 // canvas size
 //*
-#define COLS 32
-#define ROWS 16
+#define COLS 64
+#define ROWS 64
 #define LAYERS 1
 //*/
 
@@ -159,12 +159,13 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     background_render(L.background, hud_cam);
 
 
-    animation_render(L.animation, hud_cam);
+    
     canvas_render(L.canvas, canvas_cam);
     selectionctrl_render(L.selectionctrl, canvas_cam);
     multitouchcursor_render(L.mtc, hud_cam);
     toolbar_render(L.toolbar, hud_cam);
     palette_render(L.palette, hud_cam);
+    animation_render(L.animation, hud_cam);
 }
 
 int main(int argc, char **argv) {

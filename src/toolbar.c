@@ -228,6 +228,7 @@ Toolbar *toolbar_new(Camera_s *cam,
     self->L.selection_bg_b = selection_bg_b;
 
     self->active = toolbar_container_new(self->all_tools, TOOLBAR_TOOLS_LEN, active_bg_a, active_bg_b);
+    self->active.align = U_CONTAINER_ALIGN_CENTER;
     return self;
 }
 

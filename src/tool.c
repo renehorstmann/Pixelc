@@ -303,9 +303,15 @@ static void tool_kernel_update(struct Tool *super, float dtime, ToolRefs refs) {
             if(self->pressed == 1) {
                 log_info("tool kernel_minus long press");
                 brush_load_kernel(refs.brush, 0);
+                animation_longpress(refs.animation,
+                        u_pose_get_xy(self->minus.rect.pose), 
+                        R_COLOR_BLACK);
             } else if(self->pressed == 2) {
                 log_info("tool kernel_plus long press");
                 brush_load_kernel(refs.brush, refs.brush->RO.max_kernels-1);
+                animation_longpress(refs.animation, 
+                        u_pose_get_xy(self->plus.rect.pose), 
+                        R_COLOR_WHITE);
             }
             self->pressed = 0;
         }
@@ -397,6 +403,11 @@ static void tool_secondary_color_update(struct Tool *super, float dtime, ToolRef
         if(self->long_press_time <= 0) {
             log_info("tool secondary_color: set");
             refs.brush->secondary_color = refs.brush->current_color;
+            vec4 col = u_color_to_vec4(refs.brush->current_color);
+            col.a = 1;
+            animation_longpress(refs.animation,
+                    u_pose_get_xy(self->color_drop.rect.pose), 
+                    col);
         }
     }
 }
