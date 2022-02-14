@@ -59,15 +59,13 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
+- mode line
 - mode circle
   - border with kernel
   - fill
 - mode rect
   - border with kernel
   - fill
-- tooltip tool 
-  - question mark button
-  - shows the tooltip of the tools in an info box
 - preview
   - instead of animation
   - how to animate
