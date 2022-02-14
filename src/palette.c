@@ -12,8 +12,7 @@
 #define COLOR_DROP_SIZE 16.0f
 #define MAX_ROWS 10
 
-#define CHANGE_SWIPE_MAX_TIME 0.5
-#define CHANGE_SWIPE_MIN_DISTANCE 40
+#define SWIPE_DISTANCE 50
 
 #define INFO_STATIC_TIME 0.5
 #define INFO_TIME 1.5
@@ -47,6 +46,18 @@ static mat4 setup_palette_color_pose(const Palette *self, int r, int c) {
 }
 
 
+// returns the swipe move difference in %
+static float swipe_diff(const Palette *self, ePointer_s pointer) {
+    float diff;
+    if(camera_is_portrait_mode(self->camera_ref)) {
+        diff = pointer.pos.x - self->L.swipe.start.x;
+    } else {
+        diff = pointer.pos.y - self->L.swipe.start.y;
+    }
+    return diff / SWIPE_DISTANCE;
+}
+
+
 //
 // public
 //
@@ -71,8 +82,11 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
     self->L.select_ro = ro_single_new(r_texture_new_file(1, 1, "res/palette_select.png"));
     
     
-    self->L.info_bg = ro_single_new(r_texture_new_file(1, 1, "res/palette_info_bg.png"));
-    self->L.info = ro_text_new_font55(20);
+    self->L.info.bg = ro_single_new(r_texture_new_file(1, 1, "res/palette_info_bg.png"));
+    self->L.info.text = ro_text_new_font55(20);
+    
+    self->L.swipe.arrow = ro_single_new(r_texture_new_file(1, 1, "res/palette_arrow.png"));
+    
 
     // default palette:
     {
@@ -90,8 +104,6 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
 
 
 void palette_update(Palette *self, float dtime) {
-    if(self->L.change_swipe_time>=0)
-        self->L.change_swipe_time-=dtime;
     
     int cols = palette_cols(self);
     int last_row = (self->RO.palette_size - 1) / cols;
@@ -151,12 +163,12 @@ void palette_update(Palette *self, float dtime) {
         self->L.select_ro.rect.pose = self->L.palette_ro.rects[self->L.last_selected].pose;
     
     // info
-    if(self->L.info_time>=0) {
-        self->L.info_time -= dtime;
+    if(self->L.info.time>0) {
+        self->L.info.time -= dtime;
     
         float pos = 4;
-        if(self->L.info_time<INFO_STATIC_TIME) {
-            pos = sca_mix(-4, 4, self->L.info_time/INFO_STATIC_TIME);
+        if(self->L.info.time<INFO_STATIC_TIME) {
+            pos = sca_mix(-4, 4, self->L.info.time/INFO_STATIC_TIME);
         }
         
         pos += palette_get_hud_size(self);
@@ -164,48 +176,56 @@ void palette_update(Palette *self, float dtime) {
         if(camera_is_portrait_mode(self->camera_ref)) {
             pos += self->camera_ref->RO.bottom;
             
-            self->L.info_bg.rect.pose = u_pose_new(
+            self->L.info.bg.rect.pose = u_pose_new(
                     0, pos, 128, 8);
                     
             pos += 2;
-            self->L.info.pose = u_pose_new(
-                    self->L.info_x_offset, pos, 
+            self->L.info.text.pose = u_pose_new(
+                    self->L.info.x_offset, pos, 
                     1, 1);
                     
         } else {
             pos = self->camera_ref->RO.right - pos;
             
-            self->L.info_bg.rect.pose = u_pose_new_angle(
+            self->L.info.bg.rect.pose = u_pose_new_angle(
                     pos, 0, 128, 8, M_PI_2);
             
             pos -= 2;
-            self->L.info.pose = u_pose_new_angle(
-                    pos, self->L.info_x_offset, 
+            self->L.info.text.pose = u_pose_new_angle(
+                    pos, self->L.info.x_offset, 
                     1, 1, M_PI_2);
         }
     }
+    
 }
 
-void palette_render(Palette *self, const mat4 *camera_mat) {
-    if(self->L.info_time>=0) {
-        ro_single_render(&self->L.info_bg, camera_mat);
-        ro_text_render(&self->L.info, camera_mat);
+void palette_render(Palette *self, const mat4 *cam_mat) {
+    if(self->L.info.time>0) {
+        ro_single_render(&self->L.info.bg, cam_mat);
+        ro_text_render(&self->L.info.text, cam_mat);
     }
-    ro_batch_render(&self->L.background_ro, camera_mat, true);
-    ro_batch_render(&self->L.palette_ro, camera_mat, true);
-    ro_single_render(&self->L.select_ro, camera_mat);
+    
+    ro_batch_render(&self->L.background_ro, cam_mat, true);
+    ro_batch_render(&self->L.palette_ro, cam_mat, true);
+    ro_single_render(&self->L.select_ro, cam_mat);
+    
+    if(self->L.swipe.swiping)
+        ro_single_render(&self->L.swipe.arrow, cam_mat);
 }
 
 
 bool palette_pointer_event(Palette *self, ePointer_s pointer) {
-    if (!palette_contains_pos(self, pointer.pos.xy))
+    if (!palette_contains_pos(self, pointer.pos.xy)) {
+        self->L.swipe.arrow.rect.color.a = 0;
+        self->L.swipe.swiping = false;
         return false;
+    }
 
     if (pointer.action == E_POINTER_DOWN) {
+        self->L.swipe.arrow.rect.color.a = 0;
+        self->L.swipe.start = pointer.pos.xy;
+        self->L.swipe.swiping = true;
         
-        self->L.change_swipe_start = pointer.pos.xy;
-        self->L.change_swipe_time = CHANGE_SWIPE_MAX_TIME;
-
         for (int i = 0; i < self->RO.palette_size; i++) {
             // pose will be rotated in landscape mode (so do not use _aa_)!
             if (u_pose_contains(self->L.palette_ro.rects[i].pose, pointer.pos)) {
@@ -216,6 +236,11 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         
         self->L.current_pressed = -1;
         return true;
+    }
+    
+    if(pointer.action == E_POINTER_UP) {
+        self->L.swipe.arrow.rect.color.a = 0;
+        self->L.swipe.swiping = false;
     }
     
     if(self->L.current_pressed!=-1
@@ -230,25 +255,40 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         self->L.current_pressed = -1;
     }
     
-    if(self->L.change_swipe_time>=0 && pointer.action == E_POINTER_MOVE) {
-        float diff;
-        if(camera_is_portrait_mode(self->camera_ref)) {
-            diff = pointer.pos.x - self->L.change_swipe_start.x;
-        } else {
-            diff = pointer.pos.y - self->L.change_swipe_start.y;
-        }
-        if(diff>CHANGE_SWIPE_MIN_DISTANCE) {
+    if(self->L.swipe.swiping && pointer.action == E_POINTER_MOVE) {
+        float diff = swipe_diff(self, pointer);
+        if(diff>1) {
             int id = self->RO.palette_id-1;
             if(id<0)
                 id = self->RO.max_palettes-1;
             palette_load_palette(self, id);
-            self->L.change_swipe_time = -1;
+            self->L.swipe.swiping = false;
             
-        } else if(diff<=-CHANGE_SWIPE_MIN_DISTANCE) {
+        } else if(diff<=-1) {
             int id = self->RO.palette_id+1;
             id %= self->RO.max_palettes;
             palette_load_palette(self, id);
-            self->L.change_swipe_time = -1;
+            self->L.swipe.swiping = false;
+            
+        }
+        
+        float alpha = sca_smoothstep(sca_abs(diff), 0.25, 1);
+        self->L.swipe.arrow.rect.color.a = alpha;
+        
+        if(camera_is_portrait_mode(self->camera_ref)) {
+            self->L.swipe.arrow.rect.pose = u_pose_new_angle(
+                sca_sign(diff) * (camera_width(self->camera_ref)/2 - 20), 
+                self->camera_ref->RO.bottom + 16,
+                32, 32,
+                sca_sign(diff) * M_PI_2 - M_PI_2
+            );
+        } else {
+            self->L.swipe.arrow.rect.pose = u_pose_new_angle(
+                self->camera_ref->RO.right - 16,
+                sca_sign(diff) * 64,
+                32, 32,
+                sca_sign(diff) * M_PI_2
+            );
         }
     }
 
@@ -261,10 +301,21 @@ float palette_get_hud_size(const Palette *self) {
     return rows * COLOR_DROP_SIZE;
 }
 
+mat4 palette_get_pose(const Palette *self) {
+    int size = palette_get_hud_size(self);
+    if (camera_is_portrait_mode(self->camera_ref)) {
+        return u_pose_new(0, self->camera_ref->RO.bottom + size/2,
+                camera_width(self->camera_ref),
+                size);
+        
+    }
+    return u_pose_new(self->camera_ref->RO.right -size/2, 0,
+                size,
+                camera_height(self->camera_ref));
+}
+
 bool palette_contains_pos(const Palette *self, vec2 pos) {
-    int cols = palette_cols(self);
-    int rows = 1 + self->RO.palette_size / cols;
-    int size = rows * COLOR_DROP_SIZE;
+    int size = palette_get_hud_size(self);
     if (camera_is_portrait_mode(self->camera_ref)) {
         return pos.y <= self->camera_ref->RO.bottom + size;
     }
@@ -297,12 +348,12 @@ void palette_set_custom_select(Palette *self, mat4 select_pose) {
 void palette_set_info(Palette *self, const char *info) {
     if(!info) {
         // hide it immediately
-        self->L.info_time = -1;
+        self->L.info.time = -1;
         return;
     }
-    vec2 size = ro_text_set_text(&self->L.info, info);
-    self->L.info_x_offset = (int) -sca_ceil(size.x/2);
-    self->L.info_time = INFO_TIME;
+    vec2 size = ro_text_set_text(&self->L.info.text, info);
+    self->L.info.x_offset = (int) -sca_ceil(size.x/2);
+    self->L.info.time = INFO_TIME;
 }
 
 void palette_set_colors(Palette *self, const uColor_s *palette, int size, const char *name_ref) {

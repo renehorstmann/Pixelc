@@ -32,18 +32,24 @@ typedef struct {
         RoSingle select_ro;
         RoBatch background_ro;
         
-        RoSingle info_bg;
-        RoText info;
-        int info_x_offset;
-        float info_time;
+        struct {
+            RoSingle bg;
+            RoText text;
+            int x_offset;
+            float time;
+        } info;
+        
+        // long swipe from side to side to load the next palette
+        struct {
+            RoSingle arrow;
+            vec2 start;
+            bool swiping;
+        } swipe;
         
         int last_selected;
         int current_pressed;
         
-        // long swipe from side to side to load the next palette
-        vec2 change_swipe_start;
-        float change_swipe_time;
-
+        
         mat4 custom_select_pose;
         bool custom_select_active;
         
@@ -61,6 +67,8 @@ void palette_render(Palette *self, const mat4 *camera_mat);
 bool palette_pointer_event(Palette *self, ePointer_s pointer);
 
 float palette_get_hud_size(const Palette *self);
+
+mat4 palette_get_pose(const Palette *self);
 
 bool palette_contains_pos(const Palette *self, vec2 pos);
 

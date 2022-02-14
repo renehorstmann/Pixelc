@@ -59,7 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- palette swipe feedback
 - mode circle
   - border with kernel
   - fill
