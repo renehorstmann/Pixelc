@@ -535,7 +535,7 @@ static bool tool_grid_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_grid() {
     return tool_button_new("grid", 
-            "enables and disables\na pixel grid", 
+            "enables\nand disables\na pixel grid", 
             "res/button_grid.png", 
             tool_grid_pe,
             tool_grid_is_a);

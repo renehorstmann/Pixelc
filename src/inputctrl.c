@@ -23,8 +23,10 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     bool go = true;
     bool set_go = pointer.action == E_POINTER_UP;
 
-    if (go && tooltip_pointer_event(self->tooltip_ref, hud_pointer)) 
-        go = set_go;
+    if (tooltip_pointer_event(self->tooltip_ref, hud_pointer)) {
+        // always return here, so the tools are not toggles
+        return;
+    }
 
     if (go && multitouchcursor_pointer_event(self->mtc_ref, hud_pointer)) 
         go = set_go;

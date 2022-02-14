@@ -38,7 +38,7 @@ Tooltip *tooltip_new() {
     self->L.title_shadow.pose = u_pose_new(-40, 57, 2, 2);
     
     self->L.name.pose = u_pose_new(-54, 42, 1, 2);
-    self->L.tip.pose = u_pose_new(-58, 28, 1, 1);
+    self->L.tip.pose = u_pose_new(-58, 24, 1, 1);
     
     return self;
 }
@@ -66,7 +66,7 @@ bool tooltip_pointer_event(Tooltip *self, ePointer_s pointer) {
     
     Tool *tool = toolbar_get_tool_by_pos(self->toolbar_ref, pointer.pos.xy);
     
-    if(!tool)
+    if(!tool || strcmp(tool->name, "tooltip")==0)
         return false;
     
     tooltip_set(self, tool->name, tool->tip);
@@ -78,7 +78,7 @@ void tooltip_set(Tooltip *self, const char *name, const char *tip) {
     ro_text_set_text(&self->L.name, name);
     vec2 size = ro_text_set_text(&self->L.tip, tip);
     
-    float height = size.y + 35;
+    float height = size.y + 40;
     
     self->L.bg.rect.pose = u_pose_new_aa(-60, 60, 120, height);
     u_pose_set_size(&self->L.bg.rect.uv, 60, height/2);

@@ -133,7 +133,7 @@ static bool fill_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_mode_fill() {
     return tool_button_new("fill", 
-            "fills a\ntouched color\nwith mode4", 
+            "fills a\ntouched color\nwith mode 4\n\ngood to\nfill holes", 
             "res/button_fill.png", 
             fill_pe,
             fill_is_a);
@@ -142,7 +142,7 @@ Tool *tool_new_mode_fill() {
 static void fill8_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
     if(button_pressed(&self->ro.rect, pointer)) {
-        log_info("tool mode fill8");
+        log_info("tool mode fill 8");
         refs.brush->mode = BRUSH_MODE_FILL8;
     } 
 }
@@ -153,8 +153,8 @@ static bool fill8_is_a(struct Tool *super, float dtime, ToolRefs refs) {
     return true;
 }      
 Tool *tool_new_mode_fill8() {
-    return tool_button_new("fill8", 
-            "fills a\ntouched color\nwith mode8", 
+    return tool_button_new("fill 8", 
+            "fills a\ntouched color\nwith mode 8\n\ngood to replace\nlines", 
             "res/button_fill8.png", 
             fill8_pe,
             fill8_is_a);
