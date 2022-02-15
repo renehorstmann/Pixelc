@@ -18,6 +18,9 @@ Tooltip *tooltip_new() {
     rTexture tex = r_texture_new(2, 2, 1, 1, buf);
     r_texture_wrap_repeat(tex);
     self->L.bg = ro_single_new(tex);
+    self->L.bg_shadow = ro_single_new(tex);
+    self->L.bg_shadow.owns_tex = false;
+    self->L.bg_shadow.rect.color = (vec4){{0.2, 0.2, 0.2, 0.5}};
     
     self->L.title = ro_text_new_font55(16);
     ro_text_set_text(&self->L.title, "tooltip");
@@ -51,6 +54,7 @@ void tooltip_update(Tooltip *self, float dtime) {
 void tooltip_render(const Tooltip *self, const mat4 *cam_mat) {
     if(!self->active)
         return;
+    ro_single_render(&self->L.bg_shadow, cam_mat);
     ro_single_render(&self->L.bg, cam_mat);
     ro_text_render(&self->L.title_shadow, cam_mat);
     ro_text_render(&self->L.title, cam_mat);
@@ -85,6 +89,8 @@ void tooltip_set(Tooltip *self, const char *name, const char *tip) {
     
     self->L.bg.rect.pose = u_pose_new_aa(-60, 60, 120, height);
     u_pose_set_size(&self->L.bg.rect.uv, 60, height/2);
+    self->L.bg_shadow.rect.pose = u_pose_new_aa(-58, 58, 120, height);
+    self->L.bg_shadow.rect.uv = self->L.bg.rect.uv;
     
     self->active = true;
 }

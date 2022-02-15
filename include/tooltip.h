@@ -10,6 +10,7 @@ typedef struct Tooltip {
     
     struct {
         RoSingle bg;
+        RoSingle bg_shadow;
         RoText title;
         RoText title_shadow;
         RoText name;
