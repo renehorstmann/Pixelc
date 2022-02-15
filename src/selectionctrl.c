@@ -101,25 +101,13 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
-    if (pointer.action == E_POINTER_UP) {
+    if (pointer.action == E_POINTER_UP)
         self->L.moving = false;
-        return;
-    }
-    if (pointer.action == E_POINTER_DOWN) {
-        self->L.moving = true;
-        if(!selection_contains(self->selection, cr.x, cr.y)) {
-            // touched outside the selection, so pushing the selection center into that position
-            self->selection->left = cr.x - self->selection->cols / 2;
-            self->selection->top = cr.y - self->selection->rows / 2;
-        }
-        self->L.move_start_selection_lt = (ivec2) {{self->selection->left, self->selection->top}};
-        self->L.move_start_position = cr;
-    }
+    else if (pointer.action == E_POINTER_DOWN)
+        self->L.moving = true;  
 
-    if (!self->L.moving) {
+    if (!self->L.moving)
         return;
-    }
-
 
     if (self->mode == SELECTIONCTRL_COPY
             || self->mode == SELECTIONCTRL_CUT) {
@@ -135,6 +123,16 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
         self->mode = SELECTIONCTRL_PASTE;
 
         self->out.show_ok = true;
+    }
+    
+    if(pointer.action == E_POINTER_DOWN) {
+        if(!selection_contains(self->selection, cr.x, cr.y)) {
+            // touched outside the selection, so pushing the selection center into that position
+            self->selection->left = cr.x - self->selection->cols / 2;
+            self->selection->top = cr.y - self->selection->rows / 2;
+        }
+        self->L.move_start_selection_lt = (ivec2) {{self->selection->left, self->selection->top}};
+        self->L.move_start_position = cr;
     }
 
     ivec2 grab_diff = ivec2_sub_vec(cr, self->L.move_start_position);
