@@ -13,7 +13,7 @@ Lots of features are missing in the web demo! (Loading, Saving, options like siz
 Ready to draw.
 Saves after each tip on the screen to image.png.
 An import button can load import.png as selection, if available.
-Palette, canvas size, animation size can be configured in code (main.c).
+Canvas size, animation size can be configured in code (main.c).
 
 ![example_image](example.jpg)
 
@@ -74,14 +74,30 @@ python3 -m http.server --bind localhost  # [port]
   - uImage
     - scale as + interpolation options
     - merge layers (single or all)
+  - p eval
+    - evaluate mathc strings
+      - "(16+8)*4" == 96
 - options menu
+  - in container stack
   - size
+    - textinput only alt keys?
+    - save as eval string
+    - shows evaluated number
+  - layers
   - frames + fps
   - save as
   - save in HD
+  - merge current layer down
+  - merge all layers down
+  - save merged
+  - save merged in HD
+  - add a layer above current
+  - add a layer below current
   - import from?
   - import kernel
+  - delete current kernel
   - import palette
+  - delete current palette
   - tool sub menu
     - in container stack
     - shows tooltip, etc.
@@ -92,7 +108,6 @@ python3 -m http.server --bind localhost  # [port]
 - tiles
   - file containing tile names?
   - direct draw mode, in which you can select a tile in the canvas and directly draw changes there
-- combine layers and save them to combined.png
 - Frame Selection? (or grid shows frames?)
 - background image option?
 
