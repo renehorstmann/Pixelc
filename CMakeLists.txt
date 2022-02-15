@@ -38,6 +38,18 @@ file(GLOB SRCS
 
 add_executable(pixelc ${SRCS})
 
+
+# set default configuration
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to Debug as none was specified.")
+    set(CMAKE_BUILD_TYPE Debug CACHE
+            STRING "Choose the type of build." FORCE)
+    # Set the possible values of build type for cmake-gui
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+            "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+message("Using build type: " ${CMAKE_BUILD_TYPE})
+
 # check platform
 if (MINGW)
     message("Platform: Windows MinGW")
@@ -55,7 +67,6 @@ else ()
         message(FATAL_ERROR "Platform: unknown, neither GL nor GLES found!")
     endif ()
 endif ()
-
 
 # all platforms:
 # add_definitions(-DOPTION_FETCH)
@@ -97,9 +108,12 @@ if (PLATFORM_UNIX)
     message("Setup Unix")
 
     # using sanitizer
-    add_definitions(-DOPTION_SANITIZER)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
-    set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message("Using Google sanitizer")
+        add_definitions(-DOPTION_SANITIZER)
+        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
+        set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
+    endif ()
 
     find_package(SDL2 REQUIRED)
     find_library(SDL2_IMAGE_LIBRARIES SDL2_image REQUIRED)

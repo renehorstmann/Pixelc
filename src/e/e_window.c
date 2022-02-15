@@ -276,8 +276,6 @@ void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
 
 
 #ifdef OPTION_SANITIZER
-    // only in debug mode (so not not debug == debug)
-#ifndef NDEBUG
     void __lsan_do_leak_check();
     int __lsan_do_recoverable_leak_check(void);
 
@@ -293,7 +291,6 @@ void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
     //      some SDL (or ports) may have some memory leaks
     //      so we call it before shutting them down to see our own mistakes
     __lsan_do_leak_check();
-#endif
 #endif
 
     SDL_DestroyWindow(singleton.window);

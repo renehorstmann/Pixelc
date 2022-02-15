@@ -1,7 +1,8 @@
 #include "rhc/error.h"
 #include "rhc/alloc.h"
 #include "rhc/log.h"
-#include "mathc/sca/float.h"
+#include "mathc/float.h"
+#include "mathc/utils/camera.h"
 #include "r/texture.h"
 #include "r/ro_single.h"
 #include "r/ro_batch.h"
@@ -38,13 +39,13 @@ static const char layout_alt[4][10] = {
         "CCSSSSSSOO"
 };
 
-void set_key_pos(mat4 *pose, const Camera_s *cam, int col, int row, int cols, float y_offset) {
-    float width = camera_width(cam) - 16;
+void set_key_pos(TextInput *self, mat4 *pose, int col, int row, int cols, float x_offset, float y_offset) {
+    float width = self->L.cam.width - 16;
     width = sca_min(width, MAX_WIDTH);
 
     float x = 8 - width / 2 + width * col / KEY_COLS + (cols - 1) * 8;
-    float y = cam->RO.bottom + 12 + 18 * (KEY_ROWS - row - 1) + y_offset + (row != 3) * 4;
-    u_pose_set_xy(pose, (int) x, (int) y);
+    float y = self->L.cam.bottom + 12 + 18 * (KEY_ROWS - row - 1) + y_offset + (row != 3) * 4;
+    u_pose_set_xy(pose, ((int) x) + x_offset, (int) y);
 }
 
 static char get_key_char(const TextInput *self, int idx) {
@@ -66,34 +67,36 @@ static char get_key_char(const TextInput *self, int idx) {
 }
 
 static void append_char(TextInput *self, char append) {
-    int len = strlen(self->out.text);
+    int len = strlen(self->text);
     if (len >= self->L.max_chars)
         return;
-    self->out.text[len++] = append;
-    self->out.text[len] = '\0';
+    self->text[len++] = append;
+    self->text[len] = '\0';
     self->L.blink_time = 0;
 }
 
 static void handle_backspace(TextInput *self) {
-    int len = strlen(self->out.text);
+    int len = strlen(self->text);
     if (len > 0)
-        self->out.text[len - 1] = '\0';
+        self->text[len - 1] = '\0';
     self->L.blink_time = 0;
 }
 
 static void handle_cancel(TextInput *self) {
-    log_info("textinput canceled: %s", self->out.text);
-    self->out.state = TEXTINPUT_CANCELED;
+    log_info("textinput canceled: %s", self->text);
+    self->state = TEXTINPUT_CANCELED;
 }
 
 static void handle_ok(TextInput *self) {
-    log_info("textinput finished: %s", self->out.text);
-    self->out.state = TEXTINPUT_DONE;
+    if(!self->in.ok_active)
+        return;
+    log_info("textinput finished: %s", self->text);
+    self->state = TEXTINPUT_DONE;
 }
 
 static void pointer_event(ePointer_s pointer, void *user_data) {
     TextInput *self = user_data;
-    pointer.pos = mat4_mul_vec(self->camera_ref->matrices.p_inv, pointer.pos);
+    pointer.pos = mat4_mul_vec(self->L.cam.p_inv, pointer.pos);
 
     if (button_clicked(&self->L.shift.rect, pointer)) {
         self->L.shiftstate++;
@@ -149,20 +152,44 @@ static void key_raw_event(const SDL_Event *event, void *user_data) {
 
 }
 
+static void camera(TextInput *self, ivec2 window_size) {
+    int wnd_width = window_size.x;
+    int wnd_height = window_size.y;
+    float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
+    float real_pixel_per_pixel = floorf(smaller_size / 180.0f);
+
+    float width_2 = wnd_width / (2 *  real_pixel_per_pixel);
+    float height_2 = wnd_height / (2 * real_pixel_per_pixel);
+
+    // begin: (top, left) with a full pixel
+    // end: (bottom, right) with a maybe splitted pixel
+    self->L.cam.left = -floorf(width_2);
+    self->L.cam.top = floorf(height_2);
+    self->L.cam.right = width_2 + (width_2 - floorf(width_2));
+    self->L.cam.bottom = -height_2 - (height_2 - floorf(height_2));
+    self->L.cam.width = self->L.cam.right - self->L.cam.left;
+    self->L.cam.height = self->L.cam.top - self->L.cam.bottom;
+    
+    self->L.cam.p = mat4_camera_ortho(
+            self->L.cam.left, self->L.cam.right, 
+            self->L.cam.bottom, self->L.cam.top, 
+            -1, 1);
+    self->L.cam.p_inv = mat4_inv(self->L.cam.p);
+}
+
 //
 // public
 //
 
-TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title, int opt_max_chars) {
+TextInput *textinput_new(eInput *input, const char *title, int opt_max_chars) {
     TextInput *self = rhc_calloc(sizeof *self);
 
     e_input_set_vip_pointer_event(input, pointer_event, self);
     e_input_set_vip_key_raw_event(input, key_raw_event, self);
 
     self->input_ref = input;
-    self->camera_ref = cam;
-
-    self->out.state = TEXTINPUT_IN_PROGRESS;
+    
+    self->state = TEXTINPUT_IN_PROGRESS;
 
     if (opt_max_chars <= 0) {
         opt_max_chars = TEXTINPUT_MAX_CHARS;
@@ -196,15 +223,22 @@ TextInput *textinput_new(eInput *input, const Camera_s *cam, const char *title, 
     self->L.text_bg.rect.color = (vec4) {{1, 1, 1, 0.5}};
 
     for (int i = 0; i < 27; i++) {
-        self->L.keys.rects[i].pose = u_pose_new(0, 0, 16, 16);
-        self->L.chars.rects[i].pose = u_pose_new(0, 0, 5, 8);
+        self->L.keys.rects[i].pose = u_pose_new(0, 0, 
+                16, 16);
+        self->L.chars.rects[i].pose = u_pose_new(0, 0, 
+                5, 8);
         self->L.chars.rects[i].color = R_COLOR_BLACK;
     }
 
-    self->L.shift.rect.pose = u_pose_new(0, 0, 16, 16);
-    self->L.space.rect.pose = u_pose_new(0, 0, 16 * 6, 16);
+    self->L.shift.rect.pose = u_pose_new(0, 0, 
+            16, 16);
+    self->L.space.rect.pose = u_pose_new(0, 0, 
+            16 * 6 , 
+            16 );
     for (int i = 0; i < 3; i++) {
-        self->L.special.rects[i].pose = u_pose_new(0, 0, 16 * 2, 16);
+        self->L.special.rects[i].pose = u_pose_new(0, 0, 
+                16 * 2 , 
+                16 );
         self->L.special.rects[i].sprite.y = i;
     }
 
@@ -227,11 +261,11 @@ void textinput_kill(TextInput **self_ptr) {
     *self_ptr = NULL;
 }
 
-void textinput_update(TextInput *self, float dtime) {
-    const Camera_s *cam = self->camera_ref;
-
+void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
+    camera(self, window_size);
+    
     char text[TEXTINPUT_MAX_CHARS];
-    strcpy(text, self->out.text);
+    strcpy(text, self->text);
 
     self->L.blink_time += dtime;
     if (self->L.blink_time > 1.0)
@@ -245,13 +279,14 @@ void textinput_update(TextInput *self, float dtime) {
 
     ro_text_set_text(&self->L.textfield, text);
 
-    self->L.title.pose = u_pose_new(-80, 32, 1.5, 1.5);
+    self->L.title.pose = u_pose_new(-80, 32, 
+            1.5, 1.5);
 
     u_pose_set_xy(&self->L.textfield.pose, -80, 4);
 
     self->L.text_bg.rect.pose = u_pose_new_aa(
-            cam->RO.left, 6,
-            camera_width(cam), 12);
+            self->L.cam.left, 6,
+            self->L.cam.width, 12);
 
     int idx = 0;
     for (int r = 0; r < 3; r++) {
@@ -264,8 +299,8 @@ void textinput_update(TextInput *self, float dtime) {
 
             bool pressed = button_is_pressed(&self->L.keys.rects[idx]);
 
-            set_key_pos(&self->L.keys.rects[idx].pose, cam, c, r, 1, 0);
-            set_key_pos(&self->L.chars.rects[idx].pose, cam, c, pressed ? 0 : r, 1, pressed ? 16 : 1);
+            set_key_pos(self, &self->L.keys.rects[idx].pose, c, r, 1, 0, 0);
+            set_key_pos(self, &self->L.chars.rects[idx].pose, c, pressed ? 0 : r, 1, 0.5, pressed ? 16 : 1);
             self->L.chars.rects[idx].color = pressed ? R_COLOR_WHITE : R_COLOR_BLACK;
 
             self->L.textfield.sprite_fn(&self->L.chars.rects[idx].sprite, key);
@@ -275,21 +310,27 @@ void textinput_update(TextInput *self, float dtime) {
     }
 
     self->L.shift.rect.sprite.y = self->L.shiftstate;
-    set_key_pos(&self->L.shift.rect.pose, cam, 0, 2, 1, 0);
-    set_key_pos(&self->L.space.rect.pose, cam, 2, 3, 6, 0);
+    set_key_pos(self, &self->L.shift.rect.pose, 0, 2, 1, 0, 0);
+    set_key_pos(self, &self->L.space.rect.pose, 2, 3, 6, 0,  0);
 
     // ok, cancel, backspace
-    set_key_pos(&self->L.special.rects[0].pose, cam, 8, 3, 2, 0);
-    set_key_pos(&self->L.special.rects[1].pose, cam, 0, 3, 2, 0);
-    set_key_pos(&self->L.special.rects[2].pose, cam, 8, 2, 2, 0);
+    if(self->in.ok_active) {
+        set_key_pos(self, &self->L.special.rects[0].pose, 8, 3, 2, 0, 0);
+    } else {
+        u_pose_set_xy(&self->L.special.rects[0].pose, FLT_MAX, FLT_MAX);
+    }
+    set_key_pos(self, &self->L.special.rects[1].pose, 0, 3, 2, 0, 0);
+    set_key_pos(self, &self->L.special.rects[2].pose, 8, 2, 2, 0, 0);
 
     self->L.bg.rect.pose = u_pose_new_aa(
-            cam->RO.left, cam->RO.top,
-            camera_width(cam), camera_height(cam));
+            self->L.cam.left, self->L.cam.top,
+            self->L.cam.width, self->L.cam.height);
 
 }
 
-void textinput_render(const TextInput *self, const mat4 *cam_mat) {
+void textinput_render(const TextInput *self) {
+    const mat4 *cam_mat = &self->L.cam.p;
+    
     ro_single_render(&self->L.bg, cam_mat);
     ro_single_render(&self->L.text_bg, cam_mat);
 
