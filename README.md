@@ -59,6 +59,12 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
+- tools
+  - next layer
+  - prev layer
+  - add layer behind
+  - swap with prev layer
+  - merge layer down
 - secondary toolbar above palette
 - preview
   - instead of animation
@@ -93,6 +99,8 @@ python3 -m http.server --bind localhost  # [port]
   - import palette
   - delete current palette
   - tool sub menu
+    - can also be pressed (info at top)
+    - preview at top
     - in container stack
     - shows tooltip, etc.
     - turn on / off
