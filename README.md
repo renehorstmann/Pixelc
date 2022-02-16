@@ -59,13 +59,7 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- mode line
-- mode circle
-  - border with kernel
-  - fill
-- mode rect
-  - border with kernel
-  - fill
+- secondary toolbar above palette
 - preview
   - instead of animation
   - how to animate

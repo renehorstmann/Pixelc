@@ -109,9 +109,12 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
     if(self->L.hovering && pointer.action == E_POINTER_MOVE) {
         switch (self->mode) {
             case BRUSH_MODE_FREE:
+            case BRUSH_MODE_DOT:
+            case BRUSH_MODE_LINE:
+            case BRUSH_MODE_RECT:
+            case BRUSH_MODE_CIRCLE:
             case BRUSH_MODE_DITHER:
             case BRUSH_MODE_DITHER_INV:
-            case BRUSH_MODE_DOT:
                 pointer.action = E_POINTER_DOWN;
             default:
                 break;
@@ -129,6 +132,15 @@ void brush_pointer_event(Brush *self, ePointer_s pointer) {
             break;
         case BRUSH_MODE_DOT:
             change = brushmode_dot(self->brushmode, pointer);
+            break;
+        case BRUSH_MODE_LINE:
+            change = brushmode_func(self->brushmode, pointer, BRUSHMODE_FUNC_LINE);
+            break;
+        case BRUSH_MODE_RECT:
+            change = brushmode_func(self->brushmode, pointer, BRUSHMODE_FUNC_RECT);
+            break;
+        case BRUSH_MODE_CIRCLE:
+            change = brushmode_func(self->brushmode, pointer, BRUSHMODE_FUNC_CIRCLE);
             break;
         case BRUSH_MODE_FILL:
             change = brushmode_fill(self->brushmode, pointer, false);

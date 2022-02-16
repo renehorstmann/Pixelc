@@ -217,6 +217,9 @@ Toolbar *toolbar_new(Camera_s *cam,
     self->tools.mode_none = tool_new_mode_none();
     self->tools.mode_free = tool_new_mode_free();
     self->tools.mode_dot = tool_new_mode_dot();
+    self->tools.mode_line = tool_new_mode_line();
+    self->tools.mode_rect = tool_new_mode_rect();
+    self->tools.mode_circle = tool_new_mode_circle();
     self->tools.mode_dither = tool_new_mode_dither();
     self->tools.mode_dither_inv = tool_new_mode_dither_inv();
     self->tools.mode_fill = tool_new_mode_fill();

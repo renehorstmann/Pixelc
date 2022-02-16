@@ -142,6 +142,19 @@ static uImage palette_23() {
 
 
 
+static const char *name_998 = "gameboy.png";
+static uImage palette_998() {
+    uImage self = u_image_new_empty(4, 1, 1);
+    const char *hex[4] = {
+            "#00131a", "#3d8026", "#abcc47", "#f9ffb3"
+    };
+    for (int i = 0; i < 4; i++) {
+        *u_image_pixel(self, i, 0, 0) = u_color_from_hex(hex[i]);
+    }
+    return self;
+}
+
+
 static const char *name_999 = "pixilmatt.png";
 static uImage palette_999() {
     uImage self = u_image_new_empty(37, 1, 1);
@@ -226,6 +239,7 @@ uImage *palette_defaults_new() {
     *it++ = palette_23();
     
     
+    *it++ = palette_998();
     *it++ = palette_999();
         
     *it = u_image_new_invalid();
@@ -243,7 +257,7 @@ void palette_defaults_kill(uImage **self_ptr) {
 }
 
 char *palette_defaults_name_on_heap(int id) {
-    assume(id>=0 && id<=24, "wtf?");
+    assume(id>=0 && id<=25, "wtf?");
     char *name = rhc_calloc(32);
     if(id==0)
         strcpy(name, name_0);
@@ -295,6 +309,8 @@ char *palette_defaults_name_on_heap(int id) {
         strcpy(name, name_23);
     
     if(id==24)
+        strcpy(name, name_998);
+    if(id==25)
         strcpy(name, name_999);
     return name;
 }

@@ -75,6 +75,73 @@ Tool *tool_new_mode_dot() {
 }
 
 
+static void line_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_pressed(&self->ro.rect, pointer)) {
+        log_info("tool mode line");
+        refs.brush->mode = BRUSH_MODE_LINE;
+    } 
+}
+static bool line_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, refs.brush->mode == BRUSH_MODE_LINE);
+    // always active
+    return true;
+}      
+Tool *tool_new_mode_line() {
+    return tool_button_new("line", 
+            "draw a line\non the canvas", 
+            "res/button_line.png", 
+            line_pe,
+            line_is_a);
+}
+
+
+static void rect_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_pressed(&self->ro.rect, pointer)) {
+        log_info("tool mode rect");
+        refs.brush->mode = BRUSH_MODE_RECT;
+    } 
+}
+static bool rect_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, refs.brush->mode == BRUSH_MODE_RECT);
+    // always active
+    return true;
+}      
+Tool *tool_new_mode_rect() {
+    return tool_button_new("rect", 
+            "draws a rect\non the canvas", 
+            "res/button_rect.png", 
+            rect_pe,
+            rect_is_a);
+}
+
+
+
+static void circle_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(button_pressed(&self->ro.rect, pointer)) {
+        log_info("tool mode circle");
+        refs.brush->mode = BRUSH_MODE_CIRCLE;
+    } 
+}
+static bool circle_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, refs.brush->mode == BRUSH_MODE_CIRCLE);
+    // always active
+    return true;
+}      
+Tool *tool_new_mode_circle() {
+    return tool_button_new("circle", 
+            "draws a circle\non the canvas\nstart pos is\nthe circle center", 
+            "res/button_circle.png", 
+            circle_pe,
+            circle_is_a);
+}
+
+
 static void dither_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
     if(button_pressed(&self->ro.rect, pointer)) {
