@@ -119,6 +119,25 @@ Tool *tool_new_tooltip() {
             tool_tooltip_is_a);
 }
 
+static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(self->active && button_clicked(&self->ro.rect, pointer)) {
+        uImage img = u_image_new_file(1, "import.png");
+        if(!u_image_valid(img))
+            return;
+        log_info("tool import");
+        selectionctrl_paste_image(refs.selectionctrl, img);
+        u_image_kill(&img);
+    } 
+}
+Tool *tool_new_import() {
+    return tool_button_new("import", 
+            "loads import.png\nas selection", 
+            "res/button_import.png", 
+            tool_import_pe,
+            NULL);
+}
+
 
 static void tool_clear_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
@@ -174,24 +193,6 @@ Tool *tool_new_redo() {
             tool_redo_is_a);
 }
 
-static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
-    ToolButton *self = (ToolButton*) super;
-    if(self->active && button_clicked(&self->ro.rect, pointer)) {
-        uImage img = u_image_new_file(1, "import.png");
-        if(!u_image_valid(img))
-            return;
-        log_info("tool import");
-        selectionctrl_paste_image(refs.selectionctrl, img);
-        u_image_kill(&img);
-    } 
-}
-Tool *tool_new_import() {
-    return tool_button_new("import", 
-            "loads import.png\nas selection", 
-            "res/button_import.png", 
-            tool_import_pe,
-            NULL);
-}
 
 static void tool_selection_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;

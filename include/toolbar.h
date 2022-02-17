@@ -32,10 +32,10 @@ typedef struct Toolbar {
         Tool *all_tools[TOOLBAR_TOOLS_LEN];
         struct {
             Tool *tooltip;
+            Tool *import;
             Tool *clear;
             Tool *undo;
             Tool *redo;
-            Tool *import;
             Tool *selection;
             Tool *kernel;
             Tool *secondary_color;

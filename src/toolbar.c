@@ -202,10 +202,10 @@ Toolbar *toolbar_new(Camera_s *cam,
     };
 
     self->tools.tooltip = tool_new_tooltip();
+    self->tools.import = tool_new_import();
     self->tools.clear = tool_new_clear();
     self->tools.undo = tool_new_undo();
     self->tools.redo = tool_new_redo();
-    self->tools.import = tool_new_import();
     self->tools.selection = tool_new_selection();
     self->tools.kernel = tool_new_kernel();
     self->tools.secondary_color = tool_new_secondary_color();
