@@ -25,6 +25,7 @@ typedef bool (*dialog_pointer_event_fun)(struct Dialog *self, ePointer_s pointer
 typedef struct Dialog {
     char id[DIALOG_MAX_TITLE_LEN];
     void *impl;
+    void *user_data;
 
     struct {
         float impl_height;
@@ -71,9 +72,9 @@ void dialog_set_title(Dialog *self, const char *title_id, vec4 color);
 // dialogs
 //
 
-void dialog_create_delete(Dialog *self, const char *msg, dialog_on_action_cb on_action_cb);
+void dialog_create_delete(Dialog *self, const char *msg, dialog_on_action_cb on_action_cb, void *user_data);
 
-void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fun on_action_cb);
+void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fun on_action_cb, void *user_data);
 
 void dialog_create_tooltip(Dialog *self, struct Toolbar *toolbar);
 
