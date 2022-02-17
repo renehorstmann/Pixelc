@@ -59,13 +59,23 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
+- dialog:
+  - delete
+  - upload
+  - canvas_size
 - tools
-  - next layer
-  - prev layer
+  - size as window like tooltip
   - add layer behind
-  - swap with prev layer
+  - move layer up
+  - move layer down
   - merge layer down
-- secondary toolbar above palette
+  - delete current palette
+    - are you sure prompt
+  - delete current kernel
+    - are you sure prompt
+  - import new palette...?
+  - import new kernel
+- secondary toolbar above palette?
 - preview
   - instead of animation
   - how to animate

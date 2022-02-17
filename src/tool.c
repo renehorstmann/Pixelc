@@ -1,4 +1,5 @@
 #include "r/ro_single.h"
+#include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "rhc/alloc.h"
@@ -7,8 +8,6 @@
 #include "mathc/sca/int.h"
 #include "button.h"
 #include "tool.h"
-
-#include "tooltip.h"
 
 static void tool_button_kill(Tool **super_ptr) {
     ToolButton *self = (ToolButton*) *super_ptr;
@@ -98,16 +97,17 @@ static void tool_tooltip_pe(struct Tool *super, ePointer_s pointer, ToolRefs ref
     bool pressed = button_is_pressed(&self->ro.rect);
     if(pressed) {
         log_info("tool tooltip start");
-        tooltip_set(refs.tooltip, "tooltip", "click on a tool\nto get its tip");
+        dialog_create_tooltip(refs.dialog, refs.toolbar);
     } else {
         log_info("tool tooltip stop");
-        refs.tooltip->active = false;
+        dialog_hide(refs.dialog);
     }
     
 }
 static bool tool_tooltip_is_a(struct Tool *super, float dtime, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
-    button_set_pressed(&self->ro.rect, refs.tooltip->active);
+    bool tooltip = strcmp(refs.dialog->id, "tooltip") == 0;
+    button_set_pressed(&self->ro.rect, tooltip);
     // always active
     return true;
 }      
@@ -246,18 +246,18 @@ static void tool_kernel_kill(Tool **super_ptr) {
 }
 static void tool_kernel_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolKernel *self = (ToolKernel*) super;
-    int k = refs.brush->RO.kernel_id;
+    int id = refs.brush->RO.kernel_id;
     if(button_clicked(&self->minus.rect, pointer)
-            && k>0) {
+            && id>0) {
         
-        log_info("tool kernel_minus: %i", k-1);
-        brush_load_kernel(refs.brush, k-1);
+        log_info("tool kernel_minus: %i", id-1);
+        brush_load_kernel(refs.brush, id-1);
     }
     if(button_clicked(&self->plus.rect, pointer)
-            && k<refs.brush->RO.max_kernels-1) {
+            && id<refs.brush->RO.max_kernels-1) {
         
-        log_info("tool kernel_plus: %i", k+1);
-        brush_load_kernel(refs.brush, k+1);
+        log_info("tool kernel_plus: %i", id+1);
+        brush_load_kernel(refs.brush, id+1);
     }
     
     // long press
@@ -284,16 +284,16 @@ static void tool_kernel_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs
 static void tool_kernel_update(struct Tool *super, float dtime, ToolRefs refs) {
     ToolKernel *self = (ToolKernel*) super;
     
-    int k = refs.brush->RO.kernel_id;
-    if(self->last_kernel_id == 0 && k>0)
+    int id = refs.brush->RO.kernel_id;
+    if(self->last_kernel_id == 0 && id>0)
         button_set_pressed(&self->minus.rect, false);
-    if(self->last_kernel_id == refs.brush->RO.max_kernels-1 && k<self->last_kernel_id)
-        button_set_pressed(&self->minus.rect, false);
-    self->last_kernel_id = k;
+    if(self->last_kernel_id == refs.brush->RO.max_kernels-1 && id<self->last_kernel_id)
+        button_set_pressed(&self->plus.rect, false);
+    self->last_kernel_id = id;
         
-    if(k==0)
+    if(id==0)
         button_set_pressed(&self->minus.rect, true);
-    if(k==refs.brush->RO.max_kernels-1)
+    if(id==refs.brush->RO.max_kernels-1)
         button_set_pressed(&self->plus.rect, true);
     
     self->kernel.tex = refs.brush->RO.kernel_tex;
@@ -319,12 +319,12 @@ static void tool_kernel_update(struct Tool *super, float dtime, ToolRefs refs) {
     k_w = isca_min(k_w, 8);
     k_h = isca_min(k_h, 8);
     self->kernel.rect.pose = u_pose_new(
-            l[0] + 8 + super->in.pos.x,
-            t[0] - 8 + super->in.pos.y,
+            l[1] + 8 + super->in.pos.x,
+            t[1] - 8 + super->in.pos.y,
             k_w*2, k_h*2);
     
-    u_pose_aa_set_left(&self->minus.rect.pose, l[1] + super->in.pos.x);
-    u_pose_aa_set_top(&self->minus.rect.pose, t[1] + super->in.pos.y);
+    u_pose_aa_set_left(&self->minus.rect.pose, l[0] + super->in.pos.x);
+    u_pose_aa_set_top(&self->minus.rect.pose, t[0] + super->in.pos.y);
             
     u_pose_aa_set_left(&self->plus.rect.pose, l[2] + super->in.pos.x);
     u_pose_aa_set_top(&self->plus.rect.pose, t[2] + super->in.pos.y);
@@ -563,4 +563,168 @@ Tool *tool_new_preview() {
             "res/button_play.png", 
             tool_preview_pe,
             tool_preview_is_a);
+}
+
+
+
+
+
+typedef struct {
+    Tool super;
+    RoText layer;
+    RoSingle prev, next;
+    int last_layer_id;
+    float long_press_time;
+    int pressed;
+} ToolLayer;
+
+
+static void tool_layer_kill(Tool **super_ptr) {
+    ToolLayer *self = (ToolLayer*) *super_ptr;
+    if(!self)
+        return;
+    ro_text_kill(&self->layer);
+    ro_single_kill(&self->prev);
+    ro_single_kill(&self->next);
+    rhc_free(self);
+    *super_ptr = NULL;
+}
+static void tool_layer_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolLayer *self = (ToolLayer*) super;
+    int id = refs.canvas->current_layer;
+    if(button_clicked(&self->prev.rect, pointer)
+            && id>0) {
+        
+        log_info("tool layer_prev: %i", id-1);
+        refs.canvas->current_layer = id-1;
+    }
+    if(button_clicked(&self->next.rect, pointer)
+            && id<refs.canvas->RO.image.layers-1) {
+        
+        log_info("tool layer_next: %i", id+1);
+        refs.canvas->current_layer = id+1;
+    }
+    
+    // long press
+    if(u_pose_aa_contains(self->prev.rect.pose, pointer.pos.xy)) {
+        if(pointer.action == E_POINTER_DOWN) {
+            self->pressed = 1;
+            self->long_press_time = TOOL_LONG_PRESS_TIME;
+        }
+        if(self->pressed != 1)
+            self->pressed = 0;
+    } else if(u_pose_aa_contains(self->next.rect.pose, pointer.pos.xy)){
+        if(pointer.action == E_POINTER_DOWN) {
+            self->pressed = 2;
+            self->long_press_time = TOOL_LONG_PRESS_TIME;
+        }
+        if(self->pressed != 2)
+            self->pressed = 0;
+    } else {
+        self->pressed = 0;
+    }
+    if(pointer.action == E_POINTER_UP)
+        self->pressed = 0;
+}
+static void tool_layer_update(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolLayer *self = (ToolLayer*) super;
+    
+    int id = refs.canvas->current_layer;
+    if(self->last_layer_id == 0 && id>0)
+        button_set_pressed(&self->prev.rect, false);
+    if(self->last_layer_id == refs.canvas->RO.image.layers-1 && id<self->last_layer_id)
+        button_set_pressed(&self->next.rect, false);
+    self->last_layer_id = id;
+        
+    if(id==0)
+        button_set_pressed(&self->prev.rect, true);
+    if(id==refs.canvas->RO.image.layers-1)
+        button_set_pressed(&self->next.rect, true);
+    
+    // todo
+    char layer_num[3];
+    snprintf(layer_num, sizeof layer_num, "%i", refs.canvas->current_layer);
+    ro_text_set_text(&self->layer, layer_num);
+    
+    int l_x_offset = refs.canvas->current_layer<10? 3 : 0;
+
+    if(camera_is_portrait_mode(refs.cam)) {
+        self->layer.pose = u_pose_new(
+                18 + l_x_offset + super->in.pos.x,
+                -8 + super->in.pos.y,
+                1, 1);
+        u_pose_aa_set_left(&self->prev.rect.pose, 
+                1 + super->in.pos.x);
+        u_pose_aa_set_top(&self->prev.rect.pose, 
+                -1 + super->in.pos.y);
+            
+        u_pose_aa_set_left(&self->next.rect.pose,
+                30 + super->in.pos.x);
+        u_pose_aa_set_top(&self->next.rect.pose,
+                -1 + super->in.pos.y);
+                
+        super->size = (vec2) {{47, 18}};
+    } else {
+        self->layer.pose = u_pose_new(
+                3 + l_x_offset + super->in.pos.x,
+                -18 + super->in.pos.y,
+                1, 1);
+        u_pose_aa_set_left(&self->prev.rect.pose, 
+                1 + super->in.pos.x);
+        u_pose_aa_set_top(&self->prev.rect.pose, 
+                -1 + super->in.pos.y);
+            
+        u_pose_aa_set_left(&self->next.rect.pose,
+                1 + super->in.pos.x);
+        u_pose_aa_set_top(&self->next.rect.pose,
+                -24 + super->in.pos.y);
+                
+        super->size = (vec2) {{18, 41}};
+    }
+    
+    // check long pressed
+    if(self->pressed && self->long_press_time>0) {
+        self->long_press_time -= dtime;
+        if(self->long_press_time <= 0) {
+            if(self->pressed == 1) {
+                log_info("tool layer_prev long press");
+                refs.canvas->current_layer = 0;
+                animation_longpress(refs.animation,
+                        u_pose_get_xy(self->prev.rect.pose), 
+                        R_COLOR_BLACK);
+            } else if(self->pressed == 2) {
+                log_info("tool layer_next long press");
+                refs.canvas->current_layer = refs.canvas->RO.image.layers-1;
+                animation_longpress(refs.animation, 
+                        u_pose_get_xy(self->next.rect.pose), 
+                        R_COLOR_WHITE);
+            }
+            self->pressed = 0;
+        }
+    }
+}
+static void tool_layer_render(const struct Tool *super, const mat4 *cam_mat) {
+    const ToolLayer *self = (const ToolLayer*) super;
+    ro_text_render(&self->layer, cam_mat);
+    ro_single_render(&self->prev, cam_mat);
+    ro_single_render(&self->next, cam_mat);
+}
+Tool *tool_new_layer() {
+    ToolLayer *self = rhc_calloc(sizeof *self);
+
+    self->layer = ro_text_new_font55(2);
+    self->prev = ro_single_new(r_texture_new_file(2, 1, "res/button_prev.png"));
+    self->next = ro_single_new(r_texture_new_file(2, 1, "res/button_next.png"));
+    self->prev.rect.pose = u_pose_new(0, 0, 16, 16);
+    self->next.rect.pose = u_pose_new(0, 0, 16, 16);
+    
+    snprintf(self->super.name, TOOL_NAME_LEN, "layer");
+    snprintf(self->super.tip, TOOL_TIP_LEN, "select a\ncanvas layer");
+
+    self->super.kill = tool_layer_kill;
+    self->super.update = tool_layer_update;
+    self->super.render = tool_layer_render;
+    self->super.pointer_event = tool_layer_pe;
+
+    return (Tool*) self;
 }

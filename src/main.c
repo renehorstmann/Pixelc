@@ -11,7 +11,7 @@
 #include "cameractrl.h"
 #include "palette.h"
 #include "toolbar.h"
-#include "tooltip.h"
+#include "dialog.h"
 #include "inputctrl.h"
 #include "multitouchcursor.h"
 
@@ -23,7 +23,7 @@
 //*
 #define COLS 160
 #define ROWS 144
-#define LAYERS 1
+#define LAYERS 15
 //*/
 
 // Tilec
@@ -79,7 +79,7 @@ static struct {
     Palette *palette;
     CameraCtrl *camctrl;
     Toolbar *toolbar;
-    Tooltip *tooltip;
+    Dialog *dialog;
     InputCtrl *inputctrl;
     MultiTouchCursor *mtc;
 
@@ -104,7 +104,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
     
-    L.tooltip = tooltip_new();
+    L.dialog = dialog_new();
 
     L.toolbar = toolbar_new(L.camera, 
                             L.camctrl,
@@ -112,8 +112,8 @@ static void init(eSimple *simple, ivec2 window_size) {
                             L.brush, 
                             L.palette,
                             L.selectionctrl,
+                            L.dialog,
                             L.animation,
-                            L.tooltip,
                             u_color_from_hex(TB_ACTIVE_BG_A),
                             u_color_from_hex(TB_ACTIVE_BG_B),
                             u_color_from_hex(TB_SECONDARY_BG_A),
@@ -121,9 +121,6 @@ static void init(eSimple *simple, ivec2 window_size) {
                             u_color_from_hex(TB_SELECTION_BG_A),
                             u_color_from_hex(TB_SELECTION_BG_B)
     );
-    
-    // cycle header...
-    L.tooltip->toolbar_ref = L.toolbar;
     
     L.mtc = multitouchcursor_new(L.camera, L.brush, L.palette);
 
@@ -133,7 +130,7 @@ static void init(eSimple *simple, ivec2 window_size) {
             L.brush, 
             L.selectionctrl,
             L.toolbar, 
-            L.tooltip,
+            L.dialog,
             L.camctrl, 
             L.mtc);
 
@@ -163,7 +160,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
     L.brush->in.selection_ref = L.selectionctrl->selection;
 
     toolbar_update(L.toolbar, dtime);
-    tooltip_update(L.tooltip, dtime);
+    dialog_update(L.dialog, dtime);
     multitouchcursor_update(L.mtc, dtime);
 }
 
@@ -181,7 +178,7 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     toolbar_render(L.toolbar, hud_cam);
     palette_render(L.palette, hud_cam);
     
-    tooltip_render(L.tooltip, hud_cam);    
+    dialog_render(L.dialog, hud_cam);
     animation_render(L.animation, hud_cam);
 }
 

@@ -8,7 +8,7 @@
 #include "selectionctrl.h"
 #include "cameractrl.h"
 #include "toolbar.h"
-#include "tooltip.h"
+#include "dialog.h"
 #include "multitouchcursor.h"
 
 typedef struct {
@@ -17,7 +17,7 @@ typedef struct {
     Brush *brush_ref;
     SelectionCtrl *selectionctrl_ref;
     Toolbar *toolbar_ref;
-    Tooltip *tooltip_ref;
+    Dialog *dialog_ref;
     CameraCtrl *canvascamctrl_ref;
     MultiTouchCursor *mtc_ref;
 } InputCtrl;
@@ -28,7 +28,7 @@ InputCtrl *inputctrl_new(eInput *input,
         Brush *brush, 
         SelectionCtrl *selectionctrl, 
         Toolbar *toolbar,
-        Tooltip *tooltip,
+        Dialog *dialog,
         CameraCtrl *canvascamctrl, 
         MultiTouchCursor *mtc);
 

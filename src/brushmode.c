@@ -64,7 +64,6 @@ static bool rectto(BrushMode *self, ivec2 from, ivec2 to) {
 static bool circleto(BrushMode *self, ivec2 from, ivec2 to) {
     // horn circle rasterizing
     int r = ivec2_distance(from, to);
-    printf("r=%i\n", r);
     int d = -r;
     int x = r;
     int y = 0;

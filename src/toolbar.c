@@ -190,15 +190,15 @@ Toolbar *toolbar_new(Camera_s *cam,
                      Brush *brush, 
                      Palette *palette,
                      SelectionCtrl *selectionctrl,
+                     Dialog *dialog,
                      Animation *animation,
-                     struct Tooltip *tooltip,
                      uColor_s active_bg_a, uColor_s active_bg_b,
                      uColor_s secondary_bg_a, uColor_s secondary_bg_b,
                      uColor_s selection_bg_a, uColor_s selection_bg_b) {
     Toolbar *self = rhc_calloc(sizeof *self);
 
     self->refs = (ToolRefs) {
-            cam, camctrl, canvas, brush, palette, selectionctrl, animation, tooltip
+            cam, camctrl, canvas, brush, palette, selectionctrl, dialog, animation, self
     };
 
     self->tools.tooltip = tool_new_tooltip();
@@ -213,7 +213,8 @@ Toolbar *toolbar_new(Camera_s *cam,
     self->tools.camera = tool_new_camera();
     self->tools.grid = tool_new_grid();
     self->tools.preview = tool_new_preview();
-    
+    self->tools.layer = tool_new_layer();
+
     self->tools.mode_none = tool_new_mode_none();
     self->tools.mode_free = tool_new_mode_free();
     self->tools.mode_dot = tool_new_mode_dot();

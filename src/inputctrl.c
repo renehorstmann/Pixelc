@@ -18,7 +18,7 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     ePointer_s c_pointer = pointer;
     c_pointer.pos = mat4_mul_vec(self->camera_ref->matrices.v_p_inv, pointer.pos);
 
-    if (tooltip_pointer_event(self->tooltip_ref, hud_pointer)) {
+    if (dialog_pointer_event(self->dialog_ref, hud_pointer)) {
         // always return here, so the tools are not toggles
         return;
     }
@@ -58,7 +58,7 @@ InputCtrl *inputctrl_new(
         Brush *brush, 
         SelectionCtrl *selectionctrl, 
         Toolbar *toolbar,
-        Tooltip *tooltip,
+        Dialog *dialog,
         CameraCtrl *canvascamctrl,
         MultiTouchCursor *mtc) {
     InputCtrl *self = rhc_calloc(sizeof *self);
@@ -68,7 +68,7 @@ InputCtrl *inputctrl_new(
     self->brush_ref = brush;
     self->selectionctrl_ref = selectionctrl;
     self->toolbar_ref = toolbar;
-    self->tooltip_ref = tooltip;
+    self->dialog_ref = dialog;
     self->canvascamctrl_ref = canvascamctrl;
     self->mtc_ref = mtc;
 

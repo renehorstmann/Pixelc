@@ -6,7 +6,7 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 24
+#define TOOLBAR_TOOLS_LEN 25
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -21,7 +21,7 @@ typedef struct {
     RoSingle bg;
 } ToolbarContainer;
 
-typedef struct {
+typedef struct Toolbar {
     ToolRefs refs;
 
     ToolbarContainer active;
@@ -43,7 +43,8 @@ typedef struct {
             Tool *camera;
             Tool *grid;
             Tool *preview;
-            
+            Tool *layer;
+
             Tool *mode_none;
             Tool *mode_free;
             Tool *mode_dot;
@@ -96,8 +97,8 @@ Toolbar *toolbar_new(Camera_s *cam,
         Canvas *canvas,
         Brush *brush, Palette *palette, 
         SelectionCtrl *selectionctrl,
+        Dialog *dialog,
         Animation *animation,
-        struct Tooltip *tooltip,
         uColor_s active_bg_a, uColor_s active_bg_b,
         uColor_s secondary_bg_a, uColor_s secondary_bg_b,
         uColor_s selection_bg_a, uColor_s selection_bg_b);

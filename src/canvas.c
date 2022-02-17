@@ -129,6 +129,10 @@ void canvas_set_image(Canvas *self, uImage image_sink, bool save) {
         log_warn("canvas: set_image failed, invalid img");
         return;
     }
+    if(image_sink.layers>CANVAS_MAX_LAYERS) {
+        log_warn("canvas: set_image failed, to much layers!");
+        return;
+    }
     log_info("canvas: set_image");
     
     u_image_kill(&self->RO.image);

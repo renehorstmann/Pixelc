@@ -9,6 +9,7 @@
 #include "brush.h"
 #include "palette.h"
 #include "selectionctrl.h"
+#include "dialog.h"
 #include "animation.h"
 
 #define TOOL_NAME_LEN 16
@@ -17,7 +18,7 @@
 #define TOOL_BUTTON_ADDITIONAL_DATA_SIZE 64
 #define TOOL_LONG_PRESS_TIME 0.75
 
-struct Tooltip;
+struct Toolbar;
 
 typedef struct {
     Camera_s *cam;
@@ -26,8 +27,9 @@ typedef struct {
     Brush *brush;
     Palette *palette;
     SelectionCtrl *selectionctrl;
+    Dialog *dialog;
     Animation *animation;
-    struct Tooltip *tooltip;
+    struct Toolbar *toolbar;
 } ToolRefs;
 
 
@@ -96,6 +98,7 @@ Tool *tool_new_shading();
 Tool *tool_new_camera();
 Tool *tool_new_grid();
 Tool *tool_new_preview();
+Tool *tool_new_layer();
 
 Tool *tool_new_mode_none();
 Tool *tool_new_mode_free();
