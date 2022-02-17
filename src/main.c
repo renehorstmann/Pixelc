@@ -21,9 +21,9 @@
 
 // canvas size
 //*
-#define COLS 160
-#define ROWS 144
-#define LAYERS 15
+#define COLS 32
+#define ROWS 16
+#define LAYERS 1
 //*/
 
 // Tilec
