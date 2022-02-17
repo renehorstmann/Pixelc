@@ -63,8 +63,11 @@ python3 -m http.server --bind localhost  # [port]
   - delete
   - upload
   - canvas_size
+  - save
 - tools
   - size as window like tooltip
+  - save
+  - save hd
   - add layer behind
   - move layer up
   - move layer down
