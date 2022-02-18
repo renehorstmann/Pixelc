@@ -155,8 +155,8 @@ CMakeFiles
 
 ## Pixelc specific
 pixelc
-sprite.png
 image.png
+image_hd.png
 import.png
 save_*
 savestate_*
