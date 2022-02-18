@@ -350,7 +350,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-18, DIALOG_WIDTH, 10+8);
     impl->rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-40, DIALOG_WIDTH, 10+8);
 
-    dialog_set_title(self, "set size", (vec4){{0.2, 0.2, 0.6, 1}});
+    dialog_set_title(self, "set size", (vec4){{0.8, 0.2, 0.2, 1}});
     dialog_set_bg_color(self, u_color_from_hex(CANVASSIZE_BG_A), u_color_from_hex(CANVASSIZE_BG_B));
     self->in.impl_height = 50;
     self->kill = canvas_size_kill;
