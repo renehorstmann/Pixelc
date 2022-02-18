@@ -182,7 +182,8 @@ void selectionctrl_render(const SelectionCtrl *self, const mat4 *cam_mat) {
 }
 
 bool selectionctrl_pointer_event(SelectionCtrl *self, ePointer_s pointer) {
-    if (self->mode == SELECTIONCTRL_NONE
+    if (pointer.id != 0
+            || self->mode == SELECTIONCTRL_NONE
             || self->mode == SELECTIONCTRL_SET)
         return false;
         
