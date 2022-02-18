@@ -95,7 +95,7 @@ void multitouchcursor_render(const MultiTouchCursor *self, const mat4 *cam_mat) 
     ro_batch_render(&self->L.cursor, cam_mat, true);
 }
 
-void multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_pointer) {
+bool multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_pointer) {
     ePointer_s pointer = *in_out_pointer;
 
     if (pointer.id == 0 && pointer.action == E_POINTER_UP) {
@@ -110,7 +110,7 @@ void multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_p
         self->active = false;
         self->L.start = false;
         self->L.pressed = false;
-        return;
+        return false;
     }
 
     // start phase
@@ -175,4 +175,8 @@ void multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_p
             }
         }
     }
+    
+    if(self->active && in_out_pointer->id !=0)
+        return true;
+    return false;
 }

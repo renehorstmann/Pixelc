@@ -16,7 +16,10 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     hud_pointer.pos = mat4_mul_vec(self->cam_ref->matrices.p_inv, pointer.pos);
 
     // multitouchcursor may change hud_pointer, if active
-    multitouchcursor_pointer_event(self->mtc_ref, &hud_pointer);
+    if(multitouchcursor_pointer_event(self->mtc_ref, &hud_pointer)) {
+        // always return here, multitouchcursor consumed the multi touch event
+        return;
+    }
 
     // canvas pointer.pos in canvas coords
     ePointer_s c_pointer = hud_pointer;
@@ -26,6 +29,7 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
         // always return here, so the tools are not toggled
         return;
     }
+
 
     // only UP in all cases
     bool go = true;

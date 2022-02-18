@@ -81,12 +81,12 @@ void dialog_render(Dialog *self, const mat4 *cam_mat) {
 bool dialog_pointer_event(Dialog *self, ePointer_s pointer) {
     if (!dialog_valid(self))
         return false;
-    if (self->opt_on_cancel_cb && button_clicked(&self->cancel.rect, pointer)) {
+    if (pointer.id==0 && self->opt_on_cancel_cb && button_clicked(&self->cancel.rect, pointer)) {
         self->opt_on_cancel_cb(self, false);
         dialog_hide(self);
         return true;
     }
-    if (self->opt_on_ok_cb && button_clicked(&self->ok.rect, pointer)) {
+    if (pointer.id==0 && self->opt_on_ok_cb && button_clicked(&self->ok.rect, pointer)) {
         self->opt_on_ok_cb(self, true);
         dialog_hide(self);
         return true;

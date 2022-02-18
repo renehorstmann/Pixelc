@@ -32,7 +32,7 @@ void multitouchcursor_update(MultiTouchCursor *self, float dtime);
 void multitouchcursor_render(const MultiTouchCursor *self, const mat4 *cam_mat);
 
 // changes the pointer, if active
-void multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_pointer);
+bool multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_pointer);
 
 
 #endif //PIXELC_MULTITOUCHCURSOR_H
