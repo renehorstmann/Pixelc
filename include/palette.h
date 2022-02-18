@@ -10,7 +10,7 @@
 #define PALETTE_MAX 80
 
 
-typedef struct {
+typedef struct Palette {
     const Camera_s *camera_ref;
     Brush *brush_ref;
 

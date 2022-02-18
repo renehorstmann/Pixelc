@@ -19,7 +19,7 @@ Camera_s camera_new() {
     self.matrices.p = mat4_eye();
     self.matrices.p_inv = mat4_eye();
     self.matrices.vp = mat4_eye();
-    self.matrices.v_p_inv = mat4_eye();
+//    self.matrices.v_p_inv = mat4_eye();
     return self;
 }
 
@@ -53,7 +53,7 @@ void camera_update(Camera_s *self, ivec2 window_size) {
 
     self->matrices.vp = mat4_mul_mat(self->matrices.p, self->matrices.v_inv);
 
-    self->matrices.v_p_inv = mat4_mul_mat(self->matrices.v, self->matrices.p_inv);
+//    self->matrices.v_p_inv = mat4_mul_mat(self->matrices.v, self->matrices.p_inv);
     
     self->RO.left = sca_floor(self->RO.screen_left);
     self->RO.right = sca_ceil(self->RO.screen_right);

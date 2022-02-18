@@ -53,7 +53,7 @@ static char get_key_char(const TextInput *self, int idx) {
     int col = idx % 10;
     if (row == 2)
         col += 1; // S(hift)
-    switch (self->L.shiftstate) {
+    switch (self->shiftstate) {
         case TEXTINPUT_SHIFT_LOWER:
             return layout[row][col];
         case TEXTINPUT_SHIFT_UPPER:
@@ -99,9 +99,9 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     pointer.pos = mat4_mul_vec(self->L.cam.p_inv, pointer.pos);
 
     if (button_clicked(&self->L.shift.rect, pointer)) {
-        self->L.shiftstate++;
-        if (self->L.shiftstate >= TEXTINPUT_SHIFT_NUM_STATES) {
-            self->L.shiftstate = 0;
+        self->shiftstate++;
+        if (self->shiftstate >= TEXTINPUT_SHIFT_NUM_STATES) {
+            self->shiftstate = 0;
         }
     }
 
@@ -291,10 +291,10 @@ void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
     int idx = 0;
     for (int r = 0; r < 3; r++) {
         for (int c = 0; c < 10; c++) {
-            char key = self->L.shiftstate == TEXTINPUT_SHIFT_ALT ? layout_alt[r][c] : layout[r][c];
+            char key = self->shiftstate == TEXTINPUT_SHIFT_ALT ? layout_alt[r][c] : layout[r][c];
             if (isupper(key))
                 continue;
-            if (self->L.shiftstate == TEXTINPUT_SHIFT_UPPER)
+            if (self->shiftstate == TEXTINPUT_SHIFT_UPPER)
                 key = toupper(key);
 
             bool pressed = button_is_pressed(&self->L.keys.rects[idx]);
@@ -309,7 +309,7 @@ void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
         }
     }
 
-    self->L.shift.rect.sprite.y = self->L.shiftstate;
+    self->L.shift.rect.sprite.y = self->shiftstate;
     set_key_pos(self, &self->L.shift.rect.pose, 0, 2, 1, 0, 0);
     set_key_pos(self, &self->L.space.rect.pose, 2, 3, 6, 0,  0);
 

@@ -6,10 +6,11 @@
 #include "u/image.h"
 #include "r/ro_types.h"
 
+#define CANVAS_MAX_SIZE 4096
 #define CANVAS_MAX_LAYERS 16
 #define CANVAS_MAX_SAVES 128
 
-typedef struct {
+typedef struct Canvas {
     vec4 ro_color;
     
     int current_layer;

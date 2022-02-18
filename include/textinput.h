@@ -32,6 +32,7 @@ typedef struct {
 
     char text[TEXTINPUT_MAX_CHARS + 1];   // + '\0'
     enum TextInput_state state;
+    enum TextInput_shiftstate shiftstate;
     
     struct {
         // default = true
@@ -47,8 +48,6 @@ typedef struct {
         RoSingle shift, space;
         RoBatch special;
         RoSingle text_bg, bg;
-
-        enum TextInput_shiftstate shiftstate;
 
         int max_chars;
         float blink_time;

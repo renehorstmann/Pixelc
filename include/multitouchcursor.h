@@ -9,7 +9,6 @@
 
 typedef struct {
     const Camera_s *cam_ref;
-    Brush *brush_ref;
     Palette *palette_ref;
 
     vec4 pos;
@@ -24,7 +23,7 @@ typedef struct {
 } MultiTouchCursor;
 
 
-MultiTouchCursor *multitouchcursor_new(const Camera_s *cam, Brush *brush, Palette *palette);
+MultiTouchCursor *multitouchcursor_new(const Camera_s *cam, Palette *palette);
 
 void multitouchcursor_kill(MultiTouchCursor **self_ptr);
 
@@ -32,7 +31,8 @@ void multitouchcursor_update(MultiTouchCursor *self, float dtime);
 
 void multitouchcursor_render(const MultiTouchCursor *self, const mat4 *cam_mat);
 
-bool multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s pointer);
+// changes the pointer, if active
+void multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_pointer);
 
 
 #endif //PIXELC_MULTITOUCHCURSOR_H

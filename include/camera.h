@@ -32,7 +32,7 @@ typedef struct {
     //     so that the camera movement of 'v' is used
     // use 'v_p_inv' to transform a touch position to the world
     mat4 vp;        // p @ v_inv
-    mat4 v_p_inv;   // v @ p_inv
+//    mat4 v_p_inv;   // v @ p_inv
 } CameraMatrices_s;
 
 typedef struct {

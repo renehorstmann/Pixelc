@@ -44,6 +44,51 @@ uImage u_image_new_clone_a(uImage from, Allocator_i a) {
     return self;
 }
 
+uImage u_image_new_clone_scaled_a(int cols, int rows, uImage from, bool filter_linear, Allocator_i a) {
+    uImage self = u_image_new_empty_a(cols, rows, from.layers, a);
+    if (!u_image_valid(self))
+        return u_image_new_invalid();
+    for (int l = 0; l < self.layers; l++) {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                float u = (float) c / cols;
+                float v = (float) r / rows;
+                *u_image_pixel(self, c, r, l) = u_image_get_pixel_filtered(from, u, v, l, filter_linear);
+            }
+        }
+    }
+    return self;
+}
+
+uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, Allocator_i a) {
+    if (from.layers<=1 || layer_to_merge_down <= 0 || layer_to_merge_down>=from.layers) {
+        rhc_error = "image new clone merge down failed";
+        log_error("u_image_new_clone_merge_down_a failed: wrong layer to merge: %i/%i", layer_to_merge_down, from.layers);
+        return u_image_new_invalid();
+    }
+    uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers-1, a);
+    if (!u_image_valid(self))
+        return u_image_new_invalid();
+
+    // layers to clone up to layer_to_merge_down-1
+    if(layer_to_merge_down>1)
+        memcpy(self.data, from.data, sizeof(uColor_s) * self.cols * self.rows * (layer_to_merge_down-1));
+    // layers to clone behind layer_to_merge_down
+    if(layer_to_merge_down<from.layers-1)
+        memcpy(u_image_layer(self, layer_to_merge_down), u_image_layer(from, layer_to_merge_down+1),
+               sizeof(uColor_s) * self.cols * self.rows * (from.layers-layer_to_merge_down-1));
+    // merge the layers
+    for(int r=0; r<self.rows; r++) {
+        for(int c=0; c<self.cols; c++) {
+            uColor_s col_a = *u_image_pixel(from, c, r, layer_to_merge_down-1);
+            uColor_s col_b = *u_image_pixel(from, c, r, layer_to_merge_down);
+            *u_image_pixel(self, c, r, layer_to_merge_down-1) =
+                    ucvec4_mix(col_a, col_b, col_b.a/255.0f);
+        }
+    }
+    return self;
+}
+
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Allocator_i a) {
     assume(layers > 0, "A single layer needed");
     if (surface->h % layers != 0) {
@@ -51,36 +96,36 @@ uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Alloca
         log_warn("u_image_new_sdl_surface_a failed: rows %% layers != 0");
         return u_image_new_invalid();
     }
-    
+
     int cols = surface->w;
     int rows = surface->h / layers;
     uImage self = u_image_new_invalid();
-    
+
     SDL_PixelFormat *sf = surface->format;
-    SDL_PixelFormat *df = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32); 
-    
+    SDL_PixelFormat *df = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+
     SDL_Surface *cast = NULL;
-    
+
     // check if the format equals the needed
     //    and convert it otherwise
-    if(sf->BitsPerPixel != df->BitsPerPixel
-            || sf->Rmask != df->Rmask
-            || sf->Gmask != df->Gmask
-            || sf->Bmask != df->Bmask
-            || sf->Amask != df->Amask) {
-        cast = SDL_ConvertSurface(surface, df, 0); 
+    if (sf->BitsPerPixel != df->BitsPerPixel
+        || sf->Rmask != df->Rmask
+        || sf->Gmask != df->Gmask
+        || sf->Bmask != df->Bmask
+        || sf->Amask != df->Amask) {
+        cast = SDL_ConvertSurface(surface, df, 0);
         surface = cast;
     }
-    
-    if(surface->pitch != cols * 4) {
+
+    if (surface->pitch != cols * 4) {
         log_error("u_image_new_sdl_surface_a failed: pitch must be == cols*4");
         goto CLEANUP;
     }
-    
+
     // create image with the surface data
     self = u_image_new_empty_a(cols, rows, layers, a);
     memcpy(self.data, surface->pixels, u_image_data_size(self));
-    
+
     CLEANUP:
     SDL_FreeFormat(df);
     SDL_FreeSurface(cast);
@@ -110,14 +155,14 @@ void u_image_kill(uImage *self) {
 // creates an SDL_Surface from the image
 struct SDL_Surface *u_image_to_sdl_surface(uImage self) {
     SDL_PixelFormat *format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
-    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom((void*) self.data, 
-            self.cols, 
-            self.rows * self.layers, 
-            32, self.cols * 4, 
-            format->Rmask, 
-            format->Gmask, 
-            format->Bmask, 
-            format->Amask);
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom((void *) self.data,
+                                                    self.cols,
+                                                    self.rows * self.layers,
+                                                    32, self.cols * 4,
+                                                    format->Rmask,
+                                                    format->Gmask,
+                                                    format->Bmask,
+                                                    format->Amask);
     SDL_FreeFormat(format);
     return surface;
 }
@@ -161,18 +206,18 @@ bool u_image_copy(uImage self, uImage from) {
 }
 
 void u_image_copy_top_left(uImage self, uImage from) {
-    if(!u_image_valid(self) || !u_image_valid(from)) {
+    if (!u_image_valid(self) || !u_image_valid(from)) {
         log_warn("u_image_copy_top_left failed");
         return;
     }
     int layers = isca_min(self.layers, from.layers);
     int rows = isca_min(self.rows, from.rows);
     int cols = isca_min(self.cols, from.cols);
-    
-    for(int l=0; l<layers; l++) {
-        for(int r=0; r<rows; r++) {
-            for(int c=0; c<cols; c++) {
-                *u_image_pixel(self, c, r, l) = 
+
+    for (int l = 0; l < layers; l++) {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                *u_image_pixel(self, c, r, l) =
                         *u_image_pixel(from, c, r, l);
             }
         }

@@ -12,8 +12,11 @@
 #define DIALOG_LEFT -60
 #define DIALOG_TOP 60
 
+struct eWindow;
+struct eInput;
 struct Dialog;
 struct Toolbar;
+struct Palette;
 struct Canvas;
 
 typedef void (*dialog_on_action_cb)(struct Dialog *self, bool ok);
@@ -76,8 +79,8 @@ void dialog_create_delete(Dialog *self, const char *msg, dialog_on_action_cb on_
 
 void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fun on_action_cb, void *user_data);
 
-void dialog_create_tooltip(Dialog *self, struct Toolbar *toolbar);
+void dialog_create_tooltip(Dialog *self, const struct Toolbar *toolbar, const struct Palette *palette);
 
-void dialog_create_canvas_size(Dialog *self, struct Canvas *canvas);
+void dialog_create_canvas_size(Dialog *self, const struct eWindow *window, struct eInput *input_ref, struct Canvas *canvas);
 
 #endif //PIXELC_DIALOG_H

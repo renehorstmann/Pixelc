@@ -137,14 +137,13 @@ void canvas_set_image(Canvas *self, uImage image_sink, bool save) {
     
     u_image_kill(&self->RO.image);
     self->RO.image = image_sink;
-    
-    // save before cloning into orev.
-    if(save)
-        canvas_save(self);
-        
+
     u_image_kill(&self->L.prev_image);
     self->L.prev_image = u_image_new_clone(image_sink);
-    
+
+    if(save)
+        canvas_save(self);
+
     update_render_objects(self);
 }
 
@@ -155,9 +154,6 @@ void canvas_save(Canvas *self) {
         log_info("canvas: save failed, not changed");
         return;
     }
-    
-    // todo: remove...
-    u_image_save_file(self->RO.image, "image.png");
     
     u_image_copy(self->L.prev_image, self->RO.image);
     self->L.save_idx++;

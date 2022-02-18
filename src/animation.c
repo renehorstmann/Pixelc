@@ -112,7 +112,7 @@ void animation_render(const Animation *self, const mat4 *cam_mat) {
         ro_single_render(&self->L.longpress.ro, cam_mat);
     }
     if (!self->show) {
-        ro_text_render(&self->L.horsimann, cam_mat);
+        //ro_text_render(&self->L.horsimann, cam_mat);
         return;
     }
 

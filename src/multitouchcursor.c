@@ -19,7 +19,7 @@ static const vec4 COLOR_NORMAL = {{0.75, 0.75, 0.75, 0.5}};
 static const vec4 COLOR_PRESSED = {{1, 1, 1, 0.75}};
 
 
-static void send_brush_pointer_event(const MultiTouchCursor *self, enum ePointerAction action) {
+static void set_out_pointer(const MultiTouchCursor *self, ePointer_s *out_pointer, enum ePointerAction action) {
     ePointer_s pointer = {
             .pos = self->pos,
             .action = action,
@@ -30,7 +30,7 @@ static void send_brush_pointer_event(const MultiTouchCursor *self, enum ePointer
     pointer.pos = mat4_mul_vec(self->cam_ref->matrices.v, pointer.pos);
 
     // call the pointer event of brush
-    brush_pointer_event(self->brush_ref, pointer);
+//    brush_pointer_event(self->brush_ref, pointer);
 }
 
 static void activate(MultiTouchCursor *self) {
@@ -42,11 +42,10 @@ static void activate(MultiTouchCursor *self) {
 // public
 //
 
-MultiTouchCursor *multitouchcursor_new(const Camera_s *cam, Brush *brush, Palette *palette) {
+MultiTouchCursor *multitouchcursor_new(const Camera_s *cam, Palette *palette) {
     MultiTouchCursor *self = rhc_calloc(sizeof *self);
 
     self->cam_ref = cam;
-    self->brush_ref = brush;
     self->palette_ref = palette;
 
     self->L.cursor = ro_batch_new(4, r_texture_new_white_pixel());
@@ -96,15 +95,22 @@ void multitouchcursor_render(const MultiTouchCursor *self, const mat4 *cam_mat) 
     ro_batch_render(&self->L.cursor, cam_mat, true);
 }
 
-bool multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s pointer) {
+void multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_pointer) {
+    ePointer_s pointer = *in_out_pointer;
 
     if (pointer.id == 0 && pointer.action == E_POINTER_UP) {
         if(self->active && self->L.pressed) {
-            send_brush_pointer_event(self, E_POINTER_UP);
+            // end multitouch mode and reset the pointer to up
+            *in_out_pointer = (ePointer_s) {
+                    .pos = self->pos,
+                    .action = E_POINTER_UP,
+                    .id = 0
+            };
         }
         self->active = false;
         self->L.start = false;
         self->L.pressed = false;
+        return;
     }
 
     // start phase
@@ -143,20 +149,30 @@ bool multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s pointer) 
                 self->pos.x -= CURSOR_DISTANCE;
 
             // send MOVE always, like a real cursor
-            send_brush_pointer_event(self, E_POINTER_MOVE);
+            *in_out_pointer = (ePointer_s) {
+                    .pos = self->pos,
+                    .action = E_POINTER_MOVE,
+                    .id = 0
+            };
         }
 
         if (pointer.id != 0) {
             if(pointer.action == E_POINTER_DOWN) {
                 self->L.pressed = true;
-                send_brush_pointer_event(self, E_POINTER_DOWN);
+                *in_out_pointer = (ePointer_s) {
+                        .pos = self->pos,
+                        .action = E_POINTER_DOWN,
+                        .id = 0
+                };
             }
             if(pointer.action == E_POINTER_UP) {
                 self->L.pressed = false;
-                send_brush_pointer_event(self, E_POINTER_UP);
+                *in_out_pointer = (ePointer_s) {
+                        .pos = self->pos,
+                        .action = E_POINTER_UP,
+                        .id = 0
+                };
             }
         }
     }
-
-    return self->active;
 }

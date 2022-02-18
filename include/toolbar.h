@@ -14,10 +14,10 @@
 typedef struct {
     Tool **tools;
     int tools_len;
-    
+
     uContainer container;
     enum u_container_align align;
-    
+
     RoSingle bg;
 } ToolbarContainer;
 
@@ -32,6 +32,8 @@ typedef struct Toolbar {
         Tool *all_tools[TOOLBAR_TOOLS_LEN];
         struct {
             Tool *tooltip;
+            Tool *save;
+            Tool *save_hd;
             Tool *import;
             Tool *clear;
             Tool *undo;
@@ -44,6 +46,7 @@ typedef struct Toolbar {
             Tool *grid;
             Tool *preview;
             Tool *layer;
+            Tool *size;
 
             Tool *mode_none;
             Tool *mode_free;
@@ -59,7 +62,7 @@ typedef struct Toolbar {
             Tool *mode_pipette;
         } tools;
     };
-    
+
     union {
         Tool *all_selection_set_tools[TOOLBAR_SELECTION_SET_TOOLS_LEN];
         struct {
@@ -68,7 +71,7 @@ typedef struct Toolbar {
             Tool *copy;
         } selection_set_tools;
     };
-    
+
     union {
         Tool *all_selection_paste_tools[TOOLBAR_SELECTION_PASTE_TOOLS_LEN];
         struct {
@@ -84,7 +87,7 @@ typedef struct Toolbar {
 
     struct {
         enum selectionctrl_mode last_selectionctrl_mode;
-        
+
         uColor_s active_bg_a, active_bg_b;
         uColor_s secondary_bg_a, secondary_bg_b;
         uColor_s selection_bg_a, selection_bg_b;
@@ -92,16 +95,18 @@ typedef struct Toolbar {
 } Toolbar;
 
 
-Toolbar *toolbar_new(Camera_s *cam, 
-        CameraCtrl *camctrl,
-        Canvas *canvas,
-        Brush *brush, Palette *palette, 
-        SelectionCtrl *selectionctrl,
-        Dialog *dialog,
-        Animation *animation,
-        uColor_s active_bg_a, uColor_s active_bg_b,
-        uColor_s secondary_bg_a, uColor_s secondary_bg_b,
-        uColor_s selection_bg_a, uColor_s selection_bg_b);
+Toolbar *toolbar_new(struct eWindow *window,
+                     eInput *input,
+                     Camera_s *cam,
+                     CameraCtrl *camctrl,
+                     Canvas *canvas,
+                     Brush *brush, Palette *palette,
+                     SelectionCtrl *selectionctrl,
+                     Dialog *dialog,
+                     Animation *animation,
+                     uColor_s active_bg_a, uColor_s active_bg_b,
+                     uColor_s secondary_bg_a, uColor_s secondary_bg_b,
+                     uColor_s selection_bg_a, uColor_s selection_bg_b);
 
 void toolbar_update(Toolbar *self, float dtime);
 
@@ -114,6 +119,7 @@ float toolbar_size(const Toolbar *self);
 
 // returns true if pos is within the toolbar
 bool toolbar_contains(const Toolbar *self, vec2 pos);
+
 // returns NULL if not found
 Tool *toolbar_get_tool_by_pos(const Toolbar *self, vec2 pos);
 

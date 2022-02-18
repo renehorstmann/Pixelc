@@ -1,15 +1,21 @@
+#include "e/window.h"
+#include "e/input.h"
 #include "r/ro_single.h"
 #include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "toolbar.h"
+#include "palette.h"
 #include "button.h"
 #include "dialog.h"
+#include "textinput.h"
 
 #define BG_A "#776666"
 #define BG_B "#887777"
 #define TOOLTIP_BG_A "#776666"
 #define TOOLTIP_BG_B "#887777"
+#define CANVASSIZE_BG_A "#667766"
+#define CANVASSIZE_BG_B "#778877"
 
 Dialog *dialog_new() {
     Dialog *self = rhc_calloc(sizeof *self);
@@ -34,9 +40,6 @@ Dialog *dialog_new() {
     self->ok.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 10 - self->ok.tex.sprite_size.x, 0,
                                        self->ok.tex.sprite_size.x, self->ok.tex.sprite_size.y);
 
-    self->title.pose = u_pose_new(DIALOG_LEFT + 19, DIALOG_TOP - 2, 2, 2);
-    self->title_shadow.pose = self->title.pose;
-    u_pose_shift_xy(&self->title_shadow.pose, 1, -1);
 
     return self;
 }
@@ -66,13 +69,13 @@ void dialog_render(Dialog *self, const mat4 *cam_mat) {
         return;
     ro_single_render(&self->bg_shadow, cam_mat);
     ro_single_render(&self->bg, cam_mat);
-    self->render(self, cam_mat);
     ro_text_render(&self->title_shadow, cam_mat);
     ro_text_render(&self->title, cam_mat);
     if (self->opt_on_cancel_cb)
         ro_single_render(&self->cancel, cam_mat);
     if (self->opt_on_ok_cb)
         ro_single_render(&self->ok, cam_mat);
+    self->render(self, cam_mat);
 }
 
 bool dialog_pointer_event(Dialog *self, ePointer_s pointer) {
@@ -84,7 +87,7 @@ bool dialog_pointer_event(Dialog *self, ePointer_s pointer) {
         return true;
     }
     if (self->opt_on_ok_cb && button_clicked(&self->ok.rect, pointer)) {
-        self->opt_on_ok_cb(self, false);
+        self->opt_on_ok_cb(self, true);
         dialog_hide(self);
         return true;
     }
@@ -119,9 +122,13 @@ void dialog_set_bg_color(Dialog *self, uColor_s a, uColor_s b) {
 void dialog_set_title(Dialog *self, const char *title_id, vec4 color) {
     assume(strlen(title_id) < DIALOG_MAX_TITLE_LEN, "title to long");
     strcpy(self->id, title_id);
-    ro_text_set_text(&self->title, title_id);
+    vec2 size = ro_text_set_text(&self->title, title_id);
     ro_text_set_text(&self->title_shadow, title_id);
     ro_text_set_color(&self->title, color);
+    self->title.pose = u_pose_new(DIALOG_LEFT + DIALOG_WIDTH/2 - sca_ceil(size.x),
+                                  DIALOG_TOP - 2, 2, 2);
+    self->title_shadow.pose = self->title.pose;
+    u_pose_shift_xy(&self->title_shadow.pose, 1, -1);
 }
 
 void dialog_create_delete(Dialog *self, const char *msg, dialog_on_action_cb on_action_cb, void *user_data) {
@@ -134,7 +141,8 @@ void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fu
 
 
 struct ToolTip {
-    Toolbar *toolbar_ref;
+    const Toolbar *toolbar_ref;
+    const Palette *palette_ref;
     RoText name;
     RoText tip;
 };
@@ -160,6 +168,12 @@ static void tooltip_set(Dialog *self, const char *name, const char *tip) {
 }
 static bool tooltip_pe(Dialog *self, ePointer_s pointer) {
     struct ToolTip *impl = self->impl;
+    if(palette_contains_pos(impl->palette_ref, pointer.pos.xy)) {
+        tooltip_set(self, "palette", "tip to select\na color\n\n"
+                                     "swipe left or\nright to change\nthe palette\n\n"
+                                     "swipe up for\nmultitouchmode");
+        return true;
+    }
     Tool *tool = toolbar_get_tool_by_pos(impl->toolbar_ref, pointer.pos.xy);
     if(!tool)
         return true;
@@ -174,11 +188,12 @@ void tooltip_on_action(Dialog *self, bool ok) {
     dialog_hide(self);
 }
 
-void dialog_create_tooltip(Dialog *self, struct Toolbar *toolbar) {
+void dialog_create_tooltip(Dialog *self, const struct Toolbar *toolbar, const struct Palette *palette) {
     dialog_hide(self);
     struct ToolTip *impl = rhc_calloc(sizeof *impl);
     self->impl = impl;
     impl->toolbar_ref = toolbar;
+    impl->palette_ref = palette;
 
     impl->name = ro_text_new_font55(TOOL_NAME_LEN);
     ro_text_set_color(&impl->name, (vec4){{0.9, 0.9, 0.9, 1}});
@@ -199,6 +214,149 @@ void dialog_create_tooltip(Dialog *self, struct Toolbar *toolbar) {
 //    self->opt_on_ok_cb = tooltip_on_action;
 }
 
-void dialog_create_canvas_size(Dialog *self, struct Canvas *canvas) {
+
+
+struct CanvasSize {
+    const struct eWindow *window_ref;
+    eInput *input_ref;
+    Canvas *canvas_ref;
+
+    RoText cols_text;
+    RoText rows_text;
+    RoText cols_num;
+    RoText rows_num;
+    mat4 cols_hitbox;
+    mat4 rows_hitbox;
+    int cols, rows;
+
+    bool textinput_for_col;
+    TextInput *textinput;
+};
+static void canvas_size_kill(void *impl) {
+    struct CanvasSize *self = impl;
+    ro_text_kill(&self->cols_text);
+    ro_text_kill(&self->rows_text);
+    ro_text_kill(&self->cols_num);
+    ro_text_kill(&self->rows_num);
+    rhc_free(self);
+}
+static void canvas_size_update(Dialog *self, float dtime) {
+    struct CanvasSize *impl = self->impl;
+
+    if(impl->textinput) {
+        textinput_update(impl->textinput, e_window_get_size(impl->window_ref), dtime);
+
+        char *end;
+        int size = strtol(impl->textinput->text, &end, 10);
+        bool ok = end && end!=impl->textinput->text && size>0 && size<CANVAS_MAX_SIZE;
+        impl->textinput->in.ok_active = ok;
+
+        if(impl->textinput->state == TEXTINPUT_DONE) {
+            if(impl->textinput_for_col)
+                impl->cols = size;
+            else
+                impl->rows = size;
+        }
+        if(impl->textinput->state != TEXTINPUT_IN_PROGRESS)
+            textinput_kill(&impl->textinput);
+    }
+
+    char buf[16];
+    snprintf(buf, sizeof buf, "%i", impl->cols);
+    ro_text_set_text(&impl->cols_num, buf);
+    snprintf(buf, sizeof buf, "%i", impl->rows);
+    ro_text_set_text(&impl->rows_num, buf);
+}
+static void canvas_size_render(Dialog *self, const mat4 *cam_mat) {
+    struct CanvasSize *impl = self->impl;
+    ro_text_render(&impl->cols_text, cam_mat);
+    ro_text_render(&impl->rows_text, cam_mat);
+    ro_text_render(&impl->cols_num, cam_mat);
+    ro_text_render(&impl->rows_num, cam_mat);
+    if(impl->textinput) {
+        textinput_render(impl->textinput);
+    }
+}
+static bool canvas_size_pe(Dialog *self, ePointer_s pointer) {
+    struct CanvasSize *impl = self->impl;
+
+    if(pointer.id == 0 && pointer.action == E_POINTER_DOWN) {
+        if(u_pose_aa_contains(impl->cols_hitbox, pointer.pos.xy)) {
+            impl->textinput = textinput_new(impl->input_ref, "Set canvas cols", 8);
+            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->cols);
+            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+            impl->textinput_for_col = true;
+        }
+        if(u_pose_aa_contains(impl->rows_hitbox, pointer.pos.xy)) {
+            impl->textinput = textinput_new(impl->input_ref, "Set canvas rows", 8);
+            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->rows);
+            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+            impl->textinput_for_col = false;
+        }
+    }
+
+    return true;
+}
+
+void canvas_size_on_action(Dialog *self, bool ok) {
+    struct CanvasSize *impl = self->impl;
+    Canvas *canvas = impl->canvas_ref;
+    uImage img = canvas->RO.image;
+    int cols = impl->cols;
+    int rows = impl->rows;
+
     dialog_hide(self);
+    if(!ok || (cols==img.cols && rows==img.rows)) {
+        log_info("dialog canvas_size aborted");
+        return;
+    }
+    log_info("dialog canvas_size with new size: %i %i", cols, rows);
+
+    uImage new_img = u_image_new_zeros(cols, rows, img.layers);
+    u_image_copy_top_left(new_img, img);
+    canvas_set_image(canvas, new_img, true);
+}
+void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *input, struct Canvas *canvas) {
+    dialog_hide(self);
+    dialog_hide(self);
+    struct CanvasSize *impl = rhc_calloc(sizeof *impl);
+    self->impl = impl;
+    impl->window_ref = window;
+    impl->input_ref = input;
+    impl->canvas_ref = canvas;
+
+    impl->cols = canvas->RO.image.cols;
+    impl->rows = canvas->RO.image.rows;
+
+    impl->cols_text = ro_text_new_font55(5);
+    ro_text_set_text(&impl->cols_text, "cols:");
+    ro_text_set_color(&impl->cols_text, (vec4){{0.9, 0.9, 0.9, 1}});
+
+    impl->rows_text = ro_text_new_font55(5);
+    ro_text_set_text(&impl->rows_text, "rows:");
+    ro_text_set_color(&impl->rows_text, (vec4){{0.9, 0.9, 0.9, 1}});
+
+    impl->cols_num = ro_text_new_font55(8);
+    ro_text_set_color(&impl->cols_num, (vec4){{0.1, 0.1, 0.9, 1}});
+
+    impl->rows_num = ro_text_new_font55(8);
+    ro_text_set_color(&impl->rows_num, (vec4){{0.1, 0.1, 0.9, 1}});
+
+    impl->cols_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-22, 1, 2);
+    impl->cols_num.pose = u_pose_new(DIALOG_LEFT+40, DIALOG_TOP-22, 1, 2);
+    impl->rows_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-44, 1, 2);
+    impl->rows_num.pose = u_pose_new(DIALOG_LEFT+40, DIALOG_TOP-44, 1, 2);
+
+    impl->cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-18, DIALOG_WIDTH, 10+8);
+    impl->rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-40, DIALOG_WIDTH, 10+8);
+
+    dialog_set_title(self, "set size", (vec4){{0.2, 0.2, 0.6, 1}});
+    dialog_set_bg_color(self, u_color_from_hex(CANVASSIZE_BG_A), u_color_from_hex(CANVASSIZE_BG_B));
+    self->in.impl_height = 50;
+    self->kill = canvas_size_kill;
+    self->update = canvas_size_update;
+    self->render = canvas_size_render;
+    self->pointer_event = canvas_size_pe;
+    self->opt_on_cancel_cb = canvas_size_on_action;
+    self->opt_on_ok_cb = canvas_size_on_action;
 }

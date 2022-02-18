@@ -10,9 +10,9 @@ Compiled with emscripten [live demo](https://renehorstmann.github.io/pixelc)
 Lots of features are missing in the web demo! (Loading, Saving, options like size, ...)
 
 ## Status:
-Ready to draw.
-Saves after each tip on the screen to image.png.
-An import button can load import.png as selection, if available.
+Ready to draw..
+Save via the save tools to image.png or image_hd.png.
+Load image.png as selection.
 Canvas size, animation size can be configured in code (main.c).
 
 ![example_image](example.jpg)
@@ -65,12 +65,16 @@ python3 -m http.server --bind localhost  # [port]
   - canvas_size
 - tools
   - size as window like tooltip
-  - save
-  - save hd
-  - add layer behind
-  - move layer up
-  - move layer down
-  - merge layer down
+  - layer
+    - toggle like selection for a new toolbar
+    - change layer (rename layer tool)
+    - add layer behind (+)
+    - delete current layer (-)
+    - move layer up
+    - move layer down
+    - merge layer down
+    - toggle for save merged
+    - toggle for onion skinning
   - delete current palette
     - are you sure prompt
   - delete current kernel
@@ -82,41 +86,12 @@ python3 -m http.server --bind localhost  # [port]
   - instead of animation
   - how to animate
   - frame times?
-- some
-  - uImage
-    - scale as + interpolation options
-    - merge layers (single or all)
-  - p eval
-    - evaluate mathc strings
-      - "(16+8)*4" == 96
 - options menu
   - in container stack
-  - size
-    - textinput only alt keys?
-    - save as eval string
-    - shows evaluated number
-  - layers
-  - frames + fps
-  - save as
-  - save in HD
-  - merge current layer down
-  - merge all layers down
-  - save merged
-  - save merged in HD
-  - add a layer above current
-  - add a layer below current
-  - import from?
-  - import kernel
-  - delete current kernel
-  - import palette
-  - delete current palette
-  - tool sub menu
-    - can also be pressed (info at top)
-    - preview at top
-    - in container stack
-    - shows tooltip, etc.
-    - turn on / off
-    - change position (move up / down)
+  - shows all tools
+  - tools can be used (maybe not all? (tooltip))
+  - tools can be en/disabled
+  - tools can be repositioned (uo down)
 
 - onion skinning (show last animation frames alpha blended in the background)
 - tiles

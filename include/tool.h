@@ -21,6 +21,9 @@
 struct Toolbar;
 
 typedef struct {
+    struct eWindow *window;
+    eInput *input;
+
     Camera_s *cam;
     CameraCtrl *camctrl;
     Canvas *canvas;
@@ -87,6 +90,8 @@ Tool *tool_button_new(const char *name,
 //
 
 Tool *tool_new_tooltip();
+Tool *tool_new_save();
+Tool *tool_new_save_hd();
 Tool *tool_new_import();
 Tool *tool_new_clear();
 Tool *tool_new_undo();
@@ -99,6 +104,7 @@ Tool *tool_new_camera();
 Tool *tool_new_grid();
 Tool *tool_new_preview();
 Tool *tool_new_layer();
+Tool *tool_new_size();
 
 Tool *tool_new_mode_none();
 Tool *tool_new_mode_free();

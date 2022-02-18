@@ -1,3 +1,4 @@
+#include "e/io.h"
 #include "r/ro_single.h"
 #include "r/ro_text.h"
 #include "r/texture.h"
@@ -8,6 +9,8 @@
 #include "mathc/sca/int.h"
 #include "button.h"
 #include "tool.h"
+
+#define HD_MIN_SIZE 1024
 
 static void tool_button_kill(Tool **super_ptr) {
     ToolButton *self = (ToolButton*) *super_ptr;
@@ -97,7 +100,7 @@ static void tool_tooltip_pe(struct Tool *super, ePointer_s pointer, ToolRefs ref
     bool pressed = button_is_pressed(&self->ro.rect);
     if(pressed) {
         log_info("tool tooltip start");
-        dialog_create_tooltip(refs.dialog, refs.toolbar);
+        dialog_create_tooltip(refs.dialog, refs.toolbar, refs.palette);
     } else {
         log_info("tool tooltip stop");
         dialog_hide(refs.dialog);
@@ -117,6 +120,45 @@ Tool *tool_new_tooltip() {
             "res/button_tooltip.png", 
             tool_tooltip_pe,
             tool_tooltip_is_a);
+}
+
+static void tool_save_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(self->active && button_clicked(&self->ro.rect, pointer)) {
+        log_info("tool save");
+        u_image_save_file(refs.canvas->RO.image, "image.png");
+        e_io_offer_file_as_download("image.png");
+    }
+}
+Tool *tool_new_save() {
+    return tool_button_new("save",
+                           "saves the canvas\nas image.png",
+                           "res/button_save.png",
+                           tool_save_pe,
+                           NULL);
+}
+
+static void tool_save_hd_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(self->active && button_clicked(&self->ro.rect, pointer)) {
+        log_info("tool save hd");
+        uImage img = refs.canvas->RO.image;
+        int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
+        int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
+        int scale = isca_max(scale_w, scale_h);
+        img = u_image_new_clone_scaled(img.cols*scale, img.rows*scale, false, img);
+        u_image_save_file(img, "image_hd.png");
+        u_image_kill(&img);
+        e_io_offer_file_as_download("image_hd.png");
+    }
+}
+Tool *tool_new_save_hd() {
+    return tool_button_new("save hd",
+                           "saves the canvas\nas hd version\nas image_hd.png\n\n"
+                           "The hd version\nhas a size of\nat least 1024px",
+                           "res/button_save_hd.png",
+                           tool_save_hd_pe,
+                           NULL);
 }
 
 static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
@@ -728,4 +770,37 @@ Tool *tool_new_layer() {
     self->super.pointer_event = tool_layer_pe;
 
     return (Tool*) self;
+}
+
+
+
+static void tool_size_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(!button_toggled(&self->ro.rect, pointer))
+        return;
+
+    // only passed if button state toggled
+    bool pressed = button_is_pressed(&self->ro.rect);
+    if(pressed) {
+        log_info("tool size start");
+        dialog_create_canvas_size(refs.dialog, refs.window, refs.input, refs.canvas);
+    } else {
+        log_info("tool size stop");
+        dialog_hide(refs.dialog);
+    }
+
+}
+static bool tool_size_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    bool active = strcmp(refs.dialog->id, "set size") == 0;
+    button_set_pressed(&self->ro.rect, active);
+    // always active
+    return true;
+}
+Tool *tool_new_size() {
+    return tool_button_new("size",
+                           "change the\ncanvas size",
+                           "res/button_size.png",
+                           tool_size_pe,
+                           tool_size_is_a);
 }

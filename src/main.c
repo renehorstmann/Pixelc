@@ -106,7 +106,9 @@ static void init(eSimple *simple, ivec2 window_size) {
     
     L.dialog = dialog_new();
 
-    L.toolbar = toolbar_new(L.camera, 
+    L.toolbar = toolbar_new(simple->window,
+                            simple->input,
+                            L.camera,
                             L.camctrl,
                             L.canvas,
                             L.brush, 
@@ -122,7 +124,7 @@ static void init(eSimple *simple, ivec2 window_size) {
                             u_color_from_hex(TB_SELECTION_BG_B)
     );
     
-    L.mtc = multitouchcursor_new(L.camera, L.brush, L.palette);
+    L.mtc = multitouchcursor_new(L.camera, L.palette);
 
     L.inputctrl = inputctrl_new(simple->input, 
             L.camera,
@@ -174,12 +176,13 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
 
     canvas_render(L.canvas, canvas_cam);
     selectionctrl_render(L.selectionctrl, canvas_cam);
-    multitouchcursor_render(L.mtc, hud_cam);
     toolbar_render(L.toolbar, hud_cam);
     palette_render(L.palette, hud_cam);
     
     dialog_render(L.dialog, hud_cam);
     animation_render(L.animation, hud_cam);
+
+    multitouchcursor_render(L.mtc, hud_cam);
 }
 
 int main(int argc, char **argv) {

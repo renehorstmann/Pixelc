@@ -184,7 +184,9 @@ static void show_selection_move(Toolbar *self) {
 // public
 //
 
-Toolbar *toolbar_new(Camera_s *cam, 
+Toolbar *toolbar_new(struct eWindow *window,
+                     eInput *input,
+                     Camera_s *cam,
                      CameraCtrl *camctrl,
                      Canvas *canvas,
                      Brush *brush, 
@@ -198,10 +200,16 @@ Toolbar *toolbar_new(Camera_s *cam,
     Toolbar *self = rhc_calloc(sizeof *self);
 
     self->refs = (ToolRefs) {
-            cam, camctrl, canvas, brush, palette, selectionctrl, dialog, animation, self
+            window, input,
+            cam, camctrl,
+            canvas, brush, palette,
+            selectionctrl, dialog, animation,
+            self
     };
 
     self->tools.tooltip = tool_new_tooltip();
+    self->tools.save = tool_new_save();
+    self->tools.save_hd = tool_new_save_hd();
     self->tools.import = tool_new_import();
     self->tools.clear = tool_new_clear();
     self->tools.undo = tool_new_undo();
@@ -214,6 +222,7 @@ Toolbar *toolbar_new(Camera_s *cam,
     self->tools.grid = tool_new_grid();
     self->tools.preview = tool_new_preview();
     self->tools.layer = tool_new_layer();
+    self->tools.size = tool_new_size();
 
     self->tools.mode_none = tool_new_mode_none();
     self->tools.mode_free = tool_new_mode_free();

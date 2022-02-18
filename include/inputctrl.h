@@ -12,7 +12,7 @@
 #include "multitouchcursor.h"
 
 typedef struct {
-    const Camera_s *camera_ref;
+    const Camera_s *cam_ref;
     Palette *palette_ref;
     Brush *brush_ref;
     SelectionCtrl *selectionctrl_ref;
