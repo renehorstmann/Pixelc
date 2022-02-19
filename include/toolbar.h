@@ -7,6 +7,7 @@
 #include "tool.h"
 
 #define TOOLBAR_TOOLS_LEN 25
+#define TOOLBAR_LAYER_TOOLS_LEN 1
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -25,7 +26,7 @@ typedef struct Toolbar {
     ToolRefs refs;
 
     ToolbarContainer active;
-    ToolbarContainer secondary;
+    ToolbarContainer layer; 
     ToolbarContainer selection;
 
     union {
@@ -45,7 +46,6 @@ typedef struct Toolbar {
             Tool *camera;
             Tool *grid;
             Tool *preview;
-            Tool *layer;
             Tool *size;
 
             Tool *mode_none;
@@ -62,6 +62,14 @@ typedef struct Toolbar {
             Tool *mode_pipette;
         } tools;
     };
+    
+    union {
+        Tool *all_layer_tools[TOOLBAR_LAYER_TOOLS_LEN];
+        struct {
+            Tool *select;
+        } layer_tools;
+    };
+
 
     union {
         Tool *all_selection_set_tools[TOOLBAR_SELECTION_SET_TOOLS_LEN];
@@ -89,7 +97,7 @@ typedef struct Toolbar {
         enum selectionctrl_mode last_selectionctrl_mode;
 
         uColor_s active_bg_a, active_bg_b;
-        uColor_s secondary_bg_a, secondary_bg_b;
+        uColor_s layer_bg_a, layer_bg_b;
         uColor_s selection_bg_a, selection_bg_b;
     } L;
 } Toolbar;

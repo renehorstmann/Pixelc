@@ -103,7 +103,6 @@ Tool *tool_new_shading();
 Tool *tool_new_camera();
 Tool *tool_new_grid();
 Tool *tool_new_preview();
-Tool *tool_new_layer();
 Tool *tool_new_size();
 
 Tool *tool_new_mode_none();
@@ -118,6 +117,8 @@ Tool *tool_new_mode_fill();
 Tool *tool_new_mode_fill8();
 Tool *tool_new_mode_replace();
 Tool *tool_new_mode_pipette();
+
+Tool *tool_new_layer_select();
 
 Tool *tool_new_selection_set_move();
 Tool *tool_new_selection_set_copy();

@@ -151,6 +151,24 @@ float toolbar_constainer_size(const ToolbarContainer *self, const Camera_s *cam)
     return camera_is_portrait_mode(cam) ? self->container.out.size.y: self->container.out.size.x;
 }
 
+static void hide_layer(Toolbar *self) {
+    log_info("toolbar: hide_layer");
+    toolbar_container_kill(&self->layer);
+}
+
+static void show_layer(Toolbar *self) {
+    log_info("toolbar: show_layer");
+    toolbar_container_kill(&self->layer);
+    self->layer = toolbar_container_new(
+            self->all_layer_tools,
+            TOOLBAR_LAYER_TOOLS_LEN,
+            self->L.layer_bg_a, 
+            self->L.layer_bg_b);
+    self->layer.align = U_CONTAINER_ALIGN_CENTER;
+    
+}
+
+
 static void hide_selection(Toolbar *self) {
     log_info("toolbar: hide_selection");
     toolbar_container_kill(&self->selection);
@@ -195,7 +213,7 @@ Toolbar *toolbar_new(struct eWindow *window,
                      Dialog *dialog,
                      Animation *animation,
                      uColor_s active_bg_a, uColor_s active_bg_b,
-                     uColor_s secondary_bg_a, uColor_s secondary_bg_b,
+                     uColor_s layer_bg_a, uColor_s layer_bg_b,
                      uColor_s selection_bg_a, uColor_s selection_bg_b) {
     Toolbar *self = rhc_calloc(sizeof *self);
 
@@ -221,7 +239,6 @@ Toolbar *toolbar_new(struct eWindow *window,
     self->tools.camera = tool_new_camera();
     self->tools.grid = tool_new_grid();
     self->tools.preview = tool_new_preview();
-    self->tools.layer = tool_new_layer();
     self->tools.size = tool_new_size();
 
     self->tools.mode_none = tool_new_mode_none();
@@ -238,6 +255,9 @@ Toolbar *toolbar_new(struct eWindow *window,
     self->tools.mode_pipette = tool_new_mode_pipette();
 
 
+    self->layer_tools.select = tool_new_layer_select();
+    
+
     self->selection_set_tools.move = tool_new_selection_set_move();
     self->selection_set_tools.copy = tool_new_selection_set_copy();
     self->selection_set_tools.cut = tool_new_selection_set_cut();
@@ -252,13 +272,16 @@ Toolbar *toolbar_new(struct eWindow *window,
 
     self->L.active_bg_a = active_bg_a;
     self->L.active_bg_b = active_bg_b;
-    self->L.secondary_bg_a = secondary_bg_a;
-    self->L.secondary_bg_b = secondary_bg_b;
+    self->L.layer_bg_a = layer_bg_a;
+    self->L.layer_bg_b = layer_bg_b;
     self->L.selection_bg_a = selection_bg_a;
     self->L.selection_bg_b = selection_bg_b;
 
     self->active = toolbar_container_new(self->all_tools, TOOLBAR_TOOLS_LEN, active_bg_a, active_bg_b);
     self->active.align = U_CONTAINER_ALIGN_CENTER;
+    
+    // show_layer(self);
+    
     return self;
 }
 
@@ -288,15 +311,15 @@ void toolbar_update(Toolbar *self, float dtime) {
     toolbar_container_update(&self->active, start_pos, dtime, self->refs);
     start_pos += toolbar_constainer_size(&self->active, self->refs.cam);
 
-    toolbar_container_update(&self->secondary, start_pos, dtime, self->refs);
-    start_pos += toolbar_constainer_size(&self->secondary, self->refs.cam);
+    toolbar_container_update(&self->layer, start_pos, dtime, self->refs);
+    start_pos += toolbar_constainer_size(&self->layer, self->refs.cam);
 
     toolbar_container_update(&self->selection, start_pos, dtime, self->refs);
 }
 
 void toolbar_render(const Toolbar *self, const mat4 *cam_mat) {
     toolbar_container_render(&self->active, cam_mat);
-    toolbar_container_render(&self->secondary, cam_mat);
+    toolbar_container_render(&self->layer, cam_mat);
     toolbar_container_render(&self->selection, cam_mat);
 }
 
@@ -309,7 +332,7 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
         contains = true;
         go = set_go;
     }
-    if(go && toolbar_container_pointer_event(&self->secondary, pointer, self->refs)) {
+    if(go && toolbar_container_pointer_event(&self->layer, pointer, self->refs)) {
         contains = true;
         go = set_go;
     }
@@ -321,13 +344,13 @@ bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
 
 float toolbar_size(const Toolbar *self) {
     return toolbar_constainer_size(&self->active, self->refs.cam)
-            + toolbar_constainer_size(&self->secondary, self->refs.cam)
+            + toolbar_constainer_size(&self->layer, self->refs.cam)
             + toolbar_constainer_size(&self->selection, self->refs.cam);
 }
 
 bool toolbar_contains(const Toolbar *self, vec2 pos) {
     return toolbar_container_contains(&self->active, pos)
-            || toolbar_container_contains(&self->secondary, pos)
+            || toolbar_container_contains(&self->layer, pos)
             || toolbar_container_contains(&self->selection, pos);
 }
 
@@ -337,7 +360,7 @@ Tool *toolbar_get_tool_by_pos(const Toolbar *self, vec2 pos) {
     if(t)
         return t;
         
-    t = toolbar_container_get_tool_by_pos(&self->secondary, pos);
+    t = toolbar_container_get_tool_by_pos(&self->layer, pos);
     if(t)
         return t;
         
