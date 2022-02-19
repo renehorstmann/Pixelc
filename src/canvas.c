@@ -7,6 +7,7 @@
 #include "u/image.h"
 #include "u/json.h"
 #include "e/io.h"
+#include "mathc/sca/int.h"
 #include "mathc/mat/float.h"
 
 #include "canvas.h"
@@ -44,8 +45,8 @@ static void update_render_objects(Canvas *self) {
     
     u_pose_set_size(&self->L.grid.rect.uv, self->RO.image.cols, self->RO.image.rows);
     {
-        float w = (float) self->RO.image.cols / (2 * self->L.grid_cols);
-        float h = (float) self->RO.image.rows / (2 * self->L.grid_rows);
+        float w = (float) self->RO.image.cols / (2 * self->RO.pattern_cols);
+        float h = (float) self->RO.image.rows / (2 * self->RO.pattern_rows);
         u_pose_set_size(&self->L.bg.rect.uv, w, h);
     }
 }
@@ -69,8 +70,8 @@ Canvas *canvas_new() {
     
     self->RO.pose = mat4_eye();
     
-    self->L.grid_cols = 8;
-    self->L.grid_rows = 8;
+    self->RO.pattern_cols = 8;
+    self->RO.pattern_rows = 8;
     
     for (int i = 0; i < CANVAS_MAX_LAYERS; i++) {
         self->L.render_objects[i] = ro_single_new(r_texture_new_invalid());
@@ -147,6 +148,15 @@ void canvas_set_image(Canvas *self, uImage image_sink, bool save) {
     update_render_objects(self);
 }
 
+void canvas_set_pattern_size(Canvas *self, int cols, int rows) {
+    cols = isca_clamp(cols, 1, self->RO.image.cols);
+    rows = isca_clamp(rows, 1, self->RO.image.rows);
+    self->RO.pattern_cols = cols;
+    self->RO.pattern_rows = rows;
+    update_render_objects(self);
+    if(self->auto_save_config)
+        canvas_save_config(self);
+}
 
 void canvas_save(Canvas *self) {
     log_info("canvas: save");
@@ -215,9 +225,8 @@ void canvas_save_config(const Canvas *self) {
     
     uJson *canvas = u_json_append_object(config, "canvas");
     
-    u_json_append_int(canvas, "layers", self->RO.image.layers);
-    u_json_append_int(canvas, "grid_cols", self->L.grid_cols);
-    u_json_append_int(canvas, "grid_rows", self->L.grid_rows);
+    u_json_append_int(canvas, "pattern_cols", self->RO.pattern_cols);
+    u_json_append_int(canvas, "pattern_rows", self->RO.pattern_rows);
     u_json_append_int(canvas, "save_idx", self->L.save_idx);
     u_json_append_int(canvas, "save_idx_min", self->L.save_idx_min);
     u_json_append_int(canvas, "save_idx_max", self->L.save_idx_max);
@@ -236,17 +245,12 @@ void canvas_load_config(Canvas *self) {
             e_io_savestate_file_path("config.json").s);
     
     uJson *canvas = u_json_get_object(config, "canvas");
-    int layers;
-    if(u_json_get_object_int(canvas, "layers", &layers)) {
-        
-        // todo
-    }
     
-    int grid_cols, grid_rows;
-    if(u_json_get_object_int(canvas, "grid_cols", &grid_cols)
-            && u_json_get_object_int(canvas, "grid_rows", &grid_rows)) {
-        self->L.grid_cols = grid_cols;
-        self->L.grid_rows = grid_rows;
+    int pattern_cols, pattern_rows;
+    if(u_json_get_object_int(canvas, "pattern_cols", &pattern_cols)
+            && u_json_get_object_int(canvas, "pattern_rows", &pattern_rows)) {
+        self->RO.pattern_cols = pattern_cols;
+        self->RO.pattern_rows = pattern_rows;
     }
     
     int save_idx, save_idx_min, save_idx_max;

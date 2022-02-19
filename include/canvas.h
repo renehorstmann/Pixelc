@@ -24,6 +24,9 @@ typedef struct Canvas {
     struct {
         mat4 pose; // = u_pose_new_aa(0, 0, cols, rows)
         uImage image;
+        
+        int pattern_cols;
+        int pattern_rows;
     } RO;
 
     // private
@@ -34,9 +37,6 @@ typedef struct Canvas {
         RoSingle bg;
         RoSingle grid;
         
-        int grid_cols;
-        int grid_rows;
-
         int save_idx;
         int save_idx_max;
         int save_idx_min;
@@ -54,6 +54,8 @@ void canvas_render(Canvas *self, const mat4 *canvascam_mat);
 // sets a new image for the canvas
 // canvas will take the ownership of image_sink
 void canvas_set_image(Canvas *self, uImage image_sink, bool save);
+
+void canvas_set_pattern_size(Canvas *self, int cols, int rows);
 
 // saves an image (for reload, undo and redo)
 // only saves if the image changed
