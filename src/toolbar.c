@@ -325,6 +325,9 @@ void toolbar_render(const Toolbar *self, const mat4 *cam_mat) {
 
 // returns toolbar_contains(pointer.pos.xy)
 bool toolbar_pointer_event(Toolbar *self, ePointer_s pointer) {
+    if(pointer.id != 0)
+        return false;
+        
     bool contains = false;
     bool go = true;
     bool set_go = pointer.action==E_POINTER_UP? true : false;

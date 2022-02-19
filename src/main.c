@@ -152,17 +152,13 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     const mat4 *canvas_cam = &L.camera->matrices.vp;
 
     background_render(L.background, hud_cam);
-
-
     canvas_render(L.canvas, canvas_cam);
     selectionctrl_render(L.selectionctrl, canvas_cam);
     toolbar_render(L.toolbar, hud_cam);
-    palette_render(L.palette, hud_cam);
-    
     dialog_render(L.dialog, hud_cam);
-    animation_render(L.animation, hud_cam);
-
     multitouchcursor_render(L.mtc, hud_cam);
+    palette_render(L.palette, hud_cam);
+    animation_render(L.animation, hud_cam);
 }
 
 int main(int argc, char **argv) {

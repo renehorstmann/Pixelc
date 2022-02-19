@@ -454,6 +454,7 @@ static void tool_secondary_color_pe(struct Tool *super, ePointer_s pointer, Tool
             log_info("tool secondary_color: active");
             refs.brush->secondary_as_current = true;
         }
+        self->pressed = false;
     }
 }
 static void tool_secondary_color_update(struct Tool *super, float dtime, ToolRefs refs) {
@@ -578,7 +579,7 @@ static bool tool_grid_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }      
 Tool *tool_new_grid() {
     return tool_button_new("grid", 
-            "enables\nand disables\na pixel grid", 
+            "shows or hides\na pixel grid", 
             "res/button_grid.png", 
             tool_grid_pe,
             tool_grid_is_a);
