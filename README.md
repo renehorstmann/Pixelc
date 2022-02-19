@@ -59,7 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
-- size dialog + pattern
 - dialog:
   - delete
   - upload

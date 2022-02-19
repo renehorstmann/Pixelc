@@ -40,9 +40,6 @@
 #define TB_SELECTION_BG_A "#99bb99"
 #define TB_SELECTION_BG_B "#888888"
 
-#define GRID_COLS 8
-#define GRID_ROWS 8
-
 //
 // end of options
 //
