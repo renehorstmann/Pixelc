@@ -19,27 +19,6 @@
 // options
 //
 
-// canvas size
-//*
-#define COLS 32
-#define ROWS 16
-#define LAYERS 1
-//*/
-
-// Tilec
-/*
-#define COLS 16*8
-#define ROWS 16*8
-#define LAYERS 2
-//*/
-
-// JumpHare
-/*
-#define COLS 32*8
-#define ROWS 32*6
-#define LAYERS 1
-//*/
-
 
 // animation + tiles
 // screen size is >=180 pixel
@@ -94,12 +73,18 @@ static void init(eSimple *simple, ivec2 window_size) {
     camera_update(L.camera, window_size);
 
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));
+    
     L.canvas = canvas_new();
+    canvas_load_config(L.canvas);
 
     L.animation = animation_new(L.canvas, PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
     L.selectionctrl = selectionctrl_new(L.canvas);
+    
     L.brush = brush_new(L.canvas);
+    brush_load_config(L.brush);
+    
     L.palette = palette_new(L.camera, L.brush);
+    palette_load_config(L.palette);  
 
     L.camctrl = cameractrl_new(simple->input, L.camera, L.brush);
     cameractrl_set_home(L.camctrl, L.canvas->RO.image.cols, L.canvas->RO.image.rows);
@@ -136,14 +121,6 @@ static void init(eSimple *simple, ivec2 window_size) {
             L.camctrl, 
             L.mtc);
 
-
-    brush_load_config(L.brush);
-    palette_load_config(L.palette);
-    canvas_load_config(L.canvas);
-
-    uImage img = u_image_new_empty(COLS, ROWS, LAYERS);
-    u_image_copy_top_left(img, L.canvas->RO.image);
-    canvas_set_image(L.canvas, img, false);
 }
 
 // this functions is called either each frame or at a specific update/s time
@@ -163,6 +140,9 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
 
     toolbar_update(L.toolbar, dtime);
     dialog_update(L.dialog, dtime);
+    if(L.dialog->out.disable_multitouchcursor) {
+        L.mtc->active = false;
+    }
     multitouchcursor_update(L.mtc, dtime);
 }
 

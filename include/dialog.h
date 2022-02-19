@@ -31,6 +31,10 @@ typedef struct Dialog {
     void *user_data;
 
     struct {
+        bool disable_multitouchcursor;
+    } out;
+
+    struct {
         float impl_height;
     } in;
 
