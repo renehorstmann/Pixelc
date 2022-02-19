@@ -6,7 +6,7 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 25
+#define TOOLBAR_TOOLS_LEN 27
 #define TOOLBAR_LAYER_TOOLS_LEN 1
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
