@@ -140,7 +140,7 @@ static void update(eSimple *simple, ivec2 window_size, float dtime) {
 
     toolbar_update(L.toolbar, dtime);
     dialog_update(L.dialog, dtime);
-    if(L.dialog->out.disable_multitouchcursor) {
+    if(L.dialog->out.textinput_active) {
         L.mtc->active = false;
     }
     multitouchcursor_update(L.mtc, dtime);
@@ -155,9 +155,14 @@ static void render(eSimple *simple, ivec2 window_size, float dtime) {
     canvas_render(L.canvas, canvas_cam);
     selectionctrl_render(L.selectionctrl, canvas_cam);
     toolbar_render(L.toolbar, hud_cam);
-    dialog_render(L.dialog, hud_cam);
-    multitouchcursor_render(L.mtc, hud_cam);
-    palette_render(L.palette, hud_cam);
+    if(L.dialog->out.textinput_active) {
+        palette_render(L.palette, hud_cam);
+        dialog_render(L.dialog, hud_cam);
+    } else {
+        dialog_render(L.dialog, hud_cam);
+        multitouchcursor_render(L.mtc, hud_cam);
+        palette_render(L.palette, hud_cam);
+    }
     animation_render(L.animation, hud_cam);
 }
 

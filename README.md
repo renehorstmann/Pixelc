@@ -62,9 +62,7 @@ python3 -m http.server --bind localhost  # [port]
 - dialog:
   - delete
   - upload
-  - canvas_size
 - tools
-  - size as window like tooltip
   - layer
     - toggle like selection for a new toolbar
     - change layer (rename layer tool)

@@ -48,7 +48,7 @@ Dialog *dialog_new() {
 void dialog_update(Dialog *self, float dtime) {
     if (!dialog_valid(self))
         return;
-    self->out.disable_multitouchcursor = false;
+    self->out.textinput_active = false;
     self->update(self, dtime);
 
     float height = 16 + self->in.impl_height;
@@ -245,7 +245,7 @@ static void canvas_size_update(Dialog *self, float dtime) {
     struct CanvasSize *impl = self->impl;
 
     if(impl->textinput) {
-        self->out.disable_multitouchcursor = true;
+        self->out.textinput_active = true;
         
         textinput_update(impl->textinput, e_window_get_size(impl->window_ref), dtime);
 

@@ -31,7 +31,7 @@ typedef struct Dialog {
     void *user_data;
 
     struct {
-        bool disable_multitouchcursor;
+        bool textinput_active;
     } out;
 
     struct {
