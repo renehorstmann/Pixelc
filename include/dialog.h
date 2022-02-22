@@ -87,4 +87,6 @@ void dialog_create_tooltip(Dialog *self, const struct Toolbar *toolbar, const st
 
 void dialog_create_canvas_size(Dialog *self, const struct eWindow *window, struct eInput *input_ref, struct Canvas *canvas);
 
+void dialog_create_image_upload(Dialog *self);
+
 #endif //PIXELC_DIALOG_H

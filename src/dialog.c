@@ -1,5 +1,6 @@
 #include "e/window.h"
 #include "e/input.h"
+#include "e/io.h"
 #include "r/ro_single.h"
 #include "r/ro_text.h"
 #include "r/texture.h"
@@ -139,6 +140,11 @@ void dialog_create_delete(Dialog *self, const char *msg, dialog_on_action_cb on_
 void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fun on_action_cb, void *user_data) {
     dialog_hide(self);
 }
+
+
+//
+// dialogs
+//
 
 
 struct ToolTip {
@@ -440,3 +446,90 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     self->opt_on_cancel_cb = canvas_size_on_action;
     self->opt_on_ok_cb = canvas_size_on_action;
 }
+
+
+
+
+struct ImageUpload {
+    RoText info;
+    RoSingle upload;
+    bool upload_available;
+};
+static void image_upload_kill(void *impl) {
+    struct ImageUpload *self = impl;
+    ro_text_kill(&self->info);
+    ro_single_kill(&self->upload);
+    rhc_free(self);
+}
+static void image_upload_update(Dialog *self, float dtime) {
+    // noop
+}
+static void image_upload_render(Dialog *self, const mat4 *cam_mat) {
+    struct ImageUpload *impl = self->impl;
+    ro_text_render(&impl->info, cam_mat);
+    if(impl->upload_available)
+        ro_single_render(&impl->upload, cam_mat);
+}
+
+static void image_upload_set_info(Dialog *self, const char *file_name) {
+    struct ImageUpload *impl = self->impl;
+    char text[64];
+    uImage img = u_image_new_file(1, "import.png");
+    if(!u_image_valid(img)) {
+        snprintf(text, sizeof text, "failed to load\n  image\n%s", file_name);
+    } else {
+        snprintf(text, sizeof text, "%s\n   cols: %i\n   rows: %i", file_name, img.cols, img.rows);
+    }
+    ro_text_set_text(&impl->info, text);
+    u_image_kill(&img);  
+}
+
+static void image_upload_uploaded(const char *file, bool ascii, const char *user_file_name, void *user_data) {
+    image_upload_set_info(user_data, user_file_name);
+}
+
+static bool image_upload_pe(Dialog *self, ePointer_s pointer) {
+    struct ImageUpload *impl = self->impl;
+    
+    if(impl->upload_available && button_clicked(&impl->upload.rect, pointer)) {
+        e_io_ask_for_file_upload("import.png", false, image_upload_uploaded, self);
+    }
+    
+    return true;
+}
+
+void image_upload_on_action(Dialog *self, bool ok) {
+    dialog_hide(self);
+}
+
+
+void dialog_create_image_upload(Dialog *self) {
+    dialog_hide(self);
+    struct ImageUpload *impl = rhc_calloc(sizeof *impl);
+    self->impl = impl;
+    
+    impl->info = ro_text_new_font55(64);
+    ro_text_set_color(&impl->info, (vec4){{0.9, 0.9, 0.9, 1}});
+
+    image_upload_set_info(self, "import.png");
+    
+    impl->info.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-22, 1, 2);
+    
+    self->in.impl_height = 44;
+
+#ifdef __EMSCRIPTEN__ 
+    impl->upload = ro_single_new(r_texture_new_file(2, 1, "res/button_dialog_upload.png"));
+    impl->upload_available = true;
+    impl->upload.rect.pose = u_pose_new_aa(DIALOG_LEFT + 8, DIALOG_TOP-62, 64, 16);
+#endif
+    
+    dialog_set_title(self, "import", (vec4){{0.2, 0.6, 0.2, 1}});
+    dialog_set_bg_color(self, u_color_from_hex(TOOLTIP_BG_A), u_color_from_hex(TOOLTIP_BG_B));
+    self->kill = image_upload_kill;
+    self->update = image_upload_update;
+    self->render = image_upload_render;
+    self->pointer_event = image_upload_pe;
+//    self->opt_on_cancel_cb = tooltip_on_action;
+    self->opt_on_ok_cb = image_upload_on_action;
+}
+

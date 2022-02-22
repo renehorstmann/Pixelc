@@ -161,23 +161,50 @@ Tool *tool_new_save_hd() {
                            NULL);
 }
 
+
+_Static_assert(sizeof(TOOL_BUTTON_ADDITIONAL_DATA_SIZE) >= sizeof(float), "wtf");
+
 static void tool_import_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
     if(self->active && button_clicked(&self->ro.rect, pointer)) {
         uImage img = u_image_new_file(1, "import.png");
-        if(!u_image_valid(img))
+        if(!u_image_valid(img)) {
+            dialog_create_image_upload(refs.dialog);
             return;
+        }
         log_info("tool import");
         selectionctrl_paste_image(refs.selectionctrl, img);
         u_image_kill(&img);
-    } 
+    }
+}
+static bool tool_import_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    float *longpress_time = (float*) self->additional_data;
+    if(!button_is_pressed(&self->ro.rect)) {
+        *longpress_time = 0;
+        return true;
+    }
+    if(*longpress_time>=TOOL_LONG_PRESS_TIME)
+        return true;
+    *longpress_time+=dtime;
+        
+    // check for longpress
+    if(*longpress_time>=TOOL_LONG_PRESS_TIME) {
+        animation_longpress(refs.animation,
+                u_pose_get_xy(self->ro.rect.pose), 
+                R_COLOR_YELLOW);
+        dialog_create_image_upload(refs.dialog);
+        button_set_pressed(&self->ro.rect, false);
+    }
+    // always actice
+    return true;
 }
 Tool *tool_new_import() {
     return tool_button_new("import", 
             "loads import.png\nas selection", 
             "res/button_import.png", 
             tool_import_pe,
-            NULL);
+            tool_import_is_a);
 }
 
 
