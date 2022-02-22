@@ -8,6 +8,7 @@
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "button.h"
+#include "toolbar.h"
 #include "tool.h"
 
 #define HD_MIN_SIZE 1024
@@ -201,7 +202,11 @@ static bool tool_import_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }
 Tool *tool_new_import() {
     return tool_button_new("import", 
-            "loads import.png\nas selection", 
+            "tip to load\n"
+            "import.png\n"
+            "as selection\n"
+            "long press to show\n"
+            "import settings", 
             "res/button_import.png", 
             tool_import_pe,
             tool_import_is_a);
@@ -292,6 +297,37 @@ Tool *tool_new_selection() {
             "res/button_selection.png", 
             tool_selection_pe,
             tool_selection_is_a);
+}
+
+
+static void tool_layer_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(!button_toggled(&self->ro.rect, pointer))
+        return;
+    
+    // only passed if button state toggled
+    bool pressed = button_is_pressed(&self->ro.rect);
+    if(pressed) {
+        log_info("tool layer: start");
+        toolbar_show_layer(refs.toolbar);
+    }else {
+        log_info("tool layer: stop");
+        toolbar_hide_layer(refs.toolbar);
+    }
+    
+}
+static bool tool_layer_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    button_set_pressed(&self->ro.rect, toolbar_container_valid(&refs.toolbar->layer));
+    // always active
+    return true;
+}      
+Tool *tool_new_layer() {
+    return tool_button_new("layer", 
+            "open / close\nthe layer toolbar", 
+            "res/button_layer.png", 
+            tool_layer_pe,
+            tool_layer_is_a);
 }
 
 typedef struct {

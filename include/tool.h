@@ -97,6 +97,7 @@ Tool *tool_new_clear();
 Tool *tool_new_undo();
 Tool *tool_new_redo();
 Tool *tool_new_selection();
+Tool *tool_new_layer();
 Tool *tool_new_kernel();
 Tool *tool_new_secondary_color();
 Tool *tool_new_shading();

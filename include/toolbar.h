@@ -6,7 +6,7 @@
 #include "u/container.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 27
+#define TOOLBAR_TOOLS_LEN 28
 #define TOOLBAR_LAYER_TOOLS_LEN 1
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
@@ -21,6 +21,10 @@ typedef struct {
 
     RoSingle bg;
 } ToolbarContainer;
+
+static bool toolbar_container_valid(const ToolbarContainer *self) {
+    return self->tools_len>0;
+}
 
 typedef struct Toolbar {
     ToolRefs refs;
@@ -40,6 +44,7 @@ typedef struct Toolbar {
             Tool *undo;
             Tool *redo;
             Tool *selection;
+            Tool *layer;
             Tool *kernel;
             Tool *secondary_color;
             Tool *shading;
@@ -130,5 +135,9 @@ bool toolbar_contains(const Toolbar *self, vec2 pos);
 
 // returns NULL if not found
 Tool *toolbar_get_tool_by_pos(const Toolbar *self, vec2 pos);
+
+void toolbar_show_layer(Toolbar *self);
+
+void toolbar_hide_layer(Toolbar *self);
 
 #endif //PIXELC_TOOLBAR_H

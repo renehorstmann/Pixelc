@@ -7,9 +7,6 @@
 #include "mathc/uchar.h"
 #include "toolbar.h"
 
-static bool toolbar_container_valid(const ToolbarContainer *self) {
-    return self->tools_len>0;
-}
 
 static ToolbarContainer toolbar_container_new_invalid() {
     return (ToolbarContainer) {0};
@@ -151,23 +148,6 @@ float toolbar_constainer_size(const ToolbarContainer *self, const Camera_s *cam)
     return camera_is_portrait_mode(cam) ? self->container.out.size.y: self->container.out.size.x;
 }
 
-static void hide_layer(Toolbar *self) {
-    log_info("toolbar: hide_layer");
-    toolbar_container_kill(&self->layer);
-}
-
-static void show_layer(Toolbar *self) {
-    log_info("toolbar: show_layer");
-    toolbar_container_kill(&self->layer);
-    self->layer = toolbar_container_new(
-            self->all_layer_tools,
-            TOOLBAR_LAYER_TOOLS_LEN,
-            self->L.layer_bg_a, 
-            self->L.layer_bg_b);
-    self->layer.align = U_CONTAINER_ALIGN_CENTER;
-    
-}
-
 
 static void hide_selection(Toolbar *self) {
     log_info("toolbar: hide_selection");
@@ -233,6 +213,7 @@ Toolbar *toolbar_new(struct eWindow *window,
     self->tools.undo = tool_new_undo();
     self->tools.redo = tool_new_redo();
     self->tools.selection = tool_new_selection();
+    self->tools.layer = tool_new_layer();
     self->tools.kernel = tool_new_kernel();
     self->tools.secondary_color = tool_new_secondary_color();
     self->tools.shading = tool_new_shading();
@@ -370,4 +351,22 @@ Tool *toolbar_get_tool_by_pos(const Toolbar *self, vec2 pos) {
     t = toolbar_container_get_tool_by_pos(&self->selection, pos);
     return t;
 }
+
+
+void toolbar_hide_layer(Toolbar *self) {
+    log_info("toolbar: hide_layer");
+    toolbar_container_kill(&self->layer);
+}
+
+void toolbar_show_layer(Toolbar *self) {
+    log_info("toolbar: show_layer");
+    toolbar_container_kill(&self->layer);
+    self->layer = toolbar_container_new(
+            self->all_layer_tools,
+            TOOLBAR_LAYER_TOOLS_LEN,
+            self->L.layer_bg_a, 
+            self->L.layer_bg_b);
+    self->layer.align = U_CONTAINER_ALIGN_CENTER;
+}
+
 
