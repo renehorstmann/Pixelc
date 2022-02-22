@@ -64,8 +64,6 @@ python3 -m http.server --bind localhost  # [port]
   - upload
 - tools
   - layer
-    - toggle like selection for a new toolbar
-    - change layer (rename layer tool)
     - add layer behind (+)
     - delete current layer (-)
     - move layer up
