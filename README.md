@@ -59,6 +59,7 @@ python3 -m http.server --bind localhost  # [port]
 
 
 ## Todo
+- savestate images + config layer bug
 - dialog:
   - delete
   - upload

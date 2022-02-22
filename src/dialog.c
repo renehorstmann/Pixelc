@@ -238,6 +238,11 @@ struct CanvasSize {
     RoText rows_num;
     mat4 rows_hitbox;
     
+    int layers;
+    RoText layers_text;
+    RoText layers_num;
+    mat4 layers_hitbox;
+    
     int p_cols;
     RoText p_cols_text;
     RoText p_cols_num;
@@ -254,12 +259,14 @@ struct CanvasSize {
 static void canvas_size_kill(void *impl) {
     struct CanvasSize *self = impl;
     ro_text_kill(&self->cols_text);
-    ro_text_kill(&self->rows_text);
     ro_text_kill(&self->cols_num);
+    ro_text_kill(&self->rows_text);
     ro_text_kill(&self->rows_num);
+    ro_text_kill(&self->layers_text);
+    ro_text_kill(&self->layers_num);
     ro_text_kill(&self->p_cols_text);
-    ro_text_kill(&self->p_rows_text);
     ro_text_kill(&self->p_cols_num);
+    ro_text_kill(&self->p_rows_text);
     ro_text_kill(&self->p_rows_num);
     textinput_kill(&self->textinput);
     rhc_free(self);
@@ -274,7 +281,10 @@ static void canvas_size_update(Dialog *self, float dtime) {
 
         char *end;
         int size = strtol(impl->textinput->text, &end, 10);
-        bool ok = end && end!=impl->textinput->text && size>0 && size<CANVAS_MAX_SIZE;
+        bool ok = end && end!=impl->textinput->text && size>0 && size<=CANVAS_MAX_SIZE;
+        if(ok && impl->textinput_usage == 2
+                && size>CANVAS_MAX_LAYERS)
+                ok = false;
         impl->textinput->in.ok_active = ok;
 
         if(impl->textinput->state == TEXTINPUT_DONE) {
@@ -286,9 +296,12 @@ static void canvas_size_update(Dialog *self, float dtime) {
                 impl->rows = size;
                 break;
             case 2:
-                impl->p_cols = size;
+                impl->layers = size;
                 break;
             case 3:
+                impl->p_cols = size;
+                break;
+            case 4:
                 impl->p_rows = size;
                 break;
             default:
@@ -304,6 +317,8 @@ static void canvas_size_update(Dialog *self, float dtime) {
     ro_text_set_text(&impl->cols_num, buf);
     snprintf(buf, sizeof buf, "%i", impl->rows);
     ro_text_set_text(&impl->rows_num, buf);
+    snprintf(buf, sizeof buf, "%i", impl->layers);
+    ro_text_set_text(&impl->layers_num, buf);
     snprintf(buf, sizeof buf, "%i", impl->p_cols);
     ro_text_set_text(&impl->p_cols_num, buf);
     snprintf(buf, sizeof buf, "%i", impl->p_rows);
@@ -315,6 +330,8 @@ static void canvas_size_render(Dialog *self, const mat4 *cam_mat) {
     ro_text_render(&impl->cols_num, cam_mat);
     ro_text_render(&impl->rows_text, cam_mat);
     ro_text_render(&impl->rows_num, cam_mat);
+    ro_text_render(&impl->layers_text, cam_mat);
+    ro_text_render(&impl->layers_num, cam_mat);
     ro_text_render(&impl->p_cols_text, cam_mat);
     ro_text_render(&impl->p_cols_num, cam_mat);
     ro_text_render(&impl->p_rows_text, cam_mat);
@@ -337,16 +354,21 @@ static bool canvas_size_pe(Dialog *self, ePointer_s pointer) {
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->rows);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
             impl->textinput_usage = 1;
+        } else if(u_pose_aa_contains(impl->layers_hitbox, pointer.pos.xy)) {
+            impl->textinput = textinput_new(impl->input_ref, "Set layers", 8);
+            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->layers);
+            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+            impl->textinput_usage = 2;
         } else if(u_pose_aa_contains(impl->p_cols_hitbox, pointer.pos.xy)) {
             impl->textinput = textinput_new(impl->input_ref, "Set pattern cols", 8);
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->p_cols);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
-            impl->textinput_usage = 2;
+            impl->textinput_usage = 3;
         } else if(u_pose_aa_contains(impl->p_rows_hitbox, pointer.pos.xy)) {
             impl->textinput = textinput_new(impl->input_ref, "Set pattern rows", 8);
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->p_rows);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
-            impl->textinput_usage = 3;
+            impl->textinput_usage = 4;
         }
     }
 
@@ -359,6 +381,7 @@ void canvas_size_on_action(Dialog *self, bool ok) {
     uImage img = canvas->RO.image;
     int cols = impl->cols;
     int rows = impl->rows;
+    int layers = impl->layers;
     int p_cols = impl->p_cols;
     int p_rows = impl->p_rows;
 
@@ -367,10 +390,10 @@ void canvas_size_on_action(Dialog *self, bool ok) {
         log_info("dialog canvas_size aborted");
         return;
     }
-    if(cols != img.cols || rows != img.rows) {
+    if(cols != img.cols || rows != img.rows || layers != img.layers) {
         log_info("dialog canvas_size: new size %i %i", cols, rows);
 
-        uImage new_img = u_image_new_zeros(cols, rows, img.layers);
+        uImage new_img = u_image_new_zeros(cols, rows, layers);
         u_image_copy_top_left(new_img, img);
         canvas_set_image(canvas, new_img, true);
     }
@@ -391,7 +414,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     
     int pos;
 
-    pos = 22;
+    pos = 20;
     impl->cols = canvas->RO.image.cols;
     impl->cols_text = ro_text_new_font55(5);
     ro_text_set_text(&impl->cols_text, "cols:");
@@ -402,7 +425,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->cols_num.pose = u_pose_new(DIALOG_LEFT+40, DIALOG_TOP-pos, 1, 2);
     impl->cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
 
-    pos = 44;
+    pos = 35;
     impl->rows = canvas->RO.image.rows;
     impl->rows_text = ro_text_new_font55(5);
     ro_text_set_text(&impl->rows_text, "rows:");
@@ -413,7 +436,19 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->rows_num.pose = u_pose_new(DIALOG_LEFT+40, DIALOG_TOP-pos, 1, 2);    
     impl->rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
 
-    pos = 66;
+    pos = 50;
+    impl->layers = canvas->RO.image.layers;
+    impl->layers_text = ro_text_new_font55(7);
+    ro_text_set_text(&impl->layers_text, "layers:");
+    ro_text_set_color(&impl->layers_text, (vec4){{0.9, 0.9, 0.9, 1}});
+    impl->layers_num = ro_text_new_font55(8);
+    ro_text_set_color(&impl->layers_num, (vec4){{0.1, 0.1, 0.9, 1}});
+    impl->layers_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
+    impl->layers_num.pose = u_pose_new(DIALOG_LEFT+50, DIALOG_TOP-pos, 1, 2);    
+    impl->layers_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
+
+
+    pos = 70;
     impl->p_cols = canvas->RO.pattern_cols;
     impl->p_cols_text = ro_text_new_font55(13);
     ro_text_set_text(&impl->p_cols_text, "pattern cols:");
@@ -424,7 +459,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->p_cols_num.pose = u_pose_new(DIALOG_LEFT+90, DIALOG_TOP-pos, 1, 2);
     impl->p_cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
 
-    pos = 88;
+    pos = 85;
     impl->p_rows = canvas->RO.pattern_rows;
     impl->p_rows_text = ro_text_new_font55(13);
     ro_text_set_text(&impl->p_rows_text, "pattern rows:");
