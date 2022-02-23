@@ -58,13 +58,13 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 
-## Todo
-- savestate images + config layer bug
+# Todo
 - dialog:
   - delete
   - upload
 - tools
   - layer
+    - setting for onion skinning alpha
     - add layer behind (+)
     - delete current layer (-)
     - move layer up

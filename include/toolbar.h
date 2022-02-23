@@ -7,7 +7,7 @@
 #include "tool.h"
 
 #define TOOLBAR_TOOLS_LEN 28
-#define TOOLBAR_LAYER_TOOLS_LEN 1
+#define TOOLBAR_LAYER_TOOLS_LEN 2
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 3
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -72,6 +72,7 @@ typedef struct Toolbar {
         Tool *all_layer_tools[TOOLBAR_LAYER_TOOLS_LEN];
         struct {
             Tool *select;
+            Tool *blend;
         } layer_tools;
     };
 

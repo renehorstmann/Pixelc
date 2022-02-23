@@ -6,7 +6,7 @@
 #include "u/image.h"
 #include "r/ro_types.h"
 
-#define CANVAS_MAX_SIZE 4096
+#define CANVAS_MAX_SIZE 256
 #define CANVAS_MAX_LAYERS 16
 #define CANVAS_MAX_SAVES 128
 
@@ -16,6 +16,7 @@ typedef struct Canvas {
     int current_layer;
     bool show_grid;
     float alpha;
+    bool blend_layers;
     const char *import_file;
     
     bool auto_save_config;
@@ -41,6 +42,7 @@ typedef struct Canvas {
         int save_idx_max;
         int save_idx_min;
 
+        int save_layers[CANVAS_MAX_SAVES];
     } L;
 } Canvas;
 

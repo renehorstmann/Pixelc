@@ -20,20 +20,27 @@
 
 _Static_assert(CANVAS_MAX_SAVES<=999, "see save / load image");
 
-static void save_image(const Canvas *self) {
+static void save_image(Canvas *self) {
     char file[128];
     snprintf(file, sizeof file, "image_%03i.png", self->L.save_idx);
     u_image_save_file(self->RO.image,
             e_io_savestate_file_path(file).s);
     e_io_savestate_save();
+    self->L.save_layers[self->L.save_idx] = self->RO.image.layers;
 }
 
 static void load_image(Canvas *self) {
     char file[128];
     snprintf(file, sizeof file, "image_%03i.png", self->L.save_idx);
-    canvas_set_image(self, u_image_new_file(self->RO.image.layers, 
-            e_io_savestate_file_path(file).s),
-            false);
+    int layers = self->L.save_layers[self->L.save_idx];
+    layers = isca_clamp(layers, 1, CANVAS_MAX_LAYERS);
+    uImage img = u_image_new_file(1, 
+            e_io_savestate_file_path(file).s);
+    if(img.rows % layers == 0) {
+        img.rows /= layers;
+        img.layers = layers;
+    }
+    canvas_set_image(self, img, false);
 }
 
 // updates the ro tex and sizes
@@ -65,6 +72,7 @@ Canvas *canvas_new() {
     self->ro_color = R_COLOR_WHITE;
     
     self->alpha = 1.0;
+    self->blend_layers = true;
     self->import_file = "import.png";
     self->auto_save_config = true;
     
@@ -114,11 +122,16 @@ void canvas_update(Canvas *self, float dtime) {
 void canvas_render(Canvas *self, const mat4 *canvascam_mat) {
     ro_single_render(&self->L.bg, canvascam_mat);
 
-    for (int i = 0; i <= self->current_layer; i++) {
-        float alpha = (i + 1.0) / (self->current_layer + 1.0);
-        self->L.render_objects[i].rect.color.w = alpha * self->alpha;
-        ro_single_render(&self->L.render_objects[i], canvascam_mat);
+    if(self->blend_layers) {
+        for (int i = 0; i < self->current_layer; i++) {
+            float alpha = (i + 1.0) / (self->current_layer + 1.0);
+            self->L.render_objects[i].rect.color.a = alpha * self->alpha;
+            ro_single_render(&self->L.render_objects[i], canvascam_mat);
+        }
     }
+    
+    self->L.render_objects[self->current_layer].rect.color.a = 1.0;
+    ro_single_render(&self->L.render_objects[self->current_layer], canvascam_mat);
 
     if (self->show_grid)
         ro_single_render(&self->L.grid, canvascam_mat);
@@ -166,6 +179,7 @@ void canvas_save(Canvas *self) {
     }
     
     u_image_copy(self->L.prev_image, self->RO.image);
+    
     self->L.save_idx++;
     self->L.save_idx%=CANVAS_MAX_SAVES;
     self->L.save_idx_max = self->L.save_idx;
@@ -231,6 +245,11 @@ void canvas_save_config(const Canvas *self) {
     u_json_append_int(canvas, "save_idx_min", self->L.save_idx_min);
     u_json_append_int(canvas, "save_idx_max", self->L.save_idx_max);
     
+    uJson *save_layers = u_json_append_array(canvas, "save_layers");
+    for(int i=0; i<CANVAS_MAX_SAVES; i++) {
+        u_json_append_int(save_layers, NULL, self->L.save_layers[i]);
+    }
+    
     u_json_save_file(config,
                        e_io_savestate_file_path("config.json").s);
     e_io_savestate_save();
@@ -253,14 +272,32 @@ void canvas_load_config(Canvas *self) {
         self->RO.pattern_rows = pattern_rows;
     }
     
+    int tmp_layers[CANVAS_MAX_SAVES];
+    int tmp_layers_size = 0;
+    
+    uJson *save_layers = u_json_get_object(canvas, "save_layers");
+    if(save_layers) {
+        for(int i=0; i<u_json_get_size(save_layers); i++) {
+            int layers;
+            if(u_json_get_id_int(save_layers, i, &layers)) {
+                tmp_layers[tmp_layers_size++] = layers;
+            } else {
+                tmp_layers_size = 0;
+                break;
+            }
+        }
+    }
+    
     int save_idx, save_idx_min, save_idx_max;
     if(u_json_get_object_int(canvas, "save_idx", &save_idx)
             && u_json_get_object_int(canvas, "save_idx_min", &save_idx_min)
-            && u_json_get_object_int(canvas, "save_idx_max", &save_idx_max)) {
+            && u_json_get_object_int(canvas, "save_idx_max", &save_idx_max)
+            && tmp_layers_size>0) {
         self->L.save_idx = save_idx;
         self->L.save_idx_min = save_idx_min;
         self->L.save_idx_max = save_idx_max;
-        
+        for(int i=0; i<tmp_layers_size; i++)
+            self->L.save_layers[i] = tmp_layers[i];
         load_image(self);
     } else {
         log_info("canvas: load_config failed, saving the empty image as index 0");

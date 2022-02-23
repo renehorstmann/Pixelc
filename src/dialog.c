@@ -17,6 +17,8 @@
 #define TOOLTIP_BG_B "#887777"
 #define CANVASSIZE_BG_A "#667766"
 #define CANVASSIZE_BG_B "#778877"
+#define IMAGEUPLOAD_BG_A "#777755"
+#define IMAGEUPLOAD_BG_B "#888866"
 
 Dialog *dialog_new() {
     Dialog *self = rhc_calloc(sizeof *self);
@@ -570,8 +572,8 @@ void dialog_create_image_upload(Dialog *self) {
     impl->upload.rect.pose = u_pose_new_aa(DIALOG_LEFT + 8, DIALOG_TOP-62, 64, 16);
 #endif
     
-    dialog_set_title(self, "import", (vec4){{0.2, 0.6, 0.2, 1}});
-    dialog_set_bg_color(self, u_color_from_hex(TOOLTIP_BG_A), u_color_from_hex(TOOLTIP_BG_B));
+    dialog_set_title(self, "import", (vec4){{0.6, 0.2, 0.2, 1}});
+    dialog_set_bg_color(self, u_color_from_hex(IMAGEUPLOAD_BG_A), u_color_from_hex(IMAGEUPLOAD_BG_B));
     self->kill = image_upload_kill;
     self->update = image_upload_update;
     self->render = image_upload_render;

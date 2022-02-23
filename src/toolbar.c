@@ -237,6 +237,7 @@ Toolbar *toolbar_new(struct eWindow *window,
 
 
     self->layer_tools.select = tool_new_layer_select();
+    self->layer_tools.blend = tool_new_layer_blend();
     
 
     self->selection_set_tools.move = tool_new_selection_set_move();

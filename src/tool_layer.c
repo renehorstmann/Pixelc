@@ -173,3 +173,27 @@ Tool *tool_new_layer_select() {
     return (Tool*) self;
 }
 
+
+static void blend_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    
+    if (button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = button_is_pressed(&self->ro.rect);
+        log_info("tool layer blend: %i", pressed);
+        refs.canvas->blend_layers = pressed;
+    }
+}
+static bool blend_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    bool active = refs.canvas->blend_layers;
+    button_set_pressed(&self->ro.rect, active);
+    // always active
+    return true;
+}
+Tool *tool_new_layer_blend() {
+    return tool_button_new("blend",
+                           "blends in the\nprevious layers",
+                           "res/button_blend.png",
+                           blend_pe,
+                           blend_is_a);
+}
