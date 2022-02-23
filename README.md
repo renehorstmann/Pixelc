@@ -90,7 +90,6 @@ python3 -m http.server --bind localhost  # [port]
   - tools can be en/disabled
   - tools can be repositioned (uo down)
 
-- onion skinning (show last animation frames alpha blended in the background)
 - tiles
   - file containing tile names?
   - direct draw mode, in which you can select a tile in the canvas and directly draw changes there

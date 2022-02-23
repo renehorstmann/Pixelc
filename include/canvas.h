@@ -6,8 +6,8 @@
 #include "u/image.h"
 #include "r/ro_types.h"
 
-#define CANVAS_MAX_SIZE 256
-#define CANVAS_MAX_LAYERS 16
+#define CANVAS_MAX_SIZE 1024
+#define CANVAS_MAX_LAYERS 128
 #define CANVAS_MAX_SAVES 128
 
 typedef struct Canvas {
