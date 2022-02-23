@@ -394,7 +394,19 @@ void canvas_size_on_action(Dialog *self, bool ok) {
         log_info("dialog canvas_size: new size %i %i", cols, rows);
 
         uImage new_img = u_image_new_zeros(cols, rows, layers);
+        if(layers != img.layers) {
+            // copy top left as if there were no layers
+            new_img.rows *= layers;
+            new_img.layers = 1;
+            img.rows *= img.layers;
+            img.layers = 1;
+        } 
+        
         u_image_copy_top_left(new_img, img);
+        
+        // reset the size to use layers and udpate the canvas
+        new_img.rows = rows;
+        new_img.layers = layers;
         canvas_set_image(canvas, new_img, true);
     }
     if(p_cols != canvas->RO.pattern_cols 
@@ -444,7 +456,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->layers_num = ro_text_new_font55(8);
     ro_text_set_color(&impl->layers_num, (vec4){{0.1, 0.1, 0.9, 1}});
     impl->layers_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
-    impl->layers_num.pose = u_pose_new(DIALOG_LEFT+50, DIALOG_TOP-pos, 1, 2);    
+    impl->layers_num.pose = u_pose_new(DIALOG_LEFT+52, DIALOG_TOP-pos, 1, 2);    
     impl->layers_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
 
 
@@ -456,7 +468,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->p_cols_num = ro_text_new_font55(8);
     ro_text_set_color(&impl->p_cols_num, (vec4){{0.1, 0.1, 0.9, 1}});
     impl->p_cols_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
-    impl->p_cols_num.pose = u_pose_new(DIALOG_LEFT+90, DIALOG_TOP-pos, 1, 2);
+    impl->p_cols_num.pose = u_pose_new(DIALOG_LEFT+88, DIALOG_TOP-pos, 1, 2);
     impl->p_cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
 
     pos = 85;
@@ -467,7 +479,7 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     impl->p_rows_num = ro_text_new_font55(8);
     ro_text_set_color(&impl->p_rows_num, (vec4){{0.1, 0.1, 0.9, 1}});
     impl->p_rows_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
-    impl->p_rows_num.pose = u_pose_new(DIALOG_LEFT+90, DIALOG_TOP-pos, 1, 2);    
+    impl->p_rows_num.pose = u_pose_new(DIALOG_LEFT+88, DIALOG_TOP-pos, 1, 2);    
     impl->p_rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos + 4, DIALOG_WIDTH, 10+8);
 
 

@@ -698,7 +698,10 @@ static bool tool_size_is_a(struct Tool *super, float dtime, ToolRefs refs) {
 }
 Tool *tool_new_size() {
     return tool_button_new("size",
-                           "change the\ncanvas size",
+                           "change the\n"
+                           "canvas size,\n"
+                           "layer size\n"
+                           "and pattern size",
                            "res/button_size.png",
                            tool_size_pe,
                            tool_size_is_a);
