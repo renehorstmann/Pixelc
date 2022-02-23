@@ -701,7 +701,11 @@ Tool *tool_new_size() {
                            "change the\n"
                            "canvas size,\n"
                            "layer size\n"
-                           "and pattern size",
+                           "and pattern size.\n\n"
+                           "if the layer size\n"
+                           "changes, the image\n"
+                           "is copied, as there\n"
+                           "were no layers",
                            "res/button_size.png",
                            tool_size_pe,
                            tool_size_is_a);
