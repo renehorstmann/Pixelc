@@ -67,8 +67,6 @@ python3 -m http.server --bind localhost  # [port]
     - setting for onion skinning alpha
     - add layer behind (+)
     - delete current layer (-)
-    - move layer up
-    - move layer down
     - merge layer down
     - toggle for save merged
   - delete current palette

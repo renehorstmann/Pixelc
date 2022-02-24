@@ -120,6 +120,8 @@ Tool *tool_new_mode_replace();
 Tool *tool_new_mode_pipette();
 
 Tool *tool_new_layer_select();
+Tool *tool_new_layer_move_prev();
+Tool *tool_new_layer_move_next();
 Tool *tool_new_layer_blend();
 
 Tool *tool_new_selection_set_move();

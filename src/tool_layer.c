@@ -174,6 +174,73 @@ Tool *tool_new_layer_select() {
 }
 
 
+static void move_prev_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    
+    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+        bool pressed = button_is_pressed(&self->ro.rect);
+        log_info("tool layer move_prev: %i", pressed);
+        int layer = refs.canvas->current_layer;
+        uImage img = u_image_new_clone(refs.canvas->RO.image);
+        memcpy(u_image_layer(img, layer),
+                u_image_layer(refs.canvas->RO.image, layer-1),
+                u_image_layer_data_size(img));
+        memcpy(u_image_layer(img, layer-1),
+                u_image_layer(refs.canvas->RO.image, layer),
+                u_image_layer_data_size(img));
+        
+        refs.canvas->current_layer--;
+        canvas_set_image(refs.canvas, img, true);
+    }
+}
+static bool move_prev_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    return refs.canvas->current_layer>0;
+}
+Tool *tool_new_layer_move_prev() {
+    return tool_button_new("move prev",
+                           "moves the current\n"
+                           "layer back\n"
+                           "/ swaps with the\n"
+                           "previous layer",
+                           "res/button_move_prev.png",
+                           move_prev_pe,
+                           move_prev_is_a);
+}
+
+static void move_next_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    
+    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+        bool pressed = button_is_pressed(&self->ro.rect);
+        log_info("tool layer move_next: %i", pressed);
+        int layer = refs.canvas->current_layer;
+        uImage img = u_image_new_clone(refs.canvas->RO.image);
+        memcpy(u_image_layer(img, layer),
+                u_image_layer(refs.canvas->RO.image, layer+1),
+                u_image_layer_data_size(img));
+        memcpy(u_image_layer(img, layer+1),
+                u_image_layer(refs.canvas->RO.image, layer),
+                u_image_layer_data_size(img));
+        
+        refs.canvas->current_layer++;
+        canvas_set_image(refs.canvas, img, true);
+    }
+}
+static bool move_next_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    return refs.canvas->current_layer<refs.canvas->RO.image.layers-1;
+}
+Tool *tool_new_layer_move_next() {
+    return tool_button_new("move next",
+                           "moves the current\n"
+                           "layer ip\n"
+                           "/ swaps with the\n"
+                           "next layer",
+                           "res/button_move_next.png",
+                           move_next_pe,
+                           move_next_is_a);
+}
+
+
 static void blend_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
     ToolButton *self = (ToolButton *) super;
     

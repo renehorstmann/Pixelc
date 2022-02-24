@@ -114,12 +114,16 @@ void u_image_rotate(uImage *self, bool right);
 // mirrors the image
 void u_image_mirror(uImage self, bool vertical);
 
-// returns the size of the byte array
-static size_t u_image_data_size(uImage self) {
+// returns the size of the byte array of a single layer
+static size_t u_image_layer_data_size(uImage self) {
     if (!u_image_valid(self))
         return 0;
+    return self.cols * self.rows * sizeof *self.data;
+}
 
-    return self.cols * self.rows * self.layers * sizeof(uColor_s);
+// returns the size of the byte array
+static size_t u_image_data_size(uImage self) {
+    return u_image_layer_data_size(self) * self.layers;
 }
 
 // gives access (read and write) to a pixel of the image
