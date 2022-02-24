@@ -71,18 +71,17 @@ python3 -m http.server --bind localhost  # [port]
     - move layer down
     - merge layer down
     - toggle for save merged
-    - toggle for onion skinning
   - delete current palette
     - are you sure prompt
   - delete current kernel
     - are you sure prompt
   - import new palette...?
   - import new kernel
-- secondary toolbar above palette?
 - preview
   - instead of animation
   - how to animate
   - frame times?
+  - gif export?
 - options menu
   - in container stack
   - shows all tools
