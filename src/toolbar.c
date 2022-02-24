@@ -240,6 +240,7 @@ Toolbar *toolbar_new(struct eWindow *window,
     self->layer_tools.move_prev = tool_new_layer_move_prev();
     self->layer_tools.move_next = tool_new_layer_move_next();
     self->layer_tools.blend = tool_new_layer_blend();
+    self->layer_tools.add = tool_new_layer_add();
     
 
     self->selection_set_tools.move = tool_new_selection_set_move();

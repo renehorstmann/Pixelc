@@ -75,6 +75,7 @@ python3 -m http.server --bind localhost  # [port]
     - are you sure prompt
   - import new palette...?
   - import new kernel
+  - reset all
 - preview
   - instead of animation
   - how to animate

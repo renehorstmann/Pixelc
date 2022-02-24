@@ -178,8 +178,7 @@ static void move_prev_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) 
     ToolButton *self = (ToolButton *) super;
     
     if (self->active && button_clicked(&self->ro.rect, pointer)) {
-        bool pressed = button_is_pressed(&self->ro.rect);
-        log_info("tool layer move_prev: %i", pressed);
+        log_info("tool layer move_prev");
         int layer = refs.canvas->current_layer;
         uImage img = u_image_new_clone(refs.canvas->RO.image);
         memcpy(u_image_layer(img, layer),
@@ -211,8 +210,7 @@ static void move_next_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) 
     ToolButton *self = (ToolButton *) super;
     
     if (self->active && button_clicked(&self->ro.rect, pointer)) {
-        bool pressed = button_is_pressed(&self->ro.rect);
-        log_info("tool layer move_next: %i", pressed);
+        log_info("tool layer move_next");
         int layer = refs.canvas->current_layer;
         uImage img = u_image_new_clone(refs.canvas->RO.image);
         memcpy(u_image_layer(img, layer),
@@ -263,4 +261,47 @@ Tool *tool_new_layer_blend() {
                            "res/button_blend.png",
                            blend_pe,
                            blend_is_a);
+}
+
+
+static void add_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton *) super;
+    
+    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+        log_info("tool layer add");
+        int layer = refs.canvas->current_layer;
+        uImage old = refs.canvas->RO.image;
+        uImage img = u_image_new_empty(old.cols, old.rows, old.layers+1);
+        
+        // copy until current layer
+        memcpy(img.data, old.data, u_image_layer_data_size(img) * (layer+1));
+        
+        // set next (new) layer to 0
+        memset(u_image_layer(img, layer+1), 0,
+                u_image_layer_data_size(img));
+        
+        // copy tail
+        if(layer<old.layers-1) {
+            memcpy(u_image_layer(img, layer+2),
+                    u_image_layer(old, layer+1),
+                    u_image_layer_data_size(img)
+                    * (old.layers-layer-1)
+                    );
+        }
+        
+        refs.canvas->current_layer++;
+        canvas_set_image(refs.canvas, img, true);
+    }
+}
+static bool add_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    return refs.canvas->RO.image.layers<CANVAS_MAX_LAYERS;
+}
+Tool *tool_new_layer_add() {
+    return tool_button_new("add",
+                           "adds a layer\n"
+                           "on top of the\n"
+                           "current layer",
+                           "res/button_plus.png",
+                           add_pe,
+                           add_is_a);
 }

@@ -123,6 +123,7 @@ Tool *tool_new_layer_select();
 Tool *tool_new_layer_move_prev();
 Tool *tool_new_layer_move_next();
 Tool *tool_new_layer_blend();
+Tool *tool_new_layer_add();
 
 Tool *tool_new_selection_set_move();
 Tool *tool_new_selection_set_copy();
