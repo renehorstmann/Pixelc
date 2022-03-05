@@ -59,6 +59,8 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
+- tablet size dialog to big (dialog offset y?)
+- undo layer change bug
 - dialog:
   - delete
   - upload
