@@ -69,6 +69,7 @@ python3 -m http.server --bind localhost  # [port]
     - delete current layer (-)
     - merge layer down
     - toggle for save merged
+      - or always sace merged and a butten for save unmerged?
   - delete current palette
     - are you sure prompt
   - delete current kernel
