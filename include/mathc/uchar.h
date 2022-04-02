@@ -1,8 +1,6 @@
 #ifndef MATHC_UCHAR_H
 #define MATHC_UCHAR_H
 
-#include "initializer.h"
-
 #include "io/uchar.h"
 
 #include "sca/uchar.h"

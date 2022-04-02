@@ -1,8 +1,6 @@
 #ifndef MATHC_INT_H
 #define MATHC_INT_H
 
-#include "initializer.h"
-
 #include "io/int.h"
 
 #include "sca/int.h"

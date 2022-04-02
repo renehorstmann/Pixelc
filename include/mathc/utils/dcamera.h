@@ -1,6 +1,7 @@
 #ifndef MATHC_UTILS_DCAMERA_H
 #define MATHC_UTILS_DCAMERA_H
 
+
 #include "../vec/dvec3.h"
 #include "../mat/dmat4.h"
 
@@ -10,21 +11,21 @@
  * @param far_z: far flipping plane
  */
 static dmat4 dmat4_camera_ortho(double left, double right,
-                                double bottom, double top,
-                                double near_z, double far_z) {
+                              double bottom, double top,
+                              double near_z, double far_z) {
     // from cglm/cam.h/glm_ortho
-    double rl = 1.0 / (right - left);
-    double tb = 1.0 / (top - bottom);
-    double fn = -1.0 / (far_z - near_z);
+    double rl = (double) 1 / (right - left);
+    double tb = (double) 1 / (top - bottom);
+    double fn = (double) -1 / (far_z - near_z);
 
     dmat4 res = {{0}};
-    res.m[0][0] = 2.0 * rl;
-    res.m[1][1] = 2.0 * tb;
-    res.m[2][2] = 2.0 * fn;
+    res.m[0][0] = (double) 2 * rl;
+    res.m[1][1] = (double) 2 * tb;
+    res.m[2][2] = (double) 2 * fn;
     res.m[3][0] = -(right + left) * rl;
     res.m[3][1] = -(top + bottom) * tb;
     res.m[3][2] = (far_z + near_z) * fn;
-    res.m[3][3] = 1.0;
+    res.m[3][3] = (double) 1;
     return res;
 }
 
@@ -34,13 +35,13 @@ static dmat4 dmat4_camera_ortho(double left, double right,
  * @param far_z: far flipping plane
  */
 static dmat4 dmat4_camera_frustum(double left, double right,
-                                  double bottom, double top,
-                                  double near_z, double far_z) {
+                                double bottom, double top,
+                                double near_z, double far_z) {
     // from cglm/cam.h/glm_frustum
-    double rl = 1.0 / (right - left);
-    double tb = 1.0 / (top - bottom);
-    double fn = -1.0 / (far_z - near_z);
-    double nv = 2.0 * near_z;
+    double rl = (double) 1 / (right - left);
+    double tb = (double) 1 / (top - bottom);
+    double fn = (double) -1 / (far_z - near_z);
+    double nv = (double) 2 * near_z;
 
     dmat4 res = {{0}};
     res.m[0][0] = nv * rl;
@@ -48,7 +49,7 @@ static dmat4 dmat4_camera_frustum(double left, double right,
     res.m[2][0] = (right + left) * rl;
     res.m[2][1] = (top + bottom) * tb;
     res.m[2][2] = (far_z + near_z) * fn;
-    res.m[2][3] = -1.0;
+    res.m[2][3] = (double) -1;
     res.m[3][2] = far_z * nv * fn;
     return res;
 }
@@ -62,15 +63,15 @@ static dmat4 dmat4_camera_frustum(double left, double right,
  */
 static dmat4 dmat4_camera_perspective(double fovy, double aspect, double near_z, double far_z) {
     // from cglm/cam.h/glm_perspective
-    double f = 1.0 / tan(fovy * 0.5);
-    double fn = 1.0 / (near_z - far_z);
+    double f = (double) 1 / dsca_tan(fovy * 0.5f);
+    double fn =(double) 1 / (near_z - far_z);
 
     dmat4 res = {{0}};
     res.m[0][0] = f / aspect;
     res.m[1][1] = f;
     res.m[2][2] = (near_z + far_z) * fn;
-    res.m[2][3] = -1.0;
-    res.m[3][2] = 2.0 * near_z * far_z * fn;
+    res.m[2][3] = (double) -1;
+    res.m[3][2] = (double) 2 * near_z * far_z * fn;
     return res;
 }
 

@@ -1,36 +1,52 @@
 #ifndef MATHC_SCA_UCHAR_H
 #define MATHC_SCA_UCHAR_H
 
+#include <stdlib.h>  // abs
+#include <limits.h>  // UCHAR_MAX
 #include <math.h>
+
+/** maximum possible value */
+#define UCSCA_MAX UCHAR_MAX
+
+/** minimum possible value */
+#define UCSCA_MIN 0
+
+/** for printing in IO */
+#define UCSCA_PRINT_FORMAT_SPECIFIER "hhu"
 
 /** dst = pow(x, y) */
 static unsigned char ucsca_pow(unsigned char x, unsigned char y) {
-    return pow(x, y);
+    return (unsigned char) pow(x, y);
 }
 
 /** dst = exp(x) */
 static unsigned char ucsca_exp(unsigned char x) {
-    return exp(x);
+    return (unsigned char) exp(x);
 }
 
 /** dst = log(x) */
 static unsigned char ucsca_log(unsigned char x) {
-    return log(x);
+    return (unsigned char) log(x);
 }
 
 /** dst = exp2(x) */
 static unsigned char ucsca_exp2(unsigned char x) {
-    return exp2(x);
+    return (unsigned char) exp2(x);
 }
 
 /** dst = log2(x) */
 static unsigned char ucsca_log2(unsigned char x) {
-    return log2(x);
+    return (unsigned char) log2(x);
 }
 
 /** dst = sqrt(x) */
 static unsigned char ucsca_sqrt(unsigned char x) {
-    return sqrt(x);
+    return (unsigned char) sqrt(x);
+}
+
+/** dst =  x % y  **/
+static unsigned char ucsca_mod(unsigned char x, unsigned char y) {
+    return x % y;
 }
 
 /** dst = a < b ? a : b */
@@ -50,7 +66,7 @@ static unsigned char ucsca_clamp(unsigned char x, unsigned char min, unsigned ch
 
 /** dst = a * (1-t) + b * t */
 static unsigned char ucsca_mix(unsigned char a, unsigned char b, float t) {
-    return a * (1.0-t) + b * t;
+    return (unsigned char) (a * (1.0f - t) + b * t);
 }
 
 /** dst = x < edge ? 0 : 1 */

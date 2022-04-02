@@ -1,8 +1,11 @@
 #ifndef MATHC_MAT_UCMAT4_H
 #define MATHC_MAT_UCMAT4_H
 
+
 #include "ucmatn.h"
-#include "../types/uchar.h"
+#include "../types/ucmat4.h"
+#include "../types/ucmat2.h"
+#include "../types/ucmat3.h"
 #include "../vec/ucvecn.h"
 
 
@@ -13,220 +16,127 @@ static ucmat4 ucmat4_eye() {
     return res;
 }
 
-/** dst = (ucmat4) v */
-static ucmat4 ucmat4_cast_from_float(const float *v) {
-    ucmat4 res;
-    ucvecN_cast_into(res.v, v, 4*4);
-    return res;
-}
-
-/** dst = (ucmat4) v */
-static ucmat4 ucmat4_cast_from_double(const double *v) {
-    ucmat4 res;
-    ucvecN_cast_into(res.v, v, 4*4);
-    return res;
-}
-
-/** dst = (ucmat4) v */
-static ucmat4 ucmat4_cast_from_int(const int *v) {
-    ucmat4 res;
-    ucvecN_cast_into(res.v, v, 4*4);
-    return res;
-}
-
-/** dst = (ucmat4) v */
-static ucmat4 ucmat4_cast_from_unsigned(const unsigned *v) {
-    ucmat4 res;
-    ucvecN_cast_into(res.v, v, 4*4);
-    return res;
-}
-
-/** dst = (ucmat4) v */
-static ucmat4 ucmat4_cast_from_char(const signed char *v) {
-    ucmat4 res;
-    ucvecN_cast_into(res.v, v, 4*4);
-    return res;
-}
-
-/** mat_a == mat_b */
+/** a == b */
 static bool ucmat4_cmp(ucmat4 a, ucmat4 b) {
-    return ucvecN_cmp(a.v, b.v, 4*4);
+    return ucvecN_cmp(a.v, b.v, 4 * 4);
 }
 
-/** dst = mat[row][:] */
-static ucvec4 ucmat4_get_row(ucmat4 mat, int row) {
+
+/** dst = m[row][:] */
+static ucvec4 ucmat4_get_row(ucmat4 m, int row) {
     ucvec4 res;
-    ucmatN_get_row(res.v, mat.v, row, 4);
+    ucmatN_get_row(res.v, m.v, row, 4);
     return res;
 }
-/** dst = mat[row][:] */
-static ucvec4 ucmat4_get_row_v(const unsigned char *mat, int row) {
-    return ucmat4_get_row(UCMat4(mat), row);
-}
 
 
-/** dst = mat[:][col] */
-static ucvec4 ucmat4_get_col(ucmat4 mat, int col) {
+/** dst = m[:][col] */
+static ucvec4 ucmat4_get_col(ucmat4 m, int col) {
     ucvec4 res;
-    ucmatN_get_col(res.v, mat.v, col, 4);
+    ucmatN_get_col(res.v, m.v, col, 4);
     return res;
 }
-/** dst = mat[:][col] */
-static ucvec4 ucmat4_get_col_v(const unsigned char *mat, int col) {
-    return ucmat4_get_col(UCMat4(mat), col);
-}
 
 
-/** dst = mat; dst[row][:] = vec */
-static ucmat4 ucmat4_set_row(ucmat4 mat, ucvec4 vec, int row) {
-    ucmatN_set_row(mat.v, vec.v, row, 4);
-    return mat;
-}
-/** dst = mat; dst[row][:] = vec */
-static ucmat4 ucmat4_set_row_v(const unsigned char *mat, const unsigned char *vec, int row) {
-    return ucmat4_set_row(UCMat4(mat), UCVec4(vec), row);
+/** dst = m; dst[row][:] = v */
+static ucmat4 ucmat4_set_row(ucmat4 m, ucvec4 v, int row) {
+    ucmatN_set_row(m.v, v.v, row, 4);
+    return m;
 }
 
-/** mat[row][:] = vec; dst = mat */
-static ucmat4 ucmat4_set_this_row(ucmat4 *mat, ucvec4 vec, int row) {
-    ucmatN_set_row(mat->v, vec.v, row, 4);
+/** m[row][:] = v; dst = m */
+static ucmat4 ucmat4_set_this_row(ucmat4 *m, ucvec4 v, int row) {
+    ucmatN_set_row(m->v, v.v, row, 4);
+    return *m;
+}
+
+/** dst = m; dst[:][col] = v */
+static ucmat4 ucmat4_set_col(ucmat4 m, ucvec4 v, int col) {
+    ucmatN_set_col(m.v, v.v, col, 4);
+    return m;
+}
+
+/** mat[:][col] = v; dst = m */
+static ucmat4 ucmat4_set_this_col(ucmat4 *mat, ucvec4 v, int col) {
+    ucmatN_set_col(mat->v, v.v, col, 4);
     return *mat;
 }
-/** mat[row][:] = vec; dst = mat */
-static ucmat4 ucmat4_set_this_row_v(unsigned char *mat, const unsigned char *vec, int row) {
-    return ucmat4_set_this_row((ucmat4*) mat, UCVec4(vec), row);
+
+
+/** dst = m; dst[row][:] = s */
+static ucmat4 ucmat4_set_row_sca(ucmat4 m, unsigned char s, int row) {
+    ucmatN_set_row_sca(m.v, s, row, 4);
+    return m;
 }
 
-/** dst = mat; dst[:][col] = vec */
-static ucmat4 ucmat4_set_col(ucmat4 mat, ucvec4 vec, int col) {
-    ucmatN_set_col(mat.v, vec.v, col, 4);
-    return mat;
-}
-/** dst = mat; dst[:][col] = vec */
-static ucmat4 ucmat4_set_col_v(const unsigned char *mat, const unsigned char *vec, int col) {
-    return ucmat4_set_col(UCMat4(mat), UCVec4(vec), col);
-}
-
-/** mat[:][col] = vec; dst = mat */
-static ucmat4 ucmat4_set_this_col(ucmat4 *mat, ucvec4 vec, int col) {
-    ucmatN_set_col(mat->v, vec.v, col, 4);
-    return *mat;
-}
-/** mat[:][col] = vec; dst = mat */
-static ucmat4 ucmat4_set_this_col_v(unsigned char *mat, const unsigned char *vec, int col) {
-    return ucmat4_set_this_col((ucmat4*) mat, UCVec4(vec), col);
+/** m[row][:] = s; dst = m */
+static ucmat4 ucmat4_set_this_row_sca(ucmat4 *m, unsigned char s, int row) {
+    ucmatN_set_row_sca(m->v, s, row, 4);
+    return *m;
 }
 
 
-/** dst = mat; dst[row][:] = scalar */
-static ucmat4 ucmat4_set_row_sca(ucmat4 mat, unsigned char scalar, int row) {
-    ucmatN_set_row_sca(mat.v, scalar, row, 4);
-    return mat;
-}
-/** dst = mat; dst[row][:] = scalar */
-static ucmat4 ucmat4_set_row_sca_v(const unsigned char *mat, unsigned char scalar, int row) {
-    return ucmat4_set_row_sca(UCMat4(mat), scalar, row);
+/** dst = m; dst[:][col] = s */
+static ucmat4 ucmat4_set_col_sca(ucmat4 m, unsigned char s, int col) {
+    ucmatN_set_col_sca(m.v, s, col, 4);
+    return m;
 }
 
-/** mat[row][:] = scalar; dst = mat */
-static ucmat4 ucmat4_set_this_row_sca(ucmat4 *mat, unsigned char scalar, int row) {
-    ucmatN_set_row_sca(mat->v, scalar, row, 4);
-    return *mat;
-}
-/** mat[row][:] = scalar; dst = mat */
-static ucmat4 ucmat4_set_this_row_sca_v(unsigned char *mat, unsigned char scalar, int row) {
-    return ucmat4_set_this_row_sca((ucmat4*) mat, scalar, row);
-}
-
-
-/** dst = mat; dst[:][col] = scalar */
-static ucmat4 ucmat4_set_col_sca(ucmat4 mat, unsigned char scalar, int col) {
-    ucmatN_set_col_sca(mat.v, scalar, col, 4);
-    return mat;
-}
-/** dst = mat; dst[:][col] = scalar */
-static ucmat4 ucmat4_set_col_sca_v(const unsigned char *mat, unsigned char scalar, int col) {
-    return ucmat4_set_col_sca(UCMat4(mat), scalar, col);
-}
-
-/** mat[:][col] = scalar; dst = mat */
-static ucmat4 ucmat4_set_this_col_sca(ucmat4 *mat, unsigned char scalar, int col) {
-    ucmatN_set_col_sca(mat->v, scalar, col, 4);
-    return *mat;
-}
-/** mat[:][col] = scalar; dst = mat */
-static ucmat4 ucmat4_set_this_col_sca_v(unsigned char *mat, unsigned char scalar, int col) {
-    return ucmat4_set_this_col_sca((ucmat4*) mat, scalar, col);
+/** m[:][col] = s; dst = m */
+static ucmat4 ucmat4_set_this_col_sca(ucmat4 *m, unsigned char s, int col) {
+    ucmatN_set_col_sca(m->v, s, col, 4);
+    return *m;
 }
 
 
 /** returns sum of diagonal form upper left to lower right */
-static unsigned char ucmat4_trace(ucmat4 mat) {
-    return ucmatN_trace(mat.v, 4);
-}
-/** returns sum of diagonal form upper left to lower right */
-static unsigned char ucmat4_trace_v(const unsigned char *mat) {
-    return ucmat4_trace(UCMat4(mat));
+static unsigned char ucmat4_trace(ucmat4 m) {
+    return ucmatN_trace(m.v, 4);
 }
 
 
-/** dst = mat^t */
-static ucmat4 ucmat4_transpose(ucmat4 mat) {
+/** dst = m^t */
+static ucmat4 ucmat4_transpose(ucmat4 m) {
     ucmat4 res;
-    ucmatN_transpose_no_alias(res.v, mat.v, 4);
+    ucmatN_transpose_no_alias(res.v, m.v, 4);
     return res;
-}
-/** dst = mat^t */
-static ucmat4 ucmat4_transpose_v(const unsigned char *mat) {
-    return ucmat4_transpose(UCMat4(mat));
 }
 
 
 /** dst = a @ b */
-static ucmat4 ucmat4_mul_mat(ucmat4 mat_a, ucmat4 mat_b) {
+static ucmat4 ucmat4_mul_mat(ucmat4 a, ucmat4 b) {
     ucmat4 res;
-    ucmatN_mul_mat_no_alias(res.v, mat_a.v, mat_b.v, 4);
+    ucmatN_mul_mat_no_alias(res.v, a.v, b.v, 4);
     return res;
 }
-/** dst = a @ b */
-static ucmat4 ucmat4_mul_mat_v(const unsigned char *mat_a, const unsigned char *mat_b) {
-    return ucmat4_mul_mat(UCMat4(mat_a), UCMat4(mat_b));
-}
 
 
 /** dst = a @ b */
-static ucvec4 ucmat4_mul_vec(ucmat4 mat_a, ucvec4 vec_b) {
+static ucvec4 ucmat4_mul_vec(ucmat4 a, ucvec4 b) {
     ucvec4 res;
-    ucmatN_mul_vec_no_alias(res.v, mat_a.v, vec_b.v, 4);
+    ucmatN_mul_vec_no_alias(res.v, a.v, b.v, 4);
     return res;
 }
-/** dst = a @ b */
-static ucvec4 ucmat4_mul_vec_v(const unsigned char *mat_a, const unsigned char *vec_b) {
-    return ucmat4_mul_vec(UCMat4(mat_a), UCVec4(vec_b));
-}
 
 
 /** dst = a @ b */
-static ucvec4 ucvec4_mul_mat(ucvec4 vec_a, ucmat4 mat_b) {
+static ucvec4 ucvec4_mul_mat(ucvec4 a, ucmat4 b) {
     ucvec4 res;
-    ucvecN_mul_mat_no_alias(res.v, vec_a.v, mat_b.v, 4);
+    ucvecN_mul_mat_no_alias(res.v, a.v, b.v, 4);
     return res;
 }
-/** dst = a @ b */
-static ucvec4 ucvec4_mul_mat_v(const unsigned char *vec_a, const unsigned char *mat_b) {
-    return ucvec4_mul_mat(UCVec4(vec_a), UCMat4(mat_b));
-}
 
 
-/** returns = determinant mat */
-static unsigned char ucmat4_det(ucmat4 mat) {
-    // from cglm/ucmat4.h/glm_ucmat4_det
+
+/** returns = determinant mm */
+static unsigned char ucmat4_det(ucmat4 mm) {
+    // from cglm/ucmat4.h/glm_mat4_det
     /* [square] det(A) = det(At) */
     unsigned char t[6];
-    unsigned char a = mat.m[0][0], b = mat.m[0][1], c = mat.m[0][2], d = mat.m[0][3],
-            e = mat.m[1][0], f = mat.m[1][1], g = mat.m[1][2], h = mat.m[1][3],
-            i = mat.m[2][0], j = mat.m[2][1], k = mat.m[2][2], l = mat.m[2][3],
-            m = mat.m[3][0], n = mat.m[3][1], o = mat.m[3][2], p = mat.m[3][3];
+    unsigned char a = mm.m[0][0], b = mm.m[0][1], c = mm.m[0][2], d = mm.m[0][3],
+            e = mm.m[1][0], f = mm.m[1][1], g = mm.m[1][2], h = mm.m[1][3],
+            i = mm.m[2][0], j = mm.m[2][1], k = mm.m[2][2], l = mm.m[2][3],
+            m = mm.m[3][0], n = mm.m[3][1], o = mm.m[3][2], p = mm.m[3][3];
 
     t[0] = k * p - o * l;
     t[1] = j * p - n * l;
@@ -240,185 +150,139 @@ static unsigned char ucmat4_det(ucmat4 mat) {
            + c * (e * t[1] - f * t[3] + h * t[5])
            - d * (e * t[2] - f * t[4] + g * t[5]);
 }
-/** returns = determinant mat */
-static unsigned char ucmat4_det_v(const unsigned char *mat) {
-    return ucmat4_det(UCMat4(mat));
-}
 
 
-/** dst = inverted mat */
-static ucmat4 ucmat4_inv(ucmat4 mat) {
-    // from cglm/ucmat4.h/glm_ucmat4_inv
+/** dst = inverted mm */
+static ucmat4 ucmat4_inv(ucmat4 mm) {
+    // from cglm/ucmat4.h/glm_mat4_inv
     unsigned char t[6];
-    unsigned char a = mat.m[0][0], b = mat.m[0][1], c = mat.m[0][2], d = mat.m[0][3];
-    unsigned char e = mat.m[1][0], f = mat.m[1][1], g = mat.m[1][2], h = mat.m[1][3];
-    unsigned char i = mat.m[2][0], j = mat.m[2][1], k = mat.m[2][2], l = mat.m[2][3];
-    unsigned char m = mat.m[3][0], n = mat.m[3][1], o = mat.m[3][2], p = mat.m[3][3];
+    unsigned char a = mm.m[0][0], b = mm.m[0][1], c = mm.m[0][2], d = mm.m[0][3];
+    unsigned char e = mm.m[1][0], f = mm.m[1][1], g = mm.m[1][2], h = mm.m[1][3];
+    unsigned char i = mm.m[2][0], j = mm.m[2][1], k = mm.m[2][2], l = mm.m[2][3];
+    unsigned char m = mm.m[3][0], n = mm.m[3][1], o = mm.m[3][2], p = mm.m[3][3];
 
-    t[0] = k * p - o * l; t[1] = j * p - n * l; t[2] = j * o - n * k;
-    t[3] = i * p - m * l; t[4] = i * o - m * k; t[5] = i * n - m * j;
+    t[0] = k * p - o * l;
+    t[1] = j * p - n * l;
+    t[2] = j * o - n * k;
+    t[3] = i * p - m * l;
+    t[4] = i * o - m * k;
+    t[5] = i * n - m * j;
 
     ucmat4 res;
-    res.m[0][0] =  f * t[0] - g * t[1] + h * t[2];
-    res.m[1][0] =-(e * t[0] - g * t[3] + h * t[4]);
-    res.m[2][0] =  e * t[1] - f * t[3] + h * t[5];
-    res.m[3][0] =-(e * t[2] - f * t[4] + g * t[5]);
+    res.m[0][0] = f * t[0] - g * t[1] + h * t[2];
+    res.m[1][0] = -(e * t[0] - g * t[3] + h * t[4]);
+    res.m[2][0] = e * t[1] - f * t[3] + h * t[5];
+    res.m[3][0] = -(e * t[2] - f * t[4] + g * t[5]);
 
-    res.m[0][1] =-(b * t[0] - c * t[1] + d * t[2]);
-    res.m[1][1] =  a * t[0] - c * t[3] + d * t[4];
-    res.m[2][1] =-(a * t[1] - b * t[3] + d * t[5]);
-    res.m[3][1] =  a * t[2] - b * t[4] + c * t[5];
+    res.m[0][1] = -(b * t[0] - c * t[1] + d * t[2]);
+    res.m[1][1] = a * t[0] - c * t[3] + d * t[4];
+    res.m[2][1] = -(a * t[1] - b * t[3] + d * t[5]);
+    res.m[3][1] = a * t[2] - b * t[4] + c * t[5];
 
-    t[0] = g * p - o * h; t[1] = f * p - n * h; t[2] = f * o - n * g;
-    t[3] = e * p - m * h; t[4] = e * o - m * g; t[5] = e * n - m * f;
+    t[0] = g * p - o * h;
+    t[1] = f * p - n * h;
+    t[2] = f * o - n * g;
+    t[3] = e * p - m * h;
+    t[4] = e * o - m * g;
+    t[5] = e * n - m * f;
 
-    res.m[0][2] =  b * t[0] - c * t[1] + d * t[2];
-    res.m[1][2] =-(a * t[0] - c * t[3] + d * t[4]);
-    res.m[2][2] =  a * t[1] - b * t[3] + d * t[5];
-    res.m[3][2] =-(a * t[2] - b * t[4] + c * t[5]);
+    res.m[0][2] = b * t[0] - c * t[1] + d * t[2];
+    res.m[1][2] = -(a * t[0] - c * t[3] + d * t[4]);
+    res.m[2][2] = a * t[1] - b * t[3] + d * t[5];
+    res.m[3][2] = -(a * t[2] - b * t[4] + c * t[5]);
 
-    t[0] = g * l - k * h; t[1] = f * l - j * h; t[2] = f * k - j * g;
-    t[3] = e * l - i * h; t[4] = e * k - i * g; t[5] = e * j - i * f;
+    t[0] = g * l - k * h;
+    t[1] = f * l - j * h;
+    t[2] = f * k - j * g;
+    t[3] = e * l - i * h;
+    t[4] = e * k - i * g;
+    t[5] = e * j - i * f;
 
-    res.m[0][3] =-(b * t[0] - c * t[1] + d * t[2]);
-    res.m[1][3] =  a * t[0] - c * t[3] + d * t[4];
-    res.m[2][3] =-(a * t[1] - b * t[3] + d * t[5]);
-    res.m[3][3] =  a * t[2] - b * t[4] + c * t[5];
+    res.m[0][3] = -(b * t[0] - c * t[1] + d * t[2]);
+    res.m[1][3] = a * t[0] - c * t[3] + d * t[4];
+    res.m[2][3] = -(a * t[1] - b * t[3] + d * t[5]);
+    res.m[3][3] = a * t[2] - b * t[4] + c * t[5];
 
-    unsigned char inv_det = 1.0f / (a * res.m[0][0] + b * res.m[1][0]
-                  + c * res.m[2][0] + d * res.m[3][0]);
+    unsigned char det = a * res.m[0][0] + b * res.m[1][0] + c * res.m[2][0] + d * res.m[3][0];
+    ucvecN_div(res.v, res.v, det, 16);
 
-    ucvecN_scale(res.v, res.v, inv_det, 16);
     return res;
 }
-/** dst = inverted mat */
-static ucmat4 ucmat4_inv_v(const unsigned char *mat) {
-    return ucmat4_inv(UCMat4(mat));
-}
 
-
-/** dst = mat[col:col+2, row:row+2] */
-static ucmat2 ucmat4_get_block2(ucmat4 mat, int row, int col) {
+/** dst = m[col:col+2, row:row+2] */
+static ucmat2 ucmat4_get_block2(ucmat4 m, int row, int col) {
     ucmat2 res;
-    ucmatN_get_block(res.v, mat.v, row, col, 2, 4);
+    ucmatN_get_block(res.v, m.v, row, col, 2, 4);
     return res;
 }
-/** dst = mat[col:col+2, row:row+2] */
-static ucmat2 ucmat4_get_block2_v(const unsigned char *mat, int row, int col) {
-    return ucmat4_get_block2(UCMat4(mat), row, col);
+
+
+/** dst = m; dst[col:col+2, row:row+2] = block */
+static ucmat4 ucmat4_set_block2(ucmat4 m, ucmat2 block_2, int row, int col) {
+    ucmatN_set_block(m.v, block_2.v, row, col, 2, 4);
+    return m;
 }
 
 
-/** dst = mat; dst[col:col+2, row:row+2] = block */
-static ucmat4 ucmat4_set_block2(ucmat4 mat, ucmat2 block_2, int row, int col) {
-    ucmatN_set_block(mat.v, block_2.v, row, col, 2, 4);
-    return mat;
-}
-/** dst = mat; dst[col:col+2, row:row+2] = block */
-static ucmat4 ucmat4_set_block2_v(const unsigned char *mat, const unsigned char *block_2, int row, int col) {
-    return ucmat4_set_block2(UCMat4(mat), UCMat2(block_2), row, col);
+/** m[col:col+2, row:row+2] = block; dst = m */
+static ucmat4 ucmat4_set_this_block2(ucmat4 *m, ucmat2 block_2, int row, int col) {
+    ucmatN_set_block(m->v, block_2.v, row, col, 2, 4);
+    return *m;
 }
 
 
-/** mat[col:col+2, row:row+2] = block; dst = mat */
-static ucmat4 ucmat4_set_this_block2(ucmat4 *mat, ucmat2 block_2, int row, int col) {
-    ucmatN_set_block(mat->v, block_2.v, row, col, 2, 4);
-    return *mat;
-}
-/** mat[col:col+2, row:row+2] = block; dst = mat */
-static ucmat4 ucmat4_set_this_block2_v(unsigned char *mat, const unsigned char *block_2, int row, int col) {
-    return ucmat4_set_this_block2((ucmat4 *) mat, UCMat2(block_2), row, col);
-}
-
-
-/** dst = mat[col:col+2, row:row+2] */
-static ucmat3 ucmat4_get_block3(ucmat4 mat, int row, int col) {
+/** dst = m[col:col+2, row:row+2] */
+static ucmat3 ucmat4_get_block3(ucmat4 m, int row, int col) {
     ucmat3 res;
-    ucmatN_get_block(res.v, mat.v, row, col, 3, 4);
+    ucmatN_get_block(res.v, m.v, row, col, 3, 4);
     return res;
 }
-/** dst = mat[col:col+2, row:row+2] */
-static ucmat3 ucmat4_get_block3_v(const unsigned char *mat, int row, int col) {
-    return ucmat4_get_block3(UCMat4(mat), row, col);
+
+
+/** dst = m; dst[col:col+2, row:row+2] = block */
+static ucmat4 ucmat4_set_block3(ucmat4 m, ucmat3 block_3, int row, int col) {
+    ucmatN_set_block(m.v, block_3.v, row, col, 3, 4);
+    return m;
+}
+
+/** m[col:col+2, row:row+2] = block; dst = m */
+static ucmat4 ucmat4_set_this_block3(ucmat4 *m, ucmat3 block_3, int row, int col) {
+    ucmatN_set_block(m->v, block_3.v, row, col, 3, 4);
+    return *m;
 }
 
 
-/** dst = mat; dst[col:col+2, row:row+2] = block */
-static ucmat4 ucmat4_set_block3(ucmat4 mat, ucmat3 block_3, int row, int col) {
-    ucmatN_set_block(mat.v, block_3.v, row, col, 3, 4);
-    return mat;
-}
-/** dst = mat; dst[col:col+2, row:row+2] = block */
-static ucmat4 ucmat4_set_block3_v(const unsigned char *mat, const unsigned char *block_3, int row, int col) {
-    return ucmat4_set_block3(UCMat4(mat), UCMat3(block_3), row, col);
-}
-
-/** mat[col:col+2, row:row+2] = block; dst = mat */
-static ucmat4 ucmat4_set_this_block3(ucmat4 *mat, ucmat3 block_3, int row, int col) {
-    ucmatN_set_block(mat->v, block_3.v, row, col, 3, 4);
-    return *mat;
-}
-/** mat[col:col+2, row:row+2] = block; dst = mat */
-static ucmat4 ucmat4_set_this_block3_v(unsigned char *mat, const unsigned char *block_3, int row, int col) {
-    return ucmat4_set_this_block3((ucmat4 *) mat, UCMat3(block_3), row, col);
+/** dst = m[:2, :2] */
+static ucmat2 ucmat4_get_upper_left2(ucmat4 m) {
+    return ucmat4_get_block2(m, 0, 0);
 }
 
 
-/** dst = mat[:2, :2] */
-static ucmat2 ucmat4_get_upper_left2(ucmat4 mat) {
-    return ucmat4_get_block2(mat, 0, 0);
+/** dst = m; dst[:2, :2] = block */
+static ucmat4 ucmat4_set_upper_left2(ucmat4 m, ucmat2 block_2) {
+    return ucmat4_set_block2(m, block_2, 0, 0);
 }
-/** dst = mat[:2, :2] */
-static ucmat2 ucmat4_get_upper_left2_v(const unsigned char *mat) {
-    return ucmat4_get_upper_left2(UCMat4(mat));
+
+/** m[:2, :2] = block; dst = m */
+static ucmat4 ucmat4_set_this_upper_left2(ucmat4 *m, ucmat2 block_2) {
+    return ucmat4_set_this_block2(m, block_2, 0, 0);
 }
 
 
-/** dst = mat; dst[:2, :2] = block */
-static ucmat4 ucmat4_set_upper_left2(ucmat4 mat, ucmat2 block_2) {
-    return ucmat4_set_block2(mat, block_2, 0, 0);
-}
-/** dst = mat; dst[:2, :2] = block */
-static ucmat4 ucmat4_set_upper_left2_v(const unsigned char *mat, const unsigned char *block_2) {
-    return ucmat4_set_upper_left2(UCMat4(mat), UCMat2(block_2));
-}
-
-/** mat[:2, :2] = block; dst = mat */
-static ucmat4 ucmat4_set_this_upper_left2(ucmat4 *mat, ucmat2 block_2) {
-    return ucmat4_set_this_block2(mat, block_2, 0, 0);
-}
-/** mat[:2, :2] = block; dst = mat */
-static ucmat4 ucmat4_set_this_upper_left2_v(unsigned char *mat, const unsigned char *block_2) {
-    return ucmat4_set_this_upper_left2((ucmat4 *) mat, UCMat2(block_2));
+/** dst = m[:3, :3] */
+static ucmat3 ucmat4_get_upper_left3(ucmat4 m) {
+    return ucmat4_get_block3(m, 0, 0);
 }
 
 
-/** dst = mat[:3, :3] */
-static ucmat3 ucmat4_get_upper_left3(ucmat4 mat) {
-    return ucmat4_get_block3(mat, 0, 0);
-}
-/** dst = mat[:3, :3] */
-static ucmat3 ucmat4_get_upper_left3_v(const unsigned char *mat) {
-    return ucmat4_get_upper_left3(UCMat4(mat));
+/** dst = m; dst[:3, :3] = block */
+static ucmat4 ucmat4_set_upper_left3(ucmat4 m, ucmat3 block_3) {
+    return ucmat4_set_block3(m, block_3, 0, 0);
 }
 
-
-/** dst = mat; dst[:3, :3] = block */
-static ucmat4 ucmat4_set_upper_left3(ucmat4 mat, ucmat3 block_3) {
-    return ucmat4_set_block3(mat, block_3, 0, 0);
-}
-/** dst = mat; dst[:3, :3] = block */
-static ucmat4 ucmat4_set_upper_left3_v(const unsigned char *mat, const unsigned char *block_3) {
-    return ucmat4_set_upper_left3(UCMat4(mat), UCMat3(block_3));
-}
-
-/** mat[:3, :3] = block; dst = mat */
-static ucmat4 ucmat4_set_this_upper_left3(ucmat4 *mat, ucmat3 block_3) {
-    return ucmat4_set_this_block3(mat, block_3, 0, 0);
-}
-/** mat[:3, :3] = block; dst = mat */
-static ucmat4 ucmat4_set_this_upper_left3_v(unsigned char *mat, const unsigned char *block_3) {
-    return ucmat4_set_this_upper_left3((ucmat4 *) mat, UCMat3(block_3));
+/** m[:3, :3] = block; dst = m */
+static ucmat4 ucmat4_set_this_upper_left3(ucmat4 *m, ucmat3 block_3) {
+    return ucmat4_set_this_block3(m, block_3, 0, 0);
 }
 
 #endif //MATHC_MAT_UCMAT4_H

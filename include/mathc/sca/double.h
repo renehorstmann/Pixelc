@@ -1,16 +1,48 @@
 #ifndef MATHC_SCA_DOUBLE_H
 #define MATHC_SCA_DOUBLE_H
 
+#include <stdbool.h>
+#include <float.h>  // for DBL_MAX, ...
 #include <math.h>
+
+/** maximum possible value */
+#define DSCA_MAX DBL_MAX
+
+/** minimum possible value */
+#define DSCA_MIN (-DBL_MAX)
+
+/** smallest positive value */
+#define DSCA_SMALL DBL_MIN
+
+/** smallest positive value change */
+#define DSCA_EPS DBL_EPSILON
+
+/* clone o some math.h constants */
+#define DSCA_E 2.718281828459045235360287471352662498 /* e */
+#define DSCA_LOG2E 1.442695040888963407359924681001892137 /* log_2 e */
+#define DSCA_LOG10E 0.434294481903251827651128918916605082 /* log_10 e */
+#define DSCA_LN2 0.693147180559945309417232121458176568 /* log_e 2 */
+#define DSCA_LN10 2.302585092994045684017991454684364208 /* log_e 10 */
+#define DSCA_PI 3.141592653589793238462643383279502884 /* pi */
+#define DSCA_PI_2 1.570796326794896619231321691639751442 /* pi/2 */
+#define DSCA_PI_4 0.785398163397448309615660845819875721 /* pi/4 */
+#define DSCA_1_PI 0.318309886183790671537767526745028724 /* 1/pi */
+#define DSCA_2_PI 0.636619772367581343075535053490057448 /* 2/pi */
+#define DSCA_2_SQRTPI 1.128379167095512573896158903121545172 /* 2/sqrt(pi) */
+#define DSCA_SQRT2 1.414213562373095048801688724209698079 /* sqrt(2) */
+#define DSCA_SQRT1_2 0.707106781186547524400844362104849039 /* 1/sqrt(2) */
+
+/** for printing in IO */
+#define DSCA_PRINT_FORMAT_SPECIFIER "g"
 
 /** dst = a * M_PI / 180 */
 static double dsca_radians(double deg) {
-    return deg * M_PI / 180.0;
+    return deg * DSCA_PI / 180.0;
 }
 
 /** dst = a * 180 / M_PI */
 static double dsca_degrees(double rad) {
-    return rad * 180.0 / M_PI;
+    return rad * 180.0 / DSCA_PI;
 }
 
 /** dst = sin(angle_rad) */
@@ -130,7 +162,7 @@ static double dsca_clamp(double x, double min, double max) {
 
 /** dst = a * (1-t) + b * t */
 static double dsca_mix(double a, double b, double t) {
-    return a * (1.0-t) + b * t;
+    return a * (1.0 - t) + b * t;
 }
 
 /** dst = x < edge ? 0 : 1 */
@@ -144,8 +176,13 @@ static double dsca_smoothstep(double x, double edge1, double edge2) {
 }
 
 /** dst = isnan(x) */
-static double dsca_isnan(double x) {
+static bool dsca_isnan(double x) {
     return isnan(x);
+}
+
+/** dst = isinf(x) */
+static bool dsca_isinf(double x) {
+    return isinf(x);
 }
 
 #endif //MATHC_SCA_DOUBLE_H

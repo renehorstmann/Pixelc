@@ -1,8 +1,6 @@
 #ifndef MATHC_FLOAT_H
 #define MATHC_FLOAT_H
 
-#include "initializer.h"
-
 #include "io/float.h"
 
 #include "sca/float.h"

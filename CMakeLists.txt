@@ -81,7 +81,6 @@ if (PLATFORM_MINGW)
     add_definitions(-Dmain=SDL_main)
     add_definitions(-DOPTION_GLEW)
     add_definitions(-DOPTION_SDL)
-    add_definitions(-DMATHC_NO_PRINT_COLOR)
 
     # mingw may not find pixelc library, due to missing CMAKE_LIBRARY_PATH lib paths
     find_library(OPENGL_LIB opengl32 REQUIRED)

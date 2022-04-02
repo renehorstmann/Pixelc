@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "e/input.h"
+#include "mathc/types/bool.h"
 #include "camera.h"
 #include "brush.h"
 

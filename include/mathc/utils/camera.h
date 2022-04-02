@@ -1,6 +1,7 @@
 #ifndef MATHC_UTILS_CAMERA_H
 #define MATHC_UTILS_CAMERA_H
 
+
 #include "../vec/vec3.h"
 #include "../mat/mat4.h"
 
@@ -13,18 +14,18 @@ static mat4 mat4_camera_ortho(float left, float right,
                               float bottom, float top,
                               float near_z, float far_z) {
     // from cglm/cam.h/glm_ortho
-    float rl = 1.0f / (right - left);
-    float tb = 1.0f / (top - bottom);
-    float fn = -1.0f / (far_z - near_z);
+    float rl = (float) 1 / (right - left);
+    float tb = (float) 1 / (top - bottom);
+    float fn = (float) -1 / (far_z - near_z);
 
     mat4 res = {{0}};
-    res.m[0][0] = 2.0f * rl;
-    res.m[1][1] = 2.0f * tb;
-    res.m[2][2] = 2.0f * fn;
+    res.m[0][0] = (float) 2 * rl;
+    res.m[1][1] = (float) 2 * tb;
+    res.m[2][2] = (float) 2 * fn;
     res.m[3][0] = -(right + left) * rl;
     res.m[3][1] = -(top + bottom) * tb;
     res.m[3][2] = (far_z + near_z) * fn;
-    res.m[3][3] = 1.0f;
+    res.m[3][3] = (float) 1;
     return res;
 }
 
@@ -37,18 +38,18 @@ static mat4 mat4_camera_frustum(float left, float right,
                                 float bottom, float top,
                                 float near_z, float far_z) {
     // from cglm/cam.h/glm_frustum
-    float rl = 1.0f / (right  - left);
-    float tb = 1.0f / (top    - bottom);
-    float fn =-1.0f / (far_z - near_z);
-    float nv = 2.0f * near_z;
+    float rl = (float) 1 / (right - left);
+    float tb = (float) 1 / (top - bottom);
+    float fn = (float) -1 / (far_z - near_z);
+    float nv = (float) 2 * near_z;
 
     mat4 res = {{0}};
     res.m[0][0] = nv * rl;
     res.m[1][1] = nv * tb;
-    res.m[2][0] = (right  + left)    * rl;
-    res.m[2][1] = (top    + bottom)  * tb;
+    res.m[2][0] = (right + left) * rl;
+    res.m[2][1] = (top + bottom) * tb;
     res.m[2][2] = (far_z + near_z) * fn;
-    res.m[2][3] =-1.0f;
+    res.m[2][3] = (float) -1;
     res.m[3][2] = far_z * nv * fn;
     return res;
 }
@@ -62,15 +63,15 @@ static mat4 mat4_camera_frustum(float left, float right,
  */
 static mat4 mat4_camera_perspective(float fovy, float aspect, float near_z, float far_z) {
     // from cglm/cam.h/glm_perspective
-    float f = 1.0f / tanf(fovy * 0.5f);
-    float fn = 1.0f / (near_z - far_z);
+    float f = (float) 1 / sca_tan(fovy * 0.5f);
+    float fn =(float) 1 / (near_z - far_z);
 
     mat4 res = {{0}};
     res.m[0][0] = f / aspect;
     res.m[1][1] = f;
     res.m[2][2] = (near_z + far_z) * fn;
-    res.m[2][3] = -1.0f;
-    res.m[3][2] = 2.0f * near_z * far_z * fn;
+    res.m[2][3] = (float) -1;
+    res.m[3][2] = (float) 2 * near_z * far_z * fn;
     return res;
 }
 
@@ -86,7 +87,7 @@ static mat4 mat4_camera_lookat(vec3 eye, vec3 center, vec3 up) {
 
     vec3 s = vec3_cross(f, up);
     s = vec3_normalize(s);
-    
+
     vec3 u = vec3_cross(s, f);
 
     mat4 res = mat4_eye();

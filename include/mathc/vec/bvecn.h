@@ -2,6 +2,7 @@
 #define MATHC_VEC_BVECN_H
 
 #include <string.h>     // memcmp
+#include <assert.h>
 #include <stdbool.h>
 
 /** vec_a == vec_b */
@@ -19,6 +20,32 @@ static void bvecN_copy(bool *dst_vec, const bool *vec, int n) {
 static void bvecN_set(bool *dst_vec, bool set, int n) {
     for (int i = 0; i < n; i++)
         dst_vec[i] = set;
+}
+
+/** dst = unit_x */
+static void bvecN_unit_x(bool *dst, int n) {
+    bvecN_set(dst, false, n);
+    dst[0] = true;
+}
+
+/** dst = unit_y */
+static void bvecN_unit_y(bool *dst, int n) {
+    bvecN_set(dst, false, n);
+    dst[1] = true;
+}
+
+/** assert(n>=3); dst = unit_z */
+static void bvecN_unit_z(bool *dst, int n) {
+    assert(n>=3 && "mathc bvec*_unit_z");
+    bvecN_set(dst, false, n);
+    dst[2] = true;
+}
+
+/** assert(n>=4); dst = unit_w */
+static void bvecN_unit_w(bool *dst, int n) {
+    assert(n>=4 && "mathc bvec*_unit_w");
+    bvecN_set(dst, false, n);
+    dst[3] = true;
 }
 
 /** dst = !vec */
