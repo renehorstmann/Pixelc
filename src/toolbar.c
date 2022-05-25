@@ -221,6 +221,7 @@ Toolbar *toolbar_new(struct eWindow *window,
     self->tools.grid = tool_new_grid();
     self->tools.preview = tool_new_preview();
     self->tools.size = tool_new_size();
+    self->tools.display = tool_new_display();
 
     self->tools.mode_none = tool_new_mode_none();
     self->tools.mode_free = tool_new_mode_free();

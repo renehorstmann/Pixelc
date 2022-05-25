@@ -710,3 +710,39 @@ Tool *tool_new_size() {
                            tool_size_pe,
                            tool_size_is_a);
 }
+
+
+static void tool_display_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    if(!button_toggled(&self->ro.rect, pointer))
+        return;
+
+    // only passed if button state toggled
+    bool pressed = button_is_pressed(&self->ro.rect);
+    if(pressed) {
+        log_info("tool display start");
+        dialog_create_canvas_size(refs.dialog, refs.window, refs.input, refs.canvas);
+    } else {
+        log_info("tool display stop");
+        dialog_hide(refs.dialog);
+    }
+
+}
+static bool tool_display_is_a(struct Tool *super, float dtime, ToolRefs refs) {
+    ToolButton *self = (ToolButton*) super;
+    bool active = strcmp(refs.dialog->id, "set size") == 0;
+    button_set_pressed(&self->ro.rect, active);
+    // always active
+    return true;
+}
+Tool *tool_new_display() {
+    return tool_button_new("display",
+                           "change the internal\n"
+                           "display size\n\n"
+                           "and the\n"
+                           "rotation mode",
+                           "res/button_display.png",
+                           tool_display_pe,
+                           tool_display_is_a);
+}
+

@@ -207,7 +207,7 @@ void dialog_create_tooltip(Dialog *self, const struct Toolbar *toolbar, const st
     impl->name = ro_text_new_font55(TOOL_NAME_LEN);
     ro_text_set_color(&impl->name, (vec4){{0.9, 0.9, 0.9, 1}});
 
-    impl->tip = ro_text_new_font55(TOOL_TIP_LEN);
+    impl->tip = ro_text_new_font85(TOOL_TIP_LEN);
 
     impl->name.pose = u_pose_new(DIALOG_LEFT+6, DIALOG_TOP-18, 1, 2);
     impl->tip.pose = u_pose_new(DIALOG_LEFT+2, DIALOG_TOP-36, 1, 1);

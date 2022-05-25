@@ -52,6 +52,7 @@ typedef struct Toolbar {
             Tool *grid;
             Tool *preview;
             Tool *size;
+            Tool *display;
 
             Tool *mode_none;
             Tool *mode_free;

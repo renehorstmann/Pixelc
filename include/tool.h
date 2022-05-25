@@ -105,6 +105,7 @@ Tool *tool_new_camera();
 Tool *tool_new_grid();
 Tool *tool_new_preview();
 Tool *tool_new_size();
+Tool *tool_new_display();
 
 Tool *tool_new_mode_none();
 Tool *tool_new_mode_free();
