@@ -59,6 +59,15 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
+- dialog internal display
+  - display size
+    - number
+    - buttons small, big
+  - portrait, landscape, auto
+- multitouchmode offset is relative to intetnal display size
+
+- rethink layers and frames?
+
 - tablet size dialog to big (dialog offset y?)
 - undo layer change bug
 - dialog:
