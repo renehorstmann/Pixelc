@@ -31,7 +31,7 @@ static void zoom_camera(CameraCtrl *self, float new_distance) {
     float factor = new_distance / self->L.distance0;
     factor = sca_clamp(factor, 0.3, 3);
     self->L.size = self->L.size0 / factor;
-    camera_set_size(self->camera_ref, self->L.size);
+    camera_set_zoom(self->camera_ref, self->L.size);
 }
 
 static void wheel_event(bool up, void *user_data) {
@@ -40,7 +40,7 @@ static void wheel_event(bool up, void *user_data) {
         self->L.size /= WHEEL_ZOOM_FACTOR;
     else
         self->L.size *= WHEEL_ZOOM_FACTOR;
-    camera_set_size(self->camera_ref, self->L.size);
+    camera_set_zoom(self->camera_ref, self->L.size);
 }
 
 static bool event_cursor(CameraCtrl *self, ePointer_s pointer) {
@@ -146,7 +146,7 @@ void cameractrl_set_home(CameraCtrl *self, int canvas_cols, int canvas_rows) {
     }
     
     camera_set_pos(self->camera_ref, self->L.pos.x, self->L.pos.y);
-    camera_set_size(self->camera_ref, self->L.size);
+    camera_set_zoom(self->camera_ref, self->L.size);
 }
 
 bool cameractrl_pointer_event(CameraCtrl *self, ePointer_s pointer) {

@@ -67,6 +67,7 @@ static void init(eSimple *simple, ivec2 window_size) {
     // init systems
     L.camera = rhc_calloc(sizeof *L.camera);
     *L.camera = camera_new();
+    camera_load_config(L.camera);
     camera_update(L.camera, window_size);
 
     L.background = background_new(u_color_from_hex(BG_COLOR_A), u_color_from_hex(BG_COLOR_B));

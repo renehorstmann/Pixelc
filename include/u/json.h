@@ -4,6 +4,7 @@
 // load and save json files from strings or files
 
 #include "rhc/types.h"
+#include "rhc/alloc.h"
 
 typedef struct uJson uJson;
 
