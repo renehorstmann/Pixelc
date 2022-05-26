@@ -8,7 +8,7 @@
 #define INNER_RADIUS 16
 #define STROKE_RADIUS 1.0
 #define START_DISTANCE 32
-#define CURSOR_DISTANCE 64
+#define CURSOR_REL_DISTANCE 0.33
 
 
 //
@@ -143,10 +143,11 @@ bool multitouchcursor_pointer_event(MultiTouchCursor *self, ePointer_s *in_out_p
     if (self->active) {
         if (pointer.id == 0 && pointer.action == E_POINTER_MOVE) {
             self->pos = pointer.pos;
+            float cursor_distance = self->cam_ref->size * CURSOR_REL_DISTANCE;
             if (camera_is_portrait_mode(self->cam_ref))
-                self->pos.y += CURSOR_DISTANCE;
+                self->pos.y += cursor_distance;
             else
-                self->pos.x -= CURSOR_DISTANCE;
+                self->pos.x -= cursor_distance;
 
             // send MOVE always, like a real cursor
             *in_out_pointer = (ePointer_s) {
