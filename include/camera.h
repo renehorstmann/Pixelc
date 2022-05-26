@@ -11,6 +11,8 @@
 #include "mathc/types/int.h"
 
 // the camera will unsure a canvas of at least CAMERA_SIZE * CAMERA_SIZE units
+#define CAMERA_SIZE_MIN 128
+#define CAMERA_SIZE_MAX 512
 #define CAMERA_SIZE_SMALL 180 // *4=720; *6=1080; *8=1440
 #define CAMERA_SIZE_BIG 360
 
@@ -44,7 +46,7 @@ typedef struct {
 //    mat4 v_p_inv;   // v @ p_inv
 } CameraMatrices_s;
 
-typedef struct {
+typedef struct Camera_s {
     CameraMatrices_s matrices;
     
     int size;

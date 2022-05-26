@@ -10,6 +10,7 @@
 #include "button.h"
 #include "dialog.h"
 #include "textinput.h"
+#include "camera.h"
 
 #define BG_A "#776666"
 #define BG_B "#887777"
@@ -17,6 +18,8 @@
 #define TOOLTIP_BG_B "#887777"
 #define CANVASSIZE_BG_A "#667766"
 #define CANVASSIZE_BG_B "#778877"
+#define DISPLAY_BG_A "#777766"
+#define DISPLAY_BG_B "#888877"
 #define IMAGEUPLOAD_BG_A "#777755"
 #define IMAGEUPLOAD_BG_B "#888866"
 
@@ -495,6 +498,132 @@ void dialog_create_canvas_size(Dialog *self, const eWindow *window, eInput *inpu
     self->opt_on_cancel_cb = canvas_size_on_action;
     self->opt_on_ok_cb = canvas_size_on_action;
 }
+
+
+struct Display {
+    const struct eWindow *window_ref;
+    eInput *input_ref;
+    Camera_s *camera_ref;
+
+    int size;
+    RoText size_text;
+    RoText size_num;
+    mat4 size_hitbox;
+    
+    int textinput_usage;
+    TextInput *textinput;
+};
+static void display_kill(void *impl) {
+    struct Display *self = impl;
+    ro_text_kill(&self->size_text);
+    ro_text_kill(&self->size_num);
+    textinput_kill(&self->textinput);
+    rhc_free(self);
+}
+static void display_update(Dialog *self, float dtime) {
+    struct Display *impl = self->impl;
+
+    if(impl->textinput) {
+        self->out.textinput_active = true;
+        
+        textinput_update(impl->textinput, e_window_get_size(impl->window_ref), dtime);
+
+        char *end;
+        int size = strtol(impl->textinput->text, &end, 10);
+        bool ok = end && end!=impl->textinput->text && size>=CAMERA_SIZE_MIN && size<=CAMERA_SIZE_MAX;
+        impl->textinput->in.ok_active = ok;
+
+        if(impl->textinput->state == TEXTINPUT_DONE) {
+            switch(impl->textinput_usage) {
+            case 0:
+                impl->size = size;
+                break;
+            default:
+                assume(0, "wtf");
+            }
+        }
+        if(impl->textinput->state != TEXTINPUT_IN_PROGRESS)
+            textinput_kill(&impl->textinput);
+    }
+
+    char buf[16];
+    snprintf(buf, sizeof buf, "%i", impl->size);
+    ro_text_set_text(&impl->size_num, buf);
+}
+static void display_render(Dialog *self, const mat4 *cam_mat) {
+    struct Display *impl = self->impl;
+    ro_text_render(&impl->size_text, cam_mat);
+    ro_text_render(&impl->size_num, cam_mat);
+    if(impl->textinput) {
+        textinput_render(impl->textinput);
+    }
+}
+static bool display_pe(Dialog *self, ePointer_s pointer) {
+    struct Display *impl = self->impl;
+
+    if(pointer.id == 0 && pointer.action == E_POINTER_DOWN) {
+        if(u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
+            impl->textinput = textinput_new(impl->input_ref, "Set camera size", 8);
+            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->size);
+            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+            impl->textinput_usage = 0;
+        }
+    }
+
+    return true;
+}
+
+void display_on_action(Dialog *self, bool ok) {
+    struct Display *impl = self->impl;
+    Camera_s *camera = impl->camera_ref;
+    int size = impl->size;
+
+    dialog_hide(self);
+    if(!ok) {
+        log_info("dialog display aborted");
+        return;
+    }
+    if(size>=CAMERA_SIZE_MIN && size<=CAMERA_SIZE_MAX) {
+        log_info("dialog display new size %i", size);
+        camera->size = size;
+        camera_save_config(camera);
+    }
+}
+void dialog_create_display(Dialog *self, const struct eWindow *window, struct eInput *input, struct Camera_s *camera) {
+    dialog_hide(self);
+    dialog_hide(self);
+    struct Display *impl = rhc_calloc(sizeof *impl);
+    self->impl = impl;
+    impl->window_ref = window;
+    impl->input_ref = input;
+    impl->camera_ref = camera;
+    
+    int pos;
+
+    pos = 20;
+    impl->size = camera->size;
+    impl->size_text = ro_text_new_font55(5);
+    ro_text_set_text(&impl->size_text, "size:");
+    ro_text_set_color(&impl->size_text, (vec4){{0.9, 0.9, 0.9, 1}});
+    impl->size_num = ro_text_new_font55(4);
+    ro_text_set_color(&impl->size_num, (vec4){{0.1, 0.1, 0.9, 1}});
+    impl->size_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
+    impl->size_num.pose = u_pose_new(DIALOG_LEFT+40, DIALOG_TOP-pos, 1, 2);
+    impl->size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
+
+    //pos = 35;
+    
+    dialog_set_title(self, "display", (vec4){{0.8, 0.2, 0.2, 1}});
+    dialog_set_bg_color(self, u_color_from_hex(DISPLAY_BG_A), u_color_from_hex(DISPLAY_BG_B));
+    self->in.impl_height = pos;
+    self->kill = display_kill;
+    self->update = display_update;
+    self->render = display_render;
+    self->pointer_event = display_pe;
+    self->opt_on_cancel_cb = display_on_action;
+    self->opt_on_ok_cb = display_on_action;
+}
+
 
 
 

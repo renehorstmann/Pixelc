@@ -29,7 +29,7 @@ Camera_s camera_new() {
 }
 
 void camera_update(Camera_s *self, ivec2 window_size) {
-    assume(self->size>0, "must not be 0");
+    assume(self->size>=CAMERA_SIZE_MIN&&self->size<=CAMERA_SIZE_MAX, "not in limits");
     
     int wnd_width = window_size.x;
     int wnd_height = window_size.y;

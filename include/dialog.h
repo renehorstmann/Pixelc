@@ -18,6 +18,7 @@ struct Dialog;
 struct Toolbar;
 struct Palette;
 struct Canvas;
+struct Camera_s;
 
 typedef void (*dialog_on_action_cb)(struct Dialog *self, bool ok);
 typedef void (*dialog_kill_fun)(void *impl);
@@ -85,7 +86,9 @@ void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fu
 
 void dialog_create_tooltip(Dialog *self, const struct Toolbar *toolbar, const struct Palette *palette);
 
-void dialog_create_canvas_size(Dialog *self, const struct eWindow *window, struct eInput *input_ref, struct Canvas *canvas);
+void dialog_create_canvas_size(Dialog *self, const struct eWindow *window, struct eInput *input, struct Canvas *canvas);
+
+void dialog_create_display(Dialog *self, const struct eWindow *window, struct eInput *input, struct Camera_s *camera);
 
 void dialog_create_image_upload(Dialog *self);
 

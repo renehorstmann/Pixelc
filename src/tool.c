@@ -721,7 +721,7 @@ static void tool_display_pe(struct Tool *super, ePointer_s pointer, ToolRefs ref
     bool pressed = button_is_pressed(&self->ro.rect);
     if(pressed) {
         log_info("tool display start");
-        dialog_create_canvas_size(refs.dialog, refs.window, refs.input, refs.canvas);
+        dialog_create_display(refs.dialog, refs.window, refs.input, refs.cam);
     } else {
         log_info("tool display stop");
         dialog_hide(refs.dialog);
@@ -730,7 +730,7 @@ static void tool_display_pe(struct Tool *super, ePointer_s pointer, ToolRefs ref
 }
 static bool tool_display_is_a(struct Tool *super, float dtime, ToolRefs refs) {
     ToolButton *self = (ToolButton*) super;
-    bool active = strcmp(refs.dialog->id, "set size") == 0;
+    bool active = strcmp(refs.dialog->id, "display") == 0;
     button_set_pressed(&self->ro.rect, active);
     // always active
     return true;
