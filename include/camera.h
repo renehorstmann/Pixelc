@@ -14,7 +14,7 @@
 #define CAMERA_SIZE_MIN 128
 #define CAMERA_SIZE_MAX 512
 #define CAMERA_SIZE_SMALL 180 // *4=720; *6=1080; *8=1440
-#define CAMERA_SIZE_BIG 360
+#define CAMERA_SIZE_BIG 270
 
 
 enum camera_rotate_mode {

@@ -2,6 +2,7 @@
 #include "e/input.h"
 #include "e/io.h"
 #include "r/ro_single.h"
+#include "r/ro_batch.h"
 #include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
@@ -510,6 +511,8 @@ struct Display {
     RoText size_num;
     mat4 size_hitbox;
     
+    RoBatch buttons;
+    
     int textinput_usage;
     TextInput *textinput;
 };
@@ -517,6 +520,7 @@ static void display_kill(void *impl) {
     struct Display *self = impl;
     ro_text_kill(&self->size_text);
     ro_text_kill(&self->size_num);
+    ro_batch_kill(&self->buttons);
     textinput_kill(&self->textinput);
     rhc_free(self);
 }
@@ -554,6 +558,7 @@ static void display_render(Dialog *self, const mat4 *cam_mat) {
     struct Display *impl = self->impl;
     ro_text_render(&impl->size_text, cam_mat);
     ro_text_render(&impl->size_num, cam_mat);
+    ro_batch_render(&impl->buttons, cam_mat, true);
     if(impl->textinput) {
         textinput_render(impl->textinput);
     }
@@ -561,13 +566,23 @@ static void display_render(Dialog *self, const mat4 *cam_mat) {
 static bool display_pe(Dialog *self, ePointer_s pointer) {
     struct Display *impl = self->impl;
 
-    if(pointer.id == 0 && pointer.action == E_POINTER_DOWN) {
+    if(pointer.id!=0)
+        return true;
+
+    if(pointer.action == E_POINTER_DOWN) {
         if(u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
             impl->textinput = textinput_new(impl->input_ref, "Set camera size", 8);
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->size);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
             impl->textinput_usage = 0;
         }
+    }
+        
+    if(button_clicked(&impl->buttons.rects[0], pointer)) {
+        impl->size = CAMERA_SIZE_SMALL;
+    }
+    if(button_clicked(&impl->buttons.rects[1], pointer)) {
+        impl->size = CAMERA_SIZE_BIG;
     }
 
     return true;
@@ -598,6 +613,8 @@ void dialog_create_display(Dialog *self, const struct eWindow *window, struct eI
     impl->input_ref = input;
     impl->camera_ref = camera;
     
+    impl->buttons = ro_batch_new(2, r_texture_new_file(2, 5, "res/button_display_settings.png"));
+    
     int pos;
 
     pos = 20;
@@ -609,9 +626,16 @@ void dialog_create_display(Dialog *self, const struct eWindow *window, struct eI
     ro_text_set_color(&impl->size_num, (vec4){{0.1, 0.1, 0.9, 1}});
     impl->size_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
     impl->size_num.pose = u_pose_new(DIALOG_LEFT+40, DIALOG_TOP-pos, 1, 2);
-    impl->size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, DIALOG_WIDTH, 10+8);
-
-    //pos = 35;
+    impl->size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP-pos+4, 64, 10+8);
+    
+    
+    impl->buttons.rects[0].pose = u_pose_new_aa(DIALOG_LEFT+76, DIALOG_TOP-pos+4, 16, 16);
+    impl->buttons.rects[0].sprite.y=0;
+    impl->buttons.rects[1].pose = u_pose_new_aa(DIALOG_LEFT+96, DIALOG_TOP-pos+4, 16, 16);
+    impl->buttons.rects[1].sprite.y=1;
+    
+    
+    // todo set button loc
     
     dialog_set_title(self, "display", (vec4){{0.8, 0.2, 0.2, 1}});
     dialog_set_bg_color(self, u_color_from_hex(DISPLAY_BG_A), u_color_from_hex(DISPLAY_BG_B));
