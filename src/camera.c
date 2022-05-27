@@ -121,11 +121,12 @@ void camera_load_config(Camera_s *self) {
     
     int read;
     if(u_json_get_object_int(camera, "size", &read)) {
-        if(read>0)
+        if(read>=CAMERA_SIZE_MIN && read<=CAMERA_SIZE_MAX)
             self->size = read;
     }
     if(u_json_get_object_int(camera, "size", &read)) {
-        self->rotate_mode = read;
+        if(read>=0 && read<CAMERA_ROTATE_NUM_MODES)
+            self->rotate_mode = read;
     }
     
     u_json_kill(&config);
