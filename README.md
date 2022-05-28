@@ -59,10 +59,8 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
-- dialog internal display
-  - display size
-    - buttons small, big
-  - portrait, landscape, auto
+- palette swipe arrows on both sides
+- reset camera with camera size and actual main (midscreen) rect (90%)
 - dialog and tool in a sub dir with a file for each class
   - default member and static function names
 

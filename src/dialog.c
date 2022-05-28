@@ -511,6 +511,9 @@ struct Display {
     RoText size_num;
     mat4 size_hitbox;
     
+    enum camera_rotate_mode mode;
+    RoText mode_text;
+    
     RoBatch buttons;
     
     int textinput_usage;
@@ -520,6 +523,7 @@ static void display_kill(void *impl) {
     struct Display *self = impl;
     ro_text_kill(&self->size_text);
     ro_text_kill(&self->size_num);
+    ro_text_kill(&self->mode_text);
     ro_batch_kill(&self->buttons);
     textinput_kill(&self->textinput);
     rhc_free(self);
@@ -553,11 +557,16 @@ static void display_update(Dialog *self, float dtime) {
     char buf[16];
     snprintf(buf, sizeof buf, "%i", impl->size);
     ro_text_set_text(&impl->size_num, buf);
+    
+    impl->buttons.rects[2].sprite.x = impl->mode == CAMERA_ROTATE_MODE_PORTRAIT;
+    impl->buttons.rects[3].sprite.x = impl->mode == CAMERA_ROTATE_MODE_LANDSCAPE;
+    impl->buttons.rects[4].sprite.x = impl->mode == CAMERA_ROTATE_MODE_AUTO;
 }
 static void display_render(Dialog *self, const mat4 *cam_mat) {
     struct Display *impl = self->impl;
     ro_text_render(&impl->size_text, cam_mat);
     ro_text_render(&impl->size_num, cam_mat);
+    ro_text_render(&impl->mode_text, cam_mat);
     ro_batch_render(&impl->buttons, cam_mat, true);
     if(impl->textinput) {
         textinput_render(impl->textinput);
@@ -584,6 +593,17 @@ static bool display_pe(Dialog *self, ePointer_s pointer) {
     if(button_clicked(&impl->buttons.rects[1], pointer)) {
         impl->size = CAMERA_SIZE_BIG;
     }
+    
+    if(button_pressed(&impl->buttons.rects[2], pointer)) {
+        impl->mode = CAMERA_ROTATE_MODE_PORTRAIT;
+    }
+    if(button_pressed(&impl->buttons.rects[3], pointer)) {
+        impl->mode = CAMERA_ROTATE_MODE_LANDSCAPE;
+    }
+    if(button_pressed(&impl->buttons.rects[4], pointer)) {
+        impl->mode = CAMERA_ROTATE_MODE_AUTO;
+    }
+
 
     return true;
 }
@@ -592,6 +612,9 @@ void display_on_action(Dialog *self, bool ok) {
     struct Display *impl = self->impl;
     Camera_s *camera = impl->camera_ref;
     int size = impl->size;
+    enum camera_rotate_mode mode = impl->mode;
+    
+    bool save_cam = false;
 
     dialog_hide(self);
     if(!ok) {
@@ -601,8 +624,16 @@ void display_on_action(Dialog *self, bool ok) {
     if(size>=CAMERA_SIZE_MIN && size<=CAMERA_SIZE_MAX) {
         log_info("dialog display new size %i", size);
         camera->size = size;
-        camera_save_config(camera);
+        save_cam = true;
     }
+    if(mode>=0 && mode<CAMERA_ROTATE_NUM_MODES) {
+        log_info("dialog display new mode %i", mode);
+        camera->rotate_mode = mode;
+        save_cam = true;
+    }
+    
+    if(save_cam)
+        camera_save_config(camera);
 }
 void dialog_create_display(Dialog *self, const struct eWindow *window, struct eInput *input, struct Camera_s *camera) {
     dialog_hide(self);
@@ -613,7 +644,7 @@ void dialog_create_display(Dialog *self, const struct eWindow *window, struct eI
     impl->input_ref = input;
     impl->camera_ref = camera;
     
-    impl->buttons = ro_batch_new(2, r_texture_new_file(2, 5, "res/button_display_settings.png"));
+    impl->buttons = ro_batch_new(5, r_texture_new_file(2, 5, "res/button_display_settings.png"));
     
     int pos;
 
@@ -635,7 +666,18 @@ void dialog_create_display(Dialog *self, const struct eWindow *window, struct eI
     impl->buttons.rects[1].sprite.y=1;
     
     
-    // todo set button loc
+    pos = 45;
+    impl->mode = camera->rotate_mode;
+    impl->mode_text = ro_text_new_font55(12);
+    ro_text_set_text(&impl->mode_text, "rotate mode:");
+    impl->mode_text.pose = u_pose_new(DIALOG_LEFT+8, DIALOG_TOP-pos, 1, 2);
+    ro_text_set_color(&impl->mode_text, (vec4){{0.9, 0.9, 0.9, 1}});
+    
+    pos = 60;
+    for(int i=0; i<3; i++) {
+        impl->buttons.rects[i+2].sprite.y = i+2;
+        impl->buttons.rects[i+2].pose = u_pose_new_aa(DIALOG_LEFT+56+i*20, DIALOG_TOP-pos+4, 16, 16);
+    }
     
     dialog_set_title(self, "display", (vec4){{0.8, 0.2, 0.2, 1}});
     dialog_set_bg_color(self, u_color_from_hex(DISPLAY_BG_A), u_color_from_hex(DISPLAY_BG_B));
