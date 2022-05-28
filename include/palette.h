@@ -41,7 +41,7 @@ typedef struct Palette {
         
         // long swipe from side to side to load the next palette
         struct {
-            RoSingle arrow;
+            RoBatch arrows;
             vec2 start;
             bool swiping;
         } swipe;

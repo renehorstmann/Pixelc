@@ -85,7 +85,7 @@ Palette *palette_new(const Camera_s *camera, Brush *brush) {
     self->L.info.bg = ro_single_new(r_texture_new_file(1, 1, "res/palette_info_bg.png"));
     self->L.info.text = ro_text_new_font55(20);
     
-    self->L.swipe.arrow = ro_single_new(r_texture_new_file(1, 1, "res/palette_arrow.png"));
+    self->L.swipe.arrows = ro_batch_new(2, r_texture_new_file(1, 1, "res/palette_arrow.png"));
     
 
     // default palette:
@@ -210,19 +210,21 @@ void palette_render(Palette *self, const mat4 *cam_mat) {
     ro_single_render(&self->L.select_ro, cam_mat);
     
     if(self->L.swipe.swiping)
-        ro_single_render(&self->L.swipe.arrow, cam_mat);
+        ro_batch_render(&self->L.swipe.arrows, cam_mat, true);
 }
 
 
 bool palette_pointer_event(Palette *self, ePointer_s pointer) {
     if (!palette_contains_pos(self, pointer.pos.xy)) {
-        self->L.swipe.arrow.rect.color.a = 0;
+        for(int i=0;i<2;i++)
+            self->L.swipe.arrows.rects[i].color.a = 0;
         self->L.swipe.swiping = false;
         return false;
     }
 
     if (pointer.action == E_POINTER_DOWN) {
-        self->L.swipe.arrow.rect.color.a = 0;
+        for(int i=0;i<2;i++)
+            self->L.swipe.arrows.rects[i].color.a = 0;
         self->L.swipe.start = pointer.pos.xy;
         self->L.swipe.swiping = true;
         
@@ -239,7 +241,8 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
     }
     
     if(pointer.action == E_POINTER_UP) {
-        self->L.swipe.arrow.rect.color.a = 0;
+        for(int i=0;i<2;i++)
+            self->L.swipe.arrows.rects[i].color.a = 0;
         self->L.swipe.swiping = false;
     }
     
@@ -273,22 +276,26 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
         }
         
         float alpha = sca_smoothstep(sca_abs(diff), 0.25, 1);
-        self->L.swipe.arrow.rect.color.a = alpha;
-        
+        for(int i=0;i<2;i++)
+            self->L.swipe.arrows.rects[i].color.a = alpha;
         if(camera_is_portrait_mode(self->camera_ref)) {
-            self->L.swipe.arrow.rect.pose = u_pose_new_angle(
-                sca_sign(diff) * (camera_width(self->camera_ref)/2 - 20), 
+            for(int i=0;i<2;i++) {
+                self->L.swipe.arrows.rects[i].pose = u_pose_new_angle(
+                (int[]){-1,1}[i] * (camera_width(self->camera_ref)/2 - 20), 
                 self->camera_ref->RO.bottom + 16,
                 32, 32,
                 sca_sign(diff) * M_PI_2 - M_PI_2
-            );
+                );
+            }
         } else {
-            self->L.swipe.arrow.rect.pose = u_pose_new_angle(
+            for(int i=0;i<2;i++) {
+                self->L.swipe.arrows.rects[i].pose = u_pose_new_angle(
                 self->camera_ref->RO.right - 16,
-                sca_sign(diff) * 64,
+                (int[]){-1,1}[i] * 64,
                 32, 32,
                 sca_sign(diff) * M_PI_2
-            );
+                );
+            }
         }
     }
 
