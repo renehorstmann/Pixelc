@@ -291,7 +291,7 @@ bool palette_pointer_event(Palette *self, ePointer_s pointer) {
             for(int i=0;i<2;i++) {
                 self->L.swipe.arrows.rects[i].pose = u_pose_new_angle(
                 self->camera_ref->RO.right - 16,
-                (int[]){-1,1}[i] * 64,
+                (int[]){-1,1}[i] * (camera_height(self->camera_ref)/2 - 20),
                 32, 32,
                 sca_sign(diff) * M_PI_2
                 );
