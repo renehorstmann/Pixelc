@@ -59,6 +59,14 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
+- some big update
+  - remove all unecessary "classes" with simple init modules, in some and the games
+  - decouple rhc?
+    - or:
+      - update some rhc files
+      - rhc styleguide update?
+    - new base module instead of rhc
+
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -68,6 +76,8 @@ python3 -m http.server --bind localhost  # [port]
     - bottom part
 
 - reset camera with camera size and actual main (midscreen) rect (90%)
+
+
 - dialog and tool in a sub dir with a file for each class
   - default member and static function names
 
