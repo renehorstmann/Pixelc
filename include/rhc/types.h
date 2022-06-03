@@ -25,14 +25,14 @@ typedef struct Allocator_i {
 // stream.h also contains more useful functions, like stream_read/write_msg
 typedef struct Stream_i {
     void *user_data;
-    
+
     // virtual functions
-    
+
     // reads up to n bytes from the stream into memory
     // returns bytes read or 0 on error
     // optional, function may be NULL
     size_t (*opt_read)(struct Stream_i self, void *memory, size_t n);
-    
+
     // writes up to n bytes into the stream from memory
     // returns bytes written or 0 on error
     // optional, function may be NULL
@@ -110,7 +110,7 @@ static bool strarray_valid(StrArray self) {
 
 // kills the str array
 static void strarray_kill(StrArray *self) {
-    if(strarray_valid(*self))
+    if (strarray_valid(*self))
         self->allocator.realloc(self->array, 0, self->allocator.user_data);
     self->array = NULL;
     self->size = 0;
@@ -123,7 +123,7 @@ static bool string_valid(String self) {
 
 // kills the string
 static void string_kill(String *self) {
-    if(string_valid(*self))
+    if (string_valid(*self))
         self->allocator.realloc(self->data, 0, self->allocator.user_data);
     self->data = NULL;
     self->size = 0;

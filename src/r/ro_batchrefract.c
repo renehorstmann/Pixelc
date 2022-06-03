@@ -6,25 +6,18 @@
 #include "r/texture.h"
 #include "r/ro_batchrefract.h"
 
-//
-// protected
-//
-
-extern rRender *r_render_singleton_;
-
-
 
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 
 RoBatchRefract ro_batchrefract_new(int num,
-        rTexture tex_main_sink, rTexture tex_refraction_sink) {
+                                   rTexture tex_main_sink, rTexture tex_refraction_sink) {
     r_render_error_check("ro_batchrefract_newBEGIN");
     RoBatchRefract self;
-    
-    assume(num>0, "batch needs atleast 1 rect");
+
+    assume(num > 0, "batch needs atleast 1 rect");
     self.rects = rhc_malloc(sizeof *self.rects * num);
-    for(int i=0; i<num; i++) {
+    for (int i = 0; i < num; i++) {
         self.rects[i] = r_rect_new();
     }
 
@@ -81,7 +74,7 @@ RoBatchRefract ro_batchrefract_new(int num,
                                   sizeof(rRect_s),
                                   (void *) offsetof(rRect_s, color));
             glVertexAttribDivisor(loc_color, 1);
-            
+
             // sprite
             glEnableVertexAttribArray(loc_sprite);
             glVertexAttribPointer(loc_sprite, 2, GL_FLOAT, GL_FALSE,
@@ -94,7 +87,7 @@ RoBatchRefract ro_batchrefract_new(int num,
 
         glBindVertexArray(0);
     }
-    
+
     r_render_error_check("ro_batchrefract_new");
     return self;
 }
@@ -116,7 +109,7 @@ void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size
     r_render_error_check("ro_batchrefract_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
-    offset = isca_clamp(offset, 0, self->num-1);
+    offset = isca_clamp(offset, 0, self->num - 1);
     size = isca_clamp(size, 1, self->num);
 
     if (offset + size > self->num) {
@@ -144,42 +137,44 @@ void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size
 }
 
 
-void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
-        bool update_sub) {
-    if(update_sub)
+void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat, float scale,
+                                const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
+                                bool update_sub) {
+    num = isca_clamp(num, 1, self->num);
+
+    if (update_sub)
         ro_batchrefract_update_sub(self, 0, num);
-     r_render_error_check("ro_batchrefract_renderBEGIN");
-    
-    if(!opt_view_aabb)
+    r_render_error_check("ro_batchrefract_renderBEGIN");
+
+    if (!opt_view_aabb)
         opt_view_aabb = &VIEW_AABB_FULLSCREEN;
-    if(!opt_framebuffer) {
-        opt_framebuffer = r_render_get_framebuffer_tex(r_render_singleton_);
+    if (!opt_framebuffer) {
+        opt_framebuffer = &r_render.framebuffer_tex;
 
     }
-    
+
     glUseProgram(self->L.program);
 
     // base
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"),
                        1, GL_FALSE, &camera_mat->m00);
-                       
+
     vec2 sprites = vec2_cast_from_int(&self->tex_main.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 
     // fragment shader
     glUniform1f(glGetUniformLocation(self->L.program, "scale"), scale);
-    
+
     glUniform4fv(glGetUniformLocation(self->L.program, "view_aabb"), 1, opt_view_aabb->v);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex_main"), 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_main.tex);
-    
+
     glUniform1i(glGetUniformLocation(self->L.program, "tex_refraction"), 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_refraction.tex);
-    
+
     glUniform1i(glGetUniformLocation(self->L.program, "tex_framebuffer"), 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, opt_framebuffer->tex);
@@ -201,7 +196,7 @@ void ro_batchrefract_set_texture_main(RoBatchRefract *self, rTexture tex_main_si
     self->tex_main = tex_main_sink;
 }
 
-void ro_batchrefract_set_texture_refraction(RoBatchRefract *self, rTexture tex_refraction_sink){
+void ro_batchrefract_set_texture_refraction(RoBatchRefract *self, rTexture tex_refraction_sink) {
     if (self->owns_tex_refraction)
         r_texture_kill(&self->tex_refraction);
     self->tex_refraction = tex_refraction_sink;

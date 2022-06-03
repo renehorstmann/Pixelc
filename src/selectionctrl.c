@@ -1,146 +1,158 @@
 #include "r/ro_batch.h"
-#include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/int.h"
+#include "canvas.h"
 #include "selectionctrl.h"
+
+
+struct SelectionCtrl_Globals selectionctrl;
 
 //
 // private
 //
+
+static struct {
+    RoBatch border;
+
+    bool moving;
+    ivec2 pos;
+    ivec2 move_start_selection_lt;
+    ivec2 move_start_position;
+} L;
 
 static mat4 pixel_pose(int x, int y) {
     return u_pose_new_aa(x, -y, 1, 1);
 }
 
 
-static void setup_border(SelectionCtrl *self) {
+static void setup_border() {
     int x = 0, y = 0, w = 0, h = 0;
-    if (self->selection) {
-        x = self->selection->left;
-        y = self->selection->top;
-        w = self->selection->cols;
-        h = self->selection->rows;
+    if (selectionctrl.selection) {
+        x = selectionctrl.selection->left;
+        y = selectionctrl.selection->top;
+        w = selectionctrl.selection->cols;
+        h = selectionctrl.selection->rows;
     }
 
-    int max = self->L.border.num;
+    int max = L.border.num;
 
     int idx = 0;
     for (int i = 0; i < h; i++) {
-        self->L.border.rects[idx].pose = pixel_pose(x - 1, y + i);
-        self->L.border.rects[idx].sprite = (vec2) {0, 0};
+        L.border.rects[idx].pose = pixel_pose(x - 1, y + i);
+        L.border.rects[idx].sprite = (vec2) {0, 0};
         idx++;
         if (idx >= max) goto UPDATE;
 
-        self->L.border.rects[idx].pose = pixel_pose(x + w, y + i);
-        self->L.border.rects[idx].sprite = (vec2) {0, 1};
+        L.border.rects[idx].pose = pixel_pose(x + w, y + i);
+        L.border.rects[idx].sprite = (vec2) {0, 1};
         idx++;
         if (idx >= max) goto UPDATE;
     }
     for (int i = 0; i < w; i++) {
-        self->L.border.rects[idx].pose = pixel_pose(x + i, y - 1);
-        self->L.border.rects[idx].sprite = (vec2) {1, 0};
+        L.border.rects[idx].pose = pixel_pose(x + i, y - 1);
+        L.border.rects[idx].sprite = (vec2) {1, 0};
         idx++;
         if (idx >= max) goto UPDATE;
 
-        self->L.border.rects[idx].pose = pixel_pose(x + i, y + h);
-        self->L.border.rects[idx].sprite = (vec2) {1, 1};
+        L.border.rects[idx].pose = pixel_pose(x + i, y + h);
+        L.border.rects[idx].sprite = (vec2) {1, 1};
         idx++;
         if (idx >= max) goto UPDATE;
     }
 
-    for (; idx < self->L.border.num; idx++) {
-        u_pose_set(&self->L.border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+    for (; idx < L.border.num; idx++) {
+        u_pose_set(&L.border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
     }
 
     UPDATE:
-    ro_batch_update(&self->L.border);
+    ro_batch_update(&L.border);
 }
 
-static void setup_selection(SelectionCtrl *self, ePointer_s pointer) {
-    uImage img = self->canvas_ref->RO.image;
+static void setup_selection(ePointer_s pointer) {
+    uImage img = canvas.RO.image;
 
-    if (self->selection && pointer.action == E_POINTER_UP) {
-        self->mode = SELECTIONCTRL_SET;
+    if (selectionctrl.selection && pointer.action == E_POINTER_UP) {
+        selectionctrl.mode = SELECTIONCTRL_SET;
         return;
     }
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
-    if (self->L.pos.x < 0 && !u_image_contains(img, cr.x, cr.y))
+    if (L.pos.x < 0 && !u_image_contains(img, cr.x, cr.y))
         return;
 
     cr.x = isca_clamp(cr.x, 0, img.cols - 1);
     cr.y = isca_clamp(cr.y, 0, img.rows - 1);
 
-    if (self->L.pos.x < 0) {
+    if (L.pos.x < 0) {
         if (pointer.action == E_POINTER_DOWN) {
-            self->L.pos = cr;
-            self->out.show_copy_cut = true;
+            L.pos = cr;
+            selectionctrl.show_copy_cut = true;
         }
     }
 
-    if (self->L.pos.x < 0)
+    if (L.pos.x < 0)
         return;
 
-    int left = cr.x < self->L.pos.x ? cr.x : self->L.pos.x;
-    int top = cr.y < self->L.pos.y ? cr.y : self->L.pos.y;
-    int cols = 1 + abs(cr.x - self->L.pos.x);
-    int rows = 1 + abs(cr.y - self->L.pos.y);
+    int left = cr.x < L.pos.x ? cr.x : L.pos.x;
+    int top = cr.y < L.pos.y ? cr.y : L.pos.y;
+    int cols = 1 + abs(cr.x - L.pos.x);
+    int rows = 1 + abs(cr.y - L.pos.y);
 
-    if (self->selection) {
-        self->selection->left = left;
-        self->selection->top = top;
-        self->selection->cols = cols;
-        self->selection->rows = rows;
+    if (selectionctrl.selection) {
+        selectionctrl.selection->left = left;
+        selectionctrl.selection->top = top;
+        selectionctrl.selection->cols = cols;
+        selectionctrl.selection->rows = rows;
     } else {
-        self->selection = selection_new(left, top, cols, rows);
+        selectionctrl.selection = selection_new(left, top, cols, rows);
     }
 }
 
-static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
-    uImage img = self->canvas_ref->RO.image;
-    int layer = self->canvas_ref->current_layer;
+static void move_selection(ePointer_s pointer) {
+    uImage img = canvas.RO.image;
+    int layer = canvas.current_layer;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
     if (pointer.action == E_POINTER_UP)
-        self->L.moving = false;
+        L.moving = false;
     else if (pointer.action == E_POINTER_DOWN)
-        self->L.moving = true;  
+        L.moving = true;
 
-    if (!self->L.moving)
+    if (!L.moving)
         return;
 
-    if (self->mode == SELECTIONCTRL_COPY
-            || self->mode == SELECTIONCTRL_CUT) {
+    if (selectionctrl.mode == SELECTIONCTRL_COPY
+        || selectionctrl.mode == SELECTIONCTRL_CUT) {
         if (!u_image_contains(img, cr.x, cr.y))
             return;
 
-        if (self->mode == SELECTIONCTRL_COPY)
-            selection_copy(self->selection, img, layer);
+        if (selectionctrl.mode == SELECTIONCTRL_COPY)
+            selection_copy(selectionctrl.selection, img, layer);
         else
-            selection_cut(self->selection, img, layer, U_COLOR_TRANSPARENT);
+            selection_cut(selectionctrl.selection, img, layer, U_COLOR_TRANSPARENT);
 
-        canvas_save(self->canvas_ref);
-        self->mode = SELECTIONCTRL_PASTE;
+        canvas_save();
+        selectionctrl.mode = SELECTIONCTRL_PASTE;
 
-        self->out.show_ok = true;
+        selectionctrl.show_ok = true;
     }
-    
-    if(pointer.action == E_POINTER_DOWN) {
-        if(!selection_contains(self->selection, cr.x, cr.y)) {
+
+    if (pointer.action == E_POINTER_DOWN) {
+        if (!selection_contains(selectionctrl.selection, cr.x, cr.y)) {
             // touched outside the selection, so pushing the selection center into that position
-            self->selection->left = cr.x - self->selection->cols / 2;
-            self->selection->top = cr.y - self->selection->rows / 2;
+            selectionctrl.selection->left = cr.x - selectionctrl.selection->cols / 2;
+            selectionctrl.selection->top = cr.y - selectionctrl.selection->rows / 2;
         }
-        self->L.move_start_selection_lt = (ivec2) {{self->selection->left, self->selection->top}};
-        self->L.move_start_position = cr;
+        L.move_start_selection_lt = (ivec2) {{selectionctrl.selection->left, selectionctrl.selection->top}};
+        L.move_start_position = cr;
     }
 
-    ivec2 grab_diff = ivec2_sub_vec(cr, self->L.move_start_position);
-    self->selection->left = self->L.move_start_selection_lt.x + grab_diff.x;
-    self->selection->top = self->L.move_start_selection_lt.y + grab_diff.y;
+    ivec2 grab_diff = ivec2_sub_vec(cr, L.move_start_position);
+    selectionctrl.selection->left = L.move_start_selection_lt.x + grab_diff.x;
+    selectionctrl.selection->top = L.move_start_selection_lt.y + grab_diff.y;
 
-    canvas_reload(self->canvas_ref);
-    selection_paste(self->selection, img, layer);
+    canvas_reload();
+    selection_paste(selectionctrl.selection, img, layer);
 }
 
 
@@ -148,75 +160,59 @@ static void move_selection(SelectionCtrl *self, ePointer_s pointer) {
 // public
 //
 
-SelectionCtrl *selectionctrl_new(Canvas *canvas) {
-    SelectionCtrl *self = rhc_calloc(sizeof *self);
-    
-    self->canvas_ref = canvas;
-    
-    self->L.border = ro_batch_new(1024,
-                                            r_texture_new_file(2, 2, "res/selection_border.png"));
-    for (int i = 0; i < self->L.border.num; i++) {
-        self->L.border.rects[i].color = u_color_to_vec4(u_color_from_hex("#357985"));
+void selectionctrl_init() {
+    L.border = ro_batch_new(1024,
+                            r_texture_new_file(2, 2, "res/selection_border.png"));
+    for (int i = 0; i < L.border.num; i++) {
+        L.border.rects[i].color = u_color_to_vec4(u_color_from_hex("#357985"));
     }
-
-    return self;
 }
 
-void selectionctrl_kill(SelectionCtrl **self_ptr) {
-    SelectionCtrl *self = *self_ptr;
-    if(!self)
-        return;
-    selection_kill(&self->selection);
-    ro_batch_kill(&self->L.border);
-    rhc_free(self);
-    *self_ptr = NULL;
+void selectionctrl_update(float dtime) {
+    setup_border();
 }
 
-void selectionctrl_update(SelectionCtrl *self, float dtime) {
-    setup_border(self);
+void selectionctrl_render(const mat4 *cam_mat) {
+    if (selectionctrl.selection)
+        ro_batch_render(&L.border, cam_mat, false);
 }
 
-void selectionctrl_render(const SelectionCtrl *self, const mat4 *cam_mat) {
-    if(self->selection)
-        ro_batch_render(&self->L.border, cam_mat, false);
-}
-
-bool selectionctrl_pointer_event(SelectionCtrl *self, ePointer_s pointer) {
+bool selectionctrl_pointer_event(ePointer_s pointer) {
     if (pointer.id != 0
-            || self->mode == SELECTIONCTRL_NONE
-            || self->mode == SELECTIONCTRL_SET)
+        || selectionctrl.mode == SELECTIONCTRL_NONE
+        || selectionctrl.mode == SELECTIONCTRL_SET)
         return false;
-        
-    if (self->mode == SELECTIONCTRL_ACQUIRE)
-        setup_selection(self, pointer);
+
+    if (selectionctrl.mode == SELECTIONCTRL_ACQUIRE)
+        setup_selection(pointer);
     else
-        move_selection(self, pointer);
+        move_selection(pointer);
     return true;
 }
 
-void selectionctrl_stop(SelectionCtrl *self) {
-    log_info("selectionctrl stop");
-    self->L.pos = (ivec2) {{-1, -1}};
-    selection_kill(&self->selection);
-    self->mode = SELECTIONCTRL_NONE;
+void selectionctrl_stop() {
+    log_info("stop");
+    L.pos = (ivec2) {{-1, -1}};
+    selection_kill(&selectionctrl.selection);
+    selectionctrl.mode = SELECTIONCTRL_NONE;
 }
 
-void selectionctrl_acquire(SelectionCtrl *self) {
-    log_info("selectionctrl acquire");
-    self->L.pos = (ivec2) {{-1, -1}};
-    selection_kill(&self->selection);
-    self->mode = SELECTIONCTRL_ACQUIRE;
+void selectionctrl_acquire() {
+    log_info("acquire");
+    L.pos = (ivec2) {{-1, -1}};
+    selection_kill(&selectionctrl.selection);
+    selectionctrl.mode = SELECTIONCTRL_ACQUIRE;
 }
 
-void selectionctrl_paste_image(SelectionCtrl *self, uImage img) {
-    log_info("selectionctrl paste_image");
-    self->L.pos = (ivec2) {{-1, -1}};
-    selection_kill(&self->selection);
-    self->selection = selection_new(0, 0, img.cols, img.rows);
-    selection_copy(self->selection, img, 0);
-    canvas_reload(self->canvas_ref);
-    selection_paste(self->selection, self->canvas_ref->RO.image, self->canvas_ref->current_layer);
-    self->mode = SELECTIONCTRL_PASTE;
+void selectionctrl_paste_image(uImage img) {
+    log_info("paste_image");
+    L.pos = (ivec2) {{-1, -1}};
+    selection_kill(&selectionctrl.selection);
+    selectionctrl.selection = selection_new(0, 0, img.cols, img.rows);
+    selection_copy(selectionctrl.selection, img, 0);
+    canvas_reload();
+    selection_paste(selectionctrl.selection, canvas.RO.image, canvas.current_layer);
+    selectionctrl.mode = SELECTIONCTRL_PASTE;
 }
 
 

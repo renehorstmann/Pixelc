@@ -4,6 +4,7 @@
 
 #include "../publictypes/dmat2.h"
 #include "dvec2.h"
+
 typedef mathc_dmat2 dmat2;
 
 #endif //MATHC_TYPES_DMAT2_H

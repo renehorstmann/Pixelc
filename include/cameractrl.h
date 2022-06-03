@@ -1,47 +1,20 @@
 #ifndef PIXELC_CAMERACTRL_H
 #define PIXELC_CAMERACTRL_H
 
-#include <stdbool.h>
+#include "rhc/rhc.h"
 #include "e/input.h"
-#include "mathc/types/bool.h"
-#include "camera.h"
-#include "brush.h"
 
-
-typedef struct {
-    eInput *input_ref;
-    Camera_s *camera_ref;
-    Brush *brush_ref;
-
+struct CameraCtrl_Globals {
     // turn this mode true, to let every pointer just move the camera
     bool move_mode;
+};
+extern struct CameraCtrl_Globals cameractrl;
 
-    struct {
-        vec2 pos;
-        float size;
 
-        vec2 pos0;
-        vec2 move0;
+void cameractrl_init();
 
-        float size0;
-        vec2 touch[2];
-        bvec2 touching;
-        float distance0;
-        float distance;
-        bool touched;
+void cameractrl_set_home(int canvas_cols, int canvas_rows);
 
-        struct {
-            vec2 pointer_pos;
-            bool moving;
-        } cursor;
-
-    } L;
-} CameraCtrl;
-
-CameraCtrl *cameractrl_new(eInput *input, Camera_s *camera, Brush *brush_ref);
-
-void cameractrl_set_home(CameraCtrl *self, int canvas_cols, int canvas_rows);
-
-bool cameractrl_pointer_event(CameraCtrl *self, ePointer_s pointer);
+bool cameractrl_pointer_event(ePointer_s pointer);
 
 #endif //PIXELC_CAMERACTRL_H

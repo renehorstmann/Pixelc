@@ -6,7 +6,15 @@
 // renders text, prerendered by SDL_TTF, only available if OPTION_TTF is set
 //
 
-#include "ro_types.h"
+#include "ro_single.h"
+#include <SDL2/SDL_ttf.h>
+
+// Renders ttf text
+typedef struct {
+    RoSingle ro;
+    TTF_Font *font;
+    float ratio;    // width / height
+} RoTtfText;
 
 struct RoTtfTextGlobals_s {
     TTF_Font *default_font;

@@ -5,7 +5,6 @@
 // create and compile shader programs
 //
 
-#include "rhc/str.h"
 #include "core.h"
 
 

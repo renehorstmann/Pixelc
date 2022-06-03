@@ -6,9 +6,21 @@
 #include <string.h>
 #include <time.h>
 #include "../alloc.h"
+#include "../terminalcolor.h"
 #include "../log.h"
 
+#ifdef OPTION_SDL
+#include "SDL2/SDL.h"
+#endif
+
 #define RHC_LOG_MAX_LENGTH 4096     // Should be the same as SDL's log max
+
+
+#ifdef RHC_LOG_DO_NOT_USE_COLOR
+#define RHC_LOG_COLORED false
+#else
+#define RHC_LOG_COLORED true
+#endif
 
 static struct {
     enum rhc_log_level level;
@@ -16,40 +28,68 @@ static struct {
 } rhc_log_L;
 
 
-#ifdef OPTION_SDL
-static SDL_LogPriority rhc_log_sdl_priority(enum rhc_log_level level) {
-    switch(level) {
-        case RHC_LOG_TRACE:
-            return SDL_LOG_PRIORITY_VERBOSE;
-        case RHC_LOG_DEBUG:
-            return SDL_LOG_PRIORITY_DEBUG;
-        case RHC_LOG_INFO:
-            return SDL_LOG_PRIORITY_INFO;
-        case RHC_LOG_WARN:
-            return SDL_LOG_PRIORITY_WARN;
-        case RHC_LOG_ERROR:
-            return SDL_LOG_PRIORITY_ERROR;
-        case RHC_LOG_WTF:
-        default:
-            return SDL_LOG_PRIORITY_CRITICAL;
-    }
-}
-#endif
-
-#ifndef RHC_LOG_DO_NOT_USE_COLOR
 static const char *rhc_log_src_level_colors_[] = {
-        "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
+        RHC_TERMINALCOLOR_HIGHINTENSITY_BLUE,
+        RHC_TERMINALCOLOR_CYAN,
+        RHC_TERMINALCOLOR_GREEN,
+        RHC_TERMINALCOLOR_YELLOW,
+        RHC_TERMINALCOLOR_RED,
+        RHC_TERMINALCOLOR_MAGENTA
 };
-#endif
 
 static const char *rhc_log_src_level_names_[] = {
         "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "WTF"
 };
 
+static int rhc_log_to_str_v(char *str, size_t n,
+                            enum rhc_log_level level, const char *opt_file, int line, const char *opt_func,
+                            bool colored,
+                            const char *time_str,
+                            const char *format, va_list vl) {
+    if (!str)
+        n = 0;
+
+    size_t size = 0;
+    if (opt_file && *opt_file != '\0') {
+        if (colored) {
+            size = snprintf(str, n,
+                            "%s %s%-5s "
+                            RHC_TERMINALCOLOR_RESET RHC_TERMINALCOLOR_HIGHINTENSITY_BLACK
+                            "%s:%d"
+                            RHC_TERMINALCOLOR_RESET
+                            " [%s] ",
+                            time_str, rhc_log_src_level_colors_[level], rhc_log_src_level_names_[level], opt_file, line,
+                            opt_func);
+        } else {
+            size = snprintf(str, n,
+                            "%s %-5s %s:%d [%s] ",
+                            time_str, rhc_log_src_level_names_[level], opt_file, line, opt_func);
+        }
+    } else {
+        if (colored) {
+            size = snprintf(str, n,
+                            "%s %s%-5s"
+                            RHC_TERMINALCOLOR_RESET
+                            " [%s] ",
+                            time_str, rhc_log_src_level_colors_[level], rhc_log_src_level_names_[level], opt_func);
+        } else {
+            size = snprintf(str, n,
+                            "%s %-5s [%s] ",
+                            time_str, rhc_log_src_level_names_[level], opt_func);
+        }
+    }
+
+    size += vsnprintf(str ? str + size : NULL, str ? n - size : 0, format, vl);
+    size += snprintf(str ? str + size : NULL, str ? n - size : 0, "\n");
+    return (int) size;
+}
+
+
+//
+// public
+//
+
 void rhc_log_set_min_level(enum rhc_log_level level) {
-#ifdef OPTION_SDL
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, rhc_log_sdl_priority(level));
-#endif
     rhc_log_L.level = level;
 }
 
@@ -57,83 +97,45 @@ void rhc_log_set_quiet(bool set) {
     rhc_log_L.quiet = set;
 }
 
+
+void rhc_log_base(enum rhc_log_level level, const char *opt_file, int line,
+                  const char *opt_func, const char *format, ...) {
+    if (level < rhc_log_L.level || rhc_log_L.quiet) {
+        return;
+    }
+
+    if (!opt_func)
+        opt_func = "";
+
+#ifdef RHC_LOG_DO_NOT_PRINT_TIME_FILE
+    char *time_str = "";
+    opt_file = NULL;
+#else
+    /* Get current time */
+    time_t t = time(NULL);
+    struct tm *lt = localtime(&t);
+    char time_str[16];
+    size_t time_size = strftime(time_str, sizeof time_str, "%H:%M:%S", lt);
+    time_str[time_size] = '\0';
+#endif
+
+    va_list args;
+    va_start(args, format);
+    char msg[RHC_LOG_MAX_LENGTH];
+    rhc_log_to_str_v(msg, sizeof msg,
+                     level, opt_file, line, opt_func, RHC_LOG_COLORED, time_str,
+                     format, args);
+
 #ifdef OPTION_SDL
-void rhc_log_base_(enum rhc_log_level level, const char *file, int line, const char *format, ...) {
-    if (level < rhc_log_L.level || rhc_log_L.quiet) {
-        return;
-    }
-    va_list args;
-
-#ifdef RHC_LOG_DO_NOT_PRINT_TIME_FILE
-    va_start(args, format);
-    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, rhc_log_sdl_priority(level), format, args);
-    va_end(args);
-#else
-    /* Get current time */
-    time_t t = time(NULL);
-    struct tm *lt = localtime(&t);
-
-
-    char buf[16];
-    buf[strftime(buf, sizeof(buf), "%H:%M:%S", lt)] = '\0';
-
-    char msg_format[RHC_LOG_MAX_LENGTH];
-    snprintf(msg_format, RHC_LOG_MAX_LENGTH, "%s %s:%d: %s", buf, file, line, format);
-    va_start(args, format);
-    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, rhc_log_sdl_priority(level), msg_format, args);
-    va_end(args);
-#endif
-}
-
+    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "%s", msg);
 #else //!OPTION_SDL
-
-void rhc_log_base_(enum rhc_log_level level, const char *file, int line, const char *format, ...) {
-    if (level < rhc_log_L.level || rhc_log_L.quiet) {
-        return;
-    }
-    va_list args;
-
-    char msg_format[RHC_LOG_MAX_LENGTH];
-
-#ifdef RHC_LOG_DO_NOT_PRINT_TIME_FILE
-
-#ifdef RHC_LOG_DO_NOT_USE_COLOR
-    snprintf(msg_format, RHC_LOG_MAX_LENGTH, "%-5s: %s\n", rhc_log_src_level_names_[level], format);
-#else
-    snprintf(msg_format, RHC_LOG_MAX_LENGTH, "%s%-5s\x1b[0m\x1b[90m:\x1b[0m %s\n",
-            rhc_log_src_level_colors_[level], rhc_log_src_level_names_[level], format);
-#endif
-    va_start(args, format);
-    vfprintf(RHC_LOG_DEFAULT_FILE, msg_format, args);
-    va_end(args);
+    rhc_terminalcolor_start();
+    fprintf(RHC_LOG_DEFAULT_FILE, "%s", msg);
     fflush(RHC_LOG_DEFAULT_FILE);
-
-#else //!RHC_LOG_DO_NOT_PRINT_TIME_FILE
-
-    /* Get current time */
-    time_t t = time(NULL);
-    struct tm *lt = localtime(&t);
-
-    /* Log to RHC_DEFAULT_FILE (stdout) */
-    char buf[16];
-    buf[strftime(buf, sizeof(buf), "%H:%M:%S", lt)] = '\0';
-
-
-#ifdef RHC_LOG_DO_NOT_USE_COLOR
-    snprintf(msg_format, RHC_LOG_MAX_LENGTH, "%s %-5s %s:%d: %s\n",
-            buf, rhc_log_src_level_names_[level], file, line, format);
-#else
-    snprintf(msg_format, RHC_LOG_MAX_LENGTH, "%s %s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m %s\n",
-            buf, rhc_log_src_level_colors_[level], rhc_log_src_level_names_[level], file, line, format);
-#endif
-    va_start(args, format);
-    vfprintf(RHC_LOG_DEFAULT_FILE, msg_format, args);
-    va_end(args);
-    fflush(RHC_LOG_DEFAULT_FILE);
-#endif //RHC_LOG_DO_NOT_PRINT_TIME_FILE
-
-}
+    rhc_terminalcolor_stop();
 #endif //OPTION_SDL
+}
+
 
 #endif //RHC_IMPL
 #endif //RHC_LOG_IMPL_H

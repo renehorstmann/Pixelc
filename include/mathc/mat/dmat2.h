@@ -150,5 +150,4 @@ static dmat2 dmat2_inv(dmat2 m) {
 }
 
 
-
 #endif //MATHC_MAT_DMAT2_H

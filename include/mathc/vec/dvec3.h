@@ -43,8 +43,6 @@ static dvec3 dvec3_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
 /** a == b */
 static bool dvec3_cmp(dvec3 a, dvec3 b) {
     return dvecN_cmp(a.v, b.v, 3);
@@ -58,6 +56,13 @@ static dvec3 dvec3_set(double s) {
     return res;
 }
 
+
+/** dst = v0, v1, ... */
+static dvec3 dvec3_new(double v0, double v1, double v2
+) {
+    return (dvec3) {v0, v1, v2
+    };
+}
 
 /** dst = unit_x */
 static dvec3 dvec3_unit_x() {
@@ -81,8 +86,6 @@ static dvec3 dvec3_unit_z() {
     dvecN_unit_z(res.v, 3);
     return res;
 }
-
-
 
 
 /** dst = -v */

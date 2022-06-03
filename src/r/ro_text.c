@@ -1,4 +1,3 @@
-#include <float.h>    // FLT_MAX
 #include "mathc/float.h"
 #include "r/texture.h"
 #include "r/ro_batch.h"
@@ -24,7 +23,7 @@ static mat4 u_pose_new_aa(float l, float t, float w, float h) {
 }
 
 static mat4 u_pose_new_hidden() {
-    return u_pose_new(FLT_MAX, FLT_MAX, 1, 1);
+    return u_pose_new(SCA_MAX, SCA_MAX, 1, 1);
 }
 // end of u/pose copy
 
@@ -125,7 +124,7 @@ vec2 ro_text_get_size(const RoText *self, const char *text) {
 }
 
 void ro_text_set_color(RoText *self, vec4 color) {
-    for(int i=0; i<self->ro.num; i++) {
+    for (int i = 0; i < self->ro.num; i++) {
         self->ro.rects[i].color = color;
     }
     ro_batch_update(&self->ro);
@@ -153,7 +152,7 @@ static bool font55_sprite_cb(vec2 *sprite, char c) {
     c -= ' ';
     int col = c % columns;
     int row = c / columns;
-    
+
     sprite->x = col;
     sprite->y = row;
 
@@ -176,7 +175,7 @@ static bool font85_sprite_cb(vec2 *sprite, char c) {
     c -= ' ';
     int col = c % columns;
     int row = c / columns;
-    
+
     sprite->x = col;
     sprite->y = row;
 

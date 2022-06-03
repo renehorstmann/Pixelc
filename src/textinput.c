@@ -3,6 +3,7 @@
 #include "rhc/log.h"
 #include "mathc/float.h"
 #include "mathc/utils/camera.h"
+#include "e/window.h"
 #include "r/texture.h"
 #include "r/ro_single.h"
 #include "r/ro_batch.h"
@@ -88,7 +89,7 @@ static void handle_cancel(TextInput *self) {
 }
 
 static void handle_ok(TextInput *self) {
-    if(!self->in.ok_active)
+    if (!self->ok_active)
         return;
     log_info("textinput finished: %s", self->text);
     self->state = TEXTINPUT_DONE;
@@ -158,7 +159,7 @@ static void camera(TextInput *self, ivec2 window_size) {
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     float real_pixel_per_pixel = floorf(smaller_size / 180.0f);
 
-    float width_2 = wnd_width / (2 *  real_pixel_per_pixel);
+    float width_2 = wnd_width / (2 * real_pixel_per_pixel);
     float height_2 = wnd_height / (2 * real_pixel_per_pixel);
 
     // begin: (top, left) with a full pixel
@@ -169,10 +170,10 @@ static void camera(TextInput *self, ivec2 window_size) {
     self->L.cam.bottom = -height_2 - (height_2 - floorf(height_2));
     self->L.cam.width = self->L.cam.right - self->L.cam.left;
     self->L.cam.height = self->L.cam.top - self->L.cam.bottom;
-    
+
     self->L.cam.p = mat4_camera_ortho(
-            self->L.cam.left, self->L.cam.right, 
-            self->L.cam.bottom, self->L.cam.top, 
+            self->L.cam.left, self->L.cam.right,
+            self->L.cam.bottom, self->L.cam.top,
             -1, 1);
     self->L.cam.p_inv = mat4_inv(self->L.cam.p);
 }
@@ -181,14 +182,12 @@ static void camera(TextInput *self, ivec2 window_size) {
 // public
 //
 
-TextInput *textinput_new(eInput *input, const char *title, int opt_max_chars) {
+TextInput *textinput_new(const char *title, int opt_max_chars) {
     TextInput *self = rhc_calloc(sizeof *self);
 
-    e_input_set_vip_pointer_event(input, pointer_event, self);
-    e_input_set_vip_key_raw_event(input, key_raw_event, self);
+    e_input_set_vip_pointer_event(pointer_event, self);
+    e_input_set_vip_key_raw_event(key_raw_event, self);
 
-    self->input_ref = input;
-    
     self->state = TEXTINPUT_IN_PROGRESS;
 
     if (opt_max_chars <= 0) {
@@ -223,22 +222,22 @@ TextInput *textinput_new(eInput *input, const char *title, int opt_max_chars) {
     self->L.text_bg.rect.color = (vec4) {{1, 1, 1, 0.5}};
 
     for (int i = 0; i < 27; i++) {
-        self->L.keys.rects[i].pose = u_pose_new(0, 0, 
-                16, 16);
-        self->L.chars.rects[i].pose = u_pose_new(0, 0, 
-                5, 8);
+        self->L.keys.rects[i].pose = u_pose_new(0, 0,
+                                                16, 16);
+        self->L.chars.rects[i].pose = u_pose_new(0, 0,
+                                                 5, 8);
         self->L.chars.rects[i].color = R_COLOR_BLACK;
     }
 
-    self->L.shift.rect.pose = u_pose_new(0, 0, 
-            16, 16);
-    self->L.space.rect.pose = u_pose_new(0, 0, 
-            16 * 6 , 
-            16 );
+    self->L.shift.rect.pose = u_pose_new(0, 0,
+                                         16, 16);
+    self->L.space.rect.pose = u_pose_new(0, 0,
+                                         16 * 6,
+                                         16);
     for (int i = 0; i < 3; i++) {
-        self->L.special.rects[i].pose = u_pose_new(0, 0, 
-                16 * 2 , 
-                16 );
+        self->L.special.rects[i].pose = u_pose_new(0, 0,
+                                                   16 * 2,
+                                                   16);
         self->L.special.rects[i].sprite.y = i;
     }
 
@@ -250,8 +249,8 @@ void textinput_kill(TextInput **self_ptr) {
     if (!self)
         return;
 
-    e_input_set_vip_pointer_event(self->input_ref, NULL, NULL); // reset
-    e_input_set_vip_key_raw_event(self->input_ref, NULL, NULL); // reset
+    e_input_set_vip_pointer_event(NULL, NULL); // reset
+    e_input_set_vip_key_raw_event(NULL, NULL); // reset
 
     ro_text_kill(&self->L.textfield);
     ro_batch_kill(&self->L.keys);
@@ -261,9 +260,9 @@ void textinput_kill(TextInput **self_ptr) {
     *self_ptr = NULL;
 }
 
-void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
-    camera(self, window_size);
-    
+void textinput_update(TextInput *self, float dtime) {
+    camera(self, e_window.size);
+
     char text[TEXTINPUT_MAX_CHARS];
     strcpy(text, self->text);
 
@@ -279,8 +278,8 @@ void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
 
     ro_text_set_text(&self->L.textfield, text);
 
-    self->L.title.pose = u_pose_new(-80, 32, 
-            1.5, 1.5);
+    self->L.title.pose = u_pose_new(-80, 32,
+                                    1.5, 1.5);
 
     u_pose_set_xy(&self->L.textfield.pose, -80, 4);
 
@@ -311,10 +310,10 @@ void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
 
     self->L.shift.rect.sprite.y = self->shiftstate;
     set_key_pos(self, &self->L.shift.rect.pose, 0, 2, 1, 0, 0);
-    set_key_pos(self, &self->L.space.rect.pose, 2, 3, 6, 0,  0);
+    set_key_pos(self, &self->L.space.rect.pose, 2, 3, 6, 0, 0);
 
     // ok, cancel, backspace
-    if(self->in.ok_active) {
+    if (self->ok_active) {
         set_key_pos(self, &self->L.special.rects[0].pose, 8, 3, 2, 0, 0);
     } else {
         u_pose_set_xy(&self->L.special.rects[0].pose, FLT_MAX, FLT_MAX);
@@ -330,7 +329,7 @@ void textinput_update(TextInput *self, ivec2 window_size, float dtime) {
 
 void textinput_render(const TextInput *self) {
     const mat4 *cam_mat = &self->L.cam.p;
-    
+
     ro_single_render(&self->L.bg, cam_mat);
     ro_single_render(&self->L.text_bg, cam_mat);
 

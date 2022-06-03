@@ -6,7 +6,7 @@
 // and has a emscripten compatible exit failure function
 //
 
-#include <stdbool.h>
+#include "rhc/rhc.h"
 
 #define GL_GLEXT_PROTOTYPES
 

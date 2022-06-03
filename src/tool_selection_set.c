@@ -7,6 +7,9 @@
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "button.h"
+#include "canvas.h"
+#include "camera.h"
+#include "selectionctrl.h"
 #include "tool.h"
 
 
@@ -17,35 +20,36 @@ typedef struct {
     bool active[8];
     bool prev_active[8];
 } SetMove;
+
 static void move_kill(Tool **super_ptr) {
-    SetMove *self = (SetMove*) *super_ptr;
-    if(!self)
+    SetMove *self = (SetMove *) *super_ptr;
+    if (!self)
         return;
     ro_batch_kill(&self->ro);
     rhc_free(self);
     *super_ptr = NULL;
 }
 
-static void move_update(Tool *super, float dtime, ToolRefs refs) {
-    SetMove *self = (SetMove*) super;
-    Selection *s = refs.selectionctrl->selection;
-    if(!s)
+static void move_update(Tool *super, float dtime) {
+    SetMove *self = (SetMove *) super;
+    Selection *s = selectionctrl.selection;
+    if (!s)
         return;
-    int img_cols = refs.canvas->RO.image.cols;
-    int img_rows = refs.canvas->RO.image.rows;
+    int img_cols = canvas.RO.image.cols;
+    int img_rows = canvas.RO.image.rows;
 
-    self->active[0] = s->left>0;
-    self->active[1] = s->cols>1;
-    self->active[2] = s->cols>1;
-    self->active[3] = s->left+s->cols<img_cols;
-    self->active[4] = s->top>0;
-    self->active[5] = s->rows>1;
-    self->active[6] = s->rows>1;
-    self->active[7] = s->top+s->rows<img_rows;
+    self->active[0] = s->left > 0;
+    self->active[1] = s->cols > 1;
+    self->active[2] = s->cols > 1;
+    self->active[3] = s->left + s->cols < img_cols;
+    self->active[4] = s->top > 0;
+    self->active[5] = s->rows > 1;
+    self->active[6] = s->rows > 1;
+    self->active[7] = s->top + s->rows < img_rows;
 
     float l[8];
     float t[8];
-    if(camera_is_portrait_mode(refs.cam)) {
+    if (camera_is_portrait_mode()) {
         // left
         l[0] = 1;
         t[0] = -3;
@@ -70,7 +74,7 @@ static void move_update(Tool *super, float dtime, ToolRefs refs) {
         l[7] = 19;
         t[7] = -21;
 
-        super->size.x = 70+16;
+        super->size.x = 70 + 16;
         super->size.y = 38;
 
     } else {
@@ -99,13 +103,13 @@ static void move_update(Tool *super, float dtime, ToolRefs refs) {
         t[7] = -53;
 
         super->size.x = 38;
-        super->size.y = 70+16;
+        super->size.y = 70 + 16;
     }
 
-    for(int i=0;i<8;i++) {
-        if(self->active[i] && !self->prev_active[i])
+    for (int i = 0; i < 8; i++) {
+        if (self->active[i] && !self->prev_active[i])
             self->ro.rects[i].sprite.x = 0;
-        if(!self->active[i])
+        if (!self->active[i])
             self->ro.rects[i].sprite.x = 1;
 
         u_pose_aa_set_left(&self->ro.rects[i].pose, l[i] + super->in.pos.x);
@@ -116,28 +120,28 @@ static void move_update(Tool *super, float dtime, ToolRefs refs) {
 }
 
 static void move_render(const struct Tool *super, const mat4 *cam_mat) {
-    SetMove *self = (SetMove*) super;
+    SetMove *self = (SetMove *) super;
     ro_batch_render(&self->ro, cam_mat, true);
 }
 
-static void move_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
-    SetMove *self = (SetMove*) super;
-    Selection *s = refs.selectionctrl->selection;
+static void move_pe(struct Tool *super, ePointer_s pointer) {
+    SetMove *self = (SetMove *) super;
+    Selection *s = selectionctrl.selection;
 
     // may occur on pointer up
-    if(!s)
+    if (!s)
         return;
 
-    int img_cols = refs.canvas->RO.image.cols;
-    int img_rows = refs.canvas->RO.image.rows;
+    int img_cols = canvas.RO.image.cols;
+    int img_rows = canvas.RO.image.rows;
 
-    for(int i=0; i<8; i++) {
-        if(self->active[i] && button_clicked(&self->ro.rects[i], pointer)) {
+    for (int i = 0; i < 8; i++) {
+        if (self->active[i] && button_clicked(&self->ro.rects[i], pointer)) {
             log_info("tool selection set move: %i", i);
-            if (i == 0 && s->left>0) {
+            if (i == 0 && s->left > 0) {
                 s->left--;
                 s->cols++;
-            } else if (i == 1 && s->cols>1) {
+            } else if (i == 1 && s->cols > 1) {
                 s->left++;
                 s->cols--;
             } else if (i == 2) {
@@ -167,7 +171,7 @@ Tool *tool_new_selection_set_move() {
     SetMove *self = rhc_calloc(sizeof *self);
     self->ro = ro_batch_new(8, r_texture_new_file(2, 8, "res/button_selection_move.png"));
 
-    for(int i=0;i<8;i++) {
+    for (int i = 0; i < 8; i++) {
         self->ro.rects[i].sprite.y = i;
         self->ro.rects[i].pose = u_pose_new(0, 0,
                                             self->ro.tex.sprite_size.x,
@@ -184,59 +188,63 @@ Tool *tool_new_selection_set_move() {
     self->super.render = move_render;
     self->super.pointer_event = move_pe;
 
-    return (Tool*) self;
+    return (Tool *) self;
 }
 
-static void copy_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
-    ToolButton *self = (ToolButton*) super;
-    if(button_toggled(&self->ro.rect, pointer)) {
+static void copy_pe(struct Tool *super, ePointer_s pointer) {
+    ToolButton *self = (ToolButton *) super;
+    if (button_toggled(&self->ro.rect, pointer)) {
         bool pressed = button_is_pressed(&self->ro.rect);
         if (pressed) {
             log_info("tool selection set copy: start");
-            refs.selectionctrl->mode = SELECTIONCTRL_COPY;
+            selectionctrl.mode = SELECTIONCTRL_COPY;
         } else {
             log_info("tool selection set copy: stop");
-            refs.selectionctrl->mode = SELECTIONCTRL_SET;
+            selectionctrl.mode = SELECTIONCTRL_SET;
         }
     }
 }
-static bool copy_is_a(struct Tool *super, float dtime, ToolRefs refs) {
-    ToolButton *self = (ToolButton*) super;
-    button_set_pressed(&self->ro.rect, refs.selectionctrl->mode == SELECTIONCTRL_COPY);
+
+static bool copy_is_a(struct Tool *super, float dtime) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, selectionctrl.mode == SELECTIONCTRL_COPY);
     // always active
     return true;
 }
+
 Tool *tool_new_selection_set_copy() {
     return tool_button_new("copy",
-            "copies\nthe selection",
-            "res/button_copy.png",
-            copy_pe,
-            copy_is_a);
+                           "copies\nthe selection",
+                           "res/button_copy.png",
+                           copy_pe,
+                           copy_is_a);
 }
 
-static void cut_pe(struct Tool *super, ePointer_s pointer, ToolRefs refs) {
-    ToolButton *self = (ToolButton*) super;
-    if(button_toggled(&self->ro.rect, pointer)) {
+static void cut_pe(struct Tool *super, ePointer_s pointer) {
+    ToolButton *self = (ToolButton *) super;
+    if (button_toggled(&self->ro.rect, pointer)) {
         bool pressed = button_is_pressed(&self->ro.rect);
         if (pressed) {
             log_info("tool selection set cut: start");
-            refs.selectionctrl->mode = SELECTIONCTRL_CUT;
+            selectionctrl.mode = SELECTIONCTRL_CUT;
         } else {
             log_info("tool selection set cut: stop");
-            refs.selectionctrl->mode = SELECTIONCTRL_SET;
+            selectionctrl.mode = SELECTIONCTRL_SET;
         }
     }
 }
-static bool cut_is_a(struct Tool *super, float dtime, ToolRefs refs) {
-    ToolButton *self = (ToolButton*) super;
-    button_set_pressed(&self->ro.rect, refs.selectionctrl->mode == SELECTIONCTRL_CUT);
+
+static bool cut_is_a(struct Tool *super, float dtime) {
+    ToolButton *self = (ToolButton *) super;
+    button_set_pressed(&self->ro.rect, selectionctrl.mode == SELECTIONCTRL_CUT);
     // always active
     return true;
 }
+
 Tool *tool_new_selection_set_cut() {
     return tool_button_new("cut",
-            "cuts\nthe selection",
-            "res/button_cut.png",
-            cut_pe,
-            cut_is_a);
+                           "cuts\nthe selection",
+                           "res/button_cut.png",
+                           cut_pe,
+                           cut_is_a);
 }

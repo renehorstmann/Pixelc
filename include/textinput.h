@@ -6,8 +6,8 @@
 // creates and isus its owh camera (size=180)
 //
 
-#include "r/ro_types.h"
-#include "e/input.h"
+#include "r/ro_single.h"
+#include "r/ro_batch.h"
 #include "mathc/types/int.h"
 
 #define TEXTINPUT_MAX_CHARS 27
@@ -28,17 +28,13 @@ enum TextInput_state {
 };
 
 typedef struct {
-    eInput *input_ref;
+    // default = true
+    // reset for example by ok_active = strlen(out.text) > 4
+    bool ok_active;
 
     char text[TEXTINPUT_MAX_CHARS + 1];   // + '\0'
     enum TextInput_state state;
     enum TextInput_shiftstate shiftstate;
-    
-    struct {
-        // default = true
-        // reset for example by ok_active = strlen(out.text) > 4
-        bool ok_active;
-    } in;
 
     struct {
         RoText title;
@@ -51,7 +47,7 @@ typedef struct {
 
         int max_chars;
         float blink_time;
-        
+
         struct {
             mat4 p, p_inv;
             float left, right, top, bottom;
@@ -61,11 +57,11 @@ typedef struct {
 } TextInput;
 
 // if opt_max_chars <= 0, TEXTINPUT_MAX_CHARS is used instead
-TextInput *textinput_new(eInput *input, const char *title, int opt_max_chars);
+TextInput *textinput_new(const char *title, int opt_max_chars);
 
 void textinput_kill(TextInput **self_ptr);
 
-void textinput_update(TextInput *self, ivec2 window_size, float dtime);
+void textinput_update(TextInput *self, float dtime);
 
 void textinput_render(const TextInput *self);
 

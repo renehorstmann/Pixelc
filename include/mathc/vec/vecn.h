@@ -28,10 +28,6 @@ static void vecN_cast_from_uchar_1(float *dst, const unsigned char *v, int n) {
 }
 
 
-
-
-
-
 /** a == b */
 static bool vecN_cmp(const float *a, const float *b, int n) {
     return memcmp(a, b, n * sizeof(float)) == 0;
@@ -63,14 +59,14 @@ static void vecN_unit_y(float *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void vecN_unit_z(float *dst, int n) {
-    assert(n>=3 && "mathc vec*_unit_z");
+    assert(n >= 3 && "mathc vec*_unit_z");
     vecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void vecN_unit_w(float *dst, int n) {
-    assert(n>=4 && "mathc vec*_unit_w");
+    assert(n >= 4 && "mathc vec*_unit_w");
     vecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -386,11 +382,11 @@ static float vecN_dot(const float *a, const float *b, int n) {
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void vecN_cross(float *dst, const float *a, const float *b, int n) {
-    assert(n>=3 && "mathc vec*_cross only in 3D");
+    assert(n >= 3 && "mathc vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for(int i=3; i<n; i++)
+    for (int i = 3; i < n; i++)
         dst[i] = 0;
 }
 

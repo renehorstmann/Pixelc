@@ -97,7 +97,7 @@ static void imatN_transpose(int *dst, const int *m, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void imatN_mul_mat_no_alias(int *restrict dst, const int *restrict a,
-                                  const int *restrict b, int n) {
+                                   const int *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst[c * n + r] = 0;
@@ -122,7 +122,7 @@ static void imatN_mul_mat(int *dst, const int *a, const int *b, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void imatN_mul_vec_no_alias(int *restrict dst_vec, const int *restrict a,
-                                  const int *restrict b, int n) {
+                                   const int *restrict b, int n) {
     for (int r = 0; r < n; r++) {
         dst_vec[r] = 0;
         for (int c = 0; c < n; c++) {
@@ -146,7 +146,7 @@ static void imatN_mul_vec(int *dst_vec, const int *a, const int *b, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void ivecN_mul_mat_no_alias(int *restrict dst_vec, const int *restrict a,
-                                  const int *restrict b, int n) {
+                                   const int *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         dst_vec[c] = 0;
         for (int r = 0; r < n; r++) {

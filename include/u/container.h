@@ -5,9 +5,7 @@
 // to place render objects in a stack or flow container, with different alignment options
 //
 
-#include <stdbool.h>
-#include <float.h> // FLT_MAX
-#include <rhc/alloc.h>
+#include "rhc/rhc.h"
 #include "mathc/types/float.h"
 
 
@@ -49,18 +47,18 @@ typedef struct {
 typedef struct {
     uContainerItem_s *items;
     int num;
-    
+
     enum u_container_mode mode;
     enum u_container_align align_width;
     enum u_container_align align_height;
-    
+
     // true (default): ceils the item sizes
     //        so left and top are integers
     bool on_integer_positions;
-    
+
     vec2 max_size;
     float left, top;
-    
+
     struct {
         vec2 size;
         float left, top;
@@ -73,18 +71,18 @@ typedef struct {
 
 
 static vec2 u_container_item_center_pos(uContainerItem_s self) {
-    return (vec2) {{self.out.left+self.size.x/2, self.out.top-self.size.y/2}};
+    return (vec2) {{self.out.left + self.size.x / 2, self.out.top - self.size.y / 2}};
 }
 
 static void u_container_item_set_invalid(uContainerItem_s *self) {
-    self->out.left = FLT_MAX;
-    self->out.top = FLT_MAX;
+    self->out.left = SCA_MAX;
+    self->out.top = SCA_MAX;
     self->out.col = -1;
     self->out.row = -1;
 }
 
 static bool u_container_valid(uContainer self) {
-    return self.items && self.num>0 && allocator_valid(self.a);
+    return self.items && self.num > 0 && allocator_valid(self.a);
 }
 
 static uContainer u_container_new_invalid() {

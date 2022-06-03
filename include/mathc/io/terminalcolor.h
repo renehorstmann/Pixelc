@@ -35,12 +35,15 @@ static void mathc_terminalcolor_stop() {
 }
 
 #else //_WIN32
+
 static void mathc_terminalcolor_start() {
     // noop
 }
+
 static void mathc_terminalcolor_stop() {
     // noop
 }
+
 #endif //_WIN32
 
 

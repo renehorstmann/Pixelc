@@ -1,5 +1,3 @@
-#include "rhc/alloc.h"
-#include "rhc/error.h"
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 
@@ -14,7 +12,7 @@ uContainer u_container_new_a(int num, float left, float top, Allocator_i a) {
     self.on_integer_positions = true;
     self.left = left;
     self.top = top;
-    self.max_size = (vec2) {{FLT_MAX, FLT_MAX}};
+    self.max_size = (vec2) {{SCA_MAX, SCA_MAX}};
     return self;
 }
 
@@ -66,13 +64,13 @@ bool u_container_update(uContainer *self) {
             item->out.col = self->out.cols;
             item->out.row = self->out.rows++;
             pos_y += item->size.y;
-            
+
             if (max_x < item->size.x) {
                 max_x = item->size.x;
             }
             remaining_y -= item->size.y;
-            
-            if(self->on_integer_positions) {
+
+            if (self->on_integer_positions) {
                 pos_y = sca_ceil(pos_y);
                 max_x = sca_ceil(max_x);
                 remaining_y = sca_floor(remaining_y);
@@ -108,8 +106,8 @@ bool u_container_update(uContainer *self) {
                 max_y = item->size.y;
             }
             remaining_x -= item->size.x;
-            
-            if(self->on_integer_positions) {
+
+            if (self->on_integer_positions) {
                 pos_x = sca_ceil(pos_x);
                 max_y = sca_ceil(max_y);
                 remaining_x = sca_floor(remaining_x);
@@ -158,8 +156,8 @@ bool u_container_update(uContainer *self) {
             if (self->out.rows < row) {
                 self->out.rows = row;
             }
-            
-            if(self->on_integer_positions) {
+
+            if (self->on_integer_positions) {
                 pos_y = sca_ceil(pos_y);
                 max_x = sca_ceil(max_x);
             }
@@ -213,8 +211,8 @@ bool u_container_update(uContainer *self) {
             if (self->out.cols < col) {
                 self->out.cols = col;
             }
-            
-            if(self->on_integer_positions) {
+
+            if (self->on_integer_positions) {
                 pos_x = sca_ceil(pos_x);
                 max_y = sca_ceil(max_y);
             }
@@ -233,8 +231,8 @@ bool u_container_update(uContainer *self) {
         self->out.items_placed = self->num;
 
     for (int i = self->out.items_placed; i < self->num; i++) {
-        self->items[i].out.left = FLT_MAX;
-        self->items[i].out.top = FLT_MAX;
+        self->items[i].out.left = SCA_MAX;
+        self->items[i].out.top = SCA_MAX;
     }
 
     // move with offset and alignment
@@ -245,9 +243,9 @@ bool u_container_update(uContainer *self) {
         int rows = self->mode == U_CONTAINER_MODE_FREE_V ? size_list[item->out.col] : self->out.rows;
         float rem_x = self->mode == U_CONTAINER_MODE_FREE_H ? remaining_list[item->out.row] : remaining_x;
         float rem_y = self->mode == U_CONTAINER_MODE_FREE_V ? remaining_list[item->out.col] : remaining_y;
-        float rem_x_half = rem_x/2;
-        float rem_y_half = rem_y/2;
-        if(self->on_integer_positions) {
+        float rem_x_half = rem_x / 2;
+        float rem_y_half = rem_y / 2;
+        if (self->on_integer_positions) {
             rem_x_half = sca_floor(rem_x_half);
             rem_y_half = sca_ceil(rem_y_half);
         }
@@ -291,14 +289,14 @@ bool u_container_update(uContainer *self) {
 
     float min_remaining_x = remaining_x;
     float min_remaining_y = remaining_y;
-    if(self->mode==U_CONTAINER_MODE_FREE_V){
-        min_remaining_y = FLT_MAX;
+    if (self->mode == U_CONTAINER_MODE_FREE_V) {
+        min_remaining_y = SCA_MAX;
         for (int c = 0; c < self->out.cols; c++) {
             if (min_remaining_y > remaining_list[c])
                 min_remaining_y = remaining_list[c];
         }
-    } else if(self->mode==U_CONTAINER_MODE_FREE_H) {
-        min_remaining_x = FLT_MAX;
+    } else if (self->mode == U_CONTAINER_MODE_FREE_H) {
+        min_remaining_x = SCA_MAX;
         for (int r = 0; r < self->out.rows; r++) {
             if (min_remaining_x > remaining_list[r])
                 min_remaining_x = remaining_list[r];
@@ -350,7 +348,7 @@ bool u_container_update(uContainer *self) {
             break;
     }
 
-    if(self->on_integer_positions) {
+    if (self->on_integer_positions) {
         self->out.left = sca_floor(self->out.left);
         self->out.top = sca_ceil(self->out.top);
     }

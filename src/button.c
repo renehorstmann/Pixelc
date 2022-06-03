@@ -2,13 +2,12 @@
 #include "button.h"
 
 
-
 bool button_is_pressed(rRect_s *self) {
     return self->sprite.x > 0.5;
 }
 
 void button_set_pressed(rRect_s *self, bool pressed) {
-    self->sprite.x = pressed? 1 : 0;
+    self->sprite.x = pressed ? 1 : 0;
 }
 
 

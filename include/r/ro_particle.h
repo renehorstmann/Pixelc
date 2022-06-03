@@ -5,7 +5,22 @@
 // particle system
 //
 
-#include "ro_types.h"
+#include "rect.h"
+#include "texture.h"
+
+// Renders multiple particle rects in a draw call
+typedef struct {
+    rParticleRect_s *rects;
+    int num;
+    rTexture tex;       // used texture
+    bool owns_tex;      // if true (default), tex will be killed by this class
+
+    struct {
+        GLuint program;     // shader
+        GLuint vao;         // internal vertex array object
+        GLuint vbo;         // internal vertex buffer object
+    } L;
+} RoParticle;
 
 // creates a particle system with num rParticleRect's
 // this class takes ownership of tex_sink (see .owns_tex)
@@ -13,25 +28,15 @@ RoParticle ro_particle_new(int num, rTexture tex_sink);
 
 void ro_particle_kill(RoParticle *self);
 
-// updates a subset of the particles into the gpu
-void ro_particle_update_sub(const RoParticle *self, int offset, int size);
-
 // renders a subset of the particles
-// if update is true, update is called before rendering
-void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat, bool update_sub);
+void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, const mat4 *camera_mat);
 
 // resets the texture, if .owns_tex is true, it will delete the old texture
 void ro_particle_set_texture(RoParticle *self, rTexture tex_sink);
 
-// updates the particles into the gpu
-static void ro_particle_update(const RoParticle *self) {
-    ro_particle_update_sub(self, 0, self->num);
-}
-
 // renders the particles into the gpu
-// if update is true, update is called before rendering
-static void ro_particle_render(const RoParticle *self, float time, const mat4 *camera_mat, bool update) {
-    ro_particle_render_sub(self, time, self->num, camera_mat, update);
+static void ro_particle_render(const RoParticle *self, uint32_t time_ms, const mat4 *camera_mat) {
+    ro_particle_render_sub(self, time_ms, self->num, camera_mat);
 }
 
 #endif //R_RO_PARTICLE_H

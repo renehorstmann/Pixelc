@@ -2,6 +2,7 @@
 // can be used multiple times, with different types
 
 #include <string.h>     // memcpy
+#include "assume.h"
 #include "alloc.h"
 #include "log.h"
 
@@ -107,7 +108,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t approx_size, Allocator_i a
     };
     if (!self.map) {
         rhc_error = "hashmap_new failed";
-        log_error(RHC_TO_STRING2(FN_NAME) "_new failed: for approx_size: %zu", approx_size);
+        log_error("failed: for approx_size: %zu", approx_size);
         return (CLASS) {.allocator = a};
     } else {
         memset(self.map, 0, approx_size * sizeof(ITEM *));
@@ -136,7 +137,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid)() {
 // void foo_kill(Foo *self)
 static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
     // valid
-    if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
+    if (!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
         allocator_free(self->allocator, self->map);
     }
     // new_invalid_a
@@ -147,24 +148,24 @@ static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
 static TYPE *RHC_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
     // key hash
     unsigned hash = KEY_HASH_FN(key) % self->size;
-    
+
     // first item in hash map array
     ITEM **item = &self->map[hash];
-    
+
     // if item is available, get the right item in the linked list
-    while(*item && !KEY_EQUALS_FN(key, (*item)->key)) {
+    while (*item && !KEY_EQUALS_FN(key, (*item)->key)) {
         item = &((*item)->next);
     }
-    
+
     // if item not found, create a new one
-    if(!(*item)) {
+    if (!(*item)) {
         *item = (ITEM *) allocator_malloc(self->allocator, sizeof(ITEM));
         assume(*item, "hashmap failed: to allocate a new item");
         memset(*item, 0, sizeof(ITEM));
         (*item)->key = KEY_CLONE_FN(key, self->allocator);
         (*item)->next = NULL;
     }
-    
+
     // return a pointer to the item value
     return &((*item)->value);
 }
@@ -178,16 +179,16 @@ void RHC_NAME_CONCAT2(FN_NAME, _remove)(CLASS *self, KEY key) {
     ITEM **item = &self->map[hash];
 
     // if item is available, get the right item in the linked list
-    while(*item && !KEY_EQUALS_FN(key, (*item)->key)) {
+    while (*item && !KEY_EQUALS_FN(key, (*item)->key)) {
         item = &((*item)->next);
     }
-    
+
     // item for key not found?
-    if(!(*item)) {
-        log_warn(RHC_TO_STRING2(FN_NAME), "_remove: failed, key not found");
+    if (!(*item)) {
+        log_warn("failed, key not found");
         return;
     }
-    
+
     ITEM *kill = *item;
     *item = (*item)->next;
     KEY_KILL_FN(kill->key, self->allocator);
@@ -202,27 +203,27 @@ ITER RHC_NAME_CONCAT2(FN_NAME, _iter_new)(CLASS *self) {
 // FooItem_s *foo_iter_next(FooIter_s *self)
 ITEM *RHC_NAME_CONCAT2(FN_NAME, _iter_next)(ITER *self) {
     // test iter valid
-    if(!self->hashmap || !RHC_NAME_CONCAT2(FN_NAME, _valid)(*self->hashmap)
-            || self->map_index <= -2 || self->map_index >= self->hashmap->size)
+    if (!self->hashmap || !RHC_NAME_CONCAT2(FN_NAME, _valid)(*self->hashmap)
+        || self->map_index <= -2 || self->map_index >= self->hashmap->size)
         return NULL;
-        
+
     ITEM *item;
     // next item is available, so just use it
-    if(self->next) {
+    if (self->next) {
         item = self->next;
         self->next = self->next->next;
         return item;
     }
-    
+
     // find next item in the map array
     do {
         self->map_index++;
-        if(self->map_index >= self->hashmap->size) {
+        if (self->map_index >= self->hashmap->size) {
             return NULL; // end of hashmap
         }
         item = self->hashmap->map[self->map_index];
-    } while(item == NULL);
-    
+    } while (item == NULL);
+
     self->next = item->next;
     return item;
 }

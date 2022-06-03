@@ -2,7 +2,6 @@
 #define MATHC_IO_DMATN_H
 
 
-
 #include <stdio.h>
 #include <locale.h>
 

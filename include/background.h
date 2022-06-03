@@ -2,14 +2,12 @@
 #define PIXELC_BACKGROUND_H
 
 #include "u/color.h"
-#include "camera.h"
+#include "mathc/types/float.h"
 
-typedef struct Background Background;
+void background_init(uColor_s a, uColor_s b);
 
-Background *background_new(uColor_s a, uColor_s b);
+void background_update(float dtime);
 
-void background_update(Background *self, const Camera_s *camera, float dtime);
-
-void background_render(const Background *self, const mat4 *camera_mat);
+void background_render(const mat4 *camera_mat);
 
 #endif //PIXELC_BACKGROUND_H

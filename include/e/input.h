@@ -5,9 +5,8 @@
 // handles input like keys, mouse, touchscreen, gyro
 //
 
-#include <stdbool.h>
-#include "mathc/types/float.h"
 #include "core.h"
+#include "mathc/types/float.h"
 
 #define E_MAX_TOUCH_IDS 12
 
@@ -48,59 +47,55 @@ typedef void (*eWheelEventFn)(bool up, void *user_data);
 typedef void (*eKeyRawEventFn)(const SDL_Event *event, void *user_data);
 
 
-struct eWindow;
-struct eGui;
-typedef struct eInput eInput;
+struct eInput_Globals {
+    bool init;
+    bool is_touch;
+
+    // acceleration sensor (mobile)
+    bool accel_active;
+    vec3 accel;
+
+    eInputKeys keys;
+};
+extern struct eInput_Globals e_input;
 
 
 // creates the input interface
-eInput *e_input_new(const struct eWindow *window);
+void e_input_init();
 
-void e_input_kill(eInput **self_ptr);
+void e_input_kill();
 
 // runs the sdl event loop
-void e_input_update(const eInput *self);
-
-// returns pressed main keys
-eInputKeys e_input_get_keys(const eInput *self);
-
-// returns true, if its a touch input, instead of mouse
-bool e_input_is_touch(const eInput *self);
-
-// returns true, if an accelerometer is available
-bool e_input_accel_active(const eInput *self);
-
-// returns the xyz accelerometer values
-vec3 e_input_get_accel(const eInput *self);
+void e_input_update();
 
 // registers a callback for mouse and touch
-void e_input_register_pointer_event(const eInput *self, ePointerEventFn event, void *user_data);
+void e_input_register_pointer_event(ePointerEventFn event, void *user_data);
 
 // unregisters a callback
-void e_input_unregister_pointer_event(const eInput *self, ePointerEventFn event_to_unregister);
+void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister);
 
 // sets a pointer event to a vip call, pass event=NULL to reset
 // a vip event will block all other events
-void e_input_set_vip_pointer_event(const eInput *self, ePointerEventFn event, void *user_data);
+void e_input_set_vip_pointer_event(ePointerEventFn event, void *user_data);
 
 // registers a callback for mouse wheel
-void e_input_register_wheel_event(const eInput *self, eWheelEventFn event, void *user_data);
+void e_input_register_wheel_event(eWheelEventFn event, void *user_data);
 
 // unregisters a callback
-void e_input_unregister_wheel_event(const eInput *self, eWheelEventFn event_to_unregister);
+void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister);
 
 // sets a wheel event to a vip call, pass event=NULL to reset
 // a vip event will block all other events
-void e_input_set_vip_wheel_event(const eInput *self, eWheelEventFn event, void *user_data);
+void e_input_set_vip_wheel_event(eWheelEventFn event, void *user_data);
 
 // registers a callback for sdl key events
-void e_input_register_key_raw_event(const eInput *self, eKeyRawEventFn event, void *user_data);
+void e_input_register_key_raw_event(eKeyRawEventFn event, void *user_data);
 
 // unregisters a callback
-void e_input_unregister_key_raw_event(const eInput *self, eKeyRawEventFn event_to_unregister);
+void e_input_unregister_key_raw_event(eKeyRawEventFn event_to_unregister);
 
 // sets a key raw event to a vip call, pass event=NULL to reset
 // a vip event will block all other events
-void e_input_set_vip_key_raw_event(const eInput *self, eKeyRawEventFn event, void *user_data);
+void e_input_set_vip_key_raw_event(eKeyRawEventFn event, void *user_data);
 
 #endif //E_INPUT_H

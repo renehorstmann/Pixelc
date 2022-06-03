@@ -6,9 +6,9 @@
 #include "error.h"
 
 static const char *rhc_hashmap_string_key_clone_(const char *key, Allocator_i a) {
-    char *clone = allocator_malloc(a, strlen(key)+1);
+    char *clone = allocator_malloc(a, strlen(key) + 1);
     assume(clone, "hashmap_string failed to clone a key");
-    memcpy(clone, key, strlen(key)+1);
+    memcpy(clone, key, strlen(key) + 1);
     return clone;
 }
 
@@ -34,4 +34,5 @@ static unsigned rhc_hashmap_string_key_hash_(const char *key) {
 #define KEY_KILL_FN rhc_hashmap_string_key_kill_
 #define KEY_EQUALS_FN rhc_hashmap_string_key_equals_
 #define KEY_HASH_FN rhc_hashmap_string_key_hash_
+
 #include "hashmap.h"

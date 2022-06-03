@@ -5,6 +5,8 @@
 // basic types for collision objects and groupd
 //
 
+#include "rhc/rhc.h"
+
 #define P_MAX_INDICES 256
 
 typedef struct {

@@ -33,7 +33,7 @@ static size_t socket_recv(Stream_i stream, void *msg, size_t size) {
 
     int n = SDLNet_TCP_Recv(impl->so, msg, size);
     if(n <= 0) {
-        log_error("rhc_socket_recv failed, killing socket...");
+        log_error("failed, killing socket...");
         SDLNet_TCP_Close(impl->so);
         impl->so = NULL;
         return 0;
@@ -52,7 +52,7 @@ static size_t socket_send(Stream_i stream, const void *msg, size_t size) {
 
     int n = SDLNet_TCP_Send(impl->so, msg, size);
     if(n <= 0) {
-        log_error("rhc_socket_send failed, killing socket...");
+        log_error("failed, killing socket...");
         SDLNet_TCP_Close(impl->so);
         impl->so = NULL;
         return 0;
@@ -87,11 +87,11 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
     SDLSocket *impl = (SDLSocket *) self.impl_storage;
 
     if(address && strcmp(address, "0.0.0.0") != 0) {
-        log_warn("rhc_socketserver_new SDLNet uses always a public server (0.0.0.0)");
+        log_warn("SDLNet uses always a public server (0.0.0.0)");
     }
     IPaddress ip;
     if(SDLNet_ResolveHost(&ip, NULL, port) == -1) {
-        log_error("rhc_socketserver_new failed to resolve host: %s", SDLNet_GetError());
+        log_error("failed to resolve host: %s", SDLNet_GetError());
         rhc_error = "rhc_socketserver_new failed";
         return rhc_socketserver_new_invalid();
     }
@@ -100,7 +100,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
     // impl->so will be NULL on error, so _valid check would fail
 
     if(!rhc_socketserver_valid(self)) {
-        log_error("rhc_socketserver_new failed to create the server socket");
+        log_error("failed to create the server socket");
         rhc_error = "rhc_socketserver_new failed";
         return rhc_socketserver_new_invalid();
     }
@@ -133,7 +133,7 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
     };
 
     if(!rhc_socket_valid(client)) {
-        log_error("rhc_socketserver_accept failed, killing the server");
+        log_error("failed, killing the server");
         rhc_socketserver_kill(self);
         allocator_free(a, client);
         return rhc_socket_new_invalid();
@@ -141,9 +141,9 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
 
     IPaddress *client_ip = SDLNet_TCP_GetPeerAddress(client_impl->so);
     if(!client_ip) {
-        log_warn("rhc_socketserver_accept failed to get client ip address");
+        log_warn("failed to get client ip address");
     } else {
-        log_info("rhc_socketserver_accept connected with: %s", SDLNet_ResolveIP(client_ip));
+        log_info("connected with: %s", SDLNet_ResolveIP(client_ip));
     }
 
     return client;
@@ -168,7 +168,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
 
     IPaddress ip;
     if(SDLNet_ResolveHost(&ip, address, port) == -1) {
-        log_error("rhc_socketserver_new failed to resolve host: %s", SDLNet_GetError());
+        log_error("failed to resolve host: %s", SDLNet_GetError());
         rhc_error = "rhc_socketserver_new failed";
         return rhc_socket_new_invalid();
     }
@@ -177,7 +177,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
     // impl->so will be NULL on error, so _valid check would fail
 
     if(!rhc_socket_valid(self)) {
-        log_error("rhc_socket_new failed to create the connection");
+        log_error("failed to create the connection");
         rhc_error = "rhc_socket_new failed";
         allocator_free(a, self);
         return rhc_socket_new_invalid();
@@ -227,7 +227,7 @@ static size_t socket_recv(Stream_i stream, void *msg, size_t size) {
 
     ssize_t n = recv(impl->so, msg, size, MSG_NOSIGNAL);
     if(n <= 0) {
-        log_error("rhc_socket_recv failed, killing socket...");
+        log_error("failed, killing socket...");
         close(impl->so);
         impl->so = -1;
         return 0;
@@ -245,7 +245,7 @@ static size_t socket_send(Stream_i stream, const void *msg, size_t size) {
 
     ssize_t n = send(impl->so, msg, size, MSG_NOSIGNAL);
     if(n <= 0) {
-        log_error("rhc_socket_send failed, killing socket...");
+        log_error("failed, killing socket...");
         close(impl->so);
         impl->so = -1;
         return 0;
@@ -296,7 +296,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
         struct addrinfo *servinfo;
         int status = getaddrinfo(address, port_str, &hints, &servinfo);
         if (status != 0) {
-            log_error("rhc_socketserver_new failed: getaddrinfo error: %s\n", gai_strerror(status));
+            log_error("failed: getaddrinfo error: %s\n", gai_strerror(status));
             rhc_error = "rhc_socketserver_new failed";
             return rhc_socketserver_new_invalid();
         }
@@ -319,7 +319,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
 
     // no valid address found?
     if(!rhc_socketserver_valid(self)) {
-        log_error("rhc_socketserver_new failed to create the server socket");
+        log_error("failed to create the server socket");
         rhc_error = "rhc_socketserver_new failed";
         return rhc_socketserver_new_invalid();
     }
@@ -332,7 +332,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
 
     int backlog = 10;   // queue size of incoming connections
     if(listen(impl->so, backlog) == -1) {
-        log_error("rhc_socketserver_new failed to listen");
+        log_error("failed to listen");
         rhc_error = "rhc_socketserver_new failed";
         rhc_socketserver_kill(&self);
     }
@@ -362,14 +362,14 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
     client_impl->so = accept(impl->so, (struct sockaddr *) &addr, &addrlen);
 
     if(!rhc_socket_valid(client)) {
-        log_error("rhc_socketserver_accept failed, killing the server");
+        log_error("failed, killing the server");
         rhc_socketserver_kill(self);
         allocator_free(a, client);
         return rhc_socket_new_invalid();
     }
 
     char *client_ip = inet_ntoa(((struct sockaddr_in *) &addr)->sin_addr);
-    log_info("rhc_socketserver_accept connected with: %s", client_ip);
+    log_info("connected with: %s", client_ip);
 
     return client;
 }
@@ -407,7 +407,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
         struct addrinfo *servinfo;
         int status = getaddrinfo(address, port_str, &hints, &servinfo);
         if (status != 0) {
-            log_error("rhc_socket_new failed: getaddrinfo error: %s\n", gai_strerror(status));
+            log_error("failed: getaddrinfo error: %s\n", gai_strerror(status));
             rhc_error = "rhc_socket_new failed";
             allocator_free(a, self);
             return rhc_socket_new_invalid();
@@ -431,7 +431,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
 
     // no valid address found?
     if(!rhc_socket_valid(self)) {
-        log_error("rhc_socket_new failed to create the connection");
+        log_error("failed to create the connection");
         rhc_error = "rhc_socket_new failed";
         allocator_free(a, self);
         return rhc_socket_new_invalid();
@@ -474,7 +474,7 @@ static size_t socket_recv(Stream_i stream, void *msg, size_t size) {
 
     int n = recv(impl->so, msg, (int) size, 0);
     if(n <= 0) {
-        log_error("rhc_socket_recv failed, killing socket...");
+        log_error("failed, killing socket...");
         closesocket(impl->so);
         impl->so = INVALID_SOCKET;
         return 0;
@@ -492,7 +492,7 @@ static size_t socket_send(Stream_i stream, const void *msg, size_t size) {
 
     int n = send(impl->so, msg, (int) size, 0);
     if(n <= 0) {
-        log_error("rhc_socket_send failed, killing socket...");
+        log_error("failed, killing socket...");
         closesocket(impl->so);
         impl->so = INVALID_SOCKET;
         return 0;
@@ -538,7 +538,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
         WSADATA wsadata;
         int status = WSAStartup(version, &wsadata);
         if(status != 0) {
-            log_error("rhc_socketserver_new failed, WSAStartup failed: &i", status);
+            log_error("failed, WSAStartup failed: &i", status);
             rhc_error = "rhc_socketserver_new failed";
             return rhc_socketserver_new_invalid();
         }
@@ -555,7 +555,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
         struct addrinfo *servinfo;
         int status = getaddrinfo(address, port_str, &hints, &servinfo);
         if (status != 0) {
-            log_error("rhc_socketserver_new failed: getaddrinfo error: %s\n", gai_strerror(status));
+            log_error("failed: getaddrinfo error: %s\n", gai_strerror(status));
             rhc_error = "rhc_socketserver_new failed";
             return rhc_socketserver_new_invalid();
         }
@@ -578,7 +578,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
 
     // no valid address found?
     if(!rhc_socketserver_valid(self)) {
-        log_error("rhc_socketserver_new failed to create the server socket");
+        log_error("failed to create the server socket");
         rhc_error = "rhc_socketserver_new failed";
         return rhc_socketserver_new_invalid();
     }
@@ -591,7 +591,7 @@ SocketServer rhc_socketserver_new(const char *address, uint16_t port) {
 
     int backlog = 10;   // queue size of incoming connections
     if(listen(impl->so, backlog) == -1) {
-        log_error("rhc_socketserver_new failed to listen");
+        log_error("failed to listen");
         rhc_error = "rhc_socketserver_new failed";
         rhc_socketserver_kill(&self);
     }
@@ -621,14 +621,14 @@ Socket *rhc_socketserver_accept_a(SocketServer *self, Allocator_i a) {
     client_impl->so = accept(impl->so, (struct sockaddr *) &addr, &addrlen);
 
     if(!rhc_socket_valid(client)) {
-        log_error("rhc_socketserver_accept failed, killing the server");
+        log_error("failed, killing the server");
         rhc_socketserver_kill(self);
         allocator_free(a, client);
         return rhc_socket_new_invalid();
     }
 
     char *client_ip = inet_ntoa(((struct sockaddr_in *) &addr)->sin_addr);
-    log_info("rhc_socketserver_accept connected with: %s", client_ip);
+    log_info("connected with: %s", client_ip);
 
     return client;
 }
@@ -662,7 +662,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
         WSADATA wsadata;
         int status = WSAStartup(version, &wsadata);
         if(status != 0) {
-            log_error("rhc_socket_new_server failed, WSAStartup failed: &i", status);
+            log_error("failed, WSAStartup failed: &i", status);
             rhc_error = "rhc_socket_new_server failed";
             a.free(a, self);
             return rhc_socket_new_invalid();
@@ -679,7 +679,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
         struct addrinfo *servinfo;
         int status = getaddrinfo(address, port_str, &hints, &servinfo);
         if (status != 0) {
-            log_error("rhc_socket_new failed: getaddrinfo error: %s\n", gai_strerror(status));
+            log_error("failed: getaddrinfo error: %s\n", gai_strerror(status));
             rhc_error = "rhc_socket_new failed";
             allocator_free(a, self);
             return rhc_socket_new_invalid();
@@ -703,7 +703,7 @@ Socket *rhc_socket_new_a(const char *address, uint16_t port, Allocator_i a) {
 
     // no valid address found?
     if(!rhc_socket_valid(self)) {
-        log_error("rhc_socket_new failed to create the connection");
+        log_error("failed to create the connection");
         rhc_error = "rhc_socket_new failed";
         allocator_free(a, self);
         return rhc_socket_new_invalid();

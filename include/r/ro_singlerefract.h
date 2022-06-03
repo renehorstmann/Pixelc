@@ -22,8 +22,23 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
+#include "rect.h"
+#include "texture.h"
 
-#include "ro_types.h"
+
+// Like RoSingle, but with refraction
+typedef struct {
+    rRect_s rect;
+    rTexture tex_main;          // used main texture
+    rTexture tex_refraction;    // used refraction texture
+    bool owns_tex_main;         // if true (default), tex_main will be killed by this class
+    bool owns_tex_refraction;   // if true (default), tex_refraction will be killer by this clasd
+
+    struct {
+        GLuint program;         // shader
+        GLuint vao;             // internal vertex array object
+    } L;
+} RoSingleRefract;
 
 // creates a single with refraction enabled for one rRect
 // this class takes ownership of tex_sink (see .owns_tex)
@@ -36,8 +51,8 @@ void ro_singlerefract_kill(RoSingleRefract *self);
 // renders the single rRect with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
-void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
+void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat, float scale,
+                             const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_singlerefract_set_texture_main(RoSingleRefract *self, rTexture tex_main_sink);

@@ -4,8 +4,22 @@
 //
 // class to render multiple rects with a single draw call
 //
+#include "rect.h"
+#include "texture.h"
 
-#include "ro_types.h"
+// Renders multiple rects in a draw call
+typedef struct {
+    rRect_s *rects;
+    int num;
+    rTexture tex;       // used texture
+    bool owns_tex;      // if true (default), text will be killed by this class
+
+    struct {
+        GLuint program;     // shader
+        GLuint vao;         // internal vertex array object
+        GLuint vbo;         // internal vertex buffer object
+    } L;
+} RoBatch;
 
 // creates a new batch with num rRect's
 // this class takes ownership of tex_sink (see .owns_tex)

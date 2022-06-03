@@ -127,7 +127,6 @@ static vec4 vec4_mul_mat(vec4 a, mat4 b) {
 }
 
 
-
 /** returns = determinant mm */
 static float mat4_det(mat4 mm) {
     // from cglm/mat4.h/glm_mat4_det

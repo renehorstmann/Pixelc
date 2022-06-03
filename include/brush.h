@@ -1,11 +1,10 @@
 #ifndef PIXELC_BRUSH_H
 #define PIXELC_BRUSH_H
 
+#include "r/texture.h"
 #include "e/input.h"
 #include "u/color.h"
-#include "canvas.h"
 #include "selection.h"
-#include "brushmode.h"
 
 struct Toolbar;
 
@@ -25,12 +24,7 @@ enum brush_modes {
     BRUSH_NUM_MODES
 };
 
-
-typedef struct Brush {
-    BrushMode *brushmode;
-
-    Canvas *canvas_ref;
-    
+struct Brush_Globals {
     uColor_s current_color;
     uColor_s secondary_color;
     enum brush_modes mode;
@@ -38,62 +32,54 @@ typedef struct Brush {
     bool shading_active;
     bool render_hover_preview;
     bool auto_save_config;
-    
-    struct {
-        const Selection *selection_ref;
-    } in;
-    
+
+    const Selection *selection_ref;
+
     struct {
         uImage kernel;
         rTexture kernel_tex;
         int kernel_id;
         int max_kernels;
     } RO; // read only
-    
-    struct {
-        bool hovering;
-        bool hovering_change;
-        bool change;
-        
-        char **kernel_files;
-    } L;
-} Brush;
+};
+extern struct Brush_Globals brush;
 
-Brush *brush_new(Canvas *canvas);
 
-void brush_pointer_event(Brush *self, ePointer_s pointer);
+void brush_init();
 
-bool brush_draw_pixel(Brush *self, int c, int r, uColor_s kernel_color);
+void brush_pointer_event(ePointer_s pointer);
 
-bool brush_draw(Brush *self, int c, int r);
+bool brush_draw_pixel(int c, int r, uColor_s kernel_color);
 
-void brush_abort_current_draw(Brush *self);
+bool brush_draw(int c, int r);
 
-void brush_clear(Brush *self);
+void brush_abort_current_draw();
+
+void brush_clear();
 
 // moves ownership of kernel_sink to brush
-void brush_set_kernel(Brush *self, uImage kernel_sink);
+void brush_set_kernel(uImage kernel_sink);
 
 // loads a kernel by its id
-void brush_load_kernel(Brush *self, int id);
+void brush_load_kernel(int id);
 
 // saves kernel_sink into the config and calls brush_set_kernel 
 //   (which will take the ownership of kernel_sink)
 // calls brush_save_config
-void brush_append_kernel(Brush *self, uImage kernel_sink, const char *name);
+void brush_append_kernel(uImage kernel_sink, const char *name);
 
 // creates the default kernel files
 // sets self->kernel to the first new kernel file
 // also calls brush_save_kernel
-void brush_reset_kernel_files(Brush *self);
+void brush_reset_kernel_files();
 
 // saves the config to the savestate config.json 
 // uses object "brush"
-void brush_save_config(const Brush *self);
+void brush_save_config();
 
 // loads the config from the savestate config.json
 // uses object "brush"
-void brush_load_config(Brush *self);
+void brush_load_config();
 
 
 //
@@ -105,8 +91,6 @@ void brush_load_config(Brush *self);
 uImage *brush_kernel_defaults_new();
 
 void brush_kernel_defaults_kill(uImage **self_ptr);
-
-
 
 
 #endif //PIXELC_BRUSH_H

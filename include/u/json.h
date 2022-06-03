@@ -3,21 +3,20 @@
 
 // load and save json files from strings or files
 
-#include "rhc/types.h"
-#include "rhc/alloc.h"
+#include "rhc/rhc.h"
 
 typedef struct uJson uJson;
 
 
 // possible json item types, see u_json_get_type
 enum u_json_types {
-	U_JSON_TYPE_NULL,
-	U_JSON_TYPE_BOOL,
-	U_JSON_TYPE_NUM,
-	U_JSON_TYPE_STRING,
-	U_JSON_TYPE_ARRAY,
-	U_JSON_TYPE_OBJECT,
-	U_JSON_NUM_TYPES
+    U_JSON_TYPE_NULL,
+    U_JSON_TYPE_BOOL,
+    U_JSON_TYPE_NUM,
+    U_JSON_TYPE_STRING,
+    U_JSON_TYPE_ARRAY,
+    U_JSON_TYPE_OBJECT,
+    U_JSON_NUM_TYPES
 };
 
 
@@ -81,7 +80,7 @@ bool u_json_save_file(const uJson *self, const char *file);
 enum u_json_types u_json_get_type(const uJson *self);
 
 // returns the name of a json item, if available (parent is an object), NULL otherwise
-const char * u_json_get_name(const uJson *self);
+const char *u_json_get_name(const uJson *self);
 
 // returns a bool containing the json value, or NULL on missmatch
 const bool *u_json_get_bool(const uJson *self);
@@ -142,7 +141,6 @@ bool u_json_set_float(uJson *self, float value);
 // calls u_json_set_num
 // returns false on type missmatch
 bool u_json_set_double(uJson *self, double value);
-
 
 
 // append a new json "null" item to an json array or object
@@ -288,7 +286,6 @@ static float *u_json_get_id_float(const uJson *self, int id, float *out_data) {
 static double *u_json_get_id_double(const uJson *self, int id, double *out_data) {
     return u_json_get_double(u_json_get_id(self, id), out_data);
 }
-
 
 
 #endif //U_JSON_H

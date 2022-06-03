@@ -1,8 +1,5 @@
 #ifdef OPTION_FETCH
 
-#include "rhc/error.h"
-#include "rhc/log.h"
-#include "rhc/alloc.h"
 #include "rhc/string.h"
 #include "u/fetch.h"
 
@@ -23,7 +20,7 @@ struct uFetch {
 };
 
 static void ems_fetch_success(emscripten_fetch_t *fetch) {
-    log_trace("u_fetch succeded with http code: %i", fetch->status);
+    log_trace("succeded with http code: %i", fetch->status);
     uFetch *self = fetch->userData;
     assume(self->fetch == fetch, "wtf");
 
@@ -35,12 +32,12 @@ static void ems_fetch_success(emscripten_fetch_t *fetch) {
     self->fetch = NULL;
     
     if(self->fetch_completed)
-        log_warn("u_fetch was completed, but overridden");
+        log_warn("was completed, but overridden");
     self->fetch_completed = true;
 }
 
 static void ems_fetch_error(emscripten_fetch_t *fetch) {
-    log_warn("u_fetch failed with http code: %i", fetch->status);
+    log_warn("failed with http code: %i", fetch->status);
     uFetch *self = fetch->userData;
     assume(self->fetch == fetch, "wtf");
     
@@ -51,13 +48,13 @@ static void ems_fetch_error(emscripten_fetch_t *fetch) {
     self->fetch = NULL;
     
     if(self->fetch_completed)
-        log_warn("u_fetch was completed, but overridden");
+        log_warn("was completed, but overridden");
     self->fetch_completed = true;
 }
 
 
 uFetch *u_fetch_new_get_a(const char *url, Allocator_i a) {
-    log_trace("u_fetch_new_get: %s", url);
+    log_trace("get: %s", url);
     
     uFetch *self = allocator_calloc(a, sizeof *self);
     self->a = a;
@@ -79,7 +76,7 @@ uFetch *u_fetch_new_get_a(const char *url, Allocator_i a) {
 }
 
 uFetch *u_fetch_new_post_a(const char *url, Str_s data, Allocator_i a) {
-    log_trace("u_fetch_new_post: %s", url);
+    log_trace("post: %s", url);
     
     uFetch *self = allocator_calloc(a, sizeof *self);
     self->a = a;
@@ -107,7 +104,7 @@ void u_fetch_kill(uFetch **self_ptr) {
     if(!self)
         return;
     if(self->fetch) {
-        log_warn("u_fetch_kill called before fetch was finished?");
+        log_warn("kill called before fetch was finished?");
         emscripten_fetch_close(self->fetch);
     }
     string_kill(&self->data);
@@ -154,35 +151,35 @@ struct uFetch {
 };
 
 static size_t response_writer(void *ptr, size_t size, size_t nmemb, void *ud) {
-	uFetch *self = ud;
-	size_t full_size = size * nmemb;
-	string_append(&self->data, (Str_s) {ptr, full_size});
-	return full_size;
+    uFetch *self = ud;
+    size_t full_size = size * nmemb;
+    string_append(&self->data, (Str_s) {ptr, full_size});
+    return full_size;
 }
 
 static int request_thread(void *ud) {
     uFetch *self = ud;
-    
+
     CURL *curl = curl_easy_init();
-	curl_easy_setopt(curl, CURLOPT_URL, self->url.data);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, response_writer);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, self);
-	
-	String post_data = string_new_invalid();
-	if(!str_empty(self->data.str)) {
-	    // POST
+    curl_easy_setopt(curl, CURLOPT_URL, self->url.data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, response_writer);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, self);
+
+    String post_data = string_new_invalid();
+    if(!str_empty(self->data.str)) {
+        // POST
         struct curl_slist *headers = NULL;
         headers = curl_slist_append(headers, "Content-Type: text/plain");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-	    // move data
-	    post_data = self->data;
-	    self->data = string_new_invalid();
-	    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_data.data);
+        // move data
+        post_data = self->data;
+        self->data = string_new_invalid();
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_data.data);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, post_data.size);
-	    
-	}
-	self->data = string_new_a(128, self->a);
+
+    }
+    self->data = string_new_a(128, self->a);
 
     CURLcode perform_res = curl_easy_perform(curl);
 
@@ -196,17 +193,17 @@ static int request_thread(void *ud) {
         if (self->data.size == 0 || self->error)
             string_kill(&self->data);
     }
-	SDL_UnlockMutex(self->lock);
-	
-	log_trace("u_fetch succeded, error: %i", self->error);
-	curl_easy_cleanup(curl);
-	string_kill(&post_data);
-	
-	return 0;
+    SDL_UnlockMutex(self->lock);
+
+    log_trace("succeded, error: %i", self->error);
+    curl_easy_cleanup(curl);
+    string_kill(&post_data);
+
+    return 0;
 }
 
 uFetch *u_fetch_new_get_a(const char *url, Allocator_i a) {
-    log_trace("u_fetch_new_get: %s", url);
+    log_trace("get: %s", url);
     
     uFetch *self = allocator_calloc(a, sizeof *self);
     self->a = a;
@@ -221,7 +218,7 @@ uFetch *u_fetch_new_get_a(const char *url, Allocator_i a) {
 }
 
 uFetch *u_fetch_new_post_a(const char *url, Str_s data, Allocator_i a) {
-    log_trace("u_fetch_new_post: %s", url);
+    log_trace("post: %s", url);
     
     uFetch *self = allocator_calloc(a, sizeof *self);
     self->a = a;

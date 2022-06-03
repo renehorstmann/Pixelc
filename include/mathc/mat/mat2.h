@@ -150,5 +150,4 @@ static mat2 mat2_inv(mat2 m) {
 }
 
 
-
 #endif //MATHC_MAT_MAT2_H

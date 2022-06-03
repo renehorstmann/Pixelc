@@ -1,6 +1,4 @@
 #include <SDL2/SDL_image.h>
-#include "rhc/error.h"
-#include "rhc/log.h"
 #include "mathc/sca/int.h"
 #include "u/image.h"
 
@@ -15,7 +13,7 @@ uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a) {
 
     if (data_size <= 0) {
         rhc_error = "image new failed";
-        log_error("u_image_new_empty_a failed: wrong data size: %zu", data_size);
+        log_error("failed: wrong data size: %zu", data_size);
         return u_image_new_invalid();
     }
 
@@ -61,29 +59,29 @@ uImage u_image_new_clone_scaled_a(int cols, int rows, uImage from, bool filter_l
 }
 
 uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, Allocator_i a) {
-    if (from.layers<=1 || layer_to_merge_down <= 0 || layer_to_merge_down>=from.layers) {
+    if (from.layers <= 1 || layer_to_merge_down <= 0 || layer_to_merge_down >= from.layers) {
         rhc_error = "image new clone merge down failed";
-        log_error("u_image_new_clone_merge_down_a failed: wrong layer to merge: %i/%i", layer_to_merge_down, from.layers);
+        log_error("failed: wrong layer to merge: %i/%i", layer_to_merge_down, from.layers);
         return u_image_new_invalid();
     }
-    uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers-1, a);
+    uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers - 1, a);
     if (!u_image_valid(self))
         return u_image_new_invalid();
 
     // layers to clone up to layer_to_merge_down-1
-    if(layer_to_merge_down>1)
-        memcpy(self.data, from.data, sizeof(uColor_s) * self.cols * self.rows * (layer_to_merge_down-1));
+    if (layer_to_merge_down > 1)
+        memcpy(self.data, from.data, sizeof(uColor_s) * self.cols * self.rows * (layer_to_merge_down - 1));
     // layers to clone behind layer_to_merge_down
-    if(layer_to_merge_down<from.layers-1)
-        memcpy(u_image_layer(self, layer_to_merge_down), u_image_layer(from, layer_to_merge_down+1),
-               sizeof(uColor_s) * self.cols * self.rows * (from.layers-layer_to_merge_down-1));
+    if (layer_to_merge_down < from.layers - 1)
+        memcpy(u_image_layer(self, layer_to_merge_down), u_image_layer(from, layer_to_merge_down + 1),
+               sizeof(uColor_s) * self.cols * self.rows * (from.layers - layer_to_merge_down - 1));
     // merge the layers
-    for(int r=0; r<self.rows; r++) {
-        for(int c=0; c<self.cols; c++) {
-            uColor_s col_a = *u_image_pixel(from, c, r, layer_to_merge_down-1);
+    for (int r = 0; r < self.rows; r++) {
+        for (int c = 0; c < self.cols; c++) {
+            uColor_s col_a = *u_image_pixel(from, c, r, layer_to_merge_down - 1);
             uColor_s col_b = *u_image_pixel(from, c, r, layer_to_merge_down);
-            *u_image_pixel(self, c, r, layer_to_merge_down-1) =
-                    ucvec4_mix(col_a, col_b, col_b.a/255.0f);
+            *u_image_pixel(self, c, r, layer_to_merge_down - 1) =
+                    ucvec4_mix(col_a, col_b, col_b.a / 255.0f);
         }
     }
     return self;
@@ -93,7 +91,7 @@ uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Alloca
     assume(layers > 0, "A single layer needed");
     if (surface->h % layers != 0) {
         rhc_error = "load image from sdl surface failed";
-        log_warn("u_image_new_sdl_surface_a failed: rows %% layers != 0");
+        log_warn("failed: rows %% layers != 0");
         return u_image_new_invalid();
     }
 
@@ -118,7 +116,7 @@ uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Alloca
     }
 
     if (surface->pitch != cols * 4) {
-        log_error("u_image_new_sdl_surface_a failed: pitch must be == cols*4");
+        log_error("failed: pitch must be == cols*4");
         goto CLEANUP;
     }
 
@@ -137,7 +135,7 @@ uImage u_image_new_file_a(int layers, const char *file, Allocator_i a) {
     SDL_Surface *surface = IMG_Load(file);
     if (!surface) {
         rhc_error = "load image file failed";
-        log_warn("u_image_new_file_a failed: failed: %s (%s)", IMG_GetError(), file);
+        log_warn("failed: failed: %s (%s)", IMG_GetError(), file);
     } else {
         self = u_image_new_sdl_surface_a(layers, surface, a);
     }
@@ -170,20 +168,20 @@ struct SDL_Surface *u_image_to_sdl_surface(uImage self) {
 bool u_image_save_file(uImage self, const char *file) {
     if (!u_image_valid(self)) {
         rhc_error = "image save file failed";
-        log_error("u_image_save_file failed: invalid (%s)", file);
+        log_error("failed: invalid (%s)", file);
         return false;
     }
     SDL_Surface *surface = u_image_to_sdl_surface(self);
     if (!surface) {
         rhc_error = "image save file failed";
-        log_error("u_image_save_file failed: sdl buffer failed: %s", SDL_GetError());
+        log_error("failed: sdl buffer failed: %s", SDL_GetError());
         return false;
     }
     int ret = IMG_SavePNG(surface, file);
     SDL_FreeSurface(surface);
     if (ret) {
         rhc_error = "image save file failed";
-        log_error("u_image_save_file: failed: %s (%s)", IMG_GetError(), file);
+        log_error("failed: %s (%s)", IMG_GetError(), file);
         return false;
     }
     return true;
@@ -196,7 +194,7 @@ bool u_image_copy(uImage self, uImage from) {
         || self.layers != from.layers
             ) {
         rhc_error = "image copy failed";
-        log_error("u_image_copy failed: invalid or different size");
+        log_error("failed: invalid or different size");
         return false;
     }
 
@@ -207,7 +205,7 @@ bool u_image_copy(uImage self, uImage from) {
 
 void u_image_copy_top_left(uImage self, uImage from) {
     if (!u_image_valid(self) || !u_image_valid(from)) {
-        log_warn("u_image_copy_top_left failed");
+        log_warn("failed");
         return;
     }
     int layers = isca_min(self.layers, from.layers);

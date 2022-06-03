@@ -150,5 +150,4 @@ static ucmat2 ucmat2_inv(ucmat2 m) {
 }
 
 
-
 #endif //MATHC_MAT_UCMAT2_H

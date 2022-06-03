@@ -1,14 +1,16 @@
 #include "mathc/int.h"
 #include "mathc/float.h"
+#include "canvas.h"
 #include "brush.h"
 #include "brushmode.h"
 
+struct BrushMode_Globals brushmode;
 
 //
 // private
 //
 
-static bool lineto(BrushMode *self, ivec2 from, ivec2 to) {
+static bool lineto(ivec2 from, ivec2 to) {
 
     int sign_x = 1, sign_y = 1;
     if (from.x > to.x)
@@ -22,72 +24,72 @@ static bool lineto(BrushMode *self, ivec2 from, ivec2 to) {
     bool changed = false;
     if (dx == 0) {
         for (int i = 0; i <= dy; i++)
-            changed |= brush_draw(self->brush_ref, from.x, from.y + i * sign_y);
+            changed |= brush_draw(from.x, from.y + i * sign_y);
         return changed;
     }
 
     float m = (float) dy / dx;
     if (m <= 1) {
         for (int i = 0; i <= dx; i++)
-            changed |= brush_draw(self->brush_ref, from.x + i * sign_x, sca_floor(0.5 + from.y + i * m * sign_y));
+            changed |= brush_draw(from.x + i * sign_x, sca_floor(0.5 + from.y + i * m * sign_y));
         return changed;
     }
 
     for (int i = 0; i <= dy; i++)
-        changed |= brush_draw(self->brush_ref, sca_floor(0.5 + from.x + i / m * sign_x), from.y + i * sign_y);
+        changed |= brush_draw(sca_floor(0.5 + from.x + i / m * sign_x), from.y + i * sign_y);
     return changed;
 }
 
-static bool rectto(BrushMode *self, ivec2 from, ivec2 to) {
+static bool rectto(ivec2 from, ivec2 to) {
     int l = isca_min(from.x, to.x);
     int r = isca_max(from.x, to.x);
     int b = isca_min(from.y, to.y);
     int t = isca_max(from.y, to.y);
-    
+
     bool changed = false;
-    
+
     // top and bottom
-    for(int i=l; i<=r; i++) {
-        changed |= brush_draw(self->brush_ref, i, t);
-        changed |= brush_draw(self->brush_ref, i, b);
+    for (int i = l; i <= r; i++) {
+        changed |= brush_draw(i, t);
+        changed |= brush_draw(i, b);
     }
-    
-     // left and right (without the ends)
-    for(int i=b+1; i<t; i++) {
-        changed |= brush_draw(self->brush_ref, l, i);
-        changed |= brush_draw(self->brush_ref, r, i);
+
+    // left and right (without the ends)
+    for (int i = b + 1; i < t; i++) {
+        changed |= brush_draw(l, i);
+        changed |= brush_draw(r, i);
     }
-    
+
     return changed;
 }
 
-static bool circleto(BrushMode *self, ivec2 from, ivec2 to) {
+static bool circleto(ivec2 from, ivec2 to) {
     // horn circle rasterizing
     int r = ivec2_distance(from, to);
     int d = -r;
     int x = r;
     int y = 0;
-    
+
     bool changed = false;
-    
+
     do {
-        changed |= brush_draw(self->brush_ref, from.x+x, from.y+y);
-        changed |= brush_draw(self->brush_ref, from.x+y, from.y+x);
-        changed |= brush_draw(self->brush_ref, from.x+x, from.y-y);
-        changed |= brush_draw(self->brush_ref, from.x+y, from.y-x);
-        changed |= brush_draw(self->brush_ref, from.x-x, from.y+y);
-        changed |= brush_draw(self->brush_ref, from.x-y, from.y+x);
-        changed |= brush_draw(self->brush_ref, from.x-x, from.y-y);
-        changed |= brush_draw(self->brush_ref, from.x-y, from.y-x);
-        
-        d += 2*y + 1;
+        changed |= brush_draw(from.x + x, from.y + y);
+        changed |= brush_draw(from.x + y, from.y + x);
+        changed |= brush_draw(from.x + x, from.y - y);
+        changed |= brush_draw(from.x + y, from.y - x);
+        changed |= brush_draw(from.x - x, from.y + y);
+        changed |= brush_draw(from.x - y, from.y + x);
+        changed |= brush_draw(from.x - x, from.y - y);
+        changed |= brush_draw(from.x - y, from.y - x);
+
+        d += 2 * y + 1;
         y++;
-        if(d>0) {
-            d += -2*x + 2;
+        if (d > 0) {
+            d += -2 * x + 2;
             x--;
         }
-    } while(y<=x);
-    
+    } while (y <= x);
+
     return changed;
 }
 
@@ -96,81 +98,77 @@ static bool circleto(BrushMode *self, ivec2 from, ivec2 to) {
 // public
 //
 
-BrushMode *brushmode_new(Brush *brush, Canvas *canvas) {
-    BrushMode *self = rhc_calloc(sizeof *self);
-    self->brush_ref = brush;
-    self->canvas_ref = canvas;
-    return self;
+void brushmode_init() {
 }
 
-void brushmode_reset(BrushMode *self) {
-    self->L.is_drawing = false;
+void brushmode_reset() {
+    brushmode.L.is_drawing = false;
 }
 
-bool brushmode_dot(BrushMode *self, ePointer_s pointer) {
+bool brushmode_dot(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
-    return brush_draw(self->brush_ref, cr.x, cr.y);
+    return brush_draw(cr.x, cr.y);
 }
 
-bool brushmode_free(BrushMode *self, ePointer_s pointer) {
+bool brushmode_free(ePointer_s pointer) {
     if (pointer.action == E_POINTER_DOWN) {
-        self->L.is_drawing = true;
+        brushmode.L.is_drawing = true;
     } else if (pointer.action != E_POINTER_MOVE) {
-        self->L.is_drawing = false;
+        brushmode.L.is_drawing = false;
     }
 
-    if (!self->L.is_drawing)
+    if (!brushmode.L.is_drawing)
         return false;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
-    return brush_draw(self->brush_ref, cr.x, cr.y);
+    return brush_draw(cr.x, cr.y);
 }
 
-bool brushmode_func(BrushMode *self, ePointer_s pointer, enum brushmode_func func) {
+bool brushmode_func(ePointer_s pointer, enum brushmode_func func) {
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
     if (pointer.action == E_POINTER_DOWN) {
-        self->L.is_drawing = true;
-        self->L.start = cr;
+        brushmode.L.is_drawing = true;
+        brushmode.L.start = cr;
     } else if (pointer.action != E_POINTER_MOVE) {
-        self->L.is_drawing = false;
+        brushmode.L.is_drawing = false;
     }
 
-    if (!self->L.is_drawing)
+    if (!brushmode.L.is_drawing)
         return false;
-        
-    canvas_reload(self->canvas_ref);
+
+    canvas_reload();
 
     // just 1 pixel length
-    if (ivec2_norm_inf(ivec2_sub_vec(cr, self->L.start)) <= 1)
-        return brush_draw(self->brush_ref, cr.x, cr.y);
+    if (ivec2_norm_inf(ivec2_sub_vec(cr, brushmode.L.start)) <= 1)
+        return brush_draw(cr.x, cr.y);
 
     switch (func) {
-    case BRUSHMODE_FUNC_LINE: 
-        return lineto(self, self->L.start, cr);
-    case BRUSHMODE_FUNC_RECT:
-        return rectto(self, self->L.start, cr);
-    case BRUSHMODE_FUNC_CIRCLE:
-        return circleto(self, self->L.start, cr);
-    default:
-        assume(0, "wtf");
-        return false;
+        case BRUSHMODE_FUNC_LINE:
+            return lineto(brushmode.L.start, cr);
+        case BRUSHMODE_FUNC_RECT:
+            return rectto(brushmode.L.start, cr);
+        case BRUSHMODE_FUNC_CIRCLE:
+            return circleto(brushmode.L.start, cr);
+        default:
+            assume(0, "wtf");
+            return false;
     }
 }
 
 
-void brushmode_pipette(BrushMode *self, ePointer_s pointer) {
+void brushmode_pipette(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
-    uImage img = self->canvas_ref->RO.image;
-    
-    if(!u_image_contains(img, cr.x, cr.y))
+    uImage img = canvas.RO.image;
+
+    if (!u_image_contains(img, cr.x, cr.y))
         return;
-        
-    self->brush_ref->secondary_color = *u_image_pixel(img, cr.x, cr.y, self->canvas_ref->current_layer);
+
+    brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, canvas.current_layer);
 }

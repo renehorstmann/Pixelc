@@ -2,7 +2,9 @@
 #define RHC_ALLOC_IMPL_H
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
+#include "../assume.h"
 #include "../error.h"
 #include "../log.h"
 #include "../alloc.h"
@@ -17,7 +19,7 @@ void *rhc_malloc_try(size_t size) {
 #else
     void *data = malloc(size);
 #endif
-    if(!data) {
+    if (!data) {
         log_error("allocation failed for a size of: %zu", size);
         rhc_error = "allocation error";
     }
@@ -36,7 +38,7 @@ void *rhc_realloc_try(void *memory, size_t size) {
 #else
     void *data = realloc(memory, size);
 #endif
-    if(!data) {
+    if (!data) {
         log_error("reallocation failed for a size of: %zu", size);
         rhc_error = "allocation error";
         return memory;
@@ -72,7 +74,7 @@ void *rhc_calloc(size_t size) {
 
 void *rhc_realloc(void *memory, size_t size) {
     // a call to realloc with size=0 should normale free the object, but the sanitizer is angry then
-    if(size==0) {
+    if (size == 0) {
         rhc_free(memory);
         return NULL;
     }
@@ -96,11 +98,11 @@ static void *rhc_allocator_realloc_impl_(void *memory, size_t size, void *ud) {
 static void *rhc_allocator_empty_try_realloc_impl_(void *memory, size_t size, void *ud) {
     return NULL;
 }
+
 static void *rhc_allocator_empty_realloc_impl_(void *memory, size_t size, void *ud) {
     assume(false, "a empty raising realloc called");
     return NULL;
 }
-
 
 
 Allocator_i allocator_new_try() {
@@ -148,11 +150,11 @@ void *rhc_allocator_arena_realloc_impl(void *memory, size_t size, void *user_dat
     struct RhcArena *self = user_data;
 
     // free
-    if(size == 0) {
-        if(!memory)
+    if (size == 0) {
+        if (!memory)
             return NULL;
         // only possible if it was the last allocation
-        if(self->last_allocation == memory) {
+        if (self->last_allocation == memory) {
             self->used = self->last_allocation - self->stack;
             self->last_allocation = NULL;
         }
@@ -160,11 +162,11 @@ void *rhc_allocator_arena_realloc_impl(void *memory, size_t size, void *user_dat
     }
 
     // realloc
-    if(memory) {
+    if (memory) {
         // actual realloc
-        if(self->last_allocation == memory) {
+        if (self->last_allocation == memory) {
             size_t new_used = self->last_allocation - self->stack + size;
-            if(new_used > self->stack_size)
+            if (new_used > self->stack_size)
                 return NULL;
             self->used = new_used;
             return self->last_allocation;
@@ -174,7 +176,7 @@ void *rhc_allocator_arena_realloc_impl(void *memory, size_t size, void *user_dat
     }
 
     // malloc
-    if(self->used + size > self->stack_size) {
+    if (self->used + size > self->stack_size) {
         return NULL;
     }
     self->last_allocation = self->stack + self->used;
@@ -183,7 +185,7 @@ void *rhc_allocator_arena_realloc_impl(void *memory, size_t size, void *user_dat
 }
 
 Allocator_i allocator_arena_new_a(size_t arena_size, Allocator_i arena_stack_allocator) {
-    struct RhcArena *self = allocator_calloc(arena_stack_allocator, sizeof*self + arena_size);
+    struct RhcArena *self = allocator_calloc(arena_stack_allocator, sizeof *self + arena_size);
     self->a = arena_stack_allocator;
     self->stack_size = arena_size;
 
@@ -215,7 +217,7 @@ size_t allocator_arena_full_size(Allocator_i self_arena) {
 // returns the current remaining size of the arena
 size_t allocator_arena_remaining_size(Allocator_i self_arena) {
     struct RhcArena *self = self_arena.user_data;
-    return self->stack_size-self->used;
+    return self->stack_size - self->used;
 }
 
 #endif //RHC_ALLOC_IMPL_H

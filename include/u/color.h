@@ -5,13 +5,9 @@
 // pixel color based on mathc ucvec4 (uchar)
 //
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
+#include "rhc/rhc.h"
 #include "mathc/vec/ucvec4.h"
 #include "mathc/vec/vec4.h"
-#include "rhc/error.h"
-#include "rhc/log.h"
 
 // a color is a unsigned char vector with rgba elements
 // access like other mathc types

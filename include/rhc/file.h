@@ -14,7 +14,7 @@ typedef struct {
 
 // safe way to use the Stream interface
 static Stream_i rhc_file_get_stream(RhcFile *self) {
-    if(!self)
+    if (!self)
         return stream_new_invalid();
     return self->stream;
 }
@@ -24,8 +24,10 @@ bool rhc_file_valid(const RhcFile *self);
 
 // opens a file as rhc stream to read
 RhcFile *rhc_file_open_read_a(const char *file, bool ascii, Allocator_i a);
+
 // opens a file as rhc stream to write
 RhcFile *rhc_file_open_write_a(const char *file, bool ascii, Allocator_i a);
+
 // opens a file as rhc stream to append
 RhcFile *rhc_file_open_append_a(const char *file, bool ascii, Allocator_i a);
 
@@ -49,10 +51,12 @@ bool rhc_file_append(const char *file, Str_s content, bool ascii);
 static RhcFile *rhc_file_open_read(const char *file, bool ascii) {
     return rhc_file_open_read_a(file, ascii, RHC_DEFAULT_ALLOCATOR);
 }
+
 // opens a file as rhc stream to write
 static RhcFile *rhc_file_open_write(const char *file, bool ascii) {
     return rhc_file_open_write_a(file, ascii, RHC_DEFAULT_ALLOCATOR);
 }
+
 // opens a file as rhc stream to append
 static RhcFile *rhc_file_open_append(const char *file, bool ascii) {
     return rhc_file_open_append_a(file, ascii, RHC_DEFAULT_ALLOCATOR);

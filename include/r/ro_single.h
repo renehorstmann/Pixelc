@@ -5,8 +5,20 @@
 // class to render a single rect with a draw call
 //
 
-#include "rhc/alloc.h"
-#include "ro_types.h"
+#include "rect.h"
+#include "texture.h"
+
+// Renders a single rect in a draw call
+typedef struct {
+    rRect_s rect;
+    rTexture tex;       // used texture
+    bool owns_tex;      // if true (default), tex will be killed by this class
+
+    struct {
+        GLuint program;     // shader
+        GLuint vao;         // internal vertex array object
+    } L;
+} RoSingle;
 
 // creates a single to draw one rRect
 // this class takes ownership of tex_sink (see .owns_tex)

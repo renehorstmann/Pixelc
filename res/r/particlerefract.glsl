@@ -14,7 +14,7 @@
     layout(location = 12) in vec4 in_axis_angle;
     layout(location = 13) in vec4 in_color_speed;
 
-    layout(location = 14) in float in_start_time;
+    layout(location = 14) in float in_delta_time;
 
     // on some Browsers (Chrome on Desktop?!?) location = 15 is not valid, even if GL_MAX_VERTEX_ATTRIBS == 16
 
@@ -23,7 +23,6 @@
 
     uniform mat4 vp;
     uniform vec2 sprites;
-    uniform float time;
 
     const vec4 vertices[6] = vec4[](
     vec4(-0.5, -0.5, 0, 1),
@@ -68,7 +67,7 @@
         vec2 in_sprite_speed = in_sprite_and_sprite_speed.zw;
         
         
-        float dt = time - in_start_time;
+        float dt = in_delta_time;
 
         vec4 pos = vertices[gl_VertexID];
 

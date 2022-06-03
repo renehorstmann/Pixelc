@@ -35,9 +35,7 @@
 // aa stand for axis aligned / not rotated
 // these functions are usually faster
 
-#include <stdbool.h>
-#include <math.h>
-#include <float.h>  // FLT_MAX
+#include "rhc/rhc.h"
 #include "mathc/mat/mat4.h"
 
 // new pose without a rotation
@@ -74,11 +72,11 @@ static mat4 u_pose_new_aa(float l, float t, float w, float h) {
 
 // new axis aligned pose from left top to bottom right (left, right, bottom, top)
 static mat4 u_pose_new_aa_lrbt(float l, float r, float b, float t) {
-    return u_pose_new_aa(l, t, r-l, t-b);
+    return u_pose_new_aa(l, t, r - l, t - b);
 }
 
 static mat4 u_pose_new_hidden() {
-    return u_pose_new(FLT_MAX, FLT_MAX, 1, 1);
+    return u_pose_new(SCA_MAX, SCA_MAX, 1, 1);
 }
 
 static float u_pose_get_x(mat4 p) {
@@ -110,9 +108,9 @@ static float u_pose_get_h(mat4 p) {
 // returns abs(w), abs(h)
 static vec2 u_pose_get_wh(mat4 p) {
     return (vec2) {{
-        u_pose_get_w(p),
-        u_pose_get_h(p)
-    }};
+                           u_pose_get_w(p),
+                           u_pose_get_h(p)
+                   }};
 }
 
 // only safe to call for a not rotated pose (axis aligned)
@@ -157,7 +155,6 @@ static float u_pose_aa_get_bottom(mat4 p) {
 }
 
 
-
 static void u_pose_set_x(mat4 *p, float x) {
     p->m30 = x;
 }
@@ -172,7 +169,7 @@ static void u_pose_set_xy(mat4 *p, float x, float y) {
 }
 
 static void u_pose_set_hidden(mat4 *p) {
-    u_pose_set_xy(p, FLT_MAX, FLT_MAX);
+    u_pose_set_xy(p, SCA_MAX, SCA_MAX);
 }
 
 static void u_pose_set_size_angle(mat4 *p, float w, float h, float angle_rad) {
@@ -260,7 +257,7 @@ static void u_pose_aa_set(mat4 *p, float l, float t, float w, float h) {
 
 // only safe to call for a not rotated pose (axis aligned)
 static void u_pose_aa_set_lrbt(mat4 *p, float l, float r, float b, float t) {
-    u_pose_aa_set(p, l, t, r-l, t-b);
+    u_pose_aa_set(p, l, t, r - l, t - b);
 }
 
 // returns true if pos is within the pose ranges
@@ -288,18 +285,18 @@ static bool u_pose_aa_contains(mat4 p, vec2 pos) {
 // only safe to call for a not rotated pose (axis aligned)
 static bool u_pose_aa_intersects_line(mat4 p, vec2 a, vec2 b) {
     vec2 wh = u_pose_get_wh(p);
-    float size = wh.v0 < wh.v1 ? wh.v0: wh.v1;
-    
-    vec2 diff = {{b.x-a.x, b.y-a.y}};
-    float dist = sqrtf(diff.x*diff.x + diff.y*diff.y);
-    
+    float size = wh.v0 < wh.v1 ? wh.v0 : wh.v1;
+
+    vec2 diff = {{b.x - a.x, b.y - a.y}};
+    float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
+
     int checks = ceilf(dist / size);
-    checks = checks <=0 ? 1 : checks; // min 1
-    
-    for(int i=0; i<checks; i++) {
+    checks = checks <= 0 ? 1 : checks; // min 1
+
+    for (int i = 0; i < checks; i++) {
         vec2 pos = {{a.x + diff.x / checks, a.y + diff.y / checks}};
-        
-        if(u_pose_aa_contains(p, pos))
+
+        if (u_pose_aa_contains(p, pos))
             return true;
     }
     return false;

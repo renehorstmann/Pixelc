@@ -1,5 +1,4 @@
-#include "rhc/error.h"
-#include "rhc/file.h"
+#include "rhc/rhc_full.h"
 #include "r/render.h"
 #include "r/program.h"
 
@@ -7,7 +6,7 @@
 GLuint r_programshader_new(Str_s source, GLint shader_type) {
     r_render_error_check("r_programshader_new");
     // check source available
-    if(str_empty(source))
+    if (str_empty(source))
         return 0;
 
 #ifdef OPTION_GLES
@@ -17,9 +16,9 @@ GLuint r_programshader_new(Str_s source, GLint shader_type) {
 #endif
 
     const char *type = NULL;
-    if(shader_type == GL_VERTEX_SHADER)
+    if (shader_type == GL_VERTEX_SHADER)
         type = "#define VERTEX\n";
-    if(shader_type == GL_FRAGMENT_SHADER)
+    if (shader_type == GL_FRAGMENT_SHADER)
         type = "#define FRAGMENT\n";
 
     assume(type, "neither vertex nor fragment shader used: %i", shader_type);
@@ -45,7 +44,7 @@ GLuint r_programshader_new(Str_s source, GLint shader_type) {
 
         char *buffer = rhc_malloc(log_len + 1);
         glGetShaderInfoLog(shader, log_len, NULL, buffer);
-        log_error("r_programshader_new: Shader compile failure in %s shader: %s",  type, buffer);
+        log_error("Shader compile failure in %s shader: %s", type, buffer);
         rhc_free(buffer);
 
         glDeleteShader(shader);
@@ -67,8 +66,8 @@ GLuint r_programshader_new_file(const char *file, GLint shader_type) {
 GLuint r_program_new(const GLuint *shaders, int n, bool delete_shaders) {
     r_render_error_check("r_program_newBEGIN");
     // check each shader valid
-    for(int i=0; i<n; i++) {
-        if(!r_programshader_valid(shaders[i]))
+    for (int i = 0; i < n; i++) {
+        if (!r_programshader_valid(shaders[i]))
             return 0;
     }
 
@@ -86,14 +85,14 @@ GLuint r_program_new(const GLuint *shaders, int n, bool delete_shaders) {
 
         char *buffer = rhc_malloc(log_len + 1);
         glGetProgramInfoLog(program, log_len, NULL, buffer);
-        log_error("r_program_new: Shader linking failure: %s", buffer);
+        log_error("Shader linking failure: %s", buffer);
         rhc_free(buffer);
 
         glDeleteProgram(program);
         program = 0;
     }
 
-    if(delete_shaders) {
+    if (delete_shaders) {
         for (int i = 0; i < n; i++)
             glDeleteShader(shaders[i]);
     }
@@ -121,7 +120,7 @@ GLuint r_program_new_file(const char *file) {
 
 void r_program_validate(GLuint program) {
     r_render_error_check("r_program_validateBEGIN");
-    if(!r_program_valid(program))
+    if (!r_program_valid(program))
         return;
 
     glValidateProgram(program);
@@ -134,7 +133,7 @@ void r_program_validate(GLuint program) {
 
         char *buffer = rhc_malloc(log_len + 1);
         glGetProgramInfoLog(program, log_len, NULL, buffer);
-        log_error("r_program_validate: Program validate failure: %s", buffer);
+        log_error("Program validate failure: %s", buffer);
         rhc_free(buffer);
     }
     r_render_error_check("r_program_validate");

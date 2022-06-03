@@ -2,7 +2,8 @@
 #define PIXELC_DIALOG_H
 
 #include "e/input.h"
-#include "r/ro_types.h"
+#include "r/ro_single.h"
+#include "r/ro_text.h"
 #include "u/color.h"
 #include "mathc/types/float.h"
 
@@ -12,32 +13,25 @@
 #define DIALOG_LEFT -60
 #define DIALOG_TOP 60
 
-struct eWindow;
-struct eInput;
-struct Dialog;
-struct Toolbar;
-struct Palette;
-struct Canvas;
-struct Camera_s;
+typedef void (*dialog_on_action_cb)(bool ok);
 
-typedef void (*dialog_on_action_cb)(struct Dialog *self, bool ok);
 typedef void (*dialog_kill_fun)(void *impl);
-typedef void (*dialog_update_fun)(struct Dialog *self, float dtime);
-typedef void (*dialog_render_fun)(struct Dialog *self, const mat4 *cam_mat);
-typedef bool (*dialog_pointer_event_fun)(struct Dialog *self, ePointer_s pointer);
 
-typedef struct Dialog {
+typedef void (*dialog_update_fun)(float dtime);
+
+typedef void (*dialog_render_fun)(const mat4 *cam_mat);
+
+typedef bool (*dialog_pointer_event_fun)(ePointer_s pointer);
+
+
+struct Dialog_Globals {
     char id[DIALOG_MAX_TITLE_LEN];
     void *impl;
     void *user_data;
 
-    struct {
-        bool textinput_active;
-    } out;
+    bool textinput_active;
 
-    struct {
-        float impl_height;
-    } in;
+    float impl_height;
 
     RoSingle bg;
     RoSingle bg_shadow;
@@ -54,42 +48,40 @@ typedef struct Dialog {
     dialog_update_fun update;
     dialog_render_fun render;
     dialog_pointer_event_fun pointer_event;
-} Dialog;
+};
+extern struct Dialog_Globals dialog;
 
-static bool dialog_valid(const Dialog *self) {
-    return *self->id != '\0' && self->impl && self->kill && self->update && self->render && self->pointer_event;
+
+static bool dialog_valid() {
+    return *dialog.id != '\0' && dialog.impl && dialog.kill && dialog.update && dialog.render && dialog.pointer_event;
 }
 
-Dialog *dialog_new();
+void dialog_init();
 
-void dialog_update(Dialog *self, float dtime);
+void dialog_update(float dtime);
 
-void dialog_render(Dialog *self, const mat4 *cam_mat);
+void dialog_render(const mat4 *cam_mat);
 
-bool dialog_pointer_event(Dialog *self, ePointer_s pointer);
+bool dialog_pointer_event(ePointer_s pointer);
 
 // kills the internal impl of the custom dialog
-void dialog_hide(Dialog *self);
+void dialog_hide();
 
-void dialog_set_bg_color(Dialog *self, uColor_s a, uColor_s b);
+void dialog_set_bg_color(uColor_s a, uColor_s b);
 
-void dialog_set_title(Dialog *self, const char *title_id, vec4 color);
+void dialog_set_title(const char *title_id, vec4 color);
 
 
 //
 // dialogs
 //
 
-void dialog_create_delete(Dialog *self, const char *msg, dialog_on_action_cb on_action_cb, void *user_data);
+void dialog_create_tooltip();
 
-void dialog_create_upload(Dialog *self, const char *msg, dialog_pointer_event_fun on_action_cb, void *user_data);
+void dialog_create_canvas_size();
 
-void dialog_create_tooltip(Dialog *self, const struct Toolbar *toolbar, const struct Palette *palette);
+void dialog_create_display();
 
-void dialog_create_canvas_size(Dialog *self, const struct eWindow *window, struct eInput *input, struct Canvas *canvas);
-
-void dialog_create_display(Dialog *self, const struct eWindow *window, struct eInput *input, struct Camera_s *camera);
-
-void dialog_create_image_upload(Dialog *self);
+void dialog_create_image_upload();
 
 #endif //PIXELC_DIALOG_H

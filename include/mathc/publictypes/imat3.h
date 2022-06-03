@@ -4,12 +4,10 @@
 #include <assert.h>     // for static_assert
 
 
-
-
-
 #include "ivec3.h"
+
 typedef union {
-    int v[3*3];
+    int v[3 * 3];
     int m[3][3];
     mathc_ivec3 col[3];
     struct {
@@ -23,10 +21,6 @@ typedef union {
         int m20, m21, m22;
     };
 } mathc_imat3;
-
-
-
-
 
 
 static_assert(sizeof(mathc_imat3) == sizeof(int) * 3 * 3, "[Mathc] wrong expected size");

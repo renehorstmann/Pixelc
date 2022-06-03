@@ -5,12 +5,14 @@
 // as e/core.h, this file includes headers of sdl and opengl and has some color constants
 //
 
-#include <stdbool.h>
+#include "rhc/rhc.h"
 
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef OPTION_GLEW
+
 #include <GL/glew.h>
+
 #endif
 
 #include <SDL2/SDL.h>

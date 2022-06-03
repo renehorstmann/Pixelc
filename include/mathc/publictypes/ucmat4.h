@@ -4,14 +4,10 @@
 #include <assert.h>     // for static_assert
 
 
-
-
-
-
-
 #include "ucvec4.h"
+
 typedef union {
-    unsigned char v[4*4];
+    unsigned char v[4 * 4];
     unsigned char m[4][4];
     mathc_ucvec4 col[4];
     struct {
@@ -27,8 +23,6 @@ typedef union {
         unsigned char m30, m31, m32, m33;
     };
 } mathc_ucmat4;
-
-
 
 
 static_assert(sizeof(mathc_ucmat4) == sizeof(unsigned char) * 4 * 4, "[Mathc] wrong expected size");

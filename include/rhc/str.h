@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include "alloc.h"
 #include "error.h"
+#include "assume.h"
 #include "log.h"
 
 //
@@ -29,7 +30,7 @@ static bool str_empty(Str_s s) {
 
 // prints a str to stdout
 static void sv_fprint(Str_s s, FILE *file) {
-    if(!str_valid(s))
+    if (!str_valid(s))
         return;
     fprintf(file, "(Str_s) {\"%.*s\", %zu}\n", (int) s.size, s.data, s.size);
 }
@@ -40,9 +41,9 @@ static void sv_print(Str_s s) {
 
 // copies from into cpy. cpy and from must have the same size
 static void str_cpy(Str_s cpy, Str_s from) {
-    if(!str_valid(cpy) || !str_valid(from) || cpy.size != from.size) {
+    if (!str_valid(cpy) || !str_valid(from) || cpy.size != from.size) {
         rhc_error = "str_cpy failed";
-        log_error("str_cpy failed: invalid or wrong sizes");
+        log_error("failed: invalid or wrong sizes");
         return;
     }
     memcpy(cpy.data, from.data, cpy.size);
@@ -51,9 +52,9 @@ static void str_cpy(Str_s cpy, Str_s from) {
 // copies from into cpy_buffer. cpy_buffer must have at least the size of from
 // returns cpy_buffer with the copied size of from
 static Str_s str_cpy_into(Str_s cpy_buffer, Str_s from) {
-    if(!str_valid(cpy_buffer) || !str_valid(from) || cpy_buffer.size < from.size) {
+    if (!str_valid(cpy_buffer) || !str_valid(from) || cpy_buffer.size < from.size) {
         rhc_error = "str_cpy_info failed";
-        log_error("str_cpy_into failed: invalid or wrong sizes");
+        log_error("failed: invalid or wrong sizes");
         return (Str_s) {cpy_buffer.data, 0};
     }
     cpy_buffer.size = from.size;
@@ -62,16 +63,16 @@ static Str_s str_cpy_into(Str_s cpy_buffer, Str_s from) {
 }
 
 static bool str_equals(Str_s a, Str_s b) {
-    if(str_empty(a) && str_empty(b))
+    if (str_empty(a) && str_empty(b))
         return true;
-    if(!str_valid(a) || !str_valid(b) || a.size != b.size)
+    if (!str_valid(a) || !str_valid(b) || a.size != b.size)
         return false;
     return memcmp(a.data, b.data, a.size) == 0;
 }
 
 // out_c_string needs to be a buffer of at least str.size+1
 static void str_as_c(char *out_c_string, Str_s s) {
-    if(!str_valid(s)) {
+    if (!str_valid(s)) {
         out_c_string[0] = '\0';
         return;
     }
@@ -82,10 +83,10 @@ static void str_as_c(char *out_c_string, Str_s s) {
 // returns a new allocated buffer with str as cstring
 static char *str_as_new_c_a(Str_s s, Allocator_i a) {
     assume(allocator_valid(a), "a needs to be valid");
-    if(!str_valid(s))
+    if (!str_valid(s))
         return NULL;
-    char *buffer = allocator_malloc(a, s.size+1);
-    if(!buffer)
+    char *buffer = allocator_malloc(a, s.size + 1);
+    if (!buffer)
         return NULL;
     str_as_c(buffer, s);
     return buffer;
@@ -98,25 +99,24 @@ static char *str_as_new_c(Str_s s) {
 }
 
 
-
 // returns true if str begins with cmp
 static bool str_begins_with(Str_s s, Str_s cmp) {
-    if(!str_valid(s) || str_empty(cmp) || s.size < cmp.size)
+    if (!str_valid(s) || str_empty(cmp) || s.size < cmp.size)
         return false;
     return str_equals(cmp, (Str_s) {s.data, cmp.size});
 }
 
 // returns true if str ends with cmp
 static bool str_ends_with(Str_s s, Str_s cmp) {
-    if(!str_valid(s) || str_empty(cmp) || s.size < cmp.size)
+    if (!str_valid(s) || str_empty(cmp) || s.size < cmp.size)
         return false;
-    return str_equals(cmp, (Str_s) {s.data+s.size-cmp.size, cmp.size});
+    return str_equals(cmp, (Str_s) {s.data + s.size - cmp.size, cmp.size});
 }
 
 // returns a new str, based on s, but without the leading chars of strip (space -> isspace())
 static Str_s str_lstrip(Str_s s, char strip) {
     // invalid safe
-    if(strip==' ') {
+    if (strip == ' ') {
         while (!str_empty(s) && isspace(*s.data)) {
             s.data++;
             s.size--;
@@ -133,12 +133,12 @@ static Str_s str_lstrip(Str_s s, char strip) {
 // returns a new str, based on s, but without the least chars of strip (space -> isspace())
 static Str_s str_rstrip(Str_s s, char strip) {
     // invalid safe
-    if(strip==' ') {
-        while (!str_empty(s) && isspace(s.data[s.size-1])) {
+    if (strip == ' ') {
+        while (!str_empty(s) && isspace(s.data[s.size - 1])) {
             s.size--;
         }
     } else {
-        while (!str_empty(s) && s.data[s.size-1] == strip) {
+        while (!str_empty(s) && s.data[s.size - 1] == strip) {
             s.size--;
         }
     }
@@ -152,10 +152,10 @@ static Str_s str_strip(Str_s s, char strip) {
 
 // a new str, based on s, from the beginning until the first split, or the end
 static Str_s str_next_split(Str_s s, char split) {
-    if(str_empty(s))
+    if (str_empty(s))
         return str_new_invalid();
     Str_s res = {s.data, 0};
-    if (split==' ') {
+    if (split == ' ') {
         while (res.size < s.size && !isspace(res.data[res.size]))
             res.size++;
     } else {
@@ -179,7 +179,7 @@ static int str_split(Str_s *splits, int max, Str_s s, char split) {
         s.size -= item.size;
         splits[n++] = item;
         if (n >= max) {
-            log_warn("str_split: reached max: %d/%d", n, max);
+            log_warn("reached max: %d/%d", n, max);
             return n;
         }
     }
@@ -196,9 +196,9 @@ static StrArray str_split_allocated(Str_s s, char split, Allocator_i a) {
         Str_s item = str_next_split(s, split);
         s.data += item.size;
         s.size -= item.size;
-        Str_s *array = allocator_realloc(a, res.array, sizeof(Str_s) * (res.size+1));
-        if(!array) {
-            log_warn("str_split_allocated failed: to realloc");
+        Str_s *array = allocator_realloc(a, res.array, sizeof(Str_s) * (res.size + 1));
+        if (!array) {
+            log_warn("failed: to realloc");
             return res;
         }
         res.array = array;
@@ -208,16 +208,16 @@ static StrArray str_split_allocated(Str_s s, char split, Allocator_i a) {
 
 // returns the index of the first found char find in str, or -1 if nothing found
 static ssize_t str_find_first(Str_s s, char find) {
-    if(str_empty(s))
+    if (str_empty(s))
         return -1;
-    if (find==' ') {
-        for(size_t i=0; i<s.size; i++) {
-            if(isspace(s.data[i]))
+    if (find == ' ') {
+        for (size_t i = 0; i < s.size; i++) {
+            if (isspace(s.data[i]))
                 return (ssize_t) i;
         }
     } else {
-        for(size_t i=0; i<s.size; i++) {
-            if(s.data[i] == find)
+        for (size_t i = 0; i < s.size; i++) {
+            if (s.data[i] == find)
                 return (ssize_t) i;
         }
     }
@@ -227,17 +227,17 @@ static ssize_t str_find_first(Str_s s, char find) {
 
 // returns the index of the last found char find in str, or -1 if nothing found
 static ssize_t str_find_last(Str_s s, char find) {
-    if(str_empty(s))
+    if (str_empty(s))
         return -1;
-    if (find==' ') {
-        for(size_t i=s.size; i>0; i--) {
-            if(isspace(s.data[i-1]))
-                return (ssize_t) i-1;
+    if (find == ' ') {
+        for (size_t i = s.size; i > 0; i--) {
+            if (isspace(s.data[i - 1]))
+                return (ssize_t) i - 1;
         }
     } else {
-        for(size_t i=s.size; i>0; i--) {
-            if(s.data[i-1] == find)
-                return (ssize_t) i-1;
+        for (size_t i = s.size; i > 0; i--) {
+            if (s.data[i - 1] == find)
+                return (ssize_t) i - 1;
         }
     }
     return -1;
@@ -246,10 +246,10 @@ static ssize_t str_find_last(Str_s s, char find) {
 // returns the index of the first found str found in s, or -1 if nothing found
 static ssize_t str_find_first_str(Str_s s, Str_s find) {
     // invalid safe
-    if(find.size > s.size)
+    if (find.size > s.size)
         return -1;
-    for(size_t i=0; i<s.size-find.size; i++) {
-        if(str_equals(find, (Str_s) {s.data+i, find.size}))
+    for (size_t i = 0; i < s.size - find.size; i++) {
+        if (str_equals(find, (Str_s) {s.data + i, find.size}))
             return (ssize_t) i;
     }
     return -1;
@@ -258,10 +258,10 @@ static ssize_t str_find_first_str(Str_s s, Str_s find) {
 // returns the index of the last found str found in s, or -1 if nothing found
 static ssize_t str_find_last_str(Str_s s, Str_s find) {
     // invalid safe
-    if(find.size > s.size)
+    if (find.size > s.size)
         return -1;
-    for(size_t i=s.size-find.size; i>0; i--) {
-        if(str_equals(find, (Str_s) {s.data+i-1, find.size}))
+    for (size_t i = s.size - find.size; i > 0; i--) {
+        if (str_equals(find, (Str_s) {s.data + i - 1, find.size}))
             return (ssize_t) i;
     }
     return -1;
@@ -269,7 +269,7 @@ static ssize_t str_find_last_str(Str_s s, Str_s find) {
 
 // returns the index of the first found char of multiple_chars in str, or -1 if nothing found
 static ssize_t str_find_first_set(Str_s s, const char *char_set) {
-    for(size_t i=0; i<s.size; i++) {
+    for (size_t i = 0; i < s.size; i++) {
         for (const char *c = char_set; *c != 0; c++) {
             if ((*c == ' ' && isspace(s.data[i])) || *c == s.data[i])
                 return (ssize_t) i;
@@ -277,12 +277,13 @@ static ssize_t str_find_first_set(Str_s s, const char *char_set) {
     }
     return -1;
 }
+
 // returns the index of the first found char of multiple_chars in str, or -1 if nothing found
 static ssize_t str_find_last_set(Str_s s, const char *char_set) {
-    for(size_t i=s.size; i>0; i--) {
+    for (size_t i = s.size; i > 0; i--) {
         for (const char *c = char_set; *c != 0; c++) {
-            if ((*c == ' ' && isspace(s.data[i-1])) || *c == s.data[i-1])
-                return (ssize_t) i-1;
+            if ((*c == ' ' && isspace(s.data[i - 1])) || *c == s.data[i - 1])
+                return (ssize_t) i - 1;
         }
     }
     return -1;
@@ -290,7 +291,7 @@ static ssize_t str_find_last_set(Str_s s, const char *char_set) {
 
 // returns new str, based on s, but missing the first n characters
 static Str_s str_eat(Str_s s, size_t n) {
-    if(n>=s.size) {
+    if (n >= s.size) {
         s.data += s.size;
         s.size = 0;
     } else {
@@ -302,7 +303,7 @@ static Str_s str_eat(Str_s s, size_t n) {
 
 // returns new str, based on s, but missing the last n characters
 static Str_s str_eat_back(Str_s s, size_t n) {
-    if(n>=s.size) {
+    if (n >= s.size) {
         s.size = 0;
     } else {
         s.size -= n;
@@ -313,19 +314,19 @@ static Str_s str_eat_back(Str_s s, size_t n) {
 // checks if s begins with eat_begin and returns a new str, based on s, without eat_begin at the beginning
 // if s does not begin with eat_begin, an invalid str is returned
 static Str_s str_eat_str(Str_s s, Str_s eat_begin) {
-    if(!str_begins_with(s, eat_begin))
+    if (!str_begins_with(s, eat_begin))
         return str_new_invalid();
-    s.data+=eat_begin.size;
-    s.size-=eat_begin.size;
+    s.data += eat_begin.size;
+    s.size -= eat_begin.size;
     return s;
 }
 
 // checks if s ends with eat_back and returns a new str, based on s, without eat_back at the end
 // if s does not end with eat_back, an invalid str is returned
 static Str_s str_eat_back_str(Str_s s, Str_s eat_back) {
-    if(!str_ends_with(s, eat_back))
+    if (!str_ends_with(s, eat_back))
         return str_new_invalid();
-    s.size-=eat_back.size;
+    s.size -= eat_back.size;
     return s;
 }
 
@@ -335,14 +336,14 @@ static Str_s str_eat_until(Str_s s, char until, Str_s *opt_get) {
     Str_s get = s;
     ssize_t pos = str_find_first(s, until);
     if (pos >= 0) {
-        s.data+=pos;
-        s.size-=pos;
-        get.size=pos;
+        s.data += pos;
+        s.size -= pos;
+        get.size = pos;
     } else {
-        s.data+=s.size;
+        s.data += s.size;
         s.size = 0;
     }
-    if(opt_get)
+    if (opt_get)
         *opt_get = get;
     return s;
 }
@@ -353,13 +354,13 @@ static Str_s str_eat_back_until(Str_s s, char until, Str_s *opt_get) {
     Str_s get = s;
     ssize_t pos = str_find_last(s, until);
     if (pos >= 0) {
-        s.size=pos;
-        get.data+=pos;
-        get.size-=pos;
+        s.size = pos;
+        get.data += pos;
+        get.size -= pos;
     } else {
         s.size = 0;
     }
-    if(opt_get)
+    if (opt_get)
         *opt_get = get;
     return s;
 }
@@ -370,14 +371,14 @@ static Str_s str_eat_until_str(Str_s s, Str_s until, Str_s *opt_get) {
     Str_s get = s;
     ssize_t pos = str_find_first_str(s, until);
     if (pos >= 0) {
-        s.data+=pos;
-        s.size-=pos;
-        get.size=pos;
+        s.data += pos;
+        s.size -= pos;
+        get.size = pos;
     } else {
-        s.data+=s.size;
+        s.data += s.size;
         s.size = 0;
     }
-    if(opt_get)
+    if (opt_get)
         *opt_get = get;
     return s;
 }
@@ -388,13 +389,13 @@ static Str_s str_eat_back_until_str(Str_s s, Str_s until, Str_s *opt_get) {
     Str_s get = s;
     ssize_t pos = str_find_last_str(s, until);
     if (pos >= 0) {
-        s.size=pos;
-        get.data+=pos;
-        get.size-=pos;
+        s.size = pos;
+        get.data += pos;
+        get.size -= pos;
     } else {
         s.size = 0;
     }
-    if(opt_get)
+    if (opt_get)
         *opt_get = get;
     return s;
 }
@@ -405,14 +406,14 @@ static Str_s str_eat_until_set(Str_s s, const char *set_until, Str_s *opt_get) {
     Str_s get = s;
     ssize_t pos = str_find_first_set(s, set_until);
     if (pos >= 0) {
-        s.data+=pos;
-        s.size-=pos;
-        get.size=pos;
+        s.data += pos;
+        s.size -= pos;
+        get.size = pos;
     } else {
-        s.data+=s.size;
+        s.data += s.size;
         s.size = 0;
     }
-    if(opt_get)
+    if (opt_get)
         *opt_get = get;
     return s;
 }
@@ -423,30 +424,30 @@ static Str_s str_eat_back_until_set(Str_s s, const char *set_until, Str_s *opt_g
     Str_s get = s;
     ssize_t pos = str_find_last_set(s, set_until);
     if (pos >= 0) {
-        s.size=pos;
-        get.data+=pos;
-        get.size-=pos;
+        s.size = pos;
+        get.data += pos;
+        get.size -= pos;
     } else {
         s.size = 0;
     }
-    if(opt_get)
+    if (opt_get)
         *opt_get = get;
     return s;
 }
 
 // returns the number of char search, found in str
 static size_t str_count(Str_s s, char search) {
-    if(str_empty(s))
+    if (str_empty(s))
         return 0;
     size_t cnt = 0;
-    if(search==' ') {
-        for(size_t i=0; i<s.size; i++) {
-            if(isspace(s.data[i]))
+    if (search == ' ') {
+        for (size_t i = 0; i < s.size; i++) {
+            if (isspace(s.data[i]))
                 cnt++;
         }
     } else {
-        for(size_t i=0; i<s.size; i++) {
-            if(s.data[i] == search)
+        for (size_t i = 0; i < s.size; i++) {
+            if (s.data[i] == search)
                 cnt++;
         }
     }
@@ -455,11 +456,11 @@ static size_t str_count(Str_s s, char search) {
 
 // returns the number of str search, found in s
 static size_t str_count_str(Str_s s, Str_s search) {
-    if(s.size < search.size)
+    if (s.size < search.size)
         return 0;
     size_t cnt = 0;
-    for(size_t i=0; i<s.size-search.size; i++) {
-        if(str_equals(search, (Str_s) {s.data+i, search.size}))
+    for (size_t i = 0; i < s.size - search.size; i++) {
+        if (str_equals(search, (Str_s) {s.data + i, search.size}))
             cnt++;
     }
     return cnt;
@@ -468,7 +469,7 @@ static size_t str_count_str(Str_s s, Str_s search) {
 // returns the number of a char in set_search, found in s
 static size_t str_count_set(Str_s s, const char *set_search) {
     size_t cnt = 0;
-    while(*set_search) {
+    while (*set_search) {
         cnt += str_count(s, *set_search++);
     }
     return cnt;
@@ -476,16 +477,16 @@ static size_t str_count_set(Str_s s, const char *set_search) {
 
 // replaces each char old with replacement in the str s
 static void str_replace(Str_s s, char old, char replacement) {
-    if(str_empty(s))
+    if (str_empty(s))
         return;
-    if(old==' ') {
-        for(size_t i=0; i<s.size; i++) {
-            if(isspace(s.data[i]))
+    if (old == ' ') {
+        for (size_t i = 0; i < s.size; i++) {
+            if (isspace(s.data[i]))
                 s.data[i] = replacement;
         }
     } else {
-        for(size_t i=0; i<s.size; i++) {
-            if(s.data[i] == old)
+        for (size_t i = 0; i < s.size; i++) {
+            if (s.data[i] == old)
                 s.data[i] = replacement;
         }
     }
@@ -496,18 +497,18 @@ static void str_replace(Str_s s, char old, char replacement) {
 // returns the buffer with its new size
 // have a look at string.h::string_new_replace_a for an allocated version
 static Str_s str_replace_str_into(Str_s buffer, Str_s s, Str_s old, Str_s replacement) {
-    if(str_empty(buffer) || str_empty(s) || str_empty(old) || !str_valid(replacement))
+    if (str_empty(buffer) || str_empty(s) || str_empty(old) || !str_valid(replacement))
         return (Str_s) {buffer.data, 0};
 
     size_t b = 0;
-    for(size_t i=0; i<s.size; i++) {
-        if(s.size-i>=old.size && str_equals(old, (Str_s) {s.data+i, old.size})) {
-            size_t cpy_size = buffer.size-b>=replacement.size? replacement.size : buffer.size-b;
-            str_cpy((Str_s) {buffer.data+b, cpy_size}, (Str_s) {replacement.data, cpy_size});
+    for (size_t i = 0; i < s.size; i++) {
+        if (s.size - i >= old.size && str_equals(old, (Str_s) {s.data + i, old.size})) {
+            size_t cpy_size = buffer.size - b >= replacement.size ? replacement.size : buffer.size - b;
+            str_cpy((Str_s) {buffer.data + b, cpy_size}, (Str_s) {replacement.data, cpy_size});
             b += cpy_size;
         } else {
-            if(b<buffer.size) {
-                buffer.data[b] =s.data[i];
+            if (b < buffer.size) {
+                buffer.data[b] = s.data[i];
             }
             b++;
         }
@@ -517,8 +518,8 @@ static Str_s str_replace_str_into(Str_s buffer, Str_s s, Str_s old, Str_s replac
 
 // runs tolower on each char in s and returns s
 static Str_s str_tolower(Str_s s) {
-    if(str_empty(s)) return s;
-    for(size_t i=0; i<s.size; i++) {
+    if (str_empty(s)) return s;
+    for (size_t i = 0; i < s.size; i++) {
         s.data[i] = (char) tolower(s.data[i]);
     }
     return s;
@@ -526,8 +527,8 @@ static Str_s str_tolower(Str_s s) {
 
 // runs toupper on each char in s and returns s
 static Str_s str_toupper(Str_s s) {
-    if(str_empty(s)) return s;
-    for(size_t i=0; i<s.size; i++) {
+    if (str_empty(s)) return s;
+    for (size_t i = 0; i < s.size; i++) {
         s.data[i] = (char) toupper(s.data[i]);
     }
     return s;

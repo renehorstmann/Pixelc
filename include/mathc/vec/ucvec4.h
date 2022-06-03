@@ -71,6 +71,13 @@ static ucvec4 ucvec4_set(unsigned char s) {
 }
 
 
+/** dst = v0, v1, ... */
+static ucvec4 ucvec4_new(unsigned char v0, unsigned char v1, unsigned char v2, unsigned char v3
+) {
+    return (ucvec4) {v0, v1, v2, v3
+    };
+}
+
 /** dst = unit_x */
 static ucvec4 ucvec4_unit_x() {
     ucvec4 res;
@@ -101,8 +108,6 @@ static ucvec4 ucvec4_unit_w() {
     ucvecN_unit_w(res.v, 4);
     return res;
 }
-
-
 
 
 /** dst = a + b */
@@ -169,24 +174,6 @@ static ucvec4 ucvec4_div(ucvec4 a, unsigned char b) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /** dst = pow(x, y) */
 static ucvec4 ucvec4_pow(ucvec4 x, unsigned char y) {
     ucvec4 res;
@@ -241,18 +228,6 @@ static ucvec4 ucvec4_sqrt(ucvec4 x) {
     ucvecN_sqrt(res.v, x.v, 4);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -362,10 +337,6 @@ static ucvec4 ucvec4_step_vec(ucvec4 x, ucvec4 edge) {
 }
 
 
-
-
-
-
 /** returns v[0] + v[1] + ... + v[n-1] */
 static unsigned char ucvec4_sum(ucvec4 v) {
     return ucvecN_sum(v.v, 4);
@@ -392,16 +363,6 @@ static unsigned char ucvec4_norm(ucvec4 v) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 /** returns length of a vector, see ucvecN_norm. Just here to match glsl */
 static unsigned char ucvec4_length(ucvec4 v) {
     return ucvecN_length(v.v, 4);
@@ -418,12 +379,6 @@ static unsigned char ucvec4_distance(ucvec4 a, ucvec4 b) {
 static unsigned char ucvec4_sqr_distance(ucvec4 a, ucvec4 b) {
     return ucvecN_sqr_distance(a.v, b.v, 4);
 }
-
-
-
-
-
-
 
 
 /** dst = a < b */
@@ -520,21 +475,6 @@ static bvec4 ucvec4_not_equal_vec(ucvec4 a, ucvec4 b) {
     ucvecN_not_equal_vec(res.v, a.v, b.v, 4);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif //MATHC_VEC_UCVEC4_H

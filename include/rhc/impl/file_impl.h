@@ -3,6 +3,7 @@
 #ifdef RHC_IMPL
 
 #include <stdio.h>
+#include "../assume.h"
 #include "../error.h"
 #include "../str.h"
 #include "../string.h"
@@ -29,7 +30,7 @@ static size_t file_stream_read(Stream_i stream, void *msg, size_t size) {
 
     size_t n = SDL_RWread(impl->file,msg, 1, size);
     if(n <= 0) {
-        log_error("rhc_file_read failed, killing file...");
+        log_error("failed, killing file...");
         SDL_RWclose(impl->file);
         impl->file = NULL;
         return 0;
@@ -47,7 +48,7 @@ static size_t file_stream_write(Stream_i stream, void *msg, size_t size) {
 
     size_t n = SDL_RWwrite(impl->file, msg, 1, size);
     if(n <= 0) {
-        log_error("rhc_file_write failed, killing file...");
+        log_error("failed, killing file...");
         SDL_RWclose(impl->file);
         impl->file = NULL;
         return 0;
@@ -71,7 +72,7 @@ RhcFile *rhc_file_open_read_a(const char *file, bool ascii, Allocator_i a) {
     impl->file = SDL_RWFromFile(file, ascii ? "r" : "rb");
     if (!impl->file) {
         rhc_error = "rhc_file_open_read_a failed";
-        log_warn("rhc_file_open_read_a failed: %s", file);
+        log_warn("failed: %s", file);
         allocator_free(a, self);
         return NULL;
     }
@@ -85,7 +86,7 @@ RhcFile *rhc_file_open_write_a(const char *file, bool ascii, Allocator_i a) {
     impl->file = SDL_RWFromFile(file, ascii ? "w" : "wb");
     if (!impl->file) {
         rhc_error = "rhc_file_open_write_a failed";
-        log_warn("rhc_file_open_write_a failed: %s", file);
+        log_warn("failed: %s", file);
         allocator_free(a, self);
         return NULL;
     }
@@ -99,7 +100,7 @@ RhcFile *rhc_file_open_append_a(const char *file, bool ascii, Allocator_i a) {
     impl->file = SDL_RWFromFile(file, ascii ? "a" : "ab");
     if (!impl->file) {
         rhc_error = "rhc_file_open_append_a failed";
-        log_warn("rhc_file_open_append_a failed: %s", file);
+        log_warn("failed: %s", file);
         allocator_free(a, self);
         return NULL;
     }
@@ -118,21 +119,21 @@ void rhc_file_kill(RhcFile **self_ptr) {
 String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
     if(!allocator_valid(a)) {
         rhc_error = "file read failed, a invalid";
-        log_error("rhc_file_read_a failed, a invalid: %s", file);
+        log_error("failed, a invalid: %s", file);
         return string_new_invalid_a(a);
     }
 
     SDL_RWops *f = SDL_RWFromFile(file, ascii ? "r" : "rb");
     if (!f) {
         rhc_error = "file read failed";
-        log_warn("rhc_file_read_a failed: %s", file);
+        log_warn("failed: %s", file);
         return string_new_invalid_a(a);
     }
 
     Sint64 rwsize = SDL_RWsize(f);
     if(rwsize <=0) {
         rhc_error = "file read failed";
-        log_warn("rhc_file_read_a failed: %s (unknown size)", file);
+        log_warn("failed: %s (unknown size)", file);
         SDL_RWclose(f);
         return string_new_invalid_a(a);
     }
@@ -150,7 +151,7 @@ String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
         }
         //  CRLF will be converted to LF on windows in ascii and will be a byte smaller
         if (!ascii && res.size != length) {
-            log_error("rhc_file_read_a failed: %s %d/%d bytes read", file, res.size, length);
+            log_error("failed: %s %d/%d bytes read", file, res.size, length);
             string_kill(&res);
         } else {
             res.data[length] = '\0';  // should have been set in String, just to be sure
@@ -163,14 +164,14 @@ String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
 bool rhc_file_write(const char *file, Str_s content, bool ascii) {
     if(!str_valid(content)) {
         rhc_error = "file write failed, content invalid";
-        log_error("rhc_file_write failed, content invalid: %s", file);
+        log_error("failed, content invalid: %s", file);
         return false;
     }
 
     SDL_RWops *f = SDL_RWFromFile(file, ascii ? "w" : "wb");
     if (!f) {
         rhc_error = "file write failed";
-        log_warn("rhc_file_write failed: %s", file);
+        log_warn("failed: %s", file);
         return false;
     }
 
@@ -185,7 +186,7 @@ bool rhc_file_write(const char *file, Str_s content, bool ascii) {
     SDL_RWclose(f);
 
     if (chars_written != content.size) {
-        log_error("rhc_file_write failed: %s %d/%d bytes written", file, chars_written, content.size);
+        log_error("failed: %s %d/%d bytes written", file, chars_written, content.size);
         return false;
     }
     return true;
@@ -194,14 +195,14 @@ bool rhc_file_write(const char *file, Str_s content, bool ascii) {
 bool rhc_file_append(const char *file, Str_s content, bool ascii) {
     if(!str_valid(content)) {
         rhc_error = "file append failed, content invalid";
-        log_error("rhc_file_append failed, content invalid: %s", file);
+        log_error("failed, content invalid: %s", file);
         return false;
     }
 
     SDL_RWops *f = SDL_RWFromFile(file, ascii ? "a" : "ab");
     if (!f) {
         rhc_error = "file append failed";
-        log_warn("rhc_file_append failed: %s", file);
+        log_warn("failed: %s", file);
         return false;
     }
 
@@ -216,7 +217,7 @@ bool rhc_file_append(const char *file, Str_s content, bool ascii) {
     SDL_RWclose(f);
 
     if (chars_written != content.size) {
-        log_error("rhc_file_append failed: %s %d/%d bytes written", file, chars_written, content.size);
+        log_error("failed: %s %d/%d bytes written", file, chars_written, content.size);
         return false;
     }
     return true;
@@ -229,18 +230,18 @@ bool rhc_file_append(const char *file, Str_s content, bool ascii) {
 typedef struct {
     FILE *file;
 } UnixFile;
-_Static_assert(sizeof (UnixFile) <= RHC_FILE_STORAGE_SIZE, "storage not big enough");
+_Static_assert(sizeof(UnixFile) <= RHC_FILE_STORAGE_SIZE, "storage not big enough");
 
 static size_t file_stream_read(Stream_i stream, void *msg, size_t size) {
     RhcFile *self = stream.user_data;
-    if(!rhc_file_valid(self))
+    if (!rhc_file_valid(self))
         return 0;
 
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    UnixFile *impl = (UnixFile *) self->impl_storage;
 
     size_t n = fread(msg, 1, size, impl->file);
-    if(n <= 0) {
-        log_error("rhc_file_read failed, killing file...");
+    if (n <= 0) {
+        log_error("failed, killing file...");
         fclose(impl->file);
         impl->file = NULL;
         return 0;
@@ -251,14 +252,14 @@ static size_t file_stream_read(Stream_i stream, void *msg, size_t size) {
 
 static size_t file_stream_write(Stream_i stream, const void *msg, size_t size) {
     RhcFile *self = stream.user_data;
-    if(!rhc_file_valid(self))
+    if (!rhc_file_valid(self))
         return 0;
 
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    UnixFile *impl = (UnixFile *) self->impl_storage;
 
     size_t n = fwrite(msg, 1, size, impl->file);
-    if(n <= 0) {
-        log_error("rhc_file_write failed, killing file...");
+    if (n <= 0) {
+        log_error("failed, killing file...");
         fclose(impl->file);
         impl->file = NULL;
         return 0;
@@ -268,49 +269,51 @@ static size_t file_stream_write(Stream_i stream, const void *msg, size_t size) {
 }
 
 bool rhc_file_valid(const RhcFile *self) {
-    if(!self)
+    if (!self)
         return false;
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    UnixFile *impl = (UnixFile *) self->impl_storage;
     return impl->file;
 }
 
 RhcFile *rhc_file_open_read_a(const char *file, bool ascii, Allocator_i a) {
-    RhcFile *self =allocator_calloc(a, sizeof *self);
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    RhcFile *self = allocator_calloc(a, sizeof *self);
+    UnixFile *impl = (UnixFile *) self->impl_storage;
     self->stream = (Stream_i) {self, file_stream_read, NULL};
     self->a = a;
     impl->file = fopen(file, ascii ? "r" : "rb");
     if (!impl->file) {
         rhc_error = "rhc_file_open_read_a failed";
-        log_warn("rhc_file_open_read_a failed: %s", file);
+        log_warn("failed: %s", file);
         allocator_free(a, self);
         return NULL;
     }
     return self;
 }
+
 RhcFile *rhc_file_open_write_a(const char *file, bool ascii, Allocator_i a) {
     RhcFile *self = allocator_calloc(a, sizeof *self);
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    UnixFile *impl = (UnixFile *) self->impl_storage;
     self->stream = (Stream_i) {self, NULL, file_stream_write};
     self->a = a;
     impl->file = fopen(file, ascii ? "w" : "wb");
     if (!impl->file) {
         rhc_error = "rhc_file_open_write_a failed";
-        log_warn("rhc_file_open_write_a failed: %s", file);
+        log_warn("failed: %s", file);
         allocator_free(a, self);
         return NULL;
     }
     return self;
 }
+
 RhcFile *rhc_file_open_append_a(const char *file, bool ascii, Allocator_i a) {
     RhcFile *self = allocator_calloc(a, sizeof *self);
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    UnixFile *impl = (UnixFile *) self->impl_storage;
     self->stream = (Stream_i) {self, NULL, file_stream_write};
     self->a = a;
     impl->file = fopen(file, ascii ? "a" : "ab");
     if (!impl->file) {
         rhc_error = "rhc_file_open_append_a failed";
-        log_warn("rhc_file_open_append_a failed: %s", file);
+        log_warn("failed: %s", file);
         allocator_free(a, self);
         return NULL;
     }
@@ -319,25 +322,25 @@ RhcFile *rhc_file_open_append_a(const char *file, bool ascii, Allocator_i a) {
 
 void rhc_file_kill(RhcFile **self_ptr) {
     RhcFile *self = *self_ptr;
-    if(!self)
+    if (!self)
         return;
-    UnixFile *impl = (UnixFile*) self->impl_storage;
+    UnixFile *impl = (UnixFile *) self->impl_storage;
     fclose(impl->file);
     allocator_free(self->a, self);
     *self_ptr = NULL;
 }
 
 String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
-    if(!allocator_valid(a)) {
+    if (!allocator_valid(a)) {
         rhc_error = "file read failed, a invalid";
-        log_error("rhc_file_read_a failed, a invalid: %s", file);
+        log_error("failed, a invalid: %s", file);
         return string_new_invalid_a(a);
     }
 
     FILE *f = fopen(file, ascii ? "r" : "rb");
     if (!f) {
         rhc_error = "file read failed";
-        log_warn("rhc_file_read_a failed: %s", file);
+        log_warn("failed: %s", file);
         return string_new_invalid_a(a);
     }
 
@@ -349,14 +352,14 @@ String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
     if (string_valid(res)) {
         size_t buf_appended = 1;
         char *buf = res.data;
-        while(res.size < length && buf_appended != 0) {
+        while (res.size < length && buf_appended != 0) {
             buf_appended = fread(buf, 1, (length - res.size), f);
             res.size += buf_appended;
             buf += buf_appended;
         }
         //  CRLF will be converted to LF on windows in ascii and will be a byte smaller
         if (!ascii && res.size != length) {
-            log_error("rhc_file_read_a failed: %s %d/%d bytes read", file, res.size, length);
+            log_error("failed: %s %d/%d bytes read", file, res.size, length);
             string_kill(&res);
         } else {
             res.data[length] = '\0';  // should have been set in String, just to be sure
@@ -367,22 +370,22 @@ String rhc_file_read_a(const char *file, bool ascii, Allocator_i a) {
 }
 
 bool rhc_file_write(const char *file, Str_s content, bool ascii) {
-    if(!str_valid(content)) {
+    if (!str_valid(content)) {
         rhc_error = "file write failed, content invalid";
-        log_error("rhc_file_write failed, content invalid: %s", file);
+        log_error("failed, content invalid: %s", file);
         return false;
     }
 
     FILE *f = fopen(file, ascii ? "w" : "wb");
     if (!f) {
         rhc_error = "file write failed";
-        log_warn("rhc_file_write failed: %s", file);
+        log_warn("failed: %s", file);
         return false;
     }
 
     size_t chars_written = 0, buf_appended = 1;
     char *buf = content.data;
-    while(chars_written < content.size && buf_appended != 0) {
+    while (chars_written < content.size && buf_appended != 0) {
         buf_appended = fwrite(buf, 1, content.size - chars_written, f);
         chars_written += buf_appended;
         buf += buf_appended;
@@ -391,29 +394,29 @@ bool rhc_file_write(const char *file, Str_s content, bool ascii) {
     fclose(f);
 
     if (chars_written != content.size) {
-        log_error("rhc_file_write failed: %s %d/%d bytes written", file, chars_written, content.size);
+        log_error("failed: %s %d/%d bytes written", file, chars_written, content.size);
         return false;
     }
     return true;
 }
 
 bool rhc_file_append(const char *file, Str_s content, bool ascii) {
-    if(!str_valid(content)) {
+    if (!str_valid(content)) {
         rhc_error = "file append failed, content invalid";
-        log_error("rhc_file_append failed, content invalid: %s", file);
+        log_error("failed, content invalid: %s", file);
         return false;
     }
 
     FILE *f = fopen(file, ascii ? "a" : "ab");
     if (!f) {
         rhc_error = "file append failed";
-        log_warn("rhc_file_append failed: %s", file);
+        log_warn("failed: %s", file);
         return false;
     }
 
     size_t chars_written = 0, buf_appended = 1;
     char *buf = content.data;
-    while(chars_written < content.size && buf_appended != 0) {
+    while (chars_written < content.size && buf_appended != 0) {
         buf_appended = fwrite(buf, 1, content.size - chars_written, f);
         chars_written += buf_appended;
         buf += buf_appended;
@@ -422,13 +425,13 @@ bool rhc_file_append(const char *file, Str_s content, bool ascii) {
     fclose(f);
 
     if (chars_written != content.size) {
-        log_error("rhc_file_append failed: %s %d/%d bytes written", file, chars_written, content.size);
+        log_error("failed: %s %d/%d bytes written", file, chars_written, content.size);
         return false;
     }
     return true;
 }
-#endif
 
+#endif
 
 
 #endif //RHC_IMPL

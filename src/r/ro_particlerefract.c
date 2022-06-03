@@ -1,28 +1,43 @@
-#include <float.h> // FLT_MAX
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
-#include "rhc/error.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/rect.h"
 #include "r/texture.h"
 #include "r/ro_particlerefract.h"
 
-//
-// protected
-//
-
-extern rRender *r_render_singleton_;
-
 
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
+// update needs to be called each time before rendering to update the time values
+static void update_sub(const RoParticleRefract *self, uint32_t time_ms, int num) {
+    r_render_error_check("ro_particlerefract_updateBEGIN");
+    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
+
+    for (int i = 0; i < num; i++) {
+        rParticleRect_s *r = &self->rects[i];
+        r->delta_time = (time_ms - r->start_time_ms) / 1000.0f;
+    }
+
+    glBufferSubData(GL_ARRAY_BUFFER,
+                    0,
+                    num * sizeof(rParticleRect_s),
+                    self->rects);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    r_render_error_check("ro_particlerefract_update");
+}
+
+//
+// public
+//
+
 
 RoParticleRefract ro_particlerefract_new(int num,
-        rTexture tex_main_sink, rTexture tex_refraction_sink) {
+                                         rTexture tex_main_sink, rTexture tex_refraction_sink) {
     r_render_error_check("ro_particlerefract_newBEGIN");
     RoParticleRefract self;
-    
+
     assume(num > 0, "particle needs atleast 1 particlerect");
     self.rects = rhc_malloc(sizeof *self.rects * num);
     for (int i = 0; i < num; i++) {
@@ -30,7 +45,7 @@ RoParticleRefract ro_particlerefract_new(int num,
     }
 
     self.num = num;
-    
+
     self.L.program = r_program_new_file("res/r/particlerefract.glsl");
     const int loc_pose = 0;
     const int loc_uv = 4;
@@ -42,14 +57,14 @@ RoParticleRefract ro_particlerefract_new(int num,
     const int loc_axis_angle = 12;
     const int loc_color_speed = 13;
 
-    const int loc_start_time = 14;
+    const int loc_delta_time = 14;
 
     self.tex_main = tex_main_sink;
     self.tex_refraction = tex_refraction_sink;
     self.owns_tex_main = true;
     self.owns_tex_refraction = true;
 
-    
+
     // vao scope
     {
         glGenVertexArrays(1, &self.L.vao);
@@ -129,11 +144,11 @@ RoParticleRefract ro_particlerefract_new(int num,
             glVertexAttribDivisor(loc_color_speed, 1);
 
             // start_time
-            glEnableVertexAttribArray(loc_start_time);
-            glVertexAttribPointer(loc_start_time, 1, GL_FLOAT, GL_FALSE,
+            glEnableVertexAttribArray(loc_delta_time);
+            glVertexAttribPointer(loc_delta_time, 1, GL_FLOAT, GL_FALSE,
                                   sizeof(rParticleRect_s),
-                                  (void *) offsetof(rParticleRect_s, start_time));
-            glVertexAttribDivisor(loc_start_time, 1);
+                                  (void *) offsetof(rParticleRect_s, delta_time));
+            glVertexAttribDivisor(loc_delta_time, 1);
 
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -159,51 +174,21 @@ void ro_particlerefract_kill(RoParticleRefract *self) {
     *self = (RoParticleRefract) {0};
 }
 
-void ro_particlerefract_update_sub(const RoParticleRefract *self, int offset, int size) {
-    r_render_error_check("ro_particlerefract_updateBEGIN");
-    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
+void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_ms, int num, const mat4 *camera_mat,
+                                   float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+    num = isca_clamp(num, 1, self->num);
 
-    offset = isca_clamp(offset, 0, self->num - 1);
-    size = isca_clamp(size, 1, self->num);
+    update_sub(self, time_ms, num);
 
-    if (offset + size > self->num) {
-        int to_end = self->num - offset;
-        int from_start = size - to_end;
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        offset * sizeof(rParticleRect_s),
-                        to_end * sizeof(rParticleRect_s),
-                        self->rects + offset);
-
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        0,
-                        from_start * sizeof(rParticleRect_s),
-                        self->rects);
-    } else {
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        offset * sizeof(rParticleRect_s),
-                        size * sizeof(rParticleRect_s),
-                        self->rects + offset);
-
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    r_render_error_check("ro_particlerefract_update");
-}
-
-void ro_particlerefract_render_sub(const RoParticleRefract *self, float time, int num, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
-        bool update_sub) {
-    if(update_sub)
-        ro_particlerefract_update_sub(self, 0, num);
     r_render_error_check("ro_particlerefract_renderBEGIN");
-    
-    if(!opt_view_aabb)
+
+    if (!opt_view_aabb)
         opt_view_aabb = &VIEW_AABB_FULLSCREEN;
-    if(!opt_framebuffer) {
-        opt_framebuffer = r_render_get_framebuffer_tex(r_render_singleton_);
+    if (!opt_framebuffer) {
+        opt_framebuffer = &r_render.framebuffer_tex;
 
     }
-    
+
     glUseProgram(self->L.program);
 
     // base
@@ -212,8 +197,6 @@ void ro_particlerefract_render_sub(const RoParticleRefract *self, float time, in
 
     vec2 sprites = vec2_cast_from_int(&self->tex_main.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
-
-    glUniform1f(glGetUniformLocation(self->L.program, "time"), time);
 
     // fragment shader
     glUniform1f(glGetUniformLocation(self->L.program, "scale"), scale);

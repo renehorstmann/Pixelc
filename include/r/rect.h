@@ -5,9 +5,46 @@
 // rect pod structs, used by some renderobjects (ro)
 //
 
-#include "types.h"
+#include "core.h"
 
-              
+// Basic rect for rendering
+typedef struct {
+    mat4 pose;      // 3d pose for the rect position (see u/pose.h)
+    mat4 uv;        // 3d pose for the uv texture map (see u/pose.h)
+    vec4 color;     // additional color (texture_color * color)
+    vec2 sprite;    // position of the sprite in the grid
+} rRect_s;
+
+
+// Rect with additional values for a particle system
+typedef struct {
+    union {
+        rRect_s rect;
+        struct {
+            mat4 pose;
+            mat4 uv;
+            vec4 color;
+            vec2 sprite;
+        };
+    };
+    vec2 sprite_speed;  // sprite += sprite_speed * dt
+    vec4 speed;         // position += speed * dt
+    vec4 acc;           // position += acc * dt * dt
+    vec4 axis_angle;    // orientation += axis_angle * dt   (nx, ny, nz, rad)
+    vec4 color_speed;   // color += color_speed * dt
+    float delta_time;   // delta_time computed in the render function
+
+    // not used in the shader:
+    uint32_t start_time_ms;   // delta_time = (current_time - start_time)/1000.0f
+} rParticleRect_s;
+
+
+// checks padding
+_Static_assert(offsetof(rParticleRect_s, sprite_speed)
+               - offsetof(rParticleRect_s, sprite)
+               == 2 * sizeof(float),
+               "sprite_speed must not be padded");
+
 
 // creates a new rect with:
 // pose = uv = eye

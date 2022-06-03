@@ -9,11 +9,11 @@
 RoSingle ro_single_new(rTexture tex_sink) {
     r_render_error_check("ro_single_newBEGIN");
     RoSingle self;
-    
+
     self.rect = r_rect_new();
 
     self.L.program = r_program_new_file("res/r/single.glsl");
-    
+
     self.tex = tex_sink;
     self.owns_tex = true;
 
@@ -42,12 +42,12 @@ void ro_single_render(const RoSingle *self, const mat4 *camera_mat) {
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "uv"), 1, GL_FALSE, &self->rect.uv.m00);
 
     glUniform4fv(glGetUniformLocation(self->L.program, "color"), 1, &self->rect.color.v0);
-    
+
     glUniform2fv(glGetUniformLocation(self->L.program, "sprite"), 1, &self->rect.sprite.v0);
 
     // base
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"), 1, GL_FALSE, &camera_mat->m00);
-    
+
     vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 

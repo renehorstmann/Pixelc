@@ -71,6 +71,13 @@ static ivec3 ivec3_set(int s) {
 }
 
 
+/** dst = v0, v1, ... */
+static ivec3 ivec3_new(int v0, int v1, int v2
+) {
+    return (ivec3) {v0, v1, v2
+    };
+}
+
 /** dst = unit_x */
 static ivec3 ivec3_unit_x() {
     ivec3 res;
@@ -93,8 +100,6 @@ static ivec3 ivec3_unit_z() {
     ivecN_unit_z(res.v, 3);
     return res;
 }
-
-
 
 
 /** dst = -v */
@@ -169,24 +174,6 @@ static ivec3 ivec3_div(ivec3 a, int b) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /** dst = pow(x, y) */
 static ivec3 ivec3_pow(ivec3 x, int y) {
     ivec3 res;
@@ -243,8 +230,6 @@ static ivec3 ivec3_sqrt(ivec3 x) {
 }
 
 
-
-
 /** dst = abs(x) */
 static ivec3 ivec3_abs(ivec3 x) {
     ivec3 res;
@@ -259,12 +244,6 @@ static ivec3 ivec3_sign(ivec3 x) {
     ivecN_sign(res.v, x.v, 3);
     return res;
 }
-
-
-
-
-
-
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -374,10 +353,6 @@ static ivec3 ivec3_step_vec(ivec3 x, ivec3 edge) {
 }
 
 
-
-
-
-
 /** returns v[0] + v[1] + ... + v[n-1] */
 static int ivec3_sum(ivec3 v) {
     return ivecN_sum(v.v, 3);
@@ -422,10 +397,6 @@ static int ivec3_norm_inf(ivec3 v) {
 }
 
 
-
-
-
-
 /** returns length of a vector, see ivecN_norm. Just here to match glsl */
 static int ivec3_length(ivec3 v) {
     return ivecN_length(v.v, 3);
@@ -442,12 +413,6 @@ static int ivec3_distance(ivec3 a, ivec3 b) {
 static int ivec3_sqr_distance(ivec3 a, ivec3 b) {
     return ivecN_sqr_distance(a.v, b.v, 3);
 }
-
-
-
-
-
-
 
 
 /** dst = a < b */
@@ -544,21 +509,6 @@ static bvec3 ivec3_not_equal_vec(ivec3 a, ivec3 b) {
     ivecN_not_equal_vec(res.v, a.v, b.v, 3);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif //MATHC_VEC_IVEC3_H

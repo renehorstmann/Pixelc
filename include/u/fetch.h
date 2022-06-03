@@ -7,7 +7,7 @@
 // uses libcurl or the emscripten fetch api
 //
 
-#include "rhc/alloc.h"
+#include "rhc/rhc.h"
 
 typedef struct uFetch uFetch;
 

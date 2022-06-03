@@ -1,7 +1,4 @@
-#include "rhc/log.h"
-#include "rhc/str.h"
-#include "rhc/string.h"
-#include "rhc/file.h"
+#include "rhc/rhc_full.h"
 #include "e/io.h"
 
 
@@ -11,8 +8,8 @@ const char *e_window_get_title();
 static bool savestate_filename_valid(const char *filename) {
     Str_s name = strc(filename);
     bool valid = str_count(name, '/') == 0 && name.size < E_IO_SAVESTATE_MAX_FILENAME_LENGTH;
-    if(!valid)
-        log_error("e_io_savestate failed: filename not valid: %s", filename);
+    if (!valid)
+        log_error("failed: filename not valid: %s", filename);
     return valid;
 }
 
@@ -196,7 +193,7 @@ void e_io_savestate_save() {
 
 struct eIoSavestateString e_io_savestate_file_path(const char *filename) {
     struct eIoSavestateString name;
-    if(!savestate_filename_valid(filename)) {
+    if (!savestate_filename_valid(filename)) {
         memset(&name, 0, sizeof name);
         return name;
     }
@@ -205,16 +202,16 @@ struct eIoSavestateString e_io_savestate_file_path(const char *filename) {
 }
 
 String e_io_savestate_read(const char *filename, bool ascii) {
-    if(!savestate_filename_valid(filename))
+    if (!savestate_filename_valid(filename))
         return string_new_invalid();
     return file_read(
-            e_io_savestate_file_path(filename).s, 
+            e_io_savestate_file_path(filename).s,
             ascii);
 }
 
 
 bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
-    if(!savestate_filename_valid(filename))
+    if (!savestate_filename_valid(filename))
         return false;
     return file_write(
             e_io_savestate_file_path(filename).s,
@@ -223,7 +220,7 @@ bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
 
 
 bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
-    if(!savestate_filename_valid(filename))
+    if (!savestate_filename_valid(filename))
         return false;
     return file_append(
             e_io_savestate_file_path(filename).s,

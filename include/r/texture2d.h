@@ -5,15 +5,18 @@
 // load and setup textures as simple 2D textures
 //
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "core.h"
 #include "mathc/types/int.h"
-#include "types.h"
+
+// Simple Texture, without a sprite grid
+typedef struct {
+    GLuint tex;    // GL_TEXTURE_2D
+    ivec2 size;
+} rTexture2D;
 
 static bool r_texture2d_valid(rTexture2D self) {
     return self.tex > 0
-            && self.size.x > 0 && self.size.y > 0;
+           && self.size.x > 0 && self.size.y > 0;
 }
 
 static rTexture2D r_texture2d_new_invalid() {

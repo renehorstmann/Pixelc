@@ -1,16 +1,14 @@
 // INFO: this module uses not only e/ but also parts of r/ !
 
-#include "rhc/log.h"
-#include "rhc/error.h"
-#include "rhc/alloc.h"
-
 #include "e/simple.h"
+#include "rhc/rhc_full.h"
 #include "mathc/sca/float.h"
 
 #define OUT_SMOOTH_ALPHA 0.025
 
+struct eSimple_Globals e_simple;
+
 static struct {
-    eSimple super;
     e_simple_init_fn init_fn;
     float seconds_per_update;
     float update_time;
@@ -18,13 +16,13 @@ static struct {
 } L;
 
 
-static void init_loop(float delta_time);
+static void init_loop(void *user_data);
 
-static void main_loop(float delta_time);
+static void main_loop(void *user_data);
 
 // float out. fps, load*
 static float smooth_out_value(float old_value, float new_value) {
-    if(isnan(new_value) || isinf(new_value))
+    if (isnan(new_value) || isinf(new_value))
         return old_value;
     return sca_mix(old_value, new_value, OUT_SMOOTH_ALPHA);
 }
@@ -39,96 +37,86 @@ void e_simple_start(const char *title, const char *author, float startup_block_t
     rhc_log_set_min_level(RHC_LOG_TRACE);
 #endif
 
-    log_info(title);
-    log_info("e_simple_start");
+    log_info("starting: %s", title);
 
-    assume(!L.started, "e_simple is a singleton and should be started just once in thr main function");
+    assume(!L.started, "should be started just once in the main function");
     L.started = true;
 
     if (updates_per_seconds > 0)
         L.seconds_per_update = 1.0f / updates_per_seconds;
 
     L.init_fn = init_fn;
-    L.super.update_fn = update_fn;
-    L.super.render_fn = render_fn;
+    e_simple.update_fn = update_fn;
+    e_simple.render_fn = render_fn;
 
     // init e (environment)
-    L.super.window = e_window_new(title);
-    L.super.input = e_input_new(L.super.window);
-    L.super.gui = e_gui_new(L.super.window);
-
-    ivec2 window_size = e_window_get_size(L.super.window);
+    e_window_init(title);
+    e_input_init();
+    e_gui_init();
 
     // init r (render)
-    L.super.render = r_render_new(e_window_get_sdl_window(L.super.window));
+    r_render_init(e_window.sdl_window);
 
     // the startup screen acts as loading screen and also checks for render errors
-    r_render_show_startup(L.super.render,
-                          startup_block_time,
+    r_render_show_startup(startup_block_time,
                           author);
 
     // start the main loop, blocking call
-    e_window_main_loop(L.super.window, init_loop);
+    e_window_main_loop(init_loop, NULL);
 
 
     // clean up
-    r_render_kill(&L.super.render);
-    e_gui_kill(&L.super.gui);
-    e_input_kill(&L.super.input);
-    e_window_kill(&L.super.window);
+    r_render_kill();
+    e_gui_kill();
+    e_input_kill();
+    e_window_kill();
 }
 
-static void init_loop(float delta_time) {
-    ivec2 window_size = e_window_get_size(L.super.window);
-    if (r_render_startup_update(L.super.render, window_size, delta_time)) {
-        log_info("e_simple_init");
-        e_window_set_vsync(L.super.window, true);
-        e_window_reset_main_loop(L.super.window, main_loop);
-        L.init_fn(&L.super, window_size);
+static void init_loop(void *user_data) {
+    if (r_render_startup_update(e_window.size, e_window.dtime)) {
+        log_info("init");
+        e_window_set_vsync(true);
+        e_window_reset_main_loop(main_loop, NULL);
+        L.init_fn();
     }
 }
 
-static void main_loop(float delta_time) {
-    float load_delta_time;
-    Uint32 load_start_time = SDL_GetTicks();
+static void main_loop(void *user_data) {
+    RhcTimer_s timer = rhc_timer_new();
 
-    L.super.out.fps = smooth_out_value(L.super.out.fps, 1/delta_time);
-
-    ivec2 window_size = e_window_get_size(L.super.window);
-
+    e_simple.fps = smooth_out_value(e_simple.fps, 1 / e_window.dtime);
 
     // e updates
-    e_input_update(L.super.input);
+    e_input_update();
 
     // if updates_per_second is disabled, use delta time
     if (L.seconds_per_update <= 0) {
-        L.super.update_fn(&L.super, window_size, delta_time);
+        e_simple.update_fn(e_window.dtime);
     } else {
-        L.update_time += delta_time;
+        L.update_time += e_window.dtime;
         while (L.update_time >= L.seconds_per_update) {
             L.update_time -= L.seconds_per_update;
-            L.super.update_fn(&L.super, window_size, L.seconds_per_update);
+            e_simple.update_fn(L.seconds_per_update);
         }
     }
 
-    Uint32 load_update_time = SDL_GetTicks();
-    load_delta_time = (load_update_time - load_start_time) / 1000.0f;
-    L.super.out.load_update = sca_min(1, smooth_out_value(L.super.out.load_update, load_delta_time / delta_time));
+    double load_time = rhc_timer_reset(timer);
 
     // render
-    r_render_begin_frame(L.super.render, window_size);
+    r_render_begin_frame(e_window.size);
 
-    L.super.render_fn(&L.super, window_size, delta_time);
+    e_simple.render_fn(e_window.dtime);
 
     // renders the debug gui windows
-    e_gui_render(L.super.gui);
+    e_gui_render();
 
     // swap buffers
-    r_render_end_frame(L.super.render);
+    r_render_end_frame();
 
-    Uint32 load_render_time = SDL_GetTicks();
-    load_delta_time = (load_render_time - load_update_time) / 1000.0f;
-    L.super.out.load_render = sca_min(1, smooth_out_value(L.super.out.load_render, load_delta_time / delta_time));
-    load_delta_time = (load_render_time - load_start_time) / 1000.0f;
-    L.super.out.load = sca_min(1, smooth_out_value(L.super.out.load, load_delta_time / delta_time));
+    double render_time = rhc_timer_elapsed(timer);
+    double full_time = load_time + render_time;
+
+    e_simple.load_update = sca_min(1, smooth_out_value(e_simple.load_update, load_time / e_window.dtime));
+    e_simple.load_render = sca_min(1, smooth_out_value(e_simple.load_render, render_time / e_window.dtime));
+    e_simple.load = sca_min(1, smooth_out_value(e_simple.load, full_time / e_window.dtime));
 }

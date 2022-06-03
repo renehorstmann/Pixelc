@@ -2,8 +2,6 @@
 #define PIXELC_SELECTIONCTRL_H
 
 #include "e/input.h"
-#include "r/ro_types.h"
-#include "canvas.h"
 #include "selection.h"
 
 enum selectionctrl_mode {
@@ -17,43 +15,30 @@ enum selectionctrl_mode {
 };
 
 
-typedef struct {
-    Canvas *canvas_ref;
-    
+struct SelectionCtrl_Globals {
     Selection *selection;
-    
+
     enum selectionctrl_mode mode;
-    
-    struct {
-        bool show_copy_cut;
-        bool show_ok;
-    } out;
-    
-    struct {
-        RoBatch border;
-        
-        bool moving;
-        ivec2 pos;
-        ivec2 move_start_selection_lt;
-        ivec2 move_start_position;
-    } L;
-} SelectionCtrl;
 
-SelectionCtrl *selectionctrl_new(Canvas *canvas);
+    bool show_copy_cut;
+    bool show_ok;
+};
+extern struct SelectionCtrl_Globals selectionctrl;
 
-void selectionctrl_kill(SelectionCtrl **self_ptr);
 
-void selectionctrl_update(SelectionCtrl *self, float dtime);
+void selectionctrl_init();
 
-void selectionctrl_render(const SelectionCtrl *self, const mat4 *cam_mat);
+void selectionctrl_update(float dtime);
 
-bool selectionctrl_pointer_event(SelectionCtrl *self, ePointer_s pointer);
+void selectionctrl_render(const mat4 *cam_mat);
 
-void selectionctrl_stop(SelectionCtrl *self);
+bool selectionctrl_pointer_event(ePointer_s pointer);
 
-void selectionctrl_acquire(SelectionCtrl *self);
+void selectionctrl_stop();
 
-void selectionctrl_paste_image(SelectionCtrl *self, uImage img);
+void selectionctrl_acquire();
+
+void selectionctrl_paste_image(uImage img);
 
 
 #endif //PIXELC_SELECTIONCTRL_H

@@ -28,10 +28,6 @@ static void dvecN_cast_from_uchar_1(double *dst, const unsigned char *v, int n) 
 }
 
 
-
-
-
-
 /** a == b */
 static bool dvecN_cmp(const double *a, const double *b, int n) {
     return memcmp(a, b, n * sizeof(double)) == 0;
@@ -63,14 +59,14 @@ static void dvecN_unit_y(double *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void dvecN_unit_z(double *dst, int n) {
-    assert(n>=3 && "mathc vec*_unit_z");
+    assert(n >= 3 && "mathc vec*_unit_z");
     dvecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void dvecN_unit_w(double *dst, int n) {
-    assert(n>=4 && "mathc vec*_unit_w");
+    assert(n >= 4 && "mathc vec*_unit_w");
     dvecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -386,11 +382,11 @@ static double dvecN_dot(const double *a, const double *b, int n) {
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void dvecN_cross(double *dst, const double *a, const double *b, int n) {
-    assert(n>=3 && "mathc vec*_cross only in 3D");
+    assert(n >= 3 && "mathc vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for(int i=3; i<n; i++)
+    for (int i = 3; i < n; i++)
         dst[i] = 0;
 }
 

@@ -2,6 +2,7 @@
 // can be used multiple times, with different types
 
 #include <string.h>     // memcpy
+#include "assume.h"
 #include "error.h"
 #include "alloc.h"
 #include "log.h"
@@ -74,7 +75,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_a)(size_t start_capacity, Allocator_
     };
     if (!self.array) {
         rhc_error = "dynarray_new failed";
-        log_error(RHC_TO_STRING2(FN_NAME) "_new failed: for capacity: %zu", start_capacity);
+        log_error("failed: for capacity: %zu", start_capacity);
         return (CLASS) {.allocator = a};
     }
     return self;
@@ -103,7 +104,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone_a)(TYPE *to_clone, size_t n, A
     CLASS self = RHC_NAME_CONCAT2(FN_NAME, _new_a)(n, a);
 
     // valid
-    if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(self))
+    if (!RHC_NAME_CONCAT2(FN_NAME, _valid)(self))
         return self;
 
     memcpy(self.array, to_clone, n * sizeof(TYPE));
@@ -120,7 +121,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_clone)(TYPE *to_clone, size_t n) {
 // void foo_kill(Foo *self)
 static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
     // valid
-    if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
+    if (!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
         allocator_free(self->allocator, self->array);
     }
     // new_invalid_a
@@ -130,32 +131,32 @@ static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
 // void foo_set_capacity(Foo *self, size_t capacity)
 static void RHC_NAME_CONCAT2(FN_NAME, _set_capacity)(CLASS *self, size_t capacity) {
     // !valid
-    if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self))
+    if (!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self))
         return;
 
     void *array = allocator_realloc(self->allocator, self->array, capacity * sizeof(TYPE));
-    if(!array) {
+    if (!array) {
         // kill
         rhc_error = "dynarray_set_capacity failed";
-        log_error(RHC_TO_STRING2(FN_NAME) "_set_capacity failed: for capacity: %zu", capacity);
+        log_error("failed: for capacity: %zu", capacity);
         RHC_NAME_CONCAT2(FN_NAME, _kill)(self);
         return;
     }
     self->array = array;
     self->capacity = capacity;
-    if(capacity < self->size)
+    if (capacity < self->size)
         self->size = capacity;
 }
 
 // void foo_resize(Foo *self, size_t size)
 static void RHC_NAME_CONCAT2(FN_NAME, _resize)(CLASS *self, size_t size) {
-    if(size > self->capacity) {
+    if (size > self->capacity) {
         // _set_capacity
         RHC_NAME_CONCAT2(FN_NAME, _set_capacity)(self, size * 2);
     }
 
     // valid
-    if(RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
+    if (RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
         self->size = size;
     }
 }
@@ -163,10 +164,10 @@ static void RHC_NAME_CONCAT2(FN_NAME, _resize)(CLASS *self, size_t size) {
 // int *foo_append_array(Foo *self, int *opt_init_array, size_t array_size)
 static TYPE *RHC_NAME_CONCAT2(FN_NAME, _append_array)(CLASS *self, TYPE *opt_init_array, size_t array_size) {
     // resize
-    RHC_NAME_CONCAT2(FN_NAME, _resize)(self, self->size+array_size);
+    RHC_NAME_CONCAT2(FN_NAME, _resize)(self, self->size + array_size);
 
-    TYPE *ret = &self->array[self->size-array_size];
-    if(opt_init_array)
+    TYPE *ret = &self->array[self->size - array_size];
+    if (opt_init_array)
         memcpy(ret, opt_init_array, sizeof(TYPE) * array_size);
     return ret;
 }
@@ -179,6 +180,7 @@ static TYPE *RHC_NAME_CONCAT2(FN_NAME, _append)(CLASS *self, TYPE *opt_init) {
 
 
 #ifndef NO_COPY
+
 // void foo_push(Foo *self, int push)
 static void RHC_NAME_CONCAT2(FN_NAME, _push)(CLASS *self, TYPE push) {
     // append
@@ -188,20 +190,19 @@ static void RHC_NAME_CONCAT2(FN_NAME, _push)(CLASS *self, TYPE push) {
 // TYPE foo_pop(Foo *self)
 static TYPE RHC_NAME_CONCAT2(FN_NAME, _pop)(CLASS *self) {
     // !valid || self->size <= 0
-    if(!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self) || self->size <= 0) {
-        log_error(RHC_TO_STRING2(FN_NAME) "_pop failed: invalid or size = 0");
+    if (!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self) || self->size <= 0) {
+        log_error("failed: invalid or size = 0");
         return (TYPE) {0};
     }
-    TYPE ret = self->array[self->size-1];
+    TYPE ret = self->array[self->size - 1];
 
     // resize
-    RHC_NAME_CONCAT2(FN_NAME, _resize)(self, self->size-1);
+    RHC_NAME_CONCAT2(FN_NAME, _resize)(self, self->size - 1);
 
     return ret;
 }
 
 #endif
-
 
 
 #undef TYPE

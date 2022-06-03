@@ -5,10 +5,8 @@
 // circle as collision object
 //
 
-#include "math.h"
-#include "stdbool.h"
-#include "mathc/types/float.h"
 #include "core.h"
+#include "mathc/types/float.h"
 
 
 typedef struct {

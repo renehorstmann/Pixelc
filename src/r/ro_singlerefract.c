@@ -5,12 +5,6 @@
 #include "r/texture.h"
 #include "r/ro_singlerefract.h"
 
-//
-// protected
-//
-
-extern rRender *r_render_singleton_;
-
 
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
@@ -48,17 +42,17 @@ void ro_singlerefract_kill(RoSingleRefract *self) {
 }
 
 
-void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat, float scale, 
-        const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat, float scale,
+                             const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
     r_render_error_check("ro_singlerefract_renderBEGIN");
-    
-    if(!opt_view_aabb)
+
+    if (!opt_view_aabb)
         opt_view_aabb = &VIEW_AABB_FULLSCREEN;
-    if(!opt_framebuffer) {
-        opt_framebuffer = r_render_get_framebuffer_tex(r_render_singleton_);
+    if (!opt_framebuffer) {
+        opt_framebuffer = &r_render.framebuffer_tex;
 
     }
-    
+
     glUseProgram(self->L.program);
 
     // rect

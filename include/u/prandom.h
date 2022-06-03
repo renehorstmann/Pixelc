@@ -5,7 +5,7 @@
 // Pseudo random with mathc_random support
 //
 
-#include <stdint.h>
+#include "rhc/rhc.h"
 
 static const uint32_t uPRAND_MAX = 0xefffffff;
 

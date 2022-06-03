@@ -5,7 +5,7 @@
 // write and load files under specific directories
 //
 
-#include "rhc/types.h"
+#include "core.h"
 
 
 #define E_IO_SAVESTATE_MAX_FILENAME_LENGTH 128
@@ -37,7 +37,6 @@ struct eIoSavestateString {
 // filename must not include directories (/)
 // returns an empty / cleared string, if not valid
 struct eIoSavestateString e_io_savestate_file_path(const char *filename);
-
 
 
 // read a savestate file

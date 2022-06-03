@@ -1,4 +1,5 @@
 #include "brush.h"
+#include "canvas.h"
 #include "brushmode.h"
 
 
@@ -9,24 +10,24 @@
 #include "rhc/dynarray.h"
 
 
-bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8) {
+bool brushmode_fill(ePointer_s pointer, bool mode8) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    uImage img = self->canvas_ref->RO.image;
-    int layer = self->canvas_ref->current_layer;
+    uImage img = canvas.RO.image;
+    int layer = canvas.current_layer;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     if (!u_image_contains(img, cr.x, cr.y))
         return false;
 
-    uColor_s prev_secondary_color = self->brush_ref->secondary_color;
-    self->brush_ref->secondary_color = *u_image_pixel(img, cr.x, cr.y, layer); 
-    if (u_color_equals(self->brush_ref->current_color, self->brush_ref->secondary_color)) 
+    uColor_s prev_secondary_color = brush.secondary_color;
+    brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, layer);
+    if (u_color_equals(brush.current_color, brush.secondary_color))
         return false;
 
-    bool shading_was_active = self->brush_ref->shading_active;
-    self->brush_ref->shading_active = true;
+    bool shading_was_active = brush.shading_active;
+    brush.shading_active = true;
 
     // PosStack needs to be killed
     PosStack stack = posstack_new(32);
@@ -35,7 +36,7 @@ bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8) {
     while (stack.size > 0) {
         ivec2 p = posstack_pop(&stack);
 
-        if (!brush_draw_pixel(self->brush_ref, p.x, p.y, U_COLOR_WHITE))
+        if (!brush_draw_pixel(p.x, p.y, U_COLOR_WHITE))
             continue;
 
         posstack_push(&stack,
@@ -62,38 +63,38 @@ bool brushmode_fill(BrushMode *self, ePointer_s pointer, bool mode8) {
 
     posstack_kill(&stack);
 
-    self->brush_ref->shading_active = shading_was_active;
-    self->brush_ref->secondary_color = prev_secondary_color;
+    brush.shading_active = shading_was_active;
+    brush.secondary_color = prev_secondary_color;
     return true;
 }
 
-bool brushmode_replace(BrushMode *self, ePointer_s pointer) {
+bool brushmode_replace(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    uImage img = self->canvas_ref->RO.image;
-    int layer = self->canvas_ref->current_layer;
+    uImage img = canvas.RO.image;
+    int layer = canvas.current_layer;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     if (!u_image_contains(img, cr.x, cr.y))
         return false;
 
-    uColor_s prev_secondary_color = self->brush_ref->secondary_color;
-    self->brush_ref->secondary_color = *u_image_pixel(img, cr.x, cr.y, layer); 
-    if (u_color_equals(self->brush_ref->current_color, self->brush_ref->secondary_color)) 
+    uColor_s prev_secondary_color = brush.secondary_color;
+    brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, layer);
+    if (u_color_equals(brush.current_color, brush.secondary_color))
         return false;
 
-    bool shading_was_active = self->brush_ref->shading_active;
-    self->brush_ref->shading_active = true;
+    bool shading_was_active = brush.shading_active;
+    brush.shading_active = true;
 
     for (int r = 0; r < img.rows; r++) {
         for (int c = 0; c < img.cols; c++) {
-            brush_draw_pixel(self->brush_ref, c, r, U_COLOR_WHITE);
+            brush_draw_pixel(c, r, U_COLOR_WHITE);
         }
     }
 
-    self->brush_ref->shading_active = shading_was_active;
-    self->brush_ref->secondary_color = prev_secondary_color;
+    brush.shading_active = shading_was_active;
+    brush.secondary_color = prev_secondary_color;
     return true;
 }
 

@@ -1,7 +1,7 @@
 #ifndef U_IMAGE_H
 #define U_IMAGE_H
 
-#include "rhc/alloc.h"
+#include "rhc/rhc.h"
 #include "mathc/sca/float.h"
 #include "color.h"
 
@@ -162,13 +162,13 @@ static bool u_image_contains(uImage self, int c, int r) {
 static uColor_s u_image_get_pixel_filtered(uImage self, float u, float v, int layer, bool filter_linear) {
     float col = u * self.cols;
     float row = v * self.rows;
-    int fcol = (int)(sca_floor(col)) % self.cols;
-    int ccol = (int)(sca_ceil(col)) % self.cols;
-    int frow = (int)(sca_floor(row)) % self.rows;
-    int crow = (int)(sca_ceil(row)) % self.rows;
+    int fcol = (int) (sca_floor(col)) % self.cols;
+    int ccol = (int) (sca_ceil(col)) % self.cols;
+    int frow = (int) (sca_floor(row)) % self.rows;
+    int crow = (int) (sca_ceil(row)) % self.rows;
     float x = col - sca_floor(col);
     float y = row - sca_floor(row);
-    if(filter_linear) {
+    if (filter_linear) {
         uColor_s a = *u_image_pixel(self, fcol, frow, layer);
         uColor_s b = *u_image_pixel(self, ccol, frow, layer);
         uColor_s c = *u_image_pixel(self, fcol, crow, layer);

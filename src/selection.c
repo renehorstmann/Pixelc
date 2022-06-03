@@ -21,7 +21,7 @@ static bool valid_to_copy(const Selection *self, uImage img, int layer) {
 //
 
 Selection *selection_new(int left, int top, int cols, int rows) {
-    log_info("selection: new");
+    log_info("new");
     Selection *self = rhc_calloc(sizeof *self);
 
     self->left = left;
@@ -35,7 +35,7 @@ Selection *selection_new(int left, int top, int cols, int rows) {
 void selection_kill(Selection **self_ptr) {
     if (!*self_ptr)
         return;
-    log_info("selection: kill");
+    log_info("kill");
     Selection *self = *self_ptr;
     u_image_kill(&self->opt_img);
     rhc_free(*self_ptr);
@@ -50,7 +50,7 @@ bool selection_contains(const Selection *self, int c, int r) {
 }
 
 void selection_copy(Selection *self, uImage from, int layer) {
-    log_info("selection: copy");
+    log_info("copy");
     if (!valid_to_copy(self, from, layer)) {
         log_error("selection_copy failed");
         return;
@@ -70,9 +70,9 @@ void selection_copy(Selection *self, uImage from, int layer) {
 }
 
 void selection_cut(Selection *self, uImage from, int layer, uColor_s replace) {
-    log_info("selection: cut");
+    log_info("cut");
     if (!valid_to_copy(self, from, layer)) {
-        log_error("selection_cut failed");
+        log_error("failed");
         return;
     }
     selection_copy(self, from, layer);
@@ -85,9 +85,9 @@ void selection_cut(Selection *self, uImage from, int layer, uColor_s replace) {
 }
 
 void selection_paste(Selection *self, uImage to, int layer) {
-    log_info("selection: paste");
+    log_info("paste");
     if (!self || !u_image_valid(self->opt_img)) {
-        log_error("selection_paste failed");
+        log_error("failed");
         return;
     }
     for (int r = 0; r < self->rows; r++) {
@@ -102,8 +102,8 @@ void selection_paste(Selection *self, uImage to, int layer) {
             uColor_s *pixel_to = u_image_pixel(to, to_c, to_r, layer);
             const uColor_s *pixel_from = u_image_pixel(self->opt_img, c, r, 0);
 
-            if(self->blend) {
-                *pixel_to = ucvec4_mix(*pixel_to, *pixel_from, (float) pixel_from->a/255);
+            if (self->blend) {
+                *pixel_to = ucvec4_mix(*pixel_to, *pixel_from, (float) pixel_from->a / 255);
             } else {
                 *pixel_to = *pixel_from;
             }
@@ -112,9 +112,9 @@ void selection_paste(Selection *self, uImage to, int layer) {
 }
 
 void selection_rotate(Selection *self, bool right) {
-    log_info("selection: right (r=%i)", right);
+    log_info("rotate (r=%i)", right);
     if (!self || !u_image_valid(self->opt_img)) {
-        log_error("selection_rotate failed");
+        log_error("failed");
         return;
     }
 
@@ -124,9 +124,9 @@ void selection_rotate(Selection *self, bool right) {
 }
 
 void selection_mirror(Selection *self, bool vertical) {
-    log_info("selection: mirror (v=%i)", vertical);
+    log_info("mirror (v=%i)", vertical);
     if (!self || !u_image_valid(self->opt_img)) {
-        log_error("selection_mirror failed");
+        log_error("failed");
         return;
     }
 

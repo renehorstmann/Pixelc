@@ -1,4 +1,4 @@
-#include "rhc/alloc.h"
+#include "rhc/rhc.h"
 #include "brush.h"
 
 
@@ -16,9 +16,9 @@ static uImage kernel_0() {
 // dither 2x2
 static uImage kernel_1() {
     uImage self = u_image_new_empty(2, 2, 1);
-    for(int r=0; r<2; r++) {
-        for(int c=0; c<2; c++) {
-            *u_image_pixel(self, c, r, 0) = c%2==r%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+    for (int r = 0; r < 2; r++) {
+        for (int c = 0; c < 2; c++) {
+            *u_image_pixel(self, c, r, 0) = c % 2 == r % 2 ? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
         }
     }
     return self;
@@ -27,7 +27,7 @@ static uImage kernel_1() {
 // square 2x2
 static uImage kernel_2() {
     uImage self = u_image_new_empty(2, 2, 1);
-    for(int i=0; i<2*2; i++)
+    for (int i = 0; i < 2 * 2; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
     return self;
 }
@@ -35,8 +35,8 @@ static uImage kernel_2() {
 // dither 3x3
 static uImage kernel_3() {
     uImage self = u_image_new_empty(3, 3, 1);
-    for(int i=0; i<3*3; i++)
-        *u_image_pixel_index(self, i, 0) = i%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+    for (int i = 0; i < 3 * 3; i++)
+        *u_image_pixel_index(self, i, 0) = i % 2 ? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
     return self;
 }
 
@@ -44,7 +44,7 @@ static uImage kernel_3() {
 // plus 3x3
 static uImage kernel_4() {
     uImage self = u_image_new_zeros(3, 3, 1);
-    for(int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
         *u_image_pixel(self, 1, i, 0) = U_COLOR_WHITE;
     }
@@ -55,7 +55,7 @@ static uImage kernel_4() {
 // square 3x3
 static uImage kernel_5() {
     uImage self = u_image_new_empty(3, 3, 1);
-    for(int i=0; i<3*3; i++)
+    for (int i = 0; i < 3 * 3; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
     return self;
 }
@@ -64,9 +64,9 @@ static uImage kernel_5() {
 // dither 4x4
 static uImage kernel_6() {
     uImage self = u_image_new_empty(4, 4, 1);
-    for(int r=0; r<4; r++) {
-        for(int c=0; c<4; c++) {
-            *u_image_pixel(self, c, r, 0) = c%2==r%2? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+    for (int r = 0; r < 4; r++) {
+        for (int c = 0; c < 4; c++) {
+            *u_image_pixel(self, c, r, 0) = c % 2 == r % 2 ? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
         }
     }
     return self;
@@ -75,9 +75,9 @@ static uImage kernel_6() {
 // dither wide 4x4
 static uImage kernel_7() {
     uImage self = u_image_new_empty(4, 4, 1);
-    for(int r=0; r<4; r++) {
-        for(int c=0; c<4; c++) {
-            *u_image_pixel(self, c, r, 0) = c%2==(r%4>=2)? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
+    for (int r = 0; r < 4; r++) {
+        for (int c = 0; c < 4; c++) {
+            *u_image_pixel(self, c, r, 0) = c % 2 == (r % 4 >= 2) ? U_COLOR_WHITE : U_COLOR_TRANSPARENT;
         }
     }
     return self;
@@ -93,7 +93,7 @@ static uImage kernel_8() {
 // ball 4*4
 static uImage kernel_9() {
     uImage self = u_image_new_zeros(4, 4, 1);
-    for(int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
         *u_image_pixel(self, i, 1, 0) = U_COLOR_WHITE;
         *u_image_pixel(self, i, 2, 0) = U_COLOR_WHITE;
         *u_image_pixel(self, 1, i, 0) = U_COLOR_WHITE;
@@ -106,7 +106,7 @@ static uImage kernel_9() {
 // square 4x4
 static uImage kernel_10() {
     uImage self = u_image_new_empty(4, 4, 1);
-    for(int i=0; i<4*4; i++)
+    for (int i = 0; i < 4 * 4; i++)
         *u_image_pixel_index(self, i, 0) = U_COLOR_WHITE;
     return self;
 }
@@ -121,7 +121,7 @@ static uImage kernel_10() {
 uImage *brush_kernel_defaults_new() {
     uImage *self = rhc_calloc(sizeof *self * (16));
     uImage *it = self;
-    
+
     *it++ = kernel_0();
     *it++ = kernel_1();
     *it++ = kernel_2();
@@ -133,16 +133,16 @@ uImage *brush_kernel_defaults_new() {
     *it++ = kernel_8();
     *it++ = kernel_9();
     *it++ = kernel_10();
-    
+
     *it = u_image_new_invalid();
     return self;
 }
 
 void brush_kernel_defaults_kill(uImage **self_ptr) {
     uImage *it = *self_ptr;
-    if(!it)
+    if (!it)
         return;
-    while(u_image_valid(*it))
+    while (u_image_valid(*it))
         u_image_kill(it++);
     rhc_free(*self_ptr);
     *self_ptr = NULL;

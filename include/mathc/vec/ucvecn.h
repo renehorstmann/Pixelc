@@ -21,8 +21,6 @@ do { \
 } while(0)
 
 
-
-
 /** dst = vec * 255 */
 static void ucvecN_cast_from_float_1(unsigned char *dst_vec, const float *vec, int n) {
     for (int i = 0; i < n; i++)
@@ -73,14 +71,14 @@ static void ucvecN_unit_y(unsigned char *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void ucvecN_unit_z(unsigned char *dst, int n) {
-    assert(n>=3 && "mathc vec*_unit_z");
+    assert(n >= 3 && "mathc vec*_unit_z");
     ucvecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void ucvecN_unit_w(unsigned char *dst, int n) {
-    assert(n>=4 && "mathc vec*_unit_w");
+    assert(n >= 4 && "mathc vec*_unit_w");
     ucvecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -135,14 +133,6 @@ static void ucvecN_div(unsigned char *dst, const unsigned char *a, unsigned char
 }
 
 
-
-
-
-
-
-
-
-
 /** dst = pow(x, y) */
 static void ucvecN_pow(unsigned char *dst, const unsigned char *x, unsigned char y, int n) {
     for (int i = 0; i < n; i++)
@@ -184,11 +174,6 @@ static void ucvecN_sqrt(unsigned char *dst, const unsigned char *x, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = ucsca_sqrt(x[i]);
 }
-
-
-
-
-
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -254,7 +239,9 @@ static void ucvecN_clamp(unsigned char *dst, const unsigned char *x, unsigned ch
 }
 
 /** dst = x < min ? min : (x > max ? max : x) */
-static void ucvecN_clamp_vec(unsigned char *dst, const unsigned char *x, const unsigned char *min, const unsigned char *max, int n) {
+static void
+ucvecN_clamp_vec(unsigned char *dst, const unsigned char *x, const unsigned char *min, const unsigned char *max,
+                 int n) {
     for (int i = 0; i < n; i++)
         dst[i] = ucsca_clamp(x[i], min[i], max[i]);
 }
@@ -266,7 +253,8 @@ static void ucvecN_mix(unsigned char *dst, const unsigned char *a, const unsigne
 }
 
 /** dst = a * (1-t) + b * t */
-static void ucvecN_mix_vec(unsigned char *dst, const unsigned char *a, const unsigned char *b, const unsigned char *t, int n) {
+static void
+ucvecN_mix_vec(unsigned char *dst, const unsigned char *a, const unsigned char *b, const unsigned char *t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = ucsca_mix(a[i], b[i], t[i]);
 }
@@ -282,7 +270,6 @@ static void ucvecN_step_vec(unsigned char *dst, const unsigned char *x, const un
     for (int i = 0; i < n; i++)
         dst[i] = ucsca_step(x[i], edge[i]);
 }
-
 
 
 /** returns v[0] + v[1] + ... + v[n-1] */
@@ -303,11 +290,11 @@ static unsigned char ucvecN_dot(const unsigned char *a, const unsigned char *b, 
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void ucvecN_cross(unsigned char *dst, const unsigned char *a, const unsigned char *b, int n) {
-    assert(n>=3 && "mathc vec*_cross only in 3D");
+    assert(n >= 3 && "mathc vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for(int i=3; i<n; i++)
+    for (int i = 3; i < n; i++)
         dst[i] = 0;
 }
 
@@ -315,10 +302,6 @@ static void ucvecN_cross(unsigned char *dst, const unsigned char *a, const unsig
 static unsigned char ucvecN_norm(const unsigned char *v, int n) {
     return ucsca_sqrt(ucvecN_dot(v, v, n));
 }
-
-
-
-
 
 
 /** returns length of a vector, see ucvecN_norm. Just here to match glsl */
@@ -349,8 +332,6 @@ static unsigned char ucvecN_sqr_distance(const unsigned char *a, const unsigned 
     ucvecN_sub_vec(tmp, b, a, n);
     return ucvecN_dot(tmp, tmp, n);
 }
-
-
 
 
 /** dst = a < b */
@@ -424,13 +405,6 @@ static void ucvecN_not_equal_vec(bool *dst, const unsigned char *a, const unsign
     for (int i = 0; i < n; i++)
         dst[i] = a[i] != b[i];
 }
-
-
-
-
-
-
-
 
 
 #endif //MATHC_VEC_UCVECN_H

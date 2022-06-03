@@ -7,14 +7,13 @@
 #include "r/ro_batch.h"
 
 
-
 RoBatch ro_batch_new(int num, rTexture tex_sink) {
     r_render_error_check("ro_batch_newBEGIN");
     RoBatch self;
-    
-    assume(num>0, "batch needs atleast 1 rect");
+
+    assume(num > 0, "batch needs atleast 1 rect");
     self.rects = rhc_malloc(sizeof *self.rects * num);
-    for(int i=0; i<num; i++) {
+    for (int i = 0; i < num; i++) {
         self.rects[i] = r_rect_new();
     }
 
@@ -69,7 +68,7 @@ RoBatch ro_batch_new(int num, rTexture tex_sink) {
                                   sizeof(rRect_s),
                                   (void *) offsetof(rRect_s, color));
             glVertexAttribDivisor(loc_color, 1);
-            
+
             // sprite
             glEnableVertexAttribArray(loc_sprite);
             glVertexAttribPointer(loc_sprite, 2, GL_FLOAT, GL_FALSE,
@@ -82,11 +81,10 @@ RoBatch ro_batch_new(int num, rTexture tex_sink) {
 
         glBindVertexArray(0);
     }
-    
+
     r_render_error_check("ro_batch_new");
     return self;
 }
-
 
 
 void ro_batch_kill(RoBatch *self) {
@@ -103,7 +101,7 @@ void ro_batch_update_sub(const RoBatch *self, int offset, int size) {
     r_render_error_check("ro_batch_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
-    offset = isca_clamp(offset, 0, self->num-1);
+    offset = isca_clamp(offset, 0, self->num - 1);
     size = isca_clamp(size, 1, self->num);
 
     if (offset + size > self->num) {
@@ -132,16 +130,18 @@ void ro_batch_update_sub(const RoBatch *self, int offset, int size) {
 
 
 void ro_batch_render_sub(const RoBatch *self, int num, const mat4 *camera_mat, bool update_sub) {
-    if(update_sub)
+    num = isca_clamp(num, 1, self->num);
+
+    if (update_sub)
         ro_batch_update_sub(self, 0, num);
-    
+
     r_render_error_check("ro_batch_renderBEGIN");
     glUseProgram(self->L.program);
 
     // base
     glUniformMatrix4fv(glGetUniformLocation(self->L.program, "vp"),
                        1, GL_FALSE, &camera_mat->m00);
-                       
+
     vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 

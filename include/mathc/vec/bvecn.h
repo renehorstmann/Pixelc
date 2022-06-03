@@ -11,15 +11,15 @@ static bool bvecN_cmp(const bool *vec_a, const bool *vec_b, int n) {
 }
 
 /** dst = vec */
-static void bvecN_copy(bool *dst_vec, const bool *vec, int n) {
+static void bvecN_copy(bool *dst, const bool *vec, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = vec[i];
+        dst[i] = vec[i];
 }
 
 /** dst = scalar */
-static void bvecN_set(bool *dst_vec, bool set, int n) {
+static void bvecN_set(bool *dst, bool set, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = set;
+        dst[i] = set;
 }
 
 /** dst = unit_x */
@@ -36,58 +36,58 @@ static void bvecN_unit_y(bool *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void bvecN_unit_z(bool *dst, int n) {
-    assert(n>=3 && "mathc bvec*_unit_z");
+    assert(n >= 3 && "mathc bvec*_unit_z");
     bvecN_set(dst, false, n);
     dst[2] = true;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void bvecN_unit_w(bool *dst, int n) {
-    assert(n>=4 && "mathc bvec*_unit_w");
+    assert(n >= 4 && "mathc bvec*_unit_w");
     bvecN_set(dst, false, n);
     dst[3] = true;
 }
 
 /** dst = !vec */
-static void bvecN_not(bool *dst_vec, const bool *vec, int n) {
+static void bvecN_not(bool *dst, const bool *vec, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = !vec[i];
+        dst[i] = !vec[i];
 }
 
 /** dst = a || b */
-static void bvecN_or(bool *dst_vec, const bool *vec_a, const bool *vec_b, int n) {
+static void bvecN_or(bool *dst, const bool *vec_a, const bool *vec_b, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = vec_a[i] || vec_b[i];
+        dst[i] = vec_a[i] || vec_b[i];
 }
 
 /** dst = !(a || b) */
-static void bvecN_nor(bool *dst_vec, const bool *vec_a, const bool *vec_b, int n) {
+static void bvecN_nor(bool *dst, const bool *vec_a, const bool *vec_b, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = !(vec_a[i] || vec_b[i]);
+        dst[i] = !(vec_a[i] || vec_b[i]);
 }
 
 /** dst = a ^ b */
-static void bvecN_xor(bool *dst_vec, const bool *vec_a, const bool *vec_b, int n) {
+static void bvecN_xor(bool *dst, const bool *vec_a, const bool *vec_b, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = vec_a[i] ^ vec_b[i];
+        dst[i] = vec_a[i] ^ vec_b[i];
 }
 
 /** dst = !(a ^ b) */
-static void bvecN_nxor(bool *dst_vec, const bool *vec_a, const bool *vec_b, int n) {
+static void bvecN_nxor(bool *dst, const bool *vec_a, const bool *vec_b, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = !(vec_a[i] ^ vec_b[i]);
+        dst[i] = !(vec_a[i] ^ vec_b[i]);
 }
 
 /** dst = a && b */
-static void bvecN_and(bool *dst_vec, const bool *vec_a, const bool *vec_b, int n) {
+static void bvecN_and(bool *dst, const bool *vec_a, const bool *vec_b, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = vec_a[i] && vec_b[i];
+        dst[i] = vec_a[i] && vec_b[i];
 }
 
 /** dst = !(a && b) */
-static void bvecN_nand(bool *dst_vec, const bool *vec_a, const bool *vec_b, int n) {
+static void bvecN_nand(bool *dst, const bool *vec_a, const bool *vec_b, int n) {
     for (int i = 0; i < n; i++)
-        dst_vec[i] = !(vec_a[i] && vec_b[i]);
+        dst[i] = !(vec_a[i] && vec_b[i]);
 }
 
 /** returns the sum of true values */

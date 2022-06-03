@@ -127,7 +127,6 @@ static dvec4 dvec4_mul_mat(dvec4 a, dmat4 b) {
 }
 
 
-
 /** returns = determinant mm */
 static double dmat4_det(dmat4 mm) {
     // from cglm/dmat4.h/glm_mat4_det

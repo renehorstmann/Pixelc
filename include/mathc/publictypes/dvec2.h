@@ -4,9 +4,6 @@
 #include <assert.h>     // for static_assert
 
 
-
-
-
 typedef union {
     double v[2];
     struct {
@@ -19,12 +16,6 @@ typedef union {
         double r, g;
     };
 } mathc_dvec2;
-
-
-
-
-
-
 
 
 static_assert(sizeof(mathc_dvec2) == sizeof(double) * 2, "[Mathc] wrong expected size");

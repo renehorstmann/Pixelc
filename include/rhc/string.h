@@ -20,7 +20,7 @@ static String string_new_a(size_t start_capacity, Allocator_i a) {
             .capacity = start_capacity,
             .allocator = a
     };
-    if(!self.data)
+    if (!self.data)
         return string_new_invalid_a(a);
     memset(self.data, 0, start_capacity + 1);
     return self;
@@ -48,7 +48,7 @@ static String string_new_invalid() {
 // clones Str_s and appends null
 static String string_new_clone_a(Str_s to_clone, Allocator_i a) {
     String sb = string_new_a(to_clone.size, a);
-    if(!string_valid(sb))
+    if (!string_valid(sb))
         return sb;
     memcpy(sb.data, to_clone.data, to_clone.size);
     sb.size = to_clone.size;
@@ -62,14 +62,14 @@ static String string_new_clone(Str_s to_clone) {
 
 // copies str s into a new string, with old -> replacement.
 static String string_new_replace_a(Str_s to_replace, Str_s old, Str_s replacement, Allocator_i a) {
-    if(str_empty(to_replace) || str_empty(old) || !str_valid(replacement)) {
+    if (str_empty(to_replace) || str_empty(old) || !str_valid(replacement)) {
         return string_new_invalid_a(a);
     }
     size_t cnt = str_count_str(to_replace, old);
-    if(cnt <= 0) {
+    if (cnt <= 0) {
         return string_new_clone_a(to_replace, a);
     }
-    size_t size = to_replace.size - cnt*old.size + cnt*replacement.size;
+    size_t size = to_replace.size - cnt * old.size + cnt * replacement.size;
     String res = string_new_a(size, a);
     res.size = size;
     res.str = str_replace_str_into(res.str, to_replace, old, replacement);
@@ -85,15 +85,15 @@ static String string_new_replace(Str_s to_replace, Str_s old, Str_s replacement)
 // concatenates all strs
 static String string_new_cat_a(Str_s *strs, int n, Allocator_i a) {
     size_t size = 0;
-    for(int i=0; i<n; i++) {
-        size += str_empty(strs[i])? 0 : strs[i].size;
+    for (int i = 0; i < n; i++) {
+        size += str_empty(strs[i]) ? 0 : strs[i].size;
     }
     String res = string_new_a(size, a);
-    if(!string_valid(res))
+    if (!string_valid(res))
         return res;
 
-    for(int i=0; i<n; i++) {
-        if(!str_empty(strs[i])) {
+    for (int i = 0; i < n; i++) {
+        if (!str_empty(strs[i])) {
             str_cpy(strs[i], (Str_s) {res.data + res.size, strs[i].size});
             res.size += strs[i].size;
         }
@@ -108,11 +108,11 @@ static String string_new_cat(Str_s *strs, int n) {
 
 // size is the sum of characters, not including termination null (as strlen)
 static void string_set_capacity(String *self, size_t capacity) {
-    if(!string_valid(*self))
+    if (!string_valid(*self))
         return;
 
     void *data = allocator_realloc(self->allocator, self->data, capacity + 1);
-    if(!data) {
+    if (!data) {
         string_kill(self);
         return;
     }
@@ -123,10 +123,10 @@ static void string_set_capacity(String *self, size_t capacity) {
 
 // size is the sum of characters, not including termination null (as strlen)
 static void string_resize(String *self, size_t size) {
-    if(size > self->capacity) {
+    if (size > self->capacity) {
         string_set_capacity(self, size * 2);
     }
-    if(!string_valid(*self))
+    if (!string_valid(*self))
         return;
     self->size = size;
     self->data[self->size] = '\0';  //just to be sure
@@ -134,23 +134,22 @@ static void string_resize(String *self, size_t size) {
 
 // appends a char
 static void string_push(String *self, char push) {
-    if(!string_valid(*self))
+    if (!string_valid(*self))
         return;
     string_resize(self, self->size + 1);
-    self->data[self->size-1] = push;
+    self->data[self->size - 1] = push;
     self->data[self->size] = '\0';  //just to be sure
 }
 
 // appends a string
 static void string_append(String *self, Str_s append) {
-    if(!string_valid(*self))
+    if (!string_valid(*self))
         return;
     size_t prev_size = self->size;
     string_resize(self, self->size + append.size);
     memcpy(self->data + prev_size, append.data, append.size);
     self->data[self->size] = '\0';  //just to be sure
 }
-
 
 
 #endif //RHC_STRING_H

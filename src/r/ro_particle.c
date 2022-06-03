@@ -1,21 +1,41 @@
-#include <float.h> // FLT_MAX
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
-#include "rhc/error.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/rect.h"
 #include "r/texture.h"
 #include "r/ro_particle.h"
 
+// update needs to be called each time before rendering to update the time values
+static void update_sub(const RoParticle *self, uint32_t time_ms, int num) {
+    r_render_error_check("ro_particle_updateBEGIN");
+    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
+
+    for (int i = 0; i < num; i++) {
+        rParticleRect_s *r = &self->rects[i];
+        r->delta_time = (time_ms - r->start_time_ms) / 1000.0f;
+    }
+
+    glBufferSubData(GL_ARRAY_BUFFER,
+                    0,
+                    num * sizeof(rParticleRect_s),
+                    self->rects);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    r_render_error_check("ro_particle_update");
+}
+
+//
+// public
+//
 
 RoParticle ro_particle_new(int num, rTexture tex_sink) {
     r_render_error_check("ro_particle_newBEGIN");
     RoParticle self;
-    
-    assume(num>0, "particle needs atleast 1 particlerect");
+
+    assume(num > 0, "particle needs atleast 1 particlerect");
     self.rects = rhc_malloc(sizeof *self.rects * num);
-    for(int i=0; i<num; i++) {
+    for (int i = 0; i < num; i++) {
         self.rects[i] = r_particlerect_new();
     }
 
@@ -26,13 +46,13 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
     const int loc_uv = 4;
     const int loc_color = 8;
     const int loc_sprite_and_sprite_speed = 9;
-    
+
     const int loc_speed = 10;
     const int loc_acc = 11;
     const int loc_axis_angle = 12;
     const int loc_color_speed = 13;
-    
-    const int loc_start_time = 14;
+
+    const int loc_delta_time = 14;
 
     self.tex = tex_sink;
     self.owns_tex = true;
@@ -71,7 +91,7 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
                                       (void *) (offsetof(rParticleRect_s, uv) + c * sizeof(vec4)));
                 glVertexAttribDivisor(loc, 1);
             }
-            
+
 
             // color
             glEnableVertexAttribArray(loc_color);
@@ -79,7 +99,7 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
                                   sizeof(rParticleRect_s),
                                   (void *) offsetof(rParticleRect_s, color));
             glVertexAttribDivisor(loc_color, 1);
-            
+
             // sprite_and_sprite_speed
             glEnableVertexAttribArray(loc_sprite_and_sprite_speed);
             glVertexAttribPointer(loc_sprite_and_sprite_speed, 4, GL_FLOAT, GL_FALSE,
@@ -116,11 +136,11 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
             glVertexAttribDivisor(loc_color_speed, 1);
 
             // start_time
-            glEnableVertexAttribArray(loc_start_time);
-            glVertexAttribPointer(loc_start_time, 1, GL_FLOAT, GL_FALSE,
+            glEnableVertexAttribArray(loc_delta_time);
+            glVertexAttribPointer(loc_delta_time, 1, GL_FLOAT, GL_FALSE,
                                   sizeof(rParticleRect_s),
-                                  (void *) offsetof(rParticleRect_s, start_time));
-            glVertexAttribDivisor(loc_start_time, 1);
+                                  (void *) offsetof(rParticleRect_s, delta_time));
+            glVertexAttribDivisor(loc_delta_time, 1);
 
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -128,11 +148,10 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
 
         glBindVertexArray(0);
     }
-    
+
     r_render_error_check("ro_particle_new");
     return self;
 }
-
 
 
 void ro_particle_kill(RoParticle *self) {
@@ -145,41 +164,12 @@ void ro_particle_kill(RoParticle *self) {
     *self = (RoParticle) {0};
 }
 
-void ro_particle_update_sub(const RoParticle *self, int offset, int size) {
-    r_render_error_check("ro_particle_updateBEGIN");
-    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
-    offset = isca_clamp(offset, 0, self->num-1);
-    size = isca_clamp(size, 1, self->num);
+void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, const mat4 *camera_mat) {
+    num = isca_clamp(num, 1, self->num);
 
-    if (offset + size > self->num) {
-        int to_end = self->num - offset;
-        int from_start = size - to_end;
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        offset * sizeof(rParticleRect_s),
-                        to_end * sizeof(rParticleRect_s),
-                        self->rects + offset);
+    update_sub(self, time_ms, num);
 
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        0,
-                        from_start * sizeof(rParticleRect_s),
-                        self->rects);
-    } else {
-        glBufferSubData(GL_ARRAY_BUFFER,
-                        offset * sizeof(rParticleRect_s),
-                        size * sizeof(rParticleRect_s),
-                        self->rects + offset);
-
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    r_render_error_check("ro_particle_update");
-}
-
-void ro_particle_render_sub(const RoParticle *self, float time, int num, const mat4 *camera_mat, bool update_sub) {
-    if(update_sub)
-        ro_particle_update_sub(self, 0, num);
-        
     r_render_error_check("ro_particle_renderBEGIN");
     glUseProgram(self->L.program);
 
@@ -189,8 +179,6 @@ void ro_particle_render_sub(const RoParticle *self, float time, int num, const m
 
     vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
-    
-    glUniform1f(glGetUniformLocation(self->L.program, "time"), time);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);

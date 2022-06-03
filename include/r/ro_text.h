@@ -6,8 +6,20 @@
 // based on a font sprite sheet and is monospaced.
 //
 
-#include "ro_types.h"
+#include "ro_batch.h"
 
+// text sprite from char callback
+// return true for a newline
+typedef bool (*ro_text_sprite_fn)(vec2 *sprite, char c);
+
+// Renders monospace text, with a texture
+typedef struct {
+    RoBatch ro;             // internal batch to render
+    ro_text_sprite_fn sprite_fn;    // conversion function of character to sprite mapping
+    mat4 pose;              // pose (top left) for the text
+    vec2 size;              // character size
+    vec2 offset;            // offset to next character
+} RoText;
 
 
 // creates a new costum text

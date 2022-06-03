@@ -1,7 +1,7 @@
 #ifndef PIXELC_BUTTON_H
 #define PIXELC_BUTTON_H
 
-#include <stdbool.h>
+#include "rhc/rhc.h"
 #include "e/input.h"
 #include "r/rect.h"
 

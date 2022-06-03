@@ -5,15 +5,21 @@
 // load and setup textures as texture arrays
 //
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "types.h"
+#include "core.h"
+#include "mathc/types/int.h"
+
+// Texture, with sprite grid -> 2D array texture
+typedef struct {
+    GLuint tex;    // GL_TEXTURE_2D_ARRAY
+    ivec2 sprite_size;
+    ivec2 sprites;
+} rTexture;
 
 
 static bool r_texture_valid(rTexture self) {
     return self.tex > 0
-            && self.sprite_size.x > 0 && self.sprite_size.y > 0
-            && self.sprites.x > 0 && self.sprites.y > 0;
+           && self.sprite_size.x > 0 && self.sprite_size.y > 0
+           && self.sprites.x > 0 && self.sprites.y > 0;
 }
 
 static rTexture r_texture_new_invalid() {
