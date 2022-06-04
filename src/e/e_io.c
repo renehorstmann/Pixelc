@@ -2,6 +2,12 @@
 #include "e/io.h"
 
 
+//
+// private
+//
+
+static _Thread_local char L_savestate_file[64 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
+
 // protected function
 const char *e_window_get_title();
 
@@ -131,14 +137,12 @@ void e_io_savestate_save() {
     idbfs_save();
 }
 
-struct eIoSavestateString e_io_savestate_file_path(const char *filename) {
-    struct eIoSavestateString name;
+const char *e_io_savestate_file_path(const char *filename) {
     if(!savestate_filename_valid(filename)) {
-        memset(name.s, 0, sizeof name);
-        return name;
+        return NULL;
     }
-    snprintf(name.s, sizeof name, "savestate/%s_%s", e_window_get_title(), filename);
-    return name;
+    snprintf(L_savestate_file, sizeof L_savestate_file, "savestate/%s_%s", e_window_get_title(), filename);
+    return L_savestate_file;
 }
 
 
@@ -146,7 +150,7 @@ String e_io_savestate_read(const char *filename, bool ascii) {
     if(!savestate_filename_valid(filename))
         return string_new_invalid();
     return file_read(
-            e_io_savestate_file_path(filename).s,
+            e_io_savestate_file_path(filename),
             ascii);
 }
 
@@ -155,7 +159,7 @@ bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
     bool ok = file_write(
-            e_io_savestate_file_path(filename).s,
+            e_io_savestate_file_path(filename),
             content, ascii);
     idbfs_save();
     return ok;
@@ -166,7 +170,7 @@ bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
     bool ok = file_append(
-            e_io_savestate_file_path(filename).s,
+            e_io_savestate_file_path(filename),
             content, ascii);
     idbfs_save();
     return ok;
@@ -191,21 +195,19 @@ void e_io_savestate_save() {
     // noop (just for web)
 }
 
-struct eIoSavestateString e_io_savestate_file_path(const char *filename) {
-    struct eIoSavestateString name;
+const char *e_io_savestate_file_path(const char *filename) {
     if (!savestate_filename_valid(filename)) {
-        memset(&name, 0, sizeof name);
-        return name;
+        return NULL;
     }
-    snprintf(name.s, sizeof name, "savestate_%s", filename);
-    return name;
+    snprintf(L_savestate_file, sizeof L_savestate_file, "savestate_%s", filename);
+    return L_savestate_file;
 }
 
 String e_io_savestate_read(const char *filename, bool ascii) {
     if (!savestate_filename_valid(filename))
         return string_new_invalid();
     return file_read(
-            e_io_savestate_file_path(filename).s,
+            e_io_savestate_file_path(filename),
             ascii);
 }
 
@@ -214,7 +216,7 @@ bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
     if (!savestate_filename_valid(filename))
         return false;
     return file_write(
-            e_io_savestate_file_path(filename).s,
+            e_io_savestate_file_path(filename),
             content, ascii);
 }
 
@@ -223,7 +225,7 @@ bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
     if (!savestate_filename_valid(filename))
         return false;
     return file_append(
-            e_io_savestate_file_path(filename).s,
+            e_io_savestate_file_path(filename),
             content, ascii);
 }
 

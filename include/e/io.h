@@ -28,15 +28,12 @@ void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallbac
 void e_io_savestate_save();
 
 
-struct eIoSavestateString {
-    // Additional 64 bytes for the path (+title for web)
-    char s[64 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
-};
-
 // creates a savestate file path to load and save with default FILE's
 // filename must not include directories (/)
-// returns an empty / cleared string, if not valid
-struct eIoSavestateString e_io_savestate_file_path(const char *filename);
+// returns NULL if not valid.
+// do NOT free the returned string.
+// a new call to this functions changes the returned string (module global)
+const char *e_io_savestate_file_path(const char *filename);
 
 
 // read a savestate file

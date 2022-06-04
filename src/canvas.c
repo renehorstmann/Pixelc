@@ -36,7 +36,7 @@ static void save_image() {
     char file[128];
     snprintf(file, sizeof file, "image_%03i.png", L.save_idx);
     u_image_save_file(canvas.RO.image,
-                      e_io_savestate_file_path(file).s);
+                      e_io_savestate_file_path(file));
     e_io_savestate_save();
     L.save_layers[L.save_idx] = canvas.RO.image.layers;
 }
@@ -47,7 +47,7 @@ static void load_image() {
     int layers = L.save_layers[L.save_idx];
     layers = isca_clamp(layers, 1, CANVAS_MAX_LAYERS);
     uImage img = u_image_new_file(1,
-                                  e_io_savestate_file_path(file).s);
+                                  e_io_savestate_file_path(file));
     if (img.rows % layers == 0) {
         img.rows /= layers;
         img.layers = layers;
@@ -252,7 +252,7 @@ void canvas_save_config() {
     log_info("save");
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_append_object(config, "canvas");
 
@@ -268,7 +268,7 @@ void canvas_save_config() {
     }
 
     u_json_save_file(config,
-                     e_io_savestate_file_path("config.json").s);
+                     e_io_savestate_file_path("config.json"));
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -278,7 +278,7 @@ void canvas_load_config() {
     log_info("load");
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_get_object(config, "canvas");
 

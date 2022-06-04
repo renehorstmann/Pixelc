@@ -97,7 +97,7 @@ void camera_save_config() {
     log_info("save");
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_append_object(config, "camera");
 
@@ -105,7 +105,7 @@ void camera_save_config() {
     u_json_append_int(member, "rotate_mode", camera.rotate_mode);
 
     u_json_save_file(config,
-                     e_io_savestate_file_path("config.json").s);
+                     e_io_savestate_file_path("config.json"));
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -115,7 +115,7 @@ void camera_load_config() {
     log_info("load");
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_get_object(config, "camera");
 

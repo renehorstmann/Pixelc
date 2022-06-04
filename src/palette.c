@@ -455,7 +455,7 @@ void palette_load_palette(int id) {
     name_s.data[name_s.size] = '\0';
 
     uImage colors = u_image_new_file(1,
-                                     e_io_savestate_file_path(file).s
+                                     e_io_savestate_file_path(file)
     );
 
     palette.RO.palette_id = id;
@@ -470,7 +470,7 @@ void palette_load_palette(int id) {
 void palette_append_file(uImage colors, const char *name) {
     log_info("append_file: %s", name);
 
-    u_image_save_file(colors, e_io_savestate_file_path(name).s);
+    u_image_save_file(colors, e_io_savestate_file_path(name));
 
     int idx = -1;
     for (int i = 0; i < palette.RO.max_palettes; i++) {
@@ -513,7 +513,7 @@ void palette_reset_palette_files() {
         char *name = palette_defaults_name_on_heap(i);
         char file[256];
         snprintf(file, sizeof file, "palette_%s", name);
-        u_image_save_file(palettes[i], e_io_savestate_file_path(file).s);
+        u_image_save_file(palettes[i], e_io_savestate_file_path(file));
 
         L.palette_files[i] = name;
     }
@@ -536,7 +536,7 @@ void palette_save_config() {
     log_info("save");
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_append_object(config, "palette");
     uJson *palette_files = u_json_append_array(member, "palette_files");
@@ -547,7 +547,7 @@ void palette_save_config() {
     u_json_append_int(member, "palette_id", palette.RO.palette_id);
 
     u_json_save_file(config,
-                     e_io_savestate_file_path("config.json").s);
+                     e_io_savestate_file_path("config.json"));
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -559,7 +559,7 @@ void palette_load_config() {
     bool reset = false;
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
 
     uJson *member = u_json_get_object(config, "palette");

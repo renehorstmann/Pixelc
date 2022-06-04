@@ -269,7 +269,7 @@ void brush_load_kernel(int id) {
     brush.RO.kernel_id = id;
     brush_set_kernel(
             u_image_new_file(1,
-                             e_io_savestate_file_path(file).s
+                             e_io_savestate_file_path(file)
             ));
 
     if (brush.auto_save_config)
@@ -279,7 +279,7 @@ void brush_load_kernel(int id) {
 void brush_append_kernel(uImage kernel_sink, const char *name) {
     log_info("append_file: %s", name);
 
-    u_image_save_file(kernel_sink, e_io_savestate_file_path(name).s);
+    u_image_save_file(kernel_sink, e_io_savestate_file_path(name));
 
     bool found = false;
     for (int i = 0; i < brush.RO.max_kernels; i++) {
@@ -323,7 +323,7 @@ void brush_reset_kernel_files() {
         snprintf(name, 32, "default_%i.png", i);
         char file[32];
         snprintf(file, 32, "kernel_%s", name);
-        u_image_save_file(kernels[i], e_io_savestate_file_path(file).s);
+        u_image_save_file(kernels[i], e_io_savestate_file_path(file));
 
         L.kernel_files[i] = name;
     }
@@ -347,7 +347,7 @@ void brush_save_config() {
     log_info("save");
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_append_object(config, "brush");
     uJson *kernel_files = u_json_append_array(member, "kernel_files");
@@ -358,7 +358,7 @@ void brush_save_config() {
     u_json_append_int(member, "kernel_id", brush.RO.kernel_id);
 
     u_json_save_file(config,
-                     e_io_savestate_file_path("config.json").s);
+                     e_io_savestate_file_path("config.json"));
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -370,7 +370,7 @@ void brush_load_config() {
     bool reset = false;
 
     uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json").s);
+            e_io_savestate_file_path("config.json"));
 
     uJson *member = u_json_get_object(config, "brush");
     uJson *kernel_files = u_json_get_object(member, "kernel_files");
