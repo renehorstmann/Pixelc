@@ -57,7 +57,12 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- logs without fn and module name
+- some
+  - window.time -> frame_time
+  - simple.time based on update
+  - Timer with time source define option
+  - class uAnimator_s
+    - animation timer
 
 - dialog background drawn
   - with titel bar
