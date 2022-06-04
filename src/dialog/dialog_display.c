@@ -144,7 +144,7 @@ static void on_action(bool ok) {
     }
 
     if (save_cam)
-        camera_save_config(camera);
+        camera_save_config();
 }
 
 //

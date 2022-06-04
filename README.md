@@ -45,7 +45,7 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 -s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1  \
 -lidbfs.js \
 -DOPTION_GLES -DOPTION_SDL \
-../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c \
+../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c ../src/dialog/* ../src/tool/* \
 -o index.js
 ```
 

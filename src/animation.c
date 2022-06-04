@@ -87,7 +87,7 @@ void animation_update(float palette_hud_size, float dtime) {
     }
 
     if (!animation.show) {
-        if (camera_is_portrait_mode(camera))
+        if (camera_is_portrait_mode())
             u_pose_set_xy(&L.horsimann.pose,
                           camera.RO.left + 1,
                           ceilf(camera.RO.bottom + palette_hud_size + 6));
