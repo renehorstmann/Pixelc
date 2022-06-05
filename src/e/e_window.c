@@ -61,18 +61,22 @@ static void loop() {
     }
 
     uint32_t time_ms = SDL_GetTicks();
-    int dtime_ms = time_ms - L.last_time_ms;
+    int deltatime_ms = time_ms - L.last_time_ms;
     L.last_time_ms = time_ms;
-    float dtime = dtime_ms / 1000.0f;
+    float deltatime = deltatime_ms / 1000.0f;
 
-    if (dtime < 0 || dtime >= MAX_DELTA_TIME)
+    if (deltatime < 0 || deltatime >= MAX_DELTA_TIME)
         return;
 
     // only set values if the frame is not dropped
     SDL_GetWindowSize(e_window.sdl_window, &e_window.size.x, &e_window.size.y);
-    e_window.dtime = dtime;
-    e_window.dtime_ms = dtime_ms;
-    e_window.time_ms += dtime_ms;
+    e_window.frame_deltatime = deltatime;
+    e_window.frame_deltatime_ms = deltatime_ms;
+    e_window.frame_time_ms += deltatime_ms;
+    // may be reset by e_simple:
+    e_window.deltatime = e_window.frame_deltatime;
+    e_window.deltatime_ms = e_window.frame_deltatime_ms;
+    e_window.time_ms = e_window.frame_time_ms;
 
     L.main_loop_fn(L.main_loop_user_data);
 }

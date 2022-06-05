@@ -11,5 +11,7 @@
 #include "prandom.h"
 #include "fetch.h"
 #include "json.h"
+#include "timer.h"
+#include "animator.h"
 
 #endif //U_U_H

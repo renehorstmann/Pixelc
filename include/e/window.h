@@ -32,9 +32,16 @@ struct eWindow_Globals {
 
     // will read from sdl at the start of each frame:
     ivec2 size;
+    
+    // time between frames
+    uint32_t frame_time_ms;
+    int frame_deltatime_ms;
+    float frame_deltatime;
+    // time between updates
+    // if e_simple update_dtime_ms are used, this time is a multitude that time
     uint32_t time_ms;
-    int dtime_ms;
-    double dtime;
+    int deltatime_ms;
+    float deltatime;
 };
 extern struct eWindow_Globals e_window;
 
