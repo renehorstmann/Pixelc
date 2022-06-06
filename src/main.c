@@ -68,8 +68,7 @@ static void init() {
     palette_load_config();
 
     cameractrl_init();
-    cameractrl_set_home(canvas.RO.image.cols, canvas.RO.image.rows);
-
+    
     dialog_init();
 
     toolbar_init(u_color_from_hex(TB_ACTIVE_BG_A),
@@ -84,6 +83,7 @@ static void init() {
 
     inputctrl_init();
 
+    cameractrl_set_home();
 }
 
 // this functions is called either each frame or at a specific update/s time

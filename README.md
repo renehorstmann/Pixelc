@@ -57,6 +57,8 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- palette landscape mode in portrait orient bug
+
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -64,8 +66,6 @@ python3 -m http.server --bind localhost  # [port]
     - top with title bar
     - flexible middle (flex in height of course)
     - bottom part
-
-- reset camera with camera size and actual main (midscreen) rect (90%)
 
 - rethink layers and frames?
 

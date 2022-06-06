@@ -11,8 +11,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     if (button_clicked(&self->ro.rect, pointer)) {
         log_info("tool camera");
-        cameractrl_set_home(canvas.RO.image.cols,
-                            canvas.RO.image.rows);
+        cameractrl_set_home();
     }
 }
 

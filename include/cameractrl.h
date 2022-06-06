@@ -13,7 +13,7 @@ extern struct CameraCtrl_Globals cameractrl;
 
 void cameractrl_init();
 
-void cameractrl_set_home(int canvas_cols, int canvas_rows);
+void cameractrl_set_home(void);
 
 bool cameractrl_pointer_event(ePointer_s pointer);
 

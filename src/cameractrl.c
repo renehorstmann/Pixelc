@@ -2,15 +2,12 @@
 #include "mathc/float.h"
 #include "camera.h"
 #include "brush.h"
+#include "canvas.h"
+#include "palette.h"
+#include "toolbar.h"
 #include "cameractrl.h"
 
-
-#define HOME_SIZE 140
-#define HOME_PORTRAIT_X 0
-#define HOME_PORTRAIT_Y -20
-#define HOME_LANDSCAPE_X 20
-#define HOME_LANDSCAPE_Y 0
-
+#define HOME_SIZE 0.9
 #define WHEEL_ZOOM_FACTOR 1.1
 #define SMOOTH_ALPHA 0.5
 
@@ -24,12 +21,12 @@ struct CameraCtrl_Globals cameractrl;
 
 static struct {
     vec2 pos;
-    float size;
+    float zoom;
 
     vec2 pos0;
     vec2 move0;
-
-    float size0;
+    
+    float zoom0;
     vec2 touch[2];
     bvec2 touching;
     float distance0;
@@ -53,16 +50,16 @@ static void move_camera(vec2 current_pos) {
 static void zoom_camera(float new_distance) {
     float factor = new_distance / L.distance0;
     factor = sca_clamp(factor, 0.3, 3);
-    L.size = L.size0 / factor;
-    camera_set_zoom(L.size);
+    L.zoom = L.zoom0 / factor;
+    camera_set_zoom(L.zoom);
 }
 
 static void wheel_event(bool up, void *user_data) {
     if (up)
-        L.size /= WHEEL_ZOOM_FACTOR;
+        L.zoom /= WHEEL_ZOOM_FACTOR;
     else
-        L.size *= WHEEL_ZOOM_FACTOR;
-    camera_set_zoom(L.size);
+        L.zoom *= WHEEL_ZOOM_FACTOR;
+    camera_set_zoom(L.zoom);
 }
 
 static bool event_cursor(ePointer_s pointer) {
@@ -113,7 +110,7 @@ static bool event_touch(ePointer_s pointer) {
         float distance = vec2_norm(vec2_sub_vec(L.touch[0], L.touch[1]));
 
         if (pointer.action == E_POINTER_DOWN) {
-            L.size0 = L.size;
+            L.zoom0 = L.zoom;
             L.pos0 = L.pos;
             L.move0 = mean;
             L.distance0 = distance;
@@ -137,30 +134,50 @@ static bool event_touch(ePointer_s pointer) {
 
 
 void cameractrl_init() {
-    L.size = 1;
+    L.zoom = 1;
     e_input_register_wheel_event(wheel_event, NULL);
 }
 
-void cameractrl_set_home(int canvas_cols, int canvas_rows) {
+void cameractrl_set_home() {
     memset(&L, 0, sizeof(L));
 
-
-    float size = canvas_cols > canvas_rows ? canvas_cols : canvas_rows;
-    L.size = size / HOME_SIZE;
-
-    L.pos.x = canvas_cols / 2;
-    L.pos.y = -canvas_rows / 2;
-
+    int rows = canvas.RO.image.rows;
+    int cols = canvas.RO.image.cols;
+    
+    int left = camera.RO.left;
+    int right = camera.RO.right;
+    int top = camera.RO.top;
+    int bottom = camera.RO.bottom;
+    
     if (camera_is_portrait_mode()) {
-        L.pos.x += L.size * HOME_PORTRAIT_X;
-        L.pos.y += L.size * HOME_PORTRAIT_Y;
+        top -= toolbar_size();
+        bottom += palette_get_hud_size();
     } else {
-        L.pos.x += L.size * HOME_LANDSCAPE_X;
-        L.pos.y += L.size * HOME_LANDSCAPE_Y;
+        left += toolbar_size();
+        right -= palette_get_hud_size();
     }
+    
+    float w = right - left;
+    float h = top - bottom;
 
+    if(w/h >= cols/rows) {
+        // size by height
+        L.zoom = rows / (h*HOME_SIZE);
+    } else {
+        L.zoom = cols / (w*HOME_SIZE);
+    }
+    
+    float cx = (left + right) / 2.0f;
+    float cy = (bottom + top) / 2.0f;
+    
+    L.pos.x = cols/2.0f;
+    L.pos.y = -rows/2.0f;
+    
+    L.pos.x -= cx * L.zoom;
+    L.pos.y -= cy * L.zoom;
+   
     camera_set_pos(L.pos.x, L.pos.y);
-    camera_set_zoom(L.size);
+    camera_set_zoom(L.zoom);
 }
 
 bool cameractrl_pointer_event(ePointer_s pointer) {
