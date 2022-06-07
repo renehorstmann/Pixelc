@@ -8,7 +8,7 @@
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "animation.h"
-#include "button.h"
+#include "u/button.h"
 #include "canvas.h"
 #include "camera.h"
 #include "tool.h"
@@ -38,13 +38,13 @@ static void select_kill(Tool **super_ptr) {
 static void select_pe(struct Tool *super, ePointer_s pointer) {
     Select *self = (Select *) super;
     int id = canvas.current_layer;
-    if (button_clicked(&self->prev.rect, pointer)
+    if (u_button_clicked(&self->prev.rect, pointer)
         && id > 0) {
 
         log_info("tool layer_prev: %i", id - 1);
         canvas.current_layer = id - 1;
     }
-    if (button_clicked(&self->next.rect, pointer)
+    if (u_button_clicked(&self->next.rect, pointer)
         && id < canvas.RO.image.layers - 1) {
 
         log_info("tool layer_next: %i", id + 1);
@@ -78,15 +78,15 @@ static void select_update(struct Tool *super, float dtime) {
 
     int id = canvas.current_layer;
     if (self->last_layer_id == 0 && id > 0)
-        button_set_pressed(&self->prev.rect, false);
+        u_button_set_pressed(&self->prev.rect, false);
     if (self->last_layer_id == canvas.RO.image.layers - 1 && id < self->last_layer_id)
-        button_set_pressed(&self->next.rect, false);
+        u_button_set_pressed(&self->next.rect, false);
     self->last_layer_id = id;
 
     if (id == 0)
-        button_set_pressed(&self->prev.rect, true);
+        u_button_set_pressed(&self->prev.rect, true);
     if (id == canvas.RO.image.layers - 1)
-        button_set_pressed(&self->next.rect, true);
+        u_button_set_pressed(&self->next.rect, true);
 
     // todo
     char layer_num[3];
@@ -180,7 +180,7 @@ Tool *tool_new_layer_select() {
 static void move_prev_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
-    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+    if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool layer move_prev");
         int layer = canvas.current_layer;
         uImage img = u_image_new_clone(canvas.RO.image);
@@ -214,7 +214,7 @@ Tool *tool_new_layer_move_prev() {
 static void move_next_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
-    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+    if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool layer move_next");
         int layer = canvas.current_layer;
         uImage img = u_image_new_clone(canvas.RO.image);
@@ -249,8 +249,8 @@ Tool *tool_new_layer_move_next() {
 static void blend_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
-    if (button_toggled(&self->ro.rect, pointer)) {
-        bool pressed = button_is_pressed(&self->ro.rect);
+    if (u_button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = u_button_is_pressed(&self->ro.rect);
         log_info("tool layer blend: %i", pressed);
         canvas.blend_layers = pressed;
     }
@@ -259,7 +259,7 @@ static void blend_pe(struct Tool *super, ePointer_s pointer) {
 static bool blend_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     bool active = canvas.blend_layers;
-    button_set_pressed(&self->ro.rect, active);
+    u_button_set_pressed(&self->ro.rect, active);
     // always active
     return true;
 }
@@ -276,7 +276,7 @@ Tool *tool_new_layer_blend() {
 static void add_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
-    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+    if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool layer add");
         int layer = canvas.current_layer;
         uImage old = canvas.RO.image;

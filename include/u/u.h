@@ -13,5 +13,6 @@
 #include "json.h"
 #include "timer.h"
 #include "animator.h"
+#include "button.h"
 
 #endif //U_U_H

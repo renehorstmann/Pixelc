@@ -118,13 +118,10 @@ static void render(float dtime) {
     canvas_render(canvas_cam);
     selectionctrl_render(canvas_cam);
     toolbar_render(hud_cam);
-    if (dialog.textinput_active) {
-        palette_render(hud_cam);
-        dialog_render(hud_cam);
-    } else {
-        dialog_render(hud_cam);
+    palette_render(hud_cam);
+    dialog_render(hud_cam);
+    if (!dialog.textinput_active) {
         multitouchcursor_render(hud_cam);
-        palette_render(hud_cam);
     }
     animation_render(hud_cam);
 }

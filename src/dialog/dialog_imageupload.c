@@ -2,7 +2,7 @@
 #include "r/r.h"
 #include "u/pose.h"
 #include "u/image.h"
-#include "button.h"
+#include "u/button.h"
 #include "dialog.h"
 
 #define BG_A "#776666"
@@ -57,7 +57,7 @@ static void uploaded(const char *file, bool ascii, const char *user_file_name, v
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
 
-    if (impl->upload_available && button_clicked(&impl->upload.rect, pointer)) {
+    if (impl->upload_available && u_button_clicked(&impl->upload.rect, pointer)) {
         e_io_ask_for_file_upload("import.png", false, uploaded, NULL);
     }
 

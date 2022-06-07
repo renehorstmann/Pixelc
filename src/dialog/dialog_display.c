@@ -2,7 +2,7 @@
 #include "u/pose.h"
 #include "textinput.h"
 #include "camera.h"
-#include "button.h"
+#include "u/button.h"
 #include "dialog.h"
 
 #define BG_A "#776666"
@@ -92,27 +92,27 @@ static bool pointer_event(ePointer_s pointer) {
 
     if (pointer.action == E_POINTER_DOWN) {
         if (u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
-            impl->textinput = textinput_new("Set camera size", 8);
+            impl->textinput = textinput_new("Internal Min. Size", 8);
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->size);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
             impl->textinput_usage = 0;
         }
     }
 
-    if (button_clicked(&impl->buttons.rects[0], pointer)) {
+    if (u_button_clicked(&impl->buttons.rects[0], pointer)) {
         impl->size = CAMERA_SIZE_SMALL;
     }
-    if (button_clicked(&impl->buttons.rects[1], pointer)) {
+    if (u_button_clicked(&impl->buttons.rects[1], pointer)) {
         impl->size = CAMERA_SIZE_BIG;
     }
 
-    if (button_pressed(&impl->buttons.rects[2], pointer)) {
+    if (u_button_pressed(&impl->buttons.rects[2], pointer)) {
         impl->mode = CAMERA_ROTATE_MODE_PORTRAIT;
     }
-    if (button_pressed(&impl->buttons.rects[3], pointer)) {
+    if (u_button_pressed(&impl->buttons.rects[3], pointer)) {
         impl->mode = CAMERA_ROTATE_MODE_LANDSCAPE;
     }
-    if (button_pressed(&impl->buttons.rects[4], pointer)) {
+    if (u_button_pressed(&impl->buttons.rects[4], pointer)) {
         impl->mode = CAMERA_ROTATE_MODE_AUTO;
     }
 

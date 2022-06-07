@@ -1,6 +1,6 @@
 #include "u/pose.h"
 #include "mathc/float.h"
-#include "button.h"
+#include "u/button.h"
 #include "brush.h"
 #include "palette.h"
 #include "animation.h"

@@ -6,7 +6,7 @@
 #include "rhc/log.h"
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
-#include "button.h"
+#include "u/button.h"
 #include "canvas.h"
 #include "selectionctrl.h"
 #include "tool.h"
@@ -25,7 +25,7 @@ static void rotate_l_pe(struct Tool *super, ePointer_s pointer) {
     Selection *s = selectionctrl.selection;
     if (!s)
         return;
-    if (button_clicked(&self->ro.rect, pointer)) {
+    if (u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool selection paste rotate left");
         selection_rotate(s, false);
         update_canvas();
@@ -45,7 +45,7 @@ static void rotate_r_pe(struct Tool *super, ePointer_s pointer) {
     Selection *s = selectionctrl.selection;
     if (!s)
         return;
-    if (button_clicked(&self->ro.rect, pointer)) {
+    if (u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool selection paste rotate right");
         selection_rotate(s, true);
         update_canvas();
@@ -65,7 +65,7 @@ static void mirror_v_pe(struct Tool *super, ePointer_s pointer) {
     Selection *s = selectionctrl.selection;
     if (!s)
         return;
-    if (button_clicked(&self->ro.rect, pointer)) {
+    if (u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool selection paste mirror vertical");
         selection_mirror(s, true);
         update_canvas();
@@ -85,7 +85,7 @@ static void mirror_h_pe(struct Tool *super, ePointer_s pointer) {
     Selection *s = selectionctrl.selection;
     if (!s)
         return;
-    if (button_clicked(&self->ro.rect, pointer)) {
+    if (u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool selection paste mirror horizontal");
         selection_mirror(s, false);
         update_canvas();
@@ -105,8 +105,8 @@ static void blend_pe(struct Tool *super, ePointer_s pointer) {
     Selection *s = selectionctrl.selection;
     if (!s)
         return;
-    if (button_toggled(&self->ro.rect, pointer)) {
-        bool pressed = button_is_pressed(&self->ro.rect);
+    if (u_button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = u_button_is_pressed(&self->ro.rect);
         log_info("tool selection paste blend: %i", pressed);
         s->blend = pressed;
         update_canvas();
@@ -117,7 +117,7 @@ static bool blend_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     Selection *s = selectionctrl.selection;
     bool active = s ? s->blend : false;
-    button_set_pressed(&self->ro.rect, active);
+    u_button_set_pressed(&self->ro.rect, active);
     // always active
     return true;
 }
@@ -132,7 +132,7 @@ Tool *tool_new_selection_paste_blend() {
 
 static void copy_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (button_clicked(&self->ro.rect, pointer)) {
+    if (u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool selection paste copy");
         canvas_save();
     }
@@ -148,7 +148,7 @@ Tool *tool_new_selection_paste_copy() {
 
 static void ok_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (button_clicked(&self->ro.rect, pointer)) {
+    if (u_button_clicked(&self->ro.rect, pointer)) {
         log_info("tool selection paste ok");
         canvas_save();
         selectionctrl_stop();

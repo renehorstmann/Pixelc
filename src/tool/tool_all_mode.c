@@ -5,7 +5,7 @@
 #include "rhc/log.h"
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
-#include "button.h"
+#include "u/button.h"
 #include "brush.h"
 #include "tool.h"
 
@@ -14,7 +14,7 @@ _Static_assert(sizeof(enum brush_modes) <= TOOL_BUTTON_ADDITIONAL_DATA_SIZE, "wt
 static void mode_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     enum brush_modes mode = *((enum brush_modes *) self->additional_data);
-    if (button_pressed(&self->ro.rect, pointer)) {
+    if (u_button_pressed(&self->ro.rect, pointer)) {
         log_info("tool mode: %i", mode);
         brush.mode = mode;
     }
@@ -23,13 +23,13 @@ static void mode_pe(struct Tool *super, ePointer_s pointer) {
 static bool mode_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     enum brush_modes mode = *((enum brush_modes *) self->additional_data);
-    button_set_pressed(&self->ro.rect, brush.mode == mode);
+    u_button_set_pressed(&self->ro.rect, brush.mode == mode);
     // always active
     return true;
 }
 
-static Tool *mode_new(const char *name, const char *tip, const char *button_file, enum brush_modes mode) {
-    Tool *super = tool_button_new(name, tip, button_file, mode_pe, mode_is_a);
+static Tool *mode_new(const char *name, const char *tip, const char *u_button_file, enum brush_modes mode) {
+    Tool *super = tool_button_new(name, tip, u_button_file, mode_pe, mode_is_a);
     ToolButton *self = (ToolButton *) super;
     *((enum brush_modes *) self->additional_data) = mode;
     return super;

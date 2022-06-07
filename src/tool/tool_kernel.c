@@ -1,6 +1,6 @@
 #include "u/pose.h"
 #include "mathc/int.h"
-#include "button.h"
+#include "u/button.h"
 #include "brush.h"
 #include "camera.h"
 #include "animation.h"
@@ -35,13 +35,13 @@ static void kill_fn(Tool **super_ptr) {
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     Impl *self = (Impl *) super;
     int id = brush.RO.kernel_id;
-    if (button_clicked(&self->minus.rect, pointer)
+    if (u_button_clicked(&self->minus.rect, pointer)
         && id > 0) {
 
         log_info("tool kernel_minus: %i", id - 1);
         brush_load_kernel(id - 1);
     }
-    if (button_clicked(&self->plus.rect, pointer)
+    if (u_button_clicked(&self->plus.rect, pointer)
         && id < brush.RO.max_kernels - 1) {
 
         log_info("tool kernel_plus: %i", id + 1);
@@ -75,15 +75,15 @@ static void update(struct Tool *super, float dtime) {
 
     int id = brush.RO.kernel_id;
     if (self->last_kernel_id == 0 && id > 0)
-        button_set_pressed(&self->minus.rect, false);
+        u_button_set_pressed(&self->minus.rect, false);
     if (self->last_kernel_id == brush.RO.max_kernels - 1 && id < self->last_kernel_id)
-        button_set_pressed(&self->plus.rect, false);
+        u_button_set_pressed(&self->plus.rect, false);
     self->last_kernel_id = id;
 
     if (id == 0)
-        button_set_pressed(&self->minus.rect, true);
+        u_button_set_pressed(&self->minus.rect, true);
     if (id == brush.RO.max_kernels - 1)
-        button_set_pressed(&self->plus.rect, true);
+        u_button_set_pressed(&self->plus.rect, true);
 
     self->kernel.tex = brush.RO.kernel_tex;
 

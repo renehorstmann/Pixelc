@@ -1,4 +1,4 @@
-#include "button.h"
+#include "u/button.h"
 #include "dialog.h"
 #include "tool.h"
 
@@ -8,11 +8,11 @@
 
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (!button_toggled(&self->ro.rect, pointer))
+    if (!u_button_toggled(&self->ro.rect, pointer))
         return;
 
     // only passed if button state toggled
-    bool pressed = button_is_pressed(&self->ro.rect);
+    bool pressed = u_button_is_pressed(&self->ro.rect);
     if (pressed) {
         log_info("tool display start");
         dialog_create_display();
@@ -26,7 +26,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 static bool is_active(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     bool active = strcmp(dialog.id, "display") == 0;
-    button_set_pressed(&self->ro.rect, active);
+    u_button_set_pressed(&self->ro.rect, active);
     // always active
     return true;
 }
@@ -39,7 +39,8 @@ static bool is_active(struct Tool *super, float dtime) {
 Tool *tool_new_display() {
     return tool_button_new("display",
                            "change the internal\n"
-                           "display size\n\n"
+                           "display size\n"
+                           "(min. pixel size)\n\n"
                            "and the\n"
                            "rotation mode",
                            "res/button_display.png",

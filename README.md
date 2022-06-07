@@ -3,11 +3,10 @@ An opensource tile/sprite editor in C, using SDL2 and OpenGL, also running on An
 
 Based on [some](https://github.com/renehorstmann/some) framework.
 
-Have a look at [Tilec](https://github.com/renehorstmann/Tilec) for a forked tile map editor.
+Have a look at [Tilec](https://github.com/renehorstmann/Tilec) for an old forked tile map editor.
 
 ## Live demo
 Compiled with emscripten [live demo](https://renehorstmann.github.io/pixelc)
-Lots of features are missing in the web demo! (Loading, Saving, options like size, ...)
 
 ## Status:
 Ready to draw...
@@ -57,8 +56,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- palette landscape mode in portrait orient bug
-
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -69,7 +66,6 @@ python3 -m http.server --bind localhost  # [port]
 
 - rethink layers and frames?
 
-- tablet size dialog to big (dialog offset y?)
 - undo layer change bug
 - dialog:
   - delete

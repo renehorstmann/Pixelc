@@ -68,10 +68,22 @@ void multitouchcursor_update(float dtime) {
     float b = y - INNER_RADIUS;
     float t = y + INNER_RADIUS;
 
-    L.cursor.rects[0].pose = u_pose_new_aa_lrbt(camera.RO.left, l, yb, yt);
-    L.cursor.rects[1].pose = u_pose_new_aa_lrbt(r, camera.RO.right, yb, yt);
-    L.cursor.rects[2].pose = u_pose_new_aa_lrbt(xl, xr, camera.RO.bottom, b);
-    L.cursor.rects[3].pose = u_pose_new_aa_lrbt(xl, xr, t, camera.RO.top);
+    float left = camera.RO.left;
+    float right = camera.RO.right;
+    float bottom = camera.RO.bottom;
+    float top = camera.RO.top;
+
+    // so it looks like the multitouchcursor is rendered behind the palette
+    if(camera_is_portrait_mode()) {
+        bottom += palette_get_hud_size();
+    } else {
+        right -= palette_get_hud_size();
+    }
+
+    L.cursor.rects[0].pose = u_pose_new_aa_lrbt(left, l, yb, yt);
+    L.cursor.rects[1].pose = u_pose_new_aa_lrbt(r, right, yb, yt);
+    L.cursor.rects[2].pose = u_pose_new_aa_lrbt(xl, xr, bottom, b);
+    L.cursor.rects[3].pose = u_pose_new_aa_lrbt(xl, xr, t,  top);
 
     for (int i = 0; i < 4; i++) {
         L.cursor.rects[i].color = L.pressed ? COLOR_PRESSED : COLOR_NORMAL;

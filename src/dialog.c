@@ -3,7 +3,7 @@
 #include "u/pose.h"
 #include "toolbar.h"
 #include "palette.h"
-#include "button.h"
+#include "u/button.h"
 #include "dialog.h"
 #include "textinput.h"
 #include "canvas.h"
@@ -75,12 +75,12 @@ void dialog_render(const mat4 *cam_mat) {
 bool dialog_pointer_event(ePointer_s pointer) {
     if (!dialog_valid())
         return false;
-    if (pointer.id == 0 && dialog.opt_on_cancel_cb && button_clicked(&dialog.cancel.rect, pointer)) {
+    if (pointer.id == 0 && dialog.opt_on_cancel_cb && u_button_clicked(&dialog.cancel.rect, pointer)) {
         dialog.opt_on_cancel_cb(false);
         dialog_hide();
         return true;
     }
-    if (pointer.id == 0 && dialog.opt_on_ok_cb && button_clicked(&dialog.ok.rect, pointer)) {
+    if (pointer.id == 0 && dialog.opt_on_ok_cb && u_button_clicked(&dialog.ok.rect, pointer)) {
         dialog.opt_on_ok_cb(true);
         dialog_hide();
         return true;

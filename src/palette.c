@@ -9,7 +9,7 @@
 #include "palette.h"
 
 #define COLOR_DROP_SIZE 16.0f
-#define MAX_ROWS 10
+#define ADDITIONAL_PALETTE_SPACE 64
 
 #define SWIPE_DISTANCE 50
 
@@ -99,7 +99,7 @@ void palette_init() {
 
     L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
-    L.background_ro = ro_batch_new(PALETTE_MAX + MAX_ROWS,
+    L.background_ro = ro_batch_new(PALETTE_MAX + ADDITIONAL_PALETTE_SPACE,
                                    r_texture_new_file(2, 2, "res/palette_background.png"));
 
     L.select_ro = ro_single_new(r_texture_new_file(1, 1, "res/palette_select.png"));
@@ -162,7 +162,7 @@ void palette_update(float dtime) {
     }
 
     // background continuation
-    for (int r = 0; r < MAX_ROWS; r++) {
+    for (int r = 0; r < ADDITIONAL_PALETTE_SPACE; r++) {
         int idx = L.background_ro.num - r - 1;
         // pose
         mat4 pose = mat4_eye();

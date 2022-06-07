@@ -5,7 +5,7 @@
 #include "u/color.h"
 #include "u/image.h"
 
-#define PALETTE_MAX 80
+#define PALETTE_MAX 128
 
 struct Palette_Globals {
     vec4 ro_color; // render object color (default R_COLOR_WHITE)

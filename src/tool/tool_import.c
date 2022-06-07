@@ -1,6 +1,6 @@
 #include "u/image.h"
 #include "u/pose.h"
-#include "button.h"
+#include "u/button.h"
 #include "dialog.h"
 #include "selectionctrl.h"
 #include "animation.h"
@@ -14,7 +14,7 @@ _Static_assert(sizeof(TOOL_BUTTON_ADDITIONAL_DATA_SIZE) >= sizeof(float), "wtf")
 
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (self->active && button_clicked(&self->ro.rect, pointer)) {
+    if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         uImage img = u_image_new_file(1, "import.png");
         if (!u_image_valid(img)) {
             dialog_create_image_upload();
@@ -29,7 +29,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 static bool is_active(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     float *longpress_time = (float *) self->additional_data;
-    if (!button_is_pressed(&self->ro.rect)) {
+    if (!u_button_is_pressed(&self->ro.rect)) {
         *longpress_time = 0;
         return true;
     }
@@ -42,7 +42,7 @@ static bool is_active(struct Tool *super, float dtime) {
         animation_longpress(u_pose_get_xy(self->ro.rect.pose),
                             R_COLOR_YELLOW);
         dialog_create_image_upload();
-        button_set_pressed(&self->ro.rect, false);
+        u_button_set_pressed(&self->ro.rect, false);
     }
     // always actice
     return true;

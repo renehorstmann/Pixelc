@@ -137,7 +137,7 @@ static CLASS RHC_NAME_CONCAT2(FN_NAME, _new_invalid)() {
 // void foo_kill(Foo *self)
 static void RHC_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
     // valid
-    if (!RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
+    if (RHC_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
         allocator_free(self->allocator, self->map);
     }
     // new_invalid_a

@@ -6,7 +6,7 @@
 #include "rhc/log.h"
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
-#include "button.h"
+#include "u/button.h"
 #include "canvas.h"
 #include "camera.h"
 #include "selectionctrl.h"
@@ -136,7 +136,7 @@ static void move_pe(struct Tool *super, ePointer_s pointer) {
     int img_rows = canvas.RO.image.rows;
 
     for (int i = 0; i < 8; i++) {
-        if (self->active[i] && button_clicked(&self->ro.rects[i], pointer)) {
+        if (self->active[i] && u_button_clicked(&self->ro.rects[i], pointer)) {
             log_info("tool selection set move: %i", i);
             if (i == 0 && s->left > 0) {
                 s->left--;
@@ -193,8 +193,8 @@ Tool *tool_new_selection_set_move() {
 
 static void copy_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (button_toggled(&self->ro.rect, pointer)) {
-        bool pressed = button_is_pressed(&self->ro.rect);
+    if (u_button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = u_button_is_pressed(&self->ro.rect);
         if (pressed) {
             log_info("tool selection set copy: start");
             selectionctrl.mode = SELECTIONCTRL_COPY;
@@ -207,7 +207,7 @@ static void copy_pe(struct Tool *super, ePointer_s pointer) {
 
 static bool copy_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    button_set_pressed(&self->ro.rect, selectionctrl.mode == SELECTIONCTRL_COPY);
+    u_button_set_pressed(&self->ro.rect, selectionctrl.mode == SELECTIONCTRL_COPY);
     // always active
     return true;
 }
@@ -222,8 +222,8 @@ Tool *tool_new_selection_set_copy() {
 
 static void cut_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (button_toggled(&self->ro.rect, pointer)) {
-        bool pressed = button_is_pressed(&self->ro.rect);
+    if (u_button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = u_button_is_pressed(&self->ro.rect);
         if (pressed) {
             log_info("tool selection set cut: start");
             selectionctrl.mode = SELECTIONCTRL_CUT;
@@ -236,7 +236,7 @@ static void cut_pe(struct Tool *super, ePointer_s pointer) {
 
 static bool cut_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    button_set_pressed(&self->ro.rect, selectionctrl.mode == SELECTIONCTRL_CUT);
+    u_button_set_pressed(&self->ro.rect, selectionctrl.mode == SELECTIONCTRL_CUT);
     // always active
     return true;
 }

@@ -1,4 +1,4 @@
-#include "button.h"
+#include "u/button.h"
 #include "dialog.h"
 #include "tool.h"
 
@@ -8,11 +8,11 @@
 
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (!button_toggled(&self->ro.rect, pointer))
+    if (!u_button_toggled(&self->ro.rect, pointer))
         return;
 
     // only passed if button state toggled
-    bool pressed = button_is_pressed(&self->ro.rect);
+    bool pressed = u_button_is_pressed(&self->ro.rect);
     if (pressed) {
         log_info("tool size start");
         dialog_create_canvas_size();
@@ -26,7 +26,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 static bool is_active(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     bool active = strcmp(dialog.id, "set size") == 0;
-    button_set_pressed(&self->ro.rect, active);
+    u_button_set_pressed(&self->ro.rect, active);
     // always active
     return true;
 }

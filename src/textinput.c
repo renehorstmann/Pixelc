@@ -9,7 +9,7 @@
 #include "r/ro_batch.h"
 #include "r/ro_text.h"
 #include "u/pose.h"
-#include "button.h"
+#include "u/button.h"
 #include "textinput.h"
 
 #define KEY_COLS 10
@@ -99,26 +99,26 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     TextInput *self = user_data;
     pointer.pos = mat4_mul_vec(self->L.cam.p_inv, pointer.pos);
 
-    if (button_clicked(&self->L.shift.rect, pointer)) {
+    if (u_button_clicked(&self->L.shift.rect, pointer)) {
         self->shiftstate++;
         if (self->shiftstate >= TEXTINPUT_SHIFT_NUM_STATES) {
             self->shiftstate = 0;
         }
     }
 
-    if (button_clicked(&self->L.space.rect, pointer)) {
+    if (u_button_clicked(&self->L.space.rect, pointer)) {
         append_char(self, ' ');
     }
 
     for (int i = 0; i < 27; i++) {
-        if (button_clicked(&self->L.keys.rects[i], pointer)) {
+        if (u_button_clicked(&self->L.keys.rects[i], pointer)) {
             append_char(self, get_key_char(self, i));
         }
     }
 
     // ok, cancel, backspace
     for (int i = 0; i < 3; i++) {
-        if (button_clicked(&self->L.special.rects[i], pointer)) {
+        if (u_button_clicked(&self->L.special.rects[i], pointer)) {
             if (i == 0)
                 handle_ok(self);
             else if (i == 1)
@@ -216,7 +216,7 @@ TextInput *textinput_new(const char *title, int opt_max_chars) {
     self->L.special = ro_batch_new(3, r_texture_new_file(2, 3, "res/textinput_key_special.png"));
 
     self->L.bg = ro_single_new(r_texture_new_white_pixel());
-    self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.5}};
+    self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.66}};
 
     self->L.text_bg = ro_single_new(r_texture_new_white_pixel());
     self->L.text_bg.rect.color = (vec4) {{1, 1, 1, 0.5}};
@@ -296,7 +296,7 @@ void textinput_update(TextInput *self, float dtime) {
             if (self->shiftstate == TEXTINPUT_SHIFT_UPPER)
                 key = toupper(key);
 
-            bool pressed = button_is_pressed(&self->L.keys.rects[idx]);
+            bool pressed = u_button_is_pressed(&self->L.keys.rects[idx]);
 
             set_key_pos(self, &self->L.keys.rects[idx].pose, c, r, 1, 0, 0);
             set_key_pos(self, &self->L.chars.rects[idx].pose, c, pressed ? 0 : r, 1, 0.5, pressed ? 16 : 1);
