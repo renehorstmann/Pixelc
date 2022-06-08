@@ -63,6 +63,21 @@ python3 -m http.server --bind localhost  # [port]
     - top with title bar
     - flexible middle (flex in height of course)
     - bottom part
+    
+- palette long press dialog
+  - name of current palette
+  - delete this palette?
+    - opens a delete dialog
+  - upload new palette
+  - info for palette file
+  
+- kernel long press dialog
+  - shows the current kernel
+  - delete this kernel
+    - delete dialog
+  - upload new kernel
+  
+- clear longpress opens reset all dialog
 
 - rethink layers and frames?
 
