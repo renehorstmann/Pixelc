@@ -6,12 +6,17 @@
 #include "mathc/float.h"
 #include "brush.h"
 #include "camera.h"
+#include "dialog.h"
+#include "animation.h"
 #include "palette.h"
 
 #define COLOR_DROP_SIZE 16.0f
 #define ADDITIONAL_PALETTE_SPACE 64
 
 #define SWIPE_DISTANCE 50
+
+#define LONGPRESS_TIME 0.75
+#define LONGPRESS_RADIUS 8.0
 
 #define INFO_STATIC_TIME 0.5
 #define INFO_TIME 1.5
@@ -39,7 +44,8 @@ static struct {
         RoBatch arrows;
         vec2 start;
         bool swiping;
-    } swipe;
+        float longpress_time;
+    } action;
 
     int last_selected;
     int current_pressed;
@@ -78,9 +84,9 @@ static mat4 setup_palette_color_pose(int r, int c) {
 static float swipe_diff(ePointer_s pointer) {
     float diff;
     if (camera_is_portrait_mode()) {
-        diff = pointer.pos.x - L.swipe.start.x;
+        diff = pointer.pos.x - L.action.start.x;
     } else {
-        diff = pointer.pos.y - L.swipe.start.y;
+        diff = pointer.pos.y - L.action.start.y;
     }
     return diff / SWIPE_DISTANCE;
 }
@@ -108,8 +114,9 @@ void palette_init() {
     L.info.bg = ro_single_new(r_texture_new_file(1, 1, "res/palette_info_bg.png"));
     L.info.text = ro_text_new_font55(20);
 
-    L.swipe.arrows = ro_batch_new(2, r_texture_new_file(1, 1, "res/palette_arrow.png"));
+    L.action.arrows = ro_batch_new(2, r_texture_new_file(1, 1, "res/palette_arrow.png"));
 
+    L.action.longpress_time = -1;
 
     // default palette:
     {
@@ -219,6 +226,17 @@ void palette_update(float dtime) {
                     1, 1, M_PI_2);
         }
     }
+    
+    // action
+    if(L.action.longpress_time>=0) {
+        L.action.longpress_time -= dtime;
+        if(L.action.longpress_time<0) {
+            // stop actions
+            L.action.swiping = false;
+            animation_longpress(L.action.start, (vec4) {{0.8, 0.1, 0.1, 1.0}});
+            dialog_create_palette();
+        }
+    }
 
 }
 
@@ -232,24 +250,26 @@ void palette_render(const mat4 *cam_mat) {
     ro_batch_render(&L.palette_ro, cam_mat, true);
     ro_single_render(&L.select_ro, cam_mat);
 
-    if (L.swipe.swiping)
-        ro_batch_render(&L.swipe.arrows, cam_mat, true);
+    if (L.action.swiping)
+        ro_batch_render(&L.action.arrows, cam_mat, true);
 }
 
 
 bool palette_pointer_event(ePointer_s pointer) {
     if (!palette_contains_pos(pointer.pos.xy)) {
         for (int i = 0; i < 2; i++)
-            L.swipe.arrows.rects[i].color.a = 0;
-        L.swipe.swiping = false;
+            L.action.arrows.rects[i].color.a = 0;
+        L.action.swiping = false;
+        L.action.longpress_time = -1;
         return false;
     }
 
     if (pointer.action == E_POINTER_DOWN) {
         for (int i = 0; i < 2; i++)
-            L.swipe.arrows.rects[i].color.a = 0;
-        L.swipe.start = pointer.pos.xy;
-        L.swipe.swiping = true;
+            L.action.arrows.rects[i].color.a = 0;
+        L.action.start = pointer.pos.xy;
+        L.action.swiping = true;
+        L.action.longpress_time = LONGPRESS_TIME;
 
         for (int i = 0; i < palette.RO.palette_size; i++) {
             // pose will be rotated in landscape mode (so do not use _aa_)!
@@ -265,8 +285,9 @@ bool palette_pointer_event(ePointer_s pointer) {
 
     if (pointer.action == E_POINTER_UP) {
         for (int i = 0; i < 2; i++)
-            L.swipe.arrows.rects[i].color.a = 0;
-        L.swipe.swiping = false;
+            L.action.arrows.rects[i].color.a = 0;
+        L.action.swiping = false;
+        L.action.longpress_time = -1;
     }
 
     if (L.current_pressed != -1
@@ -281,29 +302,29 @@ bool palette_pointer_event(ePointer_s pointer) {
         L.current_pressed = -1;
     }
 
-    if (L.swipe.swiping && pointer.action == E_POINTER_MOVE) {
+    if (L.action.swiping && pointer.action == E_POINTER_MOVE) {
         float diff = swipe_diff(pointer);
         if (diff > 1) {
             int id = palette.RO.palette_id - 1;
             if (id < 0)
                 id = palette.RO.max_palettes - 1;
             palette_load_palette(id);
-            L.swipe.swiping = false;
+            L.action.swiping = false;
 
         } else if (diff <= -1) {
             int id = palette.RO.palette_id + 1;
             id %= palette.RO.max_palettes;
             palette_load_palette(id);
-            L.swipe.swiping = false;
+            L.action.swiping = false;
 
         }
 
         float alpha = sca_smoothstep(sca_abs(diff), 0.25, 1);
         for (int i = 0; i < 2; i++)
-            L.swipe.arrows.rects[i].color.a = alpha;
+            L.action.arrows.rects[i].color.a = alpha;
         if (camera_is_portrait_mode()) {
             for (int i = 0; i < 2; i++) {
-                L.swipe.arrows.rects[i].pose = u_pose_new_angle(
+                L.action.arrows.rects[i].pose = u_pose_new_angle(
                         (int[]) {-1, 1}[i] * (camera_width() / 2 - 20),
                         camera.RO.bottom + 16,
                         32, 32,
@@ -312,13 +333,19 @@ bool palette_pointer_event(ePointer_s pointer) {
             }
         } else {
             for (int i = 0; i < 2; i++) {
-                L.swipe.arrows.rects[i].pose = u_pose_new_angle(
+                L.action.arrows.rects[i].pose = u_pose_new_angle(
                         camera.RO.right - 16,
                         (int[]) {-1, 1}[i] * (camera_height() / 2 - 20),
                         32, 32,
                         sca_sign(diff) * M_PI_2
                 );
             }
+        }
+    }
+    
+    if(L.action.longpress_time>=0 && pointer.action == E_POINTER_MOVE) {
+        if(vec2_distance(L.action.start, pointer.pos.xy) > LONGPRESS_RADIUS) {
+            L.action.longpress_time = -1;
         }
     }
 
