@@ -64,7 +64,7 @@ python3 -m http.server --bind localhost  # [port]
     - flexible middle (flex in height of course)
     - bottom part
     
-- palette long press dialog
+- palette dialog
   - name of current palette
   - delete this palette?
     - opens a delete dialog

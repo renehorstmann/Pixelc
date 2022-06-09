@@ -15,6 +15,9 @@
 struct Dialog_Globals dialog;
 
 void dialog_init() {
+    dialog.bg_alpha_layer = ro_single_new(r_texture_new_invalid());
+    dialog.bg_alpha_layer.rect.color = (vec4) {{0, 0, 0, 0.2}};
+    
     dialog.bg = ro_single_new(r_texture_new_invalid());
     dialog.bg_shadow = ro_single_new(r_texture_new_invalid());
     dialog.bg_shadow.owns_tex = false;
@@ -43,6 +46,8 @@ void dialog_update(float dtime) {
         return;
     dialog.textinput_active = false;
     dialog.update(dtime);
+    
+    dialog.bg_alpha_layer.rect.pose = u_pose_new_aa(camera.RO.left, camera.RO.top, camera_width(), camera_height());
 
     float height = 16 + dialog.impl_height;
     if (dialog.opt_on_cancel_cb || dialog.opt_on_ok_cb)
@@ -61,6 +66,7 @@ void dialog_update(float dtime) {
 void dialog_render(const mat4 *cam_mat) {
     if (!dialog_valid())
         return;
+    ro_single_render(&dialog.bg_alpha_layer, cam_mat);
     ro_single_render(&dialog.bg_shadow, cam_mat);
     ro_single_render(&dialog.bg, cam_mat);
     ro_text_render(&dialog.title_shadow, cam_mat);

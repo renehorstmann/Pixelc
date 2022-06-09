@@ -33,6 +33,7 @@ struct Dialog_Globals {
 
     float impl_height;
 
+    RoSingle bg_alpha_layer;
     RoSingle bg;
     RoSingle bg_shadow;
     RoText title;
