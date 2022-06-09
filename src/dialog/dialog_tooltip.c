@@ -46,7 +46,8 @@ static bool pointer_event(ePointer_s pointer) {
     if (palette_contains_pos(pointer.pos.xy)) {
         set("palette", "tip to select\na color\n\n"
                        "swipe left or\nright to change\nthe palette\n\n"
-                       "swipe up for\nmultitouchmode");
+                       "swipe up for\nmultitouchmode\n\n"
+                       "hold for options");
         return true;
     }
     Tool *tool = toolbar_get_tool_by_pos(pointer.pos.xy);
