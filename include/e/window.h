@@ -30,6 +30,10 @@ struct eWindow_Globals {
     SDL_Window *sdl_window;
     SDL_GLContext gl_context;
 
+    // set this to false, if the main loop should also run on lost focus
+    // default is true
+    bool allow_pause;
+
     // will read from sdl at the start of each frame:
     ivec2 size;
     

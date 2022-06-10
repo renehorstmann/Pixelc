@@ -82,7 +82,7 @@ static void loop() {
 }
 
 static void pause_wnd() {
-    if (L.pause)
+    if (L.pause || !e_window.allow_pause)
         return;
     log_info("e_window: pause");
     L.pause = true;
@@ -92,7 +92,7 @@ static void pause_wnd() {
 }
 
 static void resume_wnd() {
-    if (!L.pause)
+    if (!L.pause || !e_window.allow_pause)
         return;
     log_info("e_window: resume");
     for (int i = 0; i < L.reg_pause_e_size; i++) {
@@ -146,6 +146,7 @@ void e_window_init(const char *title) {
 
     log_info("init");
 
+    e_window.allow_pause = true;
 
     assume(strlen(title) < sizeof L.title, "title to long: %i/%i",
            strlen(title), sizeof L.title);
