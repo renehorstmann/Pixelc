@@ -34,7 +34,7 @@ bool u_button_pressed(rRect_s *self, ePointer_s pointer) {
     return press;
 }
 
-bool button_toggled(rRect_s *self, ePointer_s pointer) {
+bool u_button_toggled(rRect_s *self, ePointer_s pointer) {
     bool toggle = pointer.action == E_POINTER_UP && u_pose_aa_contains(self->pose, pointer.pos.xy);
 
     if (toggle) {
