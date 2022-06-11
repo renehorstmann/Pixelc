@@ -59,14 +59,6 @@ void multitouchcursor_init() {
 void multitouchcursor_update(float dtime) {
     float x = multitouchcursor.pos.x;
     float y = multitouchcursor.pos.y;
-    float xl = x - STROKE_RADIUS;
-    float xr = x + STROKE_RADIUS;
-    float yb = y - STROKE_RADIUS;
-    float yt = y + STROKE_RADIUS;
-    float l = x - INNER_RADIUS;
-    float r = x + INNER_RADIUS;
-    float b = y - INNER_RADIUS;
-    float t = y + INNER_RADIUS;
 
     float left = camera.RO.left;
     float right = camera.RO.right;
@@ -76,9 +68,20 @@ void multitouchcursor_update(float dtime) {
     // so it looks like the multitouchcursor is rendered behind the palette
     if(camera_is_portrait_mode()) {
         bottom += palette_get_hud_size();
+        y = sca_max(y, bottom);
     } else {
         right -= palette_get_hud_size();
+        x = sca_min(x, right);
     }
+    
+    float xl = x - STROKE_RADIUS;
+    float xr = x + STROKE_RADIUS;
+    float yb = y - STROKE_RADIUS;
+    float yt = y + STROKE_RADIUS;
+    float l = x - INNER_RADIUS;
+    float r = x + INNER_RADIUS;
+    float b = y - INNER_RADIUS;
+    float t = y + INNER_RADIUS;
 
     L.cursor.rects[0].pose = u_pose_new_aa_lrbt(left, l, yb, yt);
     L.cursor.rects[1].pose = u_pose_new_aa_lrbt(r, right, yb, yt);
