@@ -6,6 +6,7 @@
 #include "u/image.h"
 
 #define PALETTE_MAX 128
+#define PALETTE_NAME_MAX 32
 
 struct Palette_Globals {
     vec4 ro_color; // render object color (default R_COLOR_WHITE)
@@ -17,7 +18,7 @@ struct Palette_Globals {
         uColor_s palette[PALETTE_MAX];
         int palette_size;
         int palette_id;
-        const char *palette_name;
+        char palette_name[PALETTE_NAME_MAX];
         int max_palettes;
     } RO; // read only
 };

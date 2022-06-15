@@ -66,6 +66,8 @@ python3 -m http.server --bind localhost  # [port]
     
 - palette dialog
   - name of current palette
+     - palette name_ref error
+        - should be copied not referenced
   - delete this palette?
     - opens a delete dialog
   - upload new palette

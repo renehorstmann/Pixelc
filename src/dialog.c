@@ -98,6 +98,7 @@ bool dialog_pointer_event(ePointer_s pointer) {
 void dialog_hide() {
     if (!dialog_valid())
         return;
+    log_info("hide");
     dialog.kill(dialog.impl);
     dialog.impl = NULL;
     dialog.id[0] = '\0';

@@ -438,7 +438,8 @@ void palette_set_colors(const uColor_s *colors, int size, const char *name_ref) 
     }
 
     palette_set_color(0);
-    palette.RO.palette_name = name_ref ? name_ref : "custom palette";
+    snprintf(palette.RO.palette_name, PALETTE_NAME_MAX, "%s",
+            name_ref ? name_ref : "custom palette");
 
     palette_set_info(palette.RO.palette_name);
 }
@@ -472,7 +473,7 @@ void palette_load_palette(int id) {
     char file[256];
     snprintf(file, sizeof file, "palette_%s", L.palette_files[id]);
 
-    char name[32];
+    char name[PALETTE_NAME_MAX];
     snprintf(name, sizeof name, "%s", L.palette_files[id]);
 
     // name to lower and without .png

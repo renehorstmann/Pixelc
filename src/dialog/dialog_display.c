@@ -153,7 +153,7 @@ static void on_action(bool ok) {
 
 void dialog_create_display() {
     dialog_hide();
-    dialog_hide();
+    log_info("create");
     Impl *impl = rhc_calloc(sizeof *impl);
     dialog.impl = impl;
 

@@ -75,6 +75,7 @@ static void on_action(bool ok) {
 
 void dialog_create_image_upload() {
     dialog_hide();
+    log_info("create");
     Impl *impl = rhc_calloc(sizeof *impl);
     dialog.impl = impl;
 
