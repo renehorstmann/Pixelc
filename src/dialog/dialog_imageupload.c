@@ -19,11 +19,11 @@ typedef struct {
     bool upload_available;
 } Impl;
 
-static void kill_fn(void *impl) {
-    Impl *self = impl;
-    ro_text_kill(&self->info);
-    ro_single_kill(&self->upload);
-    rhc_free(self);
+static void kill_fn() {
+    Impl *impl = dialog.impl;
+    ro_text_kill(&impl->info);
+    ro_single_kill(&impl->upload);
+    rhc_free(impl);
 }
 
 static void update(float dtime) {

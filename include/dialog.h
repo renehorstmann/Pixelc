@@ -15,7 +15,7 @@
 
 typedef void (*dialog_on_action_cb)(bool ok);
 
-typedef void (*dialog_kill_fun)(void *impl);
+typedef void (*dialog_kill_fun)();
 
 typedef void (*dialog_update_fun)(float dtime);
 

@@ -17,11 +17,11 @@ typedef struct {
     RoText tip;
 } Impl;
 
-static void kill_fn(void *impl) {
-    Impl *self = impl;
-    ro_text_kill(&self->name);
-    ro_text_kill(&self->tip);
-    rhc_free(self);
+static void kill_fn() {
+    Impl *impl = dialog.impl;
+    ro_text_kill(&impl->name);
+    ro_text_kill(&impl->tip);
+    rhc_free(impl);
 }
 
 static void update(float dtime) {

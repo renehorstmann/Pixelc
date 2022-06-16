@@ -41,20 +41,20 @@ typedef struct {
     TextInput *textinput;
 } Impl;
 
-static void kill_fn(void *impl) {
-    Impl *self = impl;
-    ro_text_kill(&self->cols_text);
-    ro_text_kill(&self->cols_num);
-    ro_text_kill(&self->rows_text);
-    ro_text_kill(&self->rows_num);
-    ro_text_kill(&self->layers_text);
-    ro_text_kill(&self->layers_num);
-    ro_text_kill(&self->p_cols_text);
-    ro_text_kill(&self->p_cols_num);
-    ro_text_kill(&self->p_rows_text);
-    ro_text_kill(&self->p_rows_num);
-    textinput_kill(&self->textinput);
-    rhc_free(self);
+static void kill_fn() {
+    Impl *impl = dialog.impl;
+    ro_text_kill(&impl->cols_text);
+    ro_text_kill(&impl->cols_num);
+    ro_text_kill(&impl->rows_text);
+    ro_text_kill(&impl->rows_num);
+    ro_text_kill(&impl->layers_text);
+    ro_text_kill(&impl->layers_num);
+    ro_text_kill(&impl->p_cols_text);
+    ro_text_kill(&impl->p_cols_num);
+    ro_text_kill(&impl->p_rows_text);
+    ro_text_kill(&impl->p_rows_num);
+    textinput_kill(&impl->textinput);
+    rhc_free(impl);
 }
 
 static void update(float dtime) {

@@ -28,14 +28,14 @@ typedef struct {
     TextInput *textinput;
 } Impl;
 
-static void kill_fn(void *impl) {
-    Impl *self = impl;
-    ro_text_kill(&self->size_text);
-    ro_text_kill(&self->size_num);
-    ro_text_kill(&self->mode_text);
-    ro_batch_kill(&self->buttons);
-    textinput_kill(&self->textinput);
-    rhc_free(self);
+static void kill_fn() {
+    Impl *impl = dialog.impl;
+    ro_text_kill(&impl->size_text);
+    ro_text_kill(&impl->size_num);
+    ro_text_kill(&impl->mode_text);
+    ro_batch_kill(&impl->buttons);
+    textinput_kill(&impl->textinput);
+    rhc_free(impl);
 }
 
 static void update(float dtime) {
