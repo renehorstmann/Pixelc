@@ -54,7 +54,7 @@ static bool pointer_event(ePointer_s pointer) {
     
     if(u_button_clicked(&impl->delete_btn.rect, pointer)) {
         log_info("delete dialog");
-        dialog_hide();
+        dialog_create_restart();
     }
 
     return true;
