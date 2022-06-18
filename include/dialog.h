@@ -77,7 +77,7 @@ void dialog_set_title(const char *title_id, vec4 color);
 // dialogs
 //
 
-void dialog_create_prompt(const char *title, const char msg, dialog_on_action_cb on_action);
+void dialog_create_prompt(const char *title, const char *msg, dialog_on_action_cb on_action);
 
 void dialog_create_restart();
 

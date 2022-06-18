@@ -83,12 +83,10 @@ bool dialog_pointer_event(ePointer_s pointer) {
         return false;
     if (pointer.id == 0 && dialog.opt_on_cancel_cb && u_button_clicked(&dialog.cancel.rect, pointer)) {
         dialog.opt_on_cancel_cb(false);
-        dialog_hide();
         return true;
     }
     if (pointer.id == 0 && dialog.opt_on_ok_cb && u_button_clicked(&dialog.ok.rect, pointer)) {
         dialog.opt_on_ok_cb(true);
-        dialog_hide();
         return true;
     }
     return dialog.pointer_event(pointer);

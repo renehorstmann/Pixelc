@@ -14,6 +14,12 @@
 // private
 //
 
+static void on_delete_action(bool ok) {
+    log_info("delete: %i", ok);
+    // todo
+    dialog_create_palette();
+}
+
 
 typedef struct {
     RoText info;
@@ -54,7 +60,7 @@ static bool pointer_event(ePointer_s pointer) {
     
     if(u_button_clicked(&impl->delete_btn.rect, pointer)) {
         log_info("delete dialog");
-        dialog_create_restart();
+        dialog_create_prompt("Delete", "delete this\npalette?", on_delete_action);
     }
 
     return true;
@@ -63,6 +69,7 @@ static bool pointer_event(ePointer_s pointer) {
 static void on_action(bool ok) {
     dialog_hide();
 }
+
 
 //
 // public
