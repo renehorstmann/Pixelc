@@ -53,18 +53,23 @@ void palette_set_custom_select(mat4 select_pose);
 void palette_set_info(const char *info);
 
 // creates an uImage and calls palette_set_palette
-void palette_set_colors(const uColor_s *colors, int size, const char *name_ref);
+void palette_set_colors(const uColor_s *colors, int size, const char *name);
 
 // calls palette_set_colors with the unique colors of palette
-void palette_set_palette(uImage colors, const char *name_ref);
+void palette_set_palette(uImage colors, const char *name);
 
 // loads a palette by its id
 void palette_load_palette(int id);
 
-// saves palette_sink into the config and calls palette_set_palette
+// saves the given palette into the config and calls palette_set_palette
 //   (which will take the ownership of palette_sink)
 // calls palette_save_config
 void palette_append_file(uImage colors, const char *name);
+
+// deletes the palette with the given id from the config, may change the current palette to the previous config palette
+// there must be at least 2 palettes in the config to delete a palette (min. 1 palette)
+// call palette_save_config to save it
+void palette_delete_palette(int id);
 
 // creates the default palette files
 // sets the palette to the first file

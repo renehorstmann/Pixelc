@@ -16,7 +16,10 @@
 
 static void on_delete_action(bool ok) {
     log_info("delete: %i", ok);
-    // todo
+    if(ok) {
+        palette_delete_palette(palette.RO.palette_id);
+        palette_save_config();
+    }
     dialog_create_palette();
 }
 
@@ -47,8 +50,10 @@ static void update(float dtime) {
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
     ro_text_render(&impl->info, cam_mat);
-    ro_text_render(&impl->delete_txt, cam_mat);
-    ro_single_render(&impl->delete_btn, cam_mat);
+    if(palette.RO.max_palettes>1) {
+        ro_text_render(&impl->delete_txt, cam_mat);
+        ro_single_render(&impl->delete_btn, cam_mat);
+    }
     
     if (impl->upload_available)
         ro_single_render(&impl->upload, cam_mat);
@@ -57,6 +62,8 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
+    if(palette.RO.max_palettes<=1)
+        return true;
     
     if(u_button_clicked(&impl->delete_btn.rect, pointer)) {
         log_info("delete dialog");

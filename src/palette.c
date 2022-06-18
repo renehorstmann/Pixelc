@@ -4,6 +4,7 @@
 #include "u/json.h"
 #include "rhc/rhc_full.h"
 #include "mathc/float.h"
+#include "mathc/int.h"
 #include "brush.h"
 #include "camera.h"
 #include "dialog.h"
@@ -413,8 +414,8 @@ void palette_set_info(const char *info) {
     L.info.time = INFO_TIME;
 }
 
-void palette_set_colors(const uColor_s *colors, int size, const char *name_ref) {
-    log_info("set_colors: %s", name_ref);
+void palette_set_colors(const uColor_s *colors, int size, const char *name) {
+    log_info("set_colors: %s", name);
     assume(size > 0, "palette set_colors failed");
 
     palette.RO.palette_size = 0;
@@ -439,13 +440,13 @@ void palette_set_colors(const uColor_s *colors, int size, const char *name_ref) 
 
     palette_set_color(0);
     snprintf(palette.RO.palette_name, PALETTE_NAME_MAX, "%s",
-            name_ref ? name_ref : "custom palette");
+            name ? name : "custom palette");
 
     palette_set_info(palette.RO.palette_name);
 }
 
 
-void palette_set_palette(uImage colors, const char *name_ref) {
+void palette_set_palette(uImage colors, const char *name) {
     if (!u_image_valid(colors)) {
         log_error("invalid");
         return;
@@ -459,7 +460,7 @@ void palette_set_palette(uImage colors, const char *name_ref) {
         return;
     }
 
-    palette_set_colors(colors.data, size, name_ref);
+    palette_set_colors(colors.data, size, name);
 }
 
 void palette_load_palette(int id) {
@@ -524,6 +525,23 @@ void palette_append_file(uImage colors, const char *name) {
     palette.RO.palette_id = idx;
     if (palette.auto_save_config)
         palette_save_config();
+}
+
+void palette_delete_palette(int id) {
+    assume(id>=0&&id<palette.RO.max_palettes, "not in range");
+    if(palette.RO.max_palettes<=1) {
+        log_warn("can not delete, min. 1 palette");
+        return;
+    }
+    palette.RO.max_palettes--;
+    if(palette.RO.palette_id >= id) {
+        int load = id-1;
+        load = isca_mod(load, palette.RO.max_palettes);
+        palette_load_palette(load);
+    }
+    for(int i=id;i<palette.RO.max_palettes;i++)
+        L.palette_files[i] = L.palette_files[i+1];
+    
 }
 
 void palette_reset_palette_files() {
