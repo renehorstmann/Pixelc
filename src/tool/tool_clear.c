@@ -47,7 +47,6 @@ static bool is_active(struct Tool *super, float dtime) {
         animation_longpress(u_pose_get_xy(self->ro.rect.pose),
                             R_COLOR_RED);
         dialog_create_prompt("reset app", "reset the\nwhole app?", on_reset_all);
-        u_button_set_pressed(&self->ro.rect, false);
     }
     // always actice
     return true;
