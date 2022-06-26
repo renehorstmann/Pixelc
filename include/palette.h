@@ -5,7 +5,7 @@
 #include "u/color.h"
 #include "u/image.h"
 
-#define PALETTE_MAX 128
+#define PALETTE_MAX 512
 #define PALETTE_NAME_MAX 32
 
 struct Palette_Globals {

@@ -56,6 +56,11 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- color picker
+  - module like textinput
+  - sets secondary color
+  - to create a palette
+
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -63,39 +68,21 @@ python3 -m http.server --bind localhost  # [port]
     - top with title bar
     - flexible middle (flex in height of course)
     - bottom part
-    
+
 - palette dialog
-  - upload new palette
-  
+  - add canvas as palette
+    - name
+  - copy into canvas?
+
 - kernel long press dialog
-  - shows the current kernel
+  - shows the current kernel?
   - delete this kernel
-    - delete dialog
   - upload new kernel
-  
-- clear longpress opens reset all dialog
 
 - rethink layers and frames?
 
 - undo layer change bug
-- dialog:
-  - delete
-  - upload
-- tools
-  - layer
-    - setting for onion skinning alpha
-    - add layer behind (+)
-    - delete current layer (-)
-    - merge layer down
-    - toggle for save merged
-      - or always sace merged and a butten for save unmerged?
-  - delete current palette
-    - are you sure prompt
-  - delete current kernel
-    - are you sure prompt
-  - import new palette...?
-  - import new kernel
-  - reset all
+
 - preview
   - instead of animation
   - how to animate
