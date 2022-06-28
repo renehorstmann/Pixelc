@@ -244,12 +244,8 @@ ColorPicker *colorpicker_new(const char *title, uColor_s init_color) {
 
     self->L.title = ro_text_new_font85(COLORPICKER_TITLE_MAX_LENGTH);
     vec2 title_size = ro_text_set_text(&self->L.title, title);
-    if (title_size.x > 85)
-        self->L.title.pose = u_pose_new(-80, 80,
-                                        1, 1);
-    else
-        self->L.title.pose = u_pose_new(-80, 80,
-                                        2, 2);
+    self->L.title.pose = u_pose_new(-80, 80,
+            title_size.x > 85? 1 : 2, 2);
 
     self->L.title_shadow = ro_text_new_font85(COLORPICKER_TITLE_MAX_LENGTH);
     ro_text_set_text(&self->L.title_shadow, title);

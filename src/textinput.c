@@ -200,12 +200,9 @@ TextInput *textinput_new(const char *title, int opt_max_chars) {
 
     self->L.title = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
     vec2 title_size = ro_text_set_text(&self->L.title, title);
-    if(title_size.x>85)
-        self->L.title.pose = u_pose_new(-80, 32,
-                                        1, 1);
-    else
-        self->L.title.pose = u_pose_new(-80, 32,
-                                        2, 2);
+    self->L.title.pose = u_pose_new(-80, 32,
+            title_size.x > 85? 1 : 2, 2);
+
 
     self->L.title_shadow = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
     ro_text_set_text(&self->L.title_shadow, title);
