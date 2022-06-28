@@ -1,8 +1,9 @@
 #include "r/r.h"
 #include "u/pose.h"
+#include "u/button.h"
 #include "textinput.h"
 #include "camera.h"
-#include "u/button.h"
+#include "modal.h"
 #include "dialog.h"
 
 #define BG_A "#776666"
@@ -35,17 +36,13 @@ static void kill_fn() {
     ro_text_kill(&impl->mode_text);
     ro_batch_kill(&impl->buttons);
     textinput_kill(&impl->textinput);
-    rhc_free(impl);
+    s_free(impl);
 }
 
 static void update(float dtime) {
     Impl *impl = dialog.impl;
 
     if (impl->textinput) {
-        dialog.textinput_active = true;
-
-        textinput_update(impl->textinput, dtime);
-
         char *end;
         int size = strtol(impl->textinput->text, &end, 10);
         bool ok = end && end != impl->textinput->text && size >= CAMERA_SIZE_MIN && size <= CAMERA_SIZE_MAX;
@@ -57,11 +54,13 @@ static void update(float dtime) {
                     impl->size = size;
                     break;
                 default:
-                    assume(0, "wtf");
+                    s_assume(0, "wtf");
             }
         }
-        if (impl->textinput->state != TEXTINPUT_IN_PROGRESS)
+        if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
+            modal.textinput = NULL;
+        }
     }
 
     char buf[16];
@@ -79,9 +78,6 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->size_num, cam_mat);
     ro_text_render(&impl->mode_text, cam_mat);
     ro_batch_render(&impl->buttons, cam_mat, true);
-    if (impl->textinput) {
-        textinput_render(impl->textinput);
-    }
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -93,6 +89,7 @@ static bool pointer_event(ePointer_s pointer) {
     if (pointer.action == E_POINTER_DOWN) {
         if (u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
             impl->textinput = textinput_new("Internal Min. Size", 8);
+            modal.textinput = impl->textinput;
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->size);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
             impl->textinput_usage = 0;
@@ -129,16 +126,16 @@ static void on_action(bool ok) {
 
     dialog_hide();
     if (!ok) {
-        log_info("dialog display aborted");
+        s_log("dialog display aborted");
         return;
     }
     if (size >= CAMERA_SIZE_MIN && size <= CAMERA_SIZE_MAX) {
-        log_info("dialog display new size %i", size);
+        s_log("dialog display new size %i", size);
         camera.size = size;
         save_cam = true;
     }
     if (mode >= 0 && mode < CAMERA_ROTATE_NUM_MODES) {
-        log_info("dialog display new mode %i", mode);
+        s_log("dialog display new mode %i", mode);
         camera.rotate_mode = mode;
         save_cam = true;
     }
@@ -153,8 +150,8 @@ static void on_action(bool ok) {
 
 void dialog_create_display() {
     dialog_hide();
-    log_info("create");
-    Impl *impl = rhc_calloc(sizeof *impl);
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
     impl->buttons = ro_batch_new(5, r_texture_new_file(2, 5, "res/button_display_settings.png"));

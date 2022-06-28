@@ -14,10 +14,10 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     // only passed if button state toggled
     bool pressed = u_button_is_pressed(&self->ro.rect);
     if (pressed) {
-        log_info("tool display start");
+        s_log("tool display start");
         dialog_create_display();
     } else {
-        log_info("tool display stop");
+        s_log("tool display stop");
         dialog_hide();
     }
 

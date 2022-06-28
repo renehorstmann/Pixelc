@@ -1,8 +1,9 @@
 #ifndef U_IMAGE_H
 #define U_IMAGE_H
 
-#include "rhc/rhc.h"
-#include "mathc/sca/float.h"
+#include "s/s.h"
+#include "s/allocator.h"
+#include "m/sca/float.h"
 #include "color.h"
 
 
@@ -13,41 +14,41 @@ typedef struct {
     uColor_s *data;
     int cols, rows;
     int layers;
-    Allocator_i a;
+    sAllocator_i a;
 } uImage;
 
 static bool u_image_valid(uImage self) {
     return self.cols > 0 && self.rows > 0
            && self.layers > 0
-           && allocator_valid(self.a);
+           && s_allocator_valid(self.a);
 }
 
-static uImage u_image_new_invalid_a(Allocator_i a) {
+static uImage u_image_new_invalid_a(sAllocator_i a) {
     return (uImage) {.a = a};
 }
 
 static uImage u_image_new_invalid() {
-    return u_image_new_invalid_a(RHC_DEFAULT_ALLOCATOR);
+    return u_image_new_invalid_a(S_ALLOCATOR_DEFAULT);
 }
 
 // creates a new empty image with a custom a
-uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a);
+uImage u_image_new_empty_a(int cols, int rows, int layers, sAllocator_i a);
 
 // creates a new empty image
 static uImage u_image_new_empty(int cols, int rows, int layers) {
-    return u_image_new_empty_a(cols, rows, layers, RHC_DEFAULT_ALLOCATOR);
+    return u_image_new_empty_a(cols, rows, layers, S_ALLOCATOR_DEFAULT);
 }
 
 // creates a new image with all values set to 0 with a custom a
-uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_i a);
+uImage u_image_new_zeros_a(int cols, int rows, int layers, sAllocator_i a);
 
 // creates a new image with all values set to 0
 static uImage u_image_new_zeros(int cols, int rows, int layers) {
-    return u_image_new_zeros_a(cols, rows, layers, RHC_DEFAULT_ALLOCATOR);
+    return u_image_new_zeros_a(cols, rows, layers, S_ALLOCATOR_DEFAULT);
 }
 
 // clones an image with a custom a
-uImage u_image_new_clone_a(uImage from, Allocator_i a);
+uImage u_image_new_clone_a(uImage from, sAllocator_i a);
 
 // clones an image
 static uImage u_image_new_clone(uImage from) {
@@ -55,7 +56,7 @@ static uImage u_image_new_clone(uImage from) {
 }
 
 // returns a new scaled clone, if filter_linear is FALSE, filter_nearest will be used, with a custom a
-uImage u_image_new_clone_scaled_a(int cols, int rows, uImage from, bool filter_linear, Allocator_i a);
+uImage u_image_new_clone_scaled_a(int cols, int rows, uImage from, bool filter_linear, sAllocator_i a);
 
 // returns a new scaled clone, if filter_linear is FALSE, filter_nearest will be used
 static uImage u_image_new_clone_scaled(int cols, int rows, bool filter_linear, uImage from) {
@@ -63,7 +64,7 @@ static uImage u_image_new_clone_scaled(int cols, int rows, bool filter_linear, u
 }
 
 // merges the given layer down with the previous one, with a custom a
-uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, Allocator_i a);
+uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, sAllocator_i a);
 
 // merges the given layer down with the previous one
 static uImage u_image_new_clone_merge_down(uImage from, int layer_to_merge_down) {
@@ -71,22 +72,22 @@ static uImage u_image_new_clone_merge_down(uImage from, int layer_to_merge_down)
 }
 
 // copy a SDL_Surface into a new image with a costum a
-uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, Allocator_i a);
+uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a);
 
 
 // copy a SDL_Surface into a new image
 static uImage u_image_new_sdl_surface(int layers, struct SDL_Surface *surface) {
     return u_image_new_sdl_surface_a(layers, surface,
-                                     allocator_new());
+                                     s_allocator_new());
 }
 
 // loads an image from a file (.png) with a costum a
-uImage u_image_new_file_a(int layers, const char *file, Allocator_i a);
+uImage u_image_new_file_a(int layers, const char *file, sAllocator_i a);
 
 // loads an image from a file (.png)
 static uImage u_image_new_file(int layers, const char *file) {
     return u_image_new_file_a(layers, file,
-                              allocator_new());
+                              s_allocator_new());
 }
 
 void u_image_kill(uImage *self);

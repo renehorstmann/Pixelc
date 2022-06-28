@@ -3,7 +3,7 @@
 #include "u/pose.h"
 #include "u/image.h"
 #include "u/button.h"
-#include "mathc/int.h"
+#include "m/int.h"
 #include "palette.h"
 #include "dialog.h"
 
@@ -15,7 +15,7 @@
 //
 
 static void on_delete_action(bool ok) {
-    log_info("delete: %i", ok);
+    s_log("delete: %i", ok);
     if(ok) {
         palette_delete_palette(palette.RO.palette_id);
         palette_save_config();
@@ -40,7 +40,7 @@ static void kill_fn() {
     ro_single_kill(&impl->delete_btn);
     
     ro_single_kill(&impl->upload);
-    rhc_free(impl);
+    s_free(impl);
 }
 
 static void update(float dtime) {
@@ -66,7 +66,7 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     
     if(u_button_clicked(&impl->delete_btn.rect, pointer)) {
-        log_info("delete dialog");
+        s_log("delete dialog");
         dialog_create_prompt("Delete", "delete this\npalette?", on_delete_action);
     }
 
@@ -85,8 +85,8 @@ static void on_action(bool ok) {
 
 void dialog_create_palette() {
     dialog_hide();
-    log_info("create");
-    Impl *impl = rhc_calloc(sizeof *impl);
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
     int pos = 20;
@@ -105,7 +105,7 @@ void dialog_create_palette() {
         }
     }
     ro_text_set_text(&impl->info, name);
-    log_info("name is: %s", palette.RO.palette_name);    
+    s_log("name is: %s", palette.RO.palette_name);
     impl->info.pose = u_pose_new(DIALOG_LEFT+6, DIALOG_TOP - pos, 1, 2);
 
     pos += 22;

@@ -2,15 +2,15 @@
 #define U_COLOR_H
 
 //
-// pixel color based on mathc ucvec4 (uchar)
+// pixel color based on m ucvec4 (uchar)
 //
 
-#include "rhc/rhc.h"
-#include "mathc/vec/ucvec4.h"
-#include "mathc/vec/vec4.h"
+#include "s/s.h"
+#include "m/vec/ucvec4.h"
+#include "m/vec/vec4.h"
 
 // a color is a unsigned char vector with rgba elements
-// access like other mathc types
+// access like other m types
 typedef ucvec4 uColor_s;
 
 // returns a == b
@@ -56,8 +56,8 @@ static uColor_s u_color_from_hex(const char *hex_string) {
     }
 
     // error
-    rhc_error = "color from hex failed";
-    log_error("u_color_from_hex failed: for %s", hex_string);
+    s_error_set("color from hex failed");
+    s_log_error("u_color_from_hex failed: for %s", hex_string);
     return c;
 }
 

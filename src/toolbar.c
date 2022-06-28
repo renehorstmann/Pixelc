@@ -1,7 +1,7 @@
 #include "r/ro_single.h"
 #include "u/pose.h"
-#include "mathc/float.h"
-#include "mathc/uchar.h"
+#include "m/float.h"
+#include "m/uchar.h"
 #include "camera.h"
 #include "toolbar.h"
 
@@ -26,7 +26,7 @@ static ToolbarContainer toolbar_container_new_invalid() {
 
 static ToolbarContainer toolbar_container_new(Tool **tools, int tools_len, uColor_s bg_a, uColor_s bg_b) {
     ToolbarContainer self = {0};
-    self.tools = rhc_calloc(sizeof *tools * tools_len);
+    self.tools = s_malloc0(sizeof *tools * tools_len);
     memcpy(self.tools, tools, sizeof *tools * tools_len);
     self.tools_len = tools_len;
     self.container = u_container_new(tools_len, 0, 0);
@@ -45,7 +45,7 @@ static ToolbarContainer toolbar_container_new(Tool **tools, int tools_len, uColo
 static void toolbar_container_kill(ToolbarContainer *self) {
     if (!toolbar_container_valid(self))
         return;
-    rhc_free(self->tools);
+    s_free(self->tools);
     u_container_kill(&self->container);
     ro_single_kill(&self->bg);
     *self = (ToolbarContainer) {0};
@@ -162,12 +162,12 @@ float toolbar_constainer_size(const ToolbarContainer *self) {
 
 
 static void hide_selection() {
-    log_info("toolbar: hide_selection");
+    s_log("toolbar: hide_selection");
     toolbar_container_kill(&toolbar.selection);
 }
 
 static void show_selection_set() {
-    log_info("toolbar: show_selection_set");
+    s_log("toolbar: show_selection_set");
     toolbar_container_kill(&toolbar.selection);
     toolbar.selection = toolbar_container_new(
             toolbar.all_selection_set_tools,
@@ -179,7 +179,7 @@ static void show_selection_set() {
 }
 
 static void show_selection_move() {
-    log_info("toolbar: show_selection_move");
+    s_log("toolbar: show_selection_move");
     toolbar_container_kill(&toolbar.selection);
     toolbar.selection = toolbar_container_new(
             toolbar.all_selection_paste_tools,
@@ -208,6 +208,7 @@ void toolbar_init(uColor_s active_bg_a, uColor_s active_bg_b,
     toolbar.tools.selection = tool_new_selection();
     toolbar.tools.layer = tool_new_layer();
     toolbar.tools.kernel = tool_new_kernel();
+    toolbar.tools.rgb = tool_new_rgb();
     toolbar.tools.secondary_color = tool_new_secondary_color();
     toolbar.tools.shading = tool_new_shading();
     toolbar.tools.camera = tool_new_camera();
@@ -348,12 +349,12 @@ Tool *toolbar_get_tool_by_pos(vec2 pos) {
 
 
 void toolbar_hide_layer() {
-    log_info("toolbar: hide_layer");
+    s_log("toolbar: hide_layer");
     toolbar_container_kill(&toolbar.layer);
 }
 
 void toolbar_show_layer() {
-    log_info("toolbar: show_layer");
+    s_log("toolbar: show_layer");
     toolbar_container_kill(&toolbar.layer);
     toolbar.layer = toolbar_container_new(
             toolbar.all_layer_tools,

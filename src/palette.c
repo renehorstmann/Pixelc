@@ -2,9 +2,9 @@
 #include "e/io.h"
 #include "u/pose.h"
 #include "u/json.h"
-#include "rhc/rhc_full.h"
-#include "mathc/float.h"
-#include "mathc/int.h"
+#include "s/s_full.h"
+#include "m/float.h"
+#include "m/int.h"
 #include "brush.h"
 #include "camera.h"
 #include "dialog.h"
@@ -75,7 +75,7 @@ static mat4 setup_palette_color_pose(int r, int c) {
     } else {
         u_pose_set_xy(&pose, camera.RO.right - COLOR_DROP_SIZE / 2 - r * COLOR_DROP_SIZE,
                       camera.RO.bottom + COLOR_DROP_SIZE / 2 + c * COLOR_DROP_SIZE);
-        u_pose_set_angle(&pose, M_PI_2);
+        u_pose_set_angle(&pose, SCA_PI_2);
     }
     return pose;
 }
@@ -219,12 +219,12 @@ void palette_update(float dtime) {
             pos = camera.RO.right - pos;
 
             L.info.bg.rect.pose = u_pose_new_angle(
-                    pos, 0, 128, 8, M_PI_2);
+                    pos, 0, 128, 8, SCA_PI_2);
 
             pos -= 2;
             L.info.text.pose = u_pose_new_angle(
                     pos, L.info.x_offset,
-                    1, 1, M_PI_2);
+                    1, 1, SCA_PI_2);
         }
     }
     
@@ -329,7 +329,7 @@ bool palette_pointer_event(ePointer_s pointer) {
                         (int[]) {-1, 1}[i] * (camera_width() / 2 - 20),
                         camera.RO.bottom + 16,
                         32, 32,
-                        sca_sign(diff) * M_PI_2 - M_PI_2
+                        sca_sign(diff) * SCA_PI_2 - SCA_PI_2
                 );
             }
         } else {
@@ -338,7 +338,7 @@ bool palette_pointer_event(ePointer_s pointer) {
                         camera.RO.right - 16,
                         (int[]) {-1, 1}[i] * (camera_height() / 2 - 20),
                         32, 32,
-                        sca_sign(diff) * M_PI_2
+                        sca_sign(diff) * SCA_PI_2
                 );
             }
         }
@@ -386,7 +386,7 @@ int palette_get_color() {
 
 void palette_set_color(int index) {
     if (index < 0 || index >= palette.RO.palette_size) {
-        log_error("invalid index (%i/%i)",
+        s_log_error("invalid index (%i/%i)",
                   index, palette.RO.palette_size);
         return;
     }
@@ -415,8 +415,8 @@ void palette_set_info(const char *info) {
 }
 
 void palette_set_colors(const uColor_s *colors, int size, const char *name) {
-    log_info("set_colors: %s", name);
-    assume(size > 0, "palette set_colors failed");
+    s_log("set_colors: %s", name);
+    s_assume(size > 0, "palette set_colors failed");
 
     palette.RO.palette_size = 0;
 
@@ -448,14 +448,14 @@ void palette_set_colors(const uColor_s *colors, int size, const char *name) {
 
 void palette_set_palette(uImage colors, const char *name) {
     if (!u_image_valid(colors)) {
-        log_error("invalid");
+        s_log_error("invalid");
         return;
     }
 
     int size = colors.cols * colors.rows;
 
     if (size > PALETTE_MAX || colors.layers != 1) {
-        log_error("to large, or multiple layers (%i/%i)",
+        s_log_error("to large, or multiple layers (%i/%i)",
                   size, PALETTE_MAX);
         return;
     }
@@ -465,11 +465,11 @@ void palette_set_palette(uImage colors, const char *name) {
 
 void palette_load_palette(int id) {
     if (id < 0 || id >= palette.RO.max_palettes) {
-        log_error("invalid id: %i/%i", id, palette.RO.max_palettes);
+        s_log_error("invalid id: %i/%i", id, palette.RO.max_palettes);
         return;
     }
 
-    log_info("load_palette[%i] = %s", id, L.palette_files[id]);
+    s_log("load_palette[%i] = %s", id, L.palette_files[id]);
 
     char file[256];
     snprintf(file, sizeof file, "palette_%s", L.palette_files[id]);
@@ -478,9 +478,9 @@ void palette_load_palette(int id) {
     snprintf(name, sizeof name, "%s", L.palette_files[id]);
 
     // name to lower and without .png
-    Str_s name_s = strc(name);
-    name_s = str_tolower(name_s);
-    name_s = str_eat_back_str(name_s, strc(".png"));
+    sStr_s name_s = s_strc(name);
+    name_s = s_str_tolower(name_s);
+    name_s = s_str_eat_back_str(name_s, s_strc(".png"));
     name_s.data[name_s.size] = '\0';
 
     uImage colors = u_image_new_file(1,
@@ -497,7 +497,7 @@ void palette_load_palette(int id) {
 }
 
 void palette_append_file(uImage colors, const char *name) {
-    log_info("append_file: %s", name);
+    s_log("append_file: %s", name);
 
     u_image_save_file(colors, e_io_savestate_file_path(name));
 
@@ -511,9 +511,9 @@ void palette_append_file(uImage colors, const char *name) {
 
     if (idx == -1) {
         size_t len = strlen(name) + 1;
-        char *clone = rhc_malloc(len);
+        char *clone = s_malloc(len);
         memcpy(clone, name, len);
-        L.palette_files = rhc_realloc(L.palette_files, sizeof *L.palette_files * ++palette.RO.max_palettes);
+        L.palette_files = s_realloc(L.palette_files, sizeof *L.palette_files * ++palette.RO.max_palettes);
         idx = palette.RO.max_palettes - 1;
         L.palette_files[idx] = clone;
     }
@@ -528,9 +528,9 @@ void palette_append_file(uImage colors, const char *name) {
 }
 
 void palette_delete_palette(int id) {
-    assume(id>=0&&id<palette.RO.max_palettes, "not in range");
+    s_assume(id>=0&&id<palette.RO.max_palettes, "not in range");
     if(palette.RO.max_palettes<=1) {
-        log_warn("can not delete, min. 1 palette");
+        s_log_warn("can not delete, min. 1 palette");
         return;
     }
     palette.RO.max_palettes--;
@@ -545,17 +545,17 @@ void palette_delete_palette(int id) {
 }
 
 void palette_reset_palette_files() {
-    log_info("reset");
+    s_log("reset");
     uImage *palettes = palette_defaults_new();
 
     for (int i = 0; i < palette.RO.max_palettes; i++)
-        rhc_free(L.palette_files[i]);
+        s_free(L.palette_files[i]);
 
-    L.palette_files = rhc_realloc(L.palette_files, sizeof *L.palette_files * 32);
+    L.palette_files = s_realloc(L.palette_files, sizeof *L.palette_files * 32);
 
     int i;
     for (i = 0; u_image_valid(palettes[i]); i++) {
-        assume(i < 32, "change max default palettes");
+        s_assume(i < 32, "change max default palettes");
         char *name = palette_defaults_name_on_heap(i);
         char file[256];
         snprintf(file, sizeof file, "palette_%s", name);
@@ -579,7 +579,7 @@ void palette_reset_palette_files() {
 }
 
 void palette_save_config() {
-    log_info("save");
+    s_log("save");
 
     uJson *config = u_json_new_file(
             e_io_savestate_file_path("config.json"));
@@ -600,7 +600,7 @@ void palette_save_config() {
 }
 
 void palette_load_config() {
-    log_info("load");
+    s_log("load");
 
     bool reset = false;
 
@@ -619,9 +619,9 @@ void palette_load_config() {
     }
 
     for (int i = 0; i < palette.RO.max_palettes; i++)
-        rhc_free(L.palette_files[i]);
+        s_free(L.palette_files[i]);
 
-    L.palette_files = rhc_realloc(L.palette_files, sizeof *L.palette_files * palettes_size);
+    L.palette_files = s_realloc(L.palette_files, sizeof *L.palette_files * palettes_size);
 
     palette.RO.max_palettes = palettes_size;
 
@@ -634,7 +634,7 @@ void palette_load_config() {
         }
 
         size_t len = strlen(file) + 1;
-        char *clone = rhc_malloc(len);
+        char *clone = s_malloc(len);
         memcpy(clone, file, len);
         L.palette_files[i] = clone;
     }
@@ -646,7 +646,7 @@ void palette_load_config() {
     }
 
     if (id < 0 || id >= palette.RO.max_palettes) {
-        log_warn("invalid id, setting to 0");
+        s_log_warn("invalid id, setting to 0");
         id = 0;
     }
 

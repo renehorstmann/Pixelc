@@ -7,7 +7,7 @@
 #define CLASS PosStack
 #define FN_NAME posstack
 
-#include "rhc/dynarray.h"
+#include "s/dynarray.h"
 
 
 bool brushmode_fill(ePointer_s pointer, bool mode8) {

@@ -5,8 +5,9 @@
 // to place render objects in a stack or flow container, with different alignment options
 //
 
-#include "rhc/rhc.h"
-#include "mathc/types/float.h"
+#include "s/s.h"
+#include "s/allocator.h"
+#include "m/types/float.h"
 
 
 #define U_CONTAINER_MAX_COLS_ROWS 128
@@ -66,7 +67,7 @@ typedef struct {
         int items_placed;
     } out;
 
-    Allocator_i a;
+    sAllocator_i a;
 } uContainer;
 
 
@@ -82,17 +83,17 @@ static void u_container_item_set_invalid(uContainerItem_s *self) {
 }
 
 static bool u_container_valid(uContainer self) {
-    return self.items && self.num > 0 && allocator_valid(self.a);
+    return self.items && self.num > 0 && s_allocator_valid(self.a);
 }
 
 static uContainer u_container_new_invalid() {
     return (uContainer) {0};
 }
 
-uContainer u_container_new_a(int num, float left, float top, Allocator_i a);
+uContainer u_container_new_a(int num, float left, float top, sAllocator_i a);
 
 static uContainer u_container_new(int num, float left, float top) {
-    return u_container_new_a(num, left, top, RHC_DEFAULT_ALLOCATOR);
+    return u_container_new_a(num, left, top, S_ALLOCATOR_DEFAULT);
 }
 
 void u_container_kill(uContainer *self);

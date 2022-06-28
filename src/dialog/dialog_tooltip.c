@@ -21,7 +21,7 @@ static void kill_fn() {
     Impl *impl = dialog.impl;
     ro_text_kill(&impl->name);
     ro_text_kill(&impl->tip);
-    rhc_free(impl);
+    s_free(impl);
 }
 
 static void update(float dtime) {
@@ -42,7 +42,6 @@ static void set(const char *name, const char *tip) {
 }
 
 static bool pointer_event(ePointer_s pointer) {
-    Impl *impl = dialog.impl;
     if (palette_contains_pos(pointer.pos.xy)) {
         set("palette", "tip to select\na color\n\n"
                        "swipe left or\nright to change\nthe palette\n\n"
@@ -60,7 +59,7 @@ static bool pointer_event(ePointer_s pointer) {
 }
 
 static void on_action(bool ok) {
-    log_info("tooltip closed, ok=%i", ok);
+    s_log("tooltip closed, ok=%i", ok);
     dialog_hide();
 }
 
@@ -70,8 +69,8 @@ static void on_action(bool ok) {
 
 void dialog_create_tooltip() {
     dialog_hide();
-    log_info("create");
-    Impl *impl = rhc_calloc(sizeof *impl);
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
     impl->name = ro_text_new_font55(TOOL_NAME_LEN);

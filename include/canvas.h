@@ -1,8 +1,8 @@
 #ifndef PIXELC_CANVAS_H
 #define PIXELC_CANVAS_H
 
-#include "mathc/types/int.h"
-#include "mathc/types/float.h"
+#include "m/types/int.h"
+#include "m/types/float.h"
 #include "u/image.h"
 #include "r/ro_single.h"
 

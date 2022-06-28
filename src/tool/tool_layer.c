@@ -14,10 +14,10 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     // only passed if button state toggled
     bool pressed = u_button_is_pressed(&self->ro.rect);
     if (pressed) {
-        log_info("tool layer: start");
+        s_log("tool layer: start");
         toolbar_show_layer();
     } else {
-        log_info("tool layer: stop");
+        s_log("tool layer: stop");
         toolbar_hide_layer();
     }
 

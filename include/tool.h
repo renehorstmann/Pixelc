@@ -84,6 +84,8 @@ Tool *tool_new_layer();
 
 Tool *tool_new_kernel();
 
+Tool *tool_new_rgb();
+
 Tool *tool_new_secondary_color();
 
 Tool *tool_new_shading();

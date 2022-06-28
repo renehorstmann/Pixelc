@@ -5,7 +5,9 @@
 #include "r/ro_single.h"
 #include "r/ro_text.h"
 #include "u/color.h"
-#include "mathc/types/float.h"
+#include "m/types/float.h"
+#include "textinput.h"
+#include "colorpicker.h"
 
 #define DIALOG_MAX_TITLE_LEN 16
 
@@ -28,8 +30,6 @@ struct Dialog_Globals {
     char id[DIALOG_MAX_TITLE_LEN];
     void *impl;
     void *user_data;
-
-    bool textinput_active;
 
     float impl_height;
 

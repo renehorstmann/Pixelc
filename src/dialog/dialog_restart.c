@@ -3,7 +3,7 @@
 #include "u/pose.h"
 #include "u/image.h"
 #include "u/button.h"
-#include "mathc/int.h"
+#include "m/int.h"
 #include "palette.h"
 #include "dialog.h"
 
@@ -23,7 +23,7 @@ static void kill_fn() {
     // should not be called...
     Impl *impl = dialog.impl;
     ro_text_kill(&impl->info);
-    rhc_free(impl);
+    s_free(impl);
 }
 
 static void update(float dtime) {
@@ -48,8 +48,8 @@ static bool pointer_event(ePointer_s pointer) {
 
 void dialog_create_restart() {
     dialog_hide();
-    log_info("create");
-    Impl *impl = rhc_calloc(sizeof *impl);
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
     impl->info = ro_text_new_font55(32);

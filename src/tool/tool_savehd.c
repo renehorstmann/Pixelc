@@ -1,6 +1,6 @@
 #include "e/io.h"
 #include "u/image.h"
-#include "mathc/int.h"
+#include "m/int.h"
 #include "u/button.h"
 #include "canvas.h"
 #include "tool.h"
@@ -15,7 +15,7 @@
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool save hd");
+        s_log("tool save hd");
         uImage img = canvas.RO.image;
         int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
         int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);

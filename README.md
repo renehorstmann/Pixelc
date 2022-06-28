@@ -41,10 +41,10 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 -s EXPORTED_RUNTIME_METHODS=FS \
 -s SDL2_IMAGE_FORMATS='["png"]' \
 --preload-file ./res \
--s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1  \
+-s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1 \
 -lidbfs.js \
--DOPTION_GLES -DOPTION_SDL \
-../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c ../src/dialog/*.c ../src/tool/*.c \
+-DPLATFORM_EMSCRIPTEN -DOPTION_GLES -DOPTION_SDL \
+../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c \
 -o index.js
 ```
 
@@ -55,11 +55,6 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
-
-- color picker
-  - module like textinput
-  - sets secondary color
-  - to create a palette
 
 - dialog background drawn
   - with titel bar
@@ -72,7 +67,7 @@ python3 -m http.server --bind localhost  # [port]
 - palette dialog
   - add canvas as palette
     - name
-  - copy into canvas?
+  - set current as canvas
 
 - kernel long press dialog
   - shows the current kernel?

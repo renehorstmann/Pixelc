@@ -1,5 +1,5 @@
-#include "mathc/int.h"
-#include "mathc/float.h"
+#include "m/int.h"
+#include "m/float.h"
 #include "canvas.h"
 #include "brush.h"
 #include "brushmode.h"
@@ -154,7 +154,7 @@ bool brushmode_func(ePointer_s pointer, enum brushmode_func func) {
         case BRUSHMODE_FUNC_CIRCLE:
             return circleto(brushmode.L.start, cr);
         default:
-            assume(0, "wtf");
+            s_assume(0, "wtf");
             return false;
     }
 }

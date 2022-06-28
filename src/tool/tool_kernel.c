@@ -1,5 +1,5 @@
 #include "u/pose.h"
-#include "mathc/int.h"
+#include "m/int.h"
 #include "u/button.h"
 #include "brush.h"
 #include "camera.h"
@@ -28,7 +28,7 @@ static void kill_fn(Tool **super_ptr) {
     ro_single_kill(&self->kernel);
     ro_single_kill(&self->minus);
     ro_single_kill(&self->plus);
-    rhc_free(self);
+    s_free(self);
     *super_ptr = NULL;
 }
 
@@ -38,13 +38,13 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     if (u_button_clicked(&self->minus.rect, pointer)
         && id > 0) {
 
-        log_info("tool kernel_minus: %i", id - 1);
+        s_log("tool kernel_minus: %i", id - 1);
         brush_load_kernel(id - 1);
     }
     if (u_button_clicked(&self->plus.rect, pointer)
         && id < brush.RO.max_kernels - 1) {
 
-        log_info("tool kernel_plus: %i", id + 1);
+        s_log("tool kernel_plus: %i", id + 1);
         brush_load_kernel(id + 1);
     }
 
@@ -123,12 +123,12 @@ static void update(struct Tool *super, float dtime) {
         self->long_press_time -= dtime;
         if (self->long_press_time <= 0) {
             if (self->pressed == 1) {
-                log_info("tool kernel_minus long press");
+                s_log("tool kernel_minus long press");
                 brush_load_kernel(0);
                 animation_longpress(u_pose_get_xy(self->minus.rect.pose),
                                     R_COLOR_BLACK);
             } else if (self->pressed == 2) {
-                log_info("tool kernel_plus long press");
+                s_log("tool kernel_plus long press");
                 brush_load_kernel(brush.RO.max_kernels - 1);
                 animation_longpress(u_pose_get_xy(self->plus.rect.pose),
                                     R_COLOR_WHITE);
@@ -150,7 +150,7 @@ static void render(const struct Tool *super, const mat4 *cam_mat) {
 //
 
 Tool *tool_new_kernel() {
-    Impl *self = rhc_calloc(sizeof *self);
+    Impl *self = s_malloc0(sizeof *self);
 
     self->kernel = ro_single_new(r_texture_new_invalid());
     self->kernel.owns_tex = false;

@@ -58,10 +58,10 @@ static struct nk_rect window_rect(float w, float h) {
 //
 
 void e_gui_init() {
-    assume(!e_gui.init, "should be called only once");
+    s_assume(!e_gui.init, "should be called only once");
     e_gui.init = true;
 
-    log_info("init");
+    s_log("init");
 
     e_gui.ctx = nk_sdl_init(e_window.sdl_window);
 

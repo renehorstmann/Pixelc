@@ -1,5 +1,5 @@
 #include <SDL2/SDL_image.h>
-#include "mathc/uchar.h"
+#include "m/uchar.h"
 #include "r/render.h"
 #include "r/texture.h"
 
@@ -38,7 +38,7 @@ static void reorder(ucvec4 *dst, const ucvec4 *src, ivec2 sprite_size, ivec2 spr
 rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer) {
     r_render_error_check("r_texture_newBEGIN");
 
-    assume(image_cols > 0 && image_rows > 0
+    s_assume(image_cols > 0 && image_rows > 0
            && sprites_cols > 0 && sprites_rows > 0
            && image_cols % sprites_cols == 0
            && image_rows % sprites_rows == 0
@@ -56,7 +56,7 @@ rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int spr
     // reorder vertical
     void *tmp_buffer = NULL;
     if (opt_buffer && self.sprites.x > 1) {
-        tmp_buffer = rhc_malloc(4 * image_cols * image_rows);
+        tmp_buffer = s_malloc(4 * image_cols * image_rows);
 
         reorder(tmp_buffer, opt_buffer, self.sprite_size, self.sprites);
         opt_buffer = tmp_buffer;
@@ -76,17 +76,17 @@ rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int spr
     r_texture_wrap_clamp(self);
 
     // NULL safe free
-    rhc_free(tmp_buffer);
+    s_free(tmp_buffer);
     r_render_error_check("r_texture_new");
     return self;
 }
 
 rTexture r_texture_new_sdl_surface(int sprites_cols, int sprites_rows, const SDL_Surface *img) {
-    assume(img, "SDL_Surface must not be null");
+    s_assume(img, "SDL_Surface must not be null");
     SDL_PixelFormat *f = img->format;
     if (f->BitsPerPixel != 32 || f->Amask == 0) {
-        rhc_error = "load texture failed";
-        log_error("failed: 8bpp and alpha needed");
+        s_error_set("load texture failed");
+        s_log_error("failed: 8bpp and alpha needed");
         return r_texture_new_invalid();
     }
     return r_texture_new(img->w, img->h, sprites_cols, sprites_rows, img->pixels);
@@ -95,8 +95,8 @@ rTexture r_texture_new_sdl_surface(int sprites_cols, int sprites_rows, const SDL
 rTexture r_texture_new_file(int sprites_cols, int sprites_rows, const char *file) {
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
-        rhc_error = "load texture failed";
-        log_error("failed: %s (%s)", IMG_GetError(), file);
+        s_error_set("load texture failed");
+        s_log_error("failed: %s (%s)", IMG_GetError(), file);
         return r_texture_new_invalid();
     }
 
@@ -126,7 +126,7 @@ void r_texture_set(rTexture self, const void *buffer) {
     if (self.sprites.x > 1) {
         int image_cols = self.sprite_size.x * self.sprites.x;
         int image_rows = self.sprite_size.y * self.sprites.y;
-        tmp_buffer = rhc_malloc(4 * image_cols * image_rows);
+        tmp_buffer = s_malloc(4 * image_cols * image_rows);
 
         reorder(tmp_buffer, buffer, self.sprite_size, self.sprites);
         buffer = tmp_buffer;
@@ -141,7 +141,7 @@ void r_texture_set(rTexture self, const void *buffer) {
                     GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
     // NULL safe free
-    rhc_free(tmp_buffer);
+    s_free(tmp_buffer);
     r_render_error_check("r_texture_set");
 }
 

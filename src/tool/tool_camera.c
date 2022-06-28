@@ -10,7 +10,7 @@
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     if (u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool camera");
+        s_log("tool camera");
         cameractrl_set_home();
     }
 }

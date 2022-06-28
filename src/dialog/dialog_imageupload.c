@@ -23,7 +23,7 @@ static void kill_fn() {
     Impl *impl = dialog.impl;
     ro_text_kill(&impl->info);
     ro_single_kill(&impl->upload);
-    rhc_free(impl);
+    s_free(impl);
 }
 
 static void update(float dtime) {
@@ -75,8 +75,8 @@ static void on_action(bool ok) {
 
 void dialog_create_image_upload() {
     dialog_hide();
-    log_info("create");
-    Impl *impl = rhc_calloc(sizeof *impl);
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
     impl->info = ro_text_new_font55(64);

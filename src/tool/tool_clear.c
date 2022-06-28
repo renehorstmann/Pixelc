@@ -1,8 +1,8 @@
 #include "u/button.h"
 #include "u/pose.h"
 #include "e/io.h"
-#include "rhc/str.h"
-#include "rhc/file.h"
+#include "s/str.h"
+#include "s/file.h"
 #include "brush.h"
 #include "animation.h"
 #include "dialog.h"
@@ -13,10 +13,10 @@
 //
 
 static void on_reset_all(bool ok) {
-    log_info("reset all: %i", ok);
+    s_log("reset all: %i", ok);
     dialog_hide();
     if(ok) {
-        file_write(e_io_savestate_file_path("config.json"), strc(""), true);
+        s_file_write(e_io_savestate_file_path("config.json"), s_strc(""), true);
         e_io_savestate_save();
         dialog_create_restart();
     }
@@ -26,7 +26,7 @@ static void on_reset_all(bool ok) {
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool clear");
+        s_log("tool clear");
         brush_clear();
     }
 }

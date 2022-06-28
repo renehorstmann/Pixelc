@@ -1,12 +1,15 @@
 #ifndef P_CIRCLE_H
 #define P_CIRCLE_H
 
+
+#include "math.h"
+
 //
 // circle as collision object
 //
 
 #include "core.h"
-#include "mathc/types/float.h"
+#include "m/types/float.h"
 
 
 typedef struct {

@@ -1,6 +1,6 @@
 #include "r/ro_batch.h"
 #include "u/pose.h"
-#include "mathc/int.h"
+#include "m/int.h"
 #include "canvas.h"
 #include "selectionctrl.h"
 
@@ -191,21 +191,21 @@ bool selectionctrl_pointer_event(ePointer_s pointer) {
 }
 
 void selectionctrl_stop() {
-    log_info("stop");
+    s_log("stop");
     L.pos = (ivec2) {{-1, -1}};
     selection_kill(&selectionctrl.selection);
     selectionctrl.mode = SELECTIONCTRL_NONE;
 }
 
 void selectionctrl_acquire() {
-    log_info("acquire");
+    s_log("acquire");
     L.pos = (ivec2) {{-1, -1}};
     selection_kill(&selectionctrl.selection);
     selectionctrl.mode = SELECTIONCTRL_ACQUIRE;
 }
 
 void selectionctrl_paste_image(uImage img) {
-    log_info("paste_image");
+    s_log("paste_image");
     L.pos = (ivec2) {{-1, -1}};
     selection_kill(&selectionctrl.selection);
     selectionctrl.selection = selection_new(0, 0, img.cols, img.rows);

@@ -1,5 +1,5 @@
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/rect.h"
@@ -11,8 +11,8 @@ RoBatch ro_batch_new(int num, rTexture tex_sink) {
     r_render_error_check("ro_batch_newBEGIN");
     RoBatch self;
 
-    assume(num > 0, "batch needs atleast 1 rect");
-    self.rects = rhc_malloc(sizeof *self.rects * num);
+    s_assume(num > 0, "batch needs atleast 1 rect");
+    self.rects = s_malloc(sizeof *self.rects * num);
     for (int i = 0; i < num; i++) {
         self.rects[i] = r_rect_new();
     }
@@ -88,7 +88,7 @@ RoBatch ro_batch_new(int num, rTexture tex_sink) {
 
 
 void ro_batch_kill(RoBatch *self) {
-    rhc_free(self->rects);
+    s_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
     glDeleteBuffers(1, &self->L.vbo);

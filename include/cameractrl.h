@@ -1,7 +1,7 @@
 #ifndef PIXELC_CAMERACTRL_H
 #define PIXELC_CAMERACTRL_H
 
-#include "rhc/rhc.h"
+#include "s/s.h"
 #include "e/input.h"
 
 struct CameraCtrl_Globals {

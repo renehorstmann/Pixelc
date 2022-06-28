@@ -1,8 +1,8 @@
 // INFO: this module uses not only e/ but also parts of r/ !
 
 #include "e/simple.h"
-#include "rhc/rhc_full.h"
-#include "mathc/sca/float.h"
+#include "s/s_full.h"
+#include "m/sca/float.h"
 
 #define OUT_SMOOTH_ALPHA 0.025
 
@@ -35,14 +35,14 @@ void e_simple_start(const char *title,
                     e_simple_update_fn update_fn,
                     e_simple_render_fn render_fn) {
 #ifdef NDEBUG
-    rhc_log_set_min_level(RHC_LOG_WARN);
+    s_log_set_min_level(S_LOG_WARN);
 #else
-    rhc_log_set_min_level(RHC_LOG_TRACE);
+    s_log_set_min_level(S_LOG_TRACE);
 #endif
 
-    log_info("starting: %s", title);
+    s_log("starting: %s", title);
 
-    assume(!L.started, "should be started just once in the main function");
+    s_assume(!L.started, "should be started just once in the main function");
     L.started = true;
 
     L.update_deltatime_ms = update_deltatime_ms;
@@ -76,7 +76,7 @@ void e_simple_start(const char *title,
 
 static void init_loop(void *user_data) {
     if (r_render_startup_update(e_window.size, e_window.deltatime)) {
-        log_info("init");
+        s_log("init");
         e_window_set_vsync(true);
         e_window_reset_main_loop(main_loop, NULL);
         L.init_fn();
@@ -84,7 +84,7 @@ static void init_loop(void *user_data) {
 }
 
 static void main_loop(void *user_data) {
-    RhcTimer_s timer = rhc_timer_new();
+    sTimer_s timer = s_timer_new();
 
     e_simple.fps = smooth_out_value(e_simple.fps, 1 / e_window.frame_deltatime);
 
@@ -106,7 +106,7 @@ static void main_loop(void *user_data) {
         }
     }
 
-    double load_time = rhc_timer_reset(timer);
+    double load_time = s_timer_reset(timer);
 
     // render
     r_render_begin_frame(e_window.size);
@@ -119,7 +119,7 @@ static void main_loop(void *user_data) {
     // swap buffers
     r_render_end_frame();
 
-    double render_time = rhc_timer_elapsed(timer);
+    double render_time = s_timer_elapsed(timer);
     double full_time = load_time + render_time;
 
     e_simple.load_update = sca_min(1, smooth_out_value(e_simple.load_update, load_time / e_window.frame_deltatime));

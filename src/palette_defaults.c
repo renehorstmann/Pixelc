@@ -1,4 +1,3 @@
-#include "rhc/alloc.h"
 #include "brush.h"
 
 
@@ -235,7 +234,7 @@ static uImage palette_999() {
 
 
 uImage *palette_defaults_new() {
-    uImage *self = rhc_calloc(sizeof *self * (32));
+    uImage *self = s_malloc0(sizeof *self * (32));
     uImage *it = self;
 
     *it++ = palette_0();
@@ -277,13 +276,13 @@ void palette_defaults_kill(uImage **self_ptr) {
         return;
     while (u_image_valid(*it))
         u_image_kill(it++);
-    rhc_free(*self_ptr);
+    s_free(*self_ptr);
     *self_ptr = NULL;
 }
 
 char *palette_defaults_name_on_heap(int id) {
-    assume(id >= 0 && id <= 25, "wtf?");
-    char *name = rhc_calloc(32);
+    s_assume(id >= 0 && id <= 25, "wtf?");
+    char *name = s_malloc0(32);
     if (id == 0)
         strcpy(name, name_0);
     if (id == 1)

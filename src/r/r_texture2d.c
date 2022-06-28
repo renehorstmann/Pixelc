@@ -6,7 +6,7 @@
 rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffer) {
     r_render_error_check("r_texture2d_newBEGIN");
 
-    assume(image_cols > 0 && image_rows > 0, "texture2d size invalid");
+    s_assume(image_cols > 0 && image_rows > 0, "texture2d size invalid");
 
     rTexture2D self = {0, {{image_cols, image_rows}}};
 
@@ -26,11 +26,11 @@ rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffe
 }
 
 rTexture2D r_texture2d_new_sdl_surface(const SDL_Surface *img) {
-    assume(img, "SDL_Surface must not be null");
+    s_assume(img, "SDL_Surface must not be null");
     SDL_PixelFormat *f = img->format;
     if (f->BitsPerPixel != 32 || f->Amask == 0) {
-        rhc_error = "load texture failed";
-        log_error("failed: 8bpp and alpha needed");
+        s_error_set("load texture failed");
+        s_log_error("failed: 8bpp and alpha needed");
         return r_texture2d_new_invalid();
     }
     return r_texture2d_new(img->w, img->h, img->pixels);
@@ -39,8 +39,8 @@ rTexture2D r_texture2d_new_sdl_surface(const SDL_Surface *img) {
 rTexture2D r_texture2d_new_file(const char *file) {
     SDL_Surface *img = IMG_Load(file);
     if (!img) {
-        rhc_error = "load texture failed";
-        log_error("failed: %s (%s)", IMG_GetError(), file);
+        s_error_set("load texture failed");
+        s_log_error("failed: %s (%s)", IMG_GetError(), file);
         return r_texture2d_new_invalid();
     }
 

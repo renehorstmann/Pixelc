@@ -1,5 +1,5 @@
 #include "u/pose.h"
-#include "mathc/float.h"
+#include "m/float.h"
 #include "u/button.h"
 #include "brush.h"
 #include "palette.h"
@@ -27,7 +27,7 @@ static void kill_fn(Tool **super_ptr) {
         return;
     ro_single_kill(&self->bg);
     ro_single_kill(&self->color_drop);
-    rhc_free(self);
+    s_free(self);
     *super_ptr = NULL;
 }
 
@@ -42,7 +42,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
         self->pressed = true;
     } else if (pointer.action == E_POINTER_UP) {
         if (self->long_press_time > 0 && self->pressed) {
-            log_info("tool secondary_color: active");
+            s_log("tool secondary_color: active");
             brush.secondary_as_current = true;
         }
         self->pressed = false;
@@ -70,7 +70,7 @@ static void update(struct Tool *super, float dtime) {
     if (self->pressed && self->long_press_time > 0) {
         self->long_press_time -= dtime;
         if (self->long_press_time <= 0) {
-            log_info("tool secondary_color: set");
+            s_log("tool secondary_color: set");
             brush.secondary_color = brush.current_color;
             vec4 col = u_color_to_vec4(brush.current_color);
             col.a = 1;
@@ -91,7 +91,7 @@ static void render(const struct Tool *super, const mat4 *cam_mat) {
 //
 
 Tool *tool_new_secondary_color() {
-    Impl *self = rhc_calloc(sizeof *self);
+    Impl *self = s_malloc0(sizeof *self);
 
     self->bg = ro_single_new(r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));
     self->color_drop = ro_single_new(r_texture_new_file(1, 1, "res/color_drop.png"));

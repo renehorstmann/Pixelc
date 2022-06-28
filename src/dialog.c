@@ -44,7 +44,6 @@ void dialog_init() {
 void dialog_update(float dtime) {
     if (!dialog_valid())
         return;
-    dialog.textinput_active = false;
     dialog.update(dtime);
     
     dialog.bg_alpha_layer.rect.pose = u_pose_new_aa(camera.RO.left, camera.RO.top, camera_width(), camera_height());
@@ -96,7 +95,7 @@ bool dialog_pointer_event(ePointer_s pointer) {
 void dialog_hide() {
     if (!dialog_valid())
         return;
-    log_info("hide");
+    s_log("hide");
     dialog.kill(dialog.impl);
     dialog.impl = NULL;
     dialog.id[0] = '\0';
@@ -119,7 +118,7 @@ void dialog_set_bg_color(uColor_s a, uColor_s b) {
 }
 
 void dialog_set_title(const char *title_id, vec4 color) {
-    assume(strlen(title_id) < DIALOG_MAX_TITLE_LEN, "title to long");
+    s_assume(strlen(title_id) < DIALOG_MAX_TITLE_LEN, "title to long");
     strcpy(dialog.id, title_id);
     vec2 size = ro_text_set_text(&dialog.title, title_id);
     ro_text_set_text(&dialog.title_shadow, title_id);

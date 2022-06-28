@@ -2,7 +2,7 @@
 #define PIXELC_SELECTION_H
 
 #include "u/image.h"
-#include "mathc/types/int.h"
+#include "m/types/int.h"
 
 typedef struct {
     int left, top;

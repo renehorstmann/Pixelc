@@ -6,7 +6,7 @@
 // and has a emscripten compatible exit failure function
 //
 
-#include "rhc/rhc.h"
+#include "s/s.h"
 
 #define GL_GLEXT_PROTOTYPES
 
@@ -31,7 +31,7 @@
 #endif
 
 
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 // #include <emscripten/html5.h>
 #endif
@@ -39,7 +39,7 @@
 
 // exit the app, on emscripten an error message will be shown
 static void e_exit_failure() {
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
     emscripten_cancel_main_loop();
     EM_ASM(
             set_exit_failure_error_msg();

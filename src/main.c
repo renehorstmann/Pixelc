@@ -14,6 +14,7 @@
 #include "dialog.h"
 #include "inputctrl.h"
 #include "multitouchcursor.h"
+#include "modal.h"
 
 //
 // options
@@ -103,10 +104,11 @@ static void update(float dtime) {
 
     toolbar_update(dtime);
     dialog_update(dtime);
-    if (dialog.textinput_active) {
+    if (modal_active()) {
         multitouchcursor.active = false;
     }
     multitouchcursor_update(dtime);
+    modal_update(dtime);
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
@@ -120,9 +122,10 @@ static void render(float dtime) {
     toolbar_render(hud_cam);
     palette_render(hud_cam);
     dialog_render(hud_cam);
-    if (!dialog.textinput_active) {
+    if (!modal_active()) {
         multitouchcursor_render(hud_cam);
     }
+    modal_render();
     animation_render(hud_cam);
 }
 

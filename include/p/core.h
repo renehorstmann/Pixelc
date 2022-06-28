@@ -5,7 +5,7 @@
 // basic types for collision objects and groupd
 //
 
-#include "rhc/rhc.h"
+#include "s/s.h"
 
 #define P_MAX_INDICES 256
 

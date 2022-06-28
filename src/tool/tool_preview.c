@@ -13,7 +13,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 
     // only passed if button state toggled
     bool pressed = u_button_is_pressed(&self->ro.rect);
-    log_info("tool preview: %i", pressed);
+    s_log("tool preview: %i", pressed);
     animation.show = pressed;
 }
 

@@ -8,10 +8,11 @@
 
 #include "r/ro_single.h"
 #include "r/ro_batch.h"
-#include "mathc/types/int.h"
+#include "r/ro_text.h"
+#include "m/types/int.h"
 
 #define TEXTINPUT_MAX_CHARS 27
-#define TEXTINPUT_TITLE_MAX_LENGTH 18
+#define TEXTINPUT_TITLE_MAX_LENGTH 28
 
 enum TextInput_shiftstate {
     TEXTINPUT_SHIFT_LOWER,
@@ -31,6 +32,7 @@ typedef struct {
     // default = true
     // reset for example by ok_active = strlen(out.text) > 4
     bool ok_active;
+    vec4 bg_color;
 
     char text[TEXTINPUT_MAX_CHARS + 1];   // + '\0'
     enum TextInput_state state;
@@ -38,6 +40,7 @@ typedef struct {
 
     struct {
         RoText title;
+        RoText title_shadow;
         RoText textfield;
         RoBatch keys;
         RoBatch chars;

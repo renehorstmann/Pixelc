@@ -20,7 +20,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
             dialog_create_image_upload();
             return;
         }
-        log_info("tool import");
+        s_log("tool import");
         selectionctrl_paste_image(img);
         u_image_kill(&img);
     }

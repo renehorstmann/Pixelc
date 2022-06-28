@@ -2,7 +2,7 @@
 #define PIXELC_BACKGROUND_H
 
 #include "u/color.h"
-#include "mathc/types/float.h"
+#include "m/types/float.h"
 
 void background_init(uColor_s a, uColor_s b);
 

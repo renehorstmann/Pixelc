@@ -6,7 +6,7 @@
 //
 
 #include "core.h"
-#include "mathc/types/int.h"
+#include "m/types/int.h"
 
 // Simple Texture, without a sprite grid
 typedef struct {

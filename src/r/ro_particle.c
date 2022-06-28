@@ -1,5 +1,5 @@
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 #include "r/render.h"
 #include "r/program.h"
 #include "r/rect.h"
@@ -33,8 +33,8 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
     r_render_error_check("ro_particle_newBEGIN");
     RoParticle self;
 
-    assume(num > 0, "particle needs atleast 1 particlerect");
-    self.rects = rhc_malloc(sizeof *self.rects * num);
+    s_assume(num > 0, "particle needs atleast 1 particlerect");
+    self.rects = s_malloc(sizeof *self.rects * num);
     for (int i = 0; i < num; i++) {
         self.rects[i] = r_particlerect_new();
     }
@@ -155,7 +155,7 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
 
 
 void ro_particle_kill(RoParticle *self) {
-    rhc_free(self->rects);
+    s_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
     glDeleteBuffers(1, &self->L.vbo);

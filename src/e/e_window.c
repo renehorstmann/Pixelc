@@ -1,5 +1,5 @@
-// rhc implementation source file, only once in a project
-#include "rhc/rhc_impl.h"
+// s implementation source file, only once in a project
+#include "s/s_impl.h"
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -84,7 +84,7 @@ static void loop() {
 static void pause_wnd() {
     if (L.pause || !e_window.allow_pause)
         return;
-    log_info("e_window: pause");
+    s_log("e_window: pause");
     L.pause = true;
     for (int i = 0; i < L.reg_pause_e_size; i++) {
         L.reg_pause_e[i].cb(false, L.reg_pause_e[i].ud);
@@ -94,7 +94,7 @@ static void pause_wnd() {
 static void resume_wnd() {
     if (!L.pause || !e_window.allow_pause)
         return;
-    log_info("e_window: resume");
+    s_log("e_window: resume");
     for (int i = 0; i < L.reg_pause_e_size; i++) {
         L.reg_pause_e[i].cb(true, L.reg_pause_e[i].ud);
     }
@@ -141,19 +141,19 @@ const char *e_window_get_title() {
 //
 
 void e_window_init(const char *title) {
-    assume(!e_window.init, "should be called only once");
+    s_assume(!e_window.init, "should be called only once");
     e_window.init = true;
 
-    log_info("init");
+    s_log("init");
 
     e_window.allow_pause = true;
 
-    assume(strlen(title) < sizeof L.title, "title to long: %i/%i",
+    s_assume(strlen(title) < sizeof L.title, "title to long: %i/%i",
            strlen(title), sizeof L.title);
     strcpy(L.title, title);
 
     if (SDL_Init(E_SDL_INIT_FLAGS) != 0) {
-        log_error("SDL_Init failed: %s", SDL_GetError());
+        s_log_error("SDL_Init failed: %s", SDL_GetError());
         e_exit_failure();
     }
 
@@ -161,14 +161,14 @@ void e_window_init(const char *title) {
     // initialize IMG
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
-        log_error("IMG_Init failed: %s", IMG_GetError());
+        s_log_error("IMG_Init failed: %s", IMG_GetError());
         e_exit_failure();
     }
 
 #ifdef OPTION_TTF
         // initialize TTF
         if (TTF_Init() == -1) {
-            log_error("TTF_Init failed: %s", TTF_GetError());
+            s_log_error("TTF_Init failed: %s", TTF_GetError());
             e_exit_failure();
         }
 #endif
@@ -176,13 +176,13 @@ void e_window_init(const char *title) {
 #ifdef OPTION_SOCKET
         // initialize net
         if (SDLNet_Init() == -1) {
-            log_error("SDLNet_Init failed: %s", SDLNet_GetError());
+            s_log_error("SDLNet_Init failed: %s", SDLNet_GetError());
             e_exit_failure();
         }
 #endif
 
     // setup OpenGL usage
-    log_info("OpenGL minimal version: %d.%d", E_GL_MAJOR_VERSION, E_GL_MINOR_VERSION);
+    s_log("OpenGL minimal version: %d.%d", E_GL_MAJOR_VERSION, E_GL_MINOR_VERSION);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, E_GL_MAJOR_VERSION);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, E_GL_MINOR_VERSION);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, E_GL_PROFILE);
@@ -198,7 +198,7 @@ void e_window_init(const char *title) {
                                            | SDL_WINDOW_RESIZABLE
     );
     if (!e_window.sdl_window) {
-        log_error("SDL_CreateWindow failed: %s", SDL_GetError());
+        s_log_error("SDL_CreateWindow failed: %s", SDL_GetError());
         e_exit_failure();
     }
 //    SDL_SetWindowMinimumSize(e_window.sdl_window, 480, 320);
@@ -208,7 +208,7 @@ void e_window_init(const char *title) {
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.sdl_window);
     if (!e_window.gl_context) {
-        log_error("SDL_GL_CreateContext failed: %s", SDL_GetError());
+        s_log_error("SDL_GL_CreateContext failed: %s", SDL_GetError());
         e_exit_failure();
     }
 
@@ -216,10 +216,10 @@ void e_window_init(const char *title) {
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
-        log_error("failed: %s", glewGetErrorString(err));
+        s_log_error("failed: %s", glewGetErrorString(err));
         e_exit_failure();
     }
-    log_info("Using GLEW version: %s", glewGetString(GLEW_VERSION));
+    s_log("Using GLEW version: %s", glewGetString(GLEW_VERSION));
 #endif
 
     SDL_GetWindowSize(e_window.sdl_window, &e_window.size.x, &e_window.size.y);
@@ -232,10 +232,10 @@ void e_window_kill() {
     if (!L.running)
         return;
 
-    log_info("killing...");
+    s_log("killing...");
     L.running = false;
 
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
     emscripten_cancel_main_loop();
     EM_ASM(set_error_img(););
 #endif
@@ -248,7 +248,7 @@ void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
     L.running = true;
     L.last_time_ms = SDL_GetTicks();
 
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
     emscripten_set_main_loop(loop, 0, true);
 #else
     while (L.running)
@@ -261,12 +261,12 @@ void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
     int __lsan_do_recoverable_leak_check(void);
 
     // checks for memory leaks
-    log_info("sanitizer leak check...");
+    s_log("sanitizer leak check...");
     int leaks = __lsan_do_recoverable_leak_check();
     if (leaks)
-        log_error("sanitizer leak check done, got %i leaks!", leaks);
+        s_log_error("sanitizer leak check done, got %i leaks!", leaks);
     else
-        log_info("sanitizer leak check done, without leaks", leaks);
+        s_log("sanitizer leak check done, without leaks", leaks);
 
     // this call also checks for leaks, but than it doesnt check at program end
     //      some SDL (or ports) may have some memory leaks
@@ -284,12 +284,12 @@ void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
     e_window.init = false;
     memset(&e_window, 0, sizeof e_window);
     memset(&L, 0, sizeof L);
-    log_info("killed");
+    s_log("killed");
 }
 
 void e_window_reset_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
-    assume(L.main_loop_fn, "main_loop not started yet?");
-    log_info("reset");
+    s_assume(L.main_loop_fn, "main_loop not started yet?");
+    s_log("reset");
     L.main_loop_fn = main_loop;
     L.main_loop_user_data = user_data;
 }
@@ -299,32 +299,32 @@ void e_window_set_vsync(bool activate) {
     if (!activate) {
         ret = SDL_GL_SetSwapInterval(0);
         if (ret == 0) {
-            log_info("turned off", activate);
+            s_log("turned off", activate);
             return;
         }
-        log_error("failed to turn off vsync");
+        s_log_error("failed to turn off vsync");
         return;
     }
     // try adaptive vsync
     ret = SDL_GL_SetSwapInterval(-1);
     if (ret == 0) {
-        log_info("applied adaptive-vsync");
+        s_log("applied adaptive-vsync");
         return;
     }
     ret = SDL_GL_SetSwapInterval(1);
     if (ret == 0) {
-        log_info("applied vsync");
+        s_log("applied vsync");
         return;
     }
-    log_info("failed to turn on vsync");
+    s_log("failed to turn on vsync");
 }
 
 void e_window_set_screen_mode(enum e_window_screen_modes mode) {
     Uint32 sdl_mode = 0;
 
     // emscripten is always fullscreen
-#ifndef __EMSCRIPTEN__
-    log_info("mode: %i", mode);
+#ifndef PLATFORM_EMSCRIPTEN
+    s_log("mode: %i", mode);
     if (mode == E_WINDOW_MODE_MAXIMIZED) {
         sdl_mode = SDL_WINDOW_FULLSCREEN_DESKTOP;
     } else if (mode == E_WINDOW_MODE_FULLSCREEN) {
@@ -336,7 +336,7 @@ void e_window_set_screen_mode(enum e_window_screen_modes mode) {
 
 
 void e_window_register_pause_callback(e_window_pause_callback_fn event, void *user_data) {
-    assume(L.reg_pause_e_size < E_WINDOW_MAX_PAUSE_EVENTS, "too many registered pause events");
+    s_assume(L.reg_pause_e_size < E_WINDOW_MAX_PAUSE_EVENTS, "too many registered pause events");
     L.reg_pause_e[L.reg_pause_e_size++] = (RegPause) {event, user_data};
 }
 
@@ -354,7 +354,7 @@ void e_window_unregister_pause_callback(e_window_pause_callback_fn event_to_unre
         }
     }
     if (!found) {
-        log_warn("failed: event not registered");
+        s_log_warn("failed: event not registered");
     }
 }
 
@@ -363,60 +363,60 @@ static void log_window_event(const SDL_Event *event) {
     if (event->type == SDL_WINDOWEVENT) {
         switch (event->window.event) {
             case SDL_WINDOWEVENT_SHOWN:
-                log_trace("eWindow %d shown", event->window.windowID);
+                s_log_trace("eWindow %d shown", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_HIDDEN:
-                log_trace("eWindow %d hidden", event->window.windowID);
+                s_log_trace("eWindow %d hidden", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_EXPOSED:
-                log_trace("eWindow %d exposed", event->window.windowID);
+                s_log_trace("eWindow %d exposed", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_MOVED:
-                log_trace("eWindow %d moved to %d,%d", event->window.windowID, event->window.data1,
+                s_log_trace("eWindow %d moved to %d,%d", event->window.windowID, event->window.data1,
                           event->window.data2);
                 break;
             case SDL_WINDOWEVENT_RESIZED:
-                log_trace("eWindow %d resized to %dx%d", event->window.windowID, event->window.data1,
+                s_log_trace("eWindow %d resized to %dx%d", event->window.windowID, event->window.data1,
                           event->window.data2);
                 break;
             case SDL_WINDOWEVENT_SIZE_CHANGED:
-                log_trace("eWindow %d size changed to %dx%d", event->window.windowID, event->window.data1,
+                s_log_trace("eWindow %d size changed to %dx%d", event->window.windowID, event->window.data1,
                           event->window.data2);
                 break;
             case SDL_WINDOWEVENT_MINIMIZED:
-                log_trace("eWindow %d minimized", event->window.windowID);
+                s_log_trace("eWindow %d minimized", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_MAXIMIZED:
-                log_trace("eWindow %d maximized", event->window.windowID);
+                s_log_trace("eWindow %d maximized", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_RESTORED:
-                log_trace("eWindow %d restored", event->window.windowID);
+                s_log_trace("eWindow %d restored", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_ENTER:
-                log_trace("Mouse entered window %d", event->window.windowID);
+                s_log_trace("Mouse entered window %d", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_LEAVE:
-                log_trace("Mouse left window %d", event->window.windowID);
+                s_log_trace("Mouse left window %d", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                log_trace("eWindow %d gained keyboard focus", event->window.windowID);
+                s_log_trace("eWindow %d gained keyboard focus", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
-                log_trace("eWindow %d lost keyboard focus", event->window.windowID);
+                s_log_trace("eWindow %d lost keyboard focus", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_CLOSE:
-                log_trace("eWindow %d closed", event->window.windowID);
+                s_log_trace("eWindow %d closed", event->window.windowID);
                 break;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
             case SDL_WINDOWEVENT_TAKE_FOCUS :
-                log_trace("eWindow %d is offered a focus", event->window.windowID);
+                s_log_trace("eWindow %d is offered a focus", event->window.windowID);
                 break;
             case SDL_WINDOWEVENT_HIT_TEST:
-                log_trace("eWindow %d has a special hit test", event->window.windowID);
+                s_log_trace("eWindow %d has a special hit test", event->window.windowID);
                 break;
 #endif
             default :
-                log_trace("eWindow %d got unknown event %d", event->window.windowID, event->window.event);
+                s_log_trace("eWindow %d got unknown event %d", event->window.windowID, event->window.event);
                 break;
         }
     }

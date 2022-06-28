@@ -1,5 +1,5 @@
-#include "rhc/error.h"
-#include "rhc/log.h"
+#include "s/error.h"
+#include "s/log.h"
 #include "selection.h"
 
 
@@ -21,8 +21,8 @@ static bool valid_to_copy(const Selection *self, uImage img, int layer) {
 //
 
 Selection *selection_new(int left, int top, int cols, int rows) {
-    log_info("new");
-    Selection *self = rhc_calloc(sizeof *self);
+    s_log("new");
+    Selection *self = s_malloc0(sizeof *self);
 
     self->left = left;
     self->top = top;
@@ -35,10 +35,10 @@ Selection *selection_new(int left, int top, int cols, int rows) {
 void selection_kill(Selection **self_ptr) {
     if (!*self_ptr)
         return;
-    log_info("kill");
+    s_log("kill");
     Selection *self = *self_ptr;
     u_image_kill(&self->opt_img);
-    rhc_free(*self_ptr);
+    s_free(*self_ptr);
     *self_ptr = NULL;
 }
 
@@ -50,9 +50,9 @@ bool selection_contains(const Selection *self, int c, int r) {
 }
 
 void selection_copy(Selection *self, uImage from, int layer) {
-    log_info("copy");
+    s_log("copy");
     if (!valid_to_copy(self, from, layer)) {
-        log_error("selection_copy failed");
+        s_log_error("selection_copy failed");
         return;
     }
 
@@ -70,9 +70,9 @@ void selection_copy(Selection *self, uImage from, int layer) {
 }
 
 void selection_cut(Selection *self, uImage from, int layer, uColor_s replace) {
-    log_info("cut");
+    s_log("cut");
     if (!valid_to_copy(self, from, layer)) {
-        log_error("failed");
+        s_log_error("failed");
         return;
     }
     selection_copy(self, from, layer);
@@ -85,9 +85,9 @@ void selection_cut(Selection *self, uImage from, int layer, uColor_s replace) {
 }
 
 void selection_paste(Selection *self, uImage to, int layer) {
-    log_info("paste");
+    s_log("paste");
     if (!self || !u_image_valid(self->opt_img)) {
-        log_error("failed");
+        s_log_error("failed");
         return;
     }
     for (int r = 0; r < self->rows; r++) {
@@ -112,9 +112,9 @@ void selection_paste(Selection *self, uImage to, int layer) {
 }
 
 void selection_rotate(Selection *self, bool right) {
-    log_info("rotate (r=%i)", right);
+    s_log("rotate (r=%i)", right);
     if (!self || !u_image_valid(self->opt_img)) {
-        log_error("failed");
+        s_log_error("failed");
         return;
     }
 
@@ -124,9 +124,9 @@ void selection_rotate(Selection *self, bool right) {
 }
 
 void selection_mirror(Selection *self, bool vertical) {
-    log_info("mirror (v=%i)", vertical);
+    s_log("mirror (v=%i)", vertical);
     if (!self || !u_image_valid(self->opt_img)) {
-        log_error("failed");
+        s_log_error("failed");
         return;
     }
 

@@ -15,10 +15,10 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     // only passed if button state toggled
     bool pressed = u_button_is_pressed(&self->ro.rect);
     if (pressed) {
-        log_info("tool selection: start");
+        s_log("tool selection: start");
         selectionctrl_acquire();
     } else {
-        log_info("tool selection: stop");
+        s_log("tool selection: stop");
         selectionctrl_stop();
         canvas_reload();
     }

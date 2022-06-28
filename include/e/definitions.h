@@ -8,7 +8,7 @@
 #include "core.h"
 
 
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
 static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_VIDEO;
 #else
 static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_EVERYTHING;

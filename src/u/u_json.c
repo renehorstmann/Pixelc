@@ -1,4 +1,4 @@
-#include "rhc/rhc_full.h"
+#include "s/s_full.h"
 #include "u/json.h"
 
 
@@ -18,23 +18,23 @@ struct uJson {
     int arr_size; // only for arr and obj
     enum u_json_types type;
 
-    Allocator_i a;
+    sAllocator_i a;
 };
 
 
 static void json_kill_r(uJson *self) {
-    allocator_free(self->a, self->name);
+    s_a_free(self->a, self->name);
     switch (self->type) {
         case U_JSON_TYPE_NUM:
         case U_JSON_TYPE_STRING:
-            allocator_free(self->a, self->data_str);
+            s_a_free(self->a, self->data_str);
             break;
         case U_JSON_TYPE_ARRAY:
         case U_JSON_TYPE_OBJECT:
             for (int i = 0; i < self->arr_size; i++) {
                 json_kill_r(&self->data_arr[i]);
             }
-            allocator_free(self->a, self->data_arr);
+            s_a_free(self->a, self->data_arr);
             break;
         default:
             break;
@@ -53,7 +53,7 @@ static uJson *append_child(uJson *self, const char *name) {
         child = old_child;
     } else {
         // append
-        self->data_arr = allocator_realloc(self->a, self->data_arr, sizeof *self->data_arr * ++self->arr_size);
+        self->data_arr = s_a_realloc(self->a, self->data_arr, sizeof *self->data_arr * ++self->arr_size);
         child = &self->data_arr[self->arr_size - 1];
     }
 
@@ -67,154 +67,154 @@ static uJson *append_child(uJson *self, const char *name) {
     return child;
 }
 
-static String use_escapes(Str_s str) {
-    String s = string_new(str.size);
+static sString *use_escapes(sStr_s str) {
+    sString *s = s_string_new(str.size);
 
-    for (size_t i = 0; i < str.size; i++) {
+    for (ssize i = 0; i < str.size; i++) {
         if (str.data[i] != '\\') {
-            string_push(&s, str.data[i]);
+            s_string_push(s, str.data[i]);
             continue;
         }
         i++;
         switch (str.data[i]) {
             case 'n':
-                string_push(&s, '\n');
+                s_string_push(s, '\n');
                 break;
             case 't':
-                string_push(&s, '\t');
+                s_string_push(s, '\t');
                 break;
             case 'b':
-                string_push(&s, '\b');
+                s_string_push(s, '\b');
                 break;
             case 'f':
-                string_push(&s, '\f');
+                s_string_push(s, '\f');
                 break;
             case 'r':
-                string_push(&s, '\r');
+                s_string_push(s, '\r');
                 break;
             case '\"':
-                string_push(&s, '\"');
+                s_string_push(s, '\"');
                 break;
             case '\\':
-                string_push(&s, '\\');
+                s_string_push(s, '\\');
                 break;
         }
     }
     return s;
 }
 
-static String create_escapes(Str_s str) {
-    String s = string_new(str.size);
+static sString *create_escapes(sStr_s str) {
+    sString *s = s_string_new(str.size);
 
-    for (size_t i = 0; i < str.size; i++) {
+    for (ssize i = 0; i < str.size; i++) {
         switch (str.data[i]) {
             case '\n':
-                string_append(&s, strc("\\n"));
+                s_string_append(s, s_strc("\\n"));
                 break;
             case '\t':
-                string_append(&s, strc("\\t"));
+                s_string_append(s, s_strc("\\t"));
                 break;
             case '\b':
-                string_append(&s, strc("\\b"));
+                s_string_append(s, s_strc("\\b"));
                 break;
             case '\f':
-                string_append(&s, strc("\\f"));
+                s_string_append(s, s_strc("\\f"));
                 break;
             case '\r':
-                string_append(&s, strc("\\r"));
+                s_string_append(s, s_strc("\\r"));
                 break;
             case '\"':
-                string_append(&s, strc("\\\""));
+                s_string_append(s, s_strc("\\\""));
                 break;
             case '\\':
-                string_append(&s, strc("\\\\"));
+                s_string_append(s, s_strc("\\\\"));
                 break;
             default:
-                string_push(&s, str.data[i]);
+                s_string_push(s, str.data[i]);
                 break;
         }
     }
     return s;
 }
 
-static void stringify_r(const uJson *self, String *string, int indent_lvl) {
+static void stringify_r(const uJson *self, sString *string, int indent_lvl) {
     switch (self->type) {
         case U_JSON_TYPE_NULL:
-            string_append(string, strc("null"));
+            s_string_append(string, s_strc("null"));
             break;
         case U_JSON_TYPE_BOOL:
-            string_append(string, strc(self->data_bool ? "true" : "false"));
+            s_string_append(string, s_strc(self->data_bool ? "true" : "false"));
             break;
         case U_JSON_TYPE_NUM:
-            string_append(string, strc(self->data_str));
+            s_string_append(string, s_strc(self->data_str));
             break;
         case U_JSON_TYPE_STRING: {
-            string_push(string, '\"');
-            String s = create_escapes(strc(self->data_str));
-            string_append(string, s.str);
-            string_kill(&s);
-            string_push(string, '\"');
+            s_string_push(string, '\"');
+            sString *s = create_escapes(s_strc(self->data_str));
+            s_string_append(string, s_string_get_str(s));
+            s_string_kill(&s);
+            s_string_push(string, '\"');
         }
             break;
         case U_JSON_TYPE_ARRAY:
-            string_append(string, strc("[\n"));
+            s_string_append(string, s_strc("[\n"));
             for (int i = 0; i < self->arr_size; i++) {
                 for (int indent = 0; indent < indent_lvl + INDENT_TAB; indent++)
-                    string_push(string, ' ');
+                    s_string_push(string, ' ');
                 stringify_r(&self->data_arr[i], string, indent_lvl);
                 if (i < self->arr_size - 1)
-                    string_push(string, ',');
-                string_push(string, '\n');
+                    s_string_push(string, ',');
+                s_string_push(string, '\n');
             }
             for (int indent = 0; indent < indent_lvl; indent++)
-                string_push(string, ' ');
-            string_push(string, ']');
+                s_string_push(string, ' ');
+            s_string_push(string, ']');
             break;
         case U_JSON_TYPE_OBJECT:
-            string_append(string, strc("{\n"));
+            s_string_append(string, s_strc("{\n"));
             for (int i = 0; i < self->arr_size; i++) {
                 for (int indent = 0; indent < indent_lvl + INDENT_TAB; indent++)
-                    string_push(string, ' ');
-                string_push(string, '\"');
-                string_append(string, strc(self->data_arr[i].name));
-                string_append(string, strc("\": "));
+                    s_string_push(string, ' ');
+                s_string_push(string, '\"');
+                s_string_append(string, s_strc(self->data_arr[i].name));
+                s_string_append(string, s_strc("\": "));
                 stringify_r(&self->data_arr[i], string, indent_lvl + INDENT_TAB);
                 if (i < self->arr_size - 1)
-                    string_push(string, ',');
-                string_push(string, '\n');
+                    s_string_push(string, ',');
+                s_string_push(string, '\n');
             }
             for (int indent = 0; indent < indent_lvl; indent++)
-                string_push(string, ' ');
-            string_push(string, '}');
+                s_string_push(string, ' ');
+            s_string_push(string, '}');
             break;
         default:
             break;
     }
 }
 
-static char *eat_string_to_heap(Str_s *remaining, Allocator_i a) {
+static char *eat_string_to_heap(sStr_s *remaining, sAllocator_i a) {
     // must begin with " and end with " (not \")
-    *remaining = str_eat(*remaining, 1);
-    size_t len = 0;
+    *remaining = s_str_eat(*remaining, 1);
+    ssize len = 0;
     while (len < remaining->size && !(remaining->data[len] == '\"' && remaining->data[len - 1] != '\"'))
         len++;
 
     if (len == remaining->size && remaining->data[len - 1] != '\"') {
-        log_error("failed to parse a string");
+        s_log_error("failed to parse a string");
         return NULL;
     }
 
     // todo parse escape stuff
 
-    char *str = allocator_malloc(a, len + 1);
+    char *str = s_a_malloc(a, len + 1);
     memcpy(str, remaining->data, len);
     str[len] = '\0';
-    *remaining = str_eat(*remaining, len + 1);
+    *remaining = s_str_eat(*remaining, len + 1);
     return str;
 }
 
-static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
-    *remaining = str_lstrip(*remaining, ' ');
+static bool parse_r(uJson *self, sStr_s *remaining, const char *child_name) {
+    *remaining = s_str_lstrip(*remaining, ' ');
 
     // start of a json item
     switch (remaining->data[0]) {
@@ -224,18 +224,18 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
             char *str = eat_string_to_heap(remaining, self->a);
             if (!str)
                 return false;
-            String s = use_escapes(strc(str));
-            u_json_append_string(self, child_name, s.data);
-            string_kill(&s);
-            allocator_free(self->a, str);
+            sString *s = use_escapes(s_strc(str));
+            u_json_append_string(self, child_name, s->data);
+            s_string_kill(&s);
+            s_a_free(self->a, str);
         }
             break;
         case 'n':
             // null
         {
-            *remaining = str_eat_str(*remaining, strc("null"));
-            if (!str_valid(*remaining)) {
-                log_error("failed to parse null");
+            *remaining = s_str_eat_str(*remaining, s_strc("null"));
+            if (!s_str_valid(*remaining)) {
+                s_log_error("failed to parse null");
                 return false;
             }
             u_json_append_null(self, child_name);
@@ -244,9 +244,9 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
         case 't':
             // true
         {
-            *remaining = str_eat_str(*remaining, strc("true"));
-            if (!str_valid(*remaining)) {
-                log_error("failed to parse true");
+            *remaining = s_str_eat_str(*remaining, s_strc("true"));
+            if (!s_str_valid(*remaining)) {
+                s_log_error("failed to parse true");
                 return false;
             }
             u_json_append_bool(self, child_name, true);
@@ -255,9 +255,9 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
         case 'f':
             // false
         {
-            *remaining = str_eat_str(*remaining, strc("false"));
-            if (!str_valid(*remaining)) {
-                log_error("failed to parse false");
+            *remaining = s_str_eat_str(*remaining, s_strc("false"));
+            if (!s_str_valid(*remaining)) {
+                s_log_error("failed to parse false");
                 return false;
             }
             u_json_append_bool(self, child_name, false);
@@ -266,23 +266,23 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
         case '[':
             // array
         {
-            *remaining = str_eat(*remaining, 1);
+            *remaining = s_str_eat(*remaining, 1);
             uJson *arr = u_json_append_array(self, child_name);
-            while (str_valid(*remaining)) {
-                *remaining = str_lstrip(*remaining, ' ');
+            while (s_str_valid(*remaining)) {
+                *remaining = s_str_lstrip(*remaining, ' ');
                 if (remaining->data[0] == ']') {
-                    *remaining = str_eat(*remaining, 1);
+                    *remaining = s_str_eat(*remaining, 1);
                     break;
                 }
                 if (!parse_r(arr, remaining, NULL))
                     return false;
-                *remaining = str_lstrip(*remaining, ' ');
+                *remaining = s_str_lstrip(*remaining, ' ');
                 if (remaining->data[0] == ',') {
-                    *remaining = str_eat(*remaining, 1);
+                    *remaining = s_str_eat(*remaining, 1);
                 }
             }
-            if (!str_valid(*remaining)) {
-                log_error("failed to parse array");
+            if (!s_str_valid(*remaining)) {
+                s_log_error("failed to parse array");
                 return false;
             }
         }
@@ -290,41 +290,41 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
         case '{':
             // object
         {
-            *remaining = str_eat(*remaining, 1);
+            *remaining = s_str_eat(*remaining, 1);
             uJson *obj = u_json_append_object(self, child_name);
-            while (str_valid(*remaining)) {
-                *remaining = str_lstrip(*remaining, ' ');
+            while (s_str_valid(*remaining)) {
+                *remaining = s_str_lstrip(*remaining, ' ');
                 if (remaining->data[0] == '}') {
-                    *remaining = str_eat(*remaining, 1);
+                    *remaining = s_str_eat(*remaining, 1);
                     break;
                 }
                 char *name = eat_string_to_heap(remaining, self->a);
                 if (!name) {
-                    log_error("failed to parse object");
+                    s_log_error("failed to parse object");
                     return false;
                 }
-                *remaining = str_lstrip(*remaining, ' ');
-                *remaining = str_eat_str(*remaining, strc(":"));
-                if (!str_valid(*remaining)) {
-                    allocator_free(self->a, name);
-                    log_error("failed to parse object");
+                *remaining = s_str_lstrip(*remaining, ' ');
+                *remaining = s_str_eat_str(*remaining, s_strc(":"));
+                if (!s_str_valid(*remaining)) {
+                    s_a_free(self->a, name);
+                    s_log_error("failed to parse object");
                     return false;
                 }
 
                 bool parse_ok = parse_r(obj, remaining, name);
-                allocator_free(self->a, name);
+                s_a_free(self->a, name);
                 if (!parse_ok) {
-                    log_error("failed to parse object");
+                    s_log_error("failed to parse object");
                     return false;
                 }
 
-                *remaining = str_lstrip(*remaining, ' ');
+                *remaining = s_str_lstrip(*remaining, ' ');
                 if (remaining->data[0] == ',') {
-                    *remaining = str_eat(*remaining, 1);
+                    *remaining = s_str_eat(*remaining, 1);
                 }
             }
-            if (!str_valid(*remaining)) {
-                log_error("failed to parse object");
+            if (!s_str_valid(*remaining)) {
+                s_log_error("failed to parse object");
                 return false;
             }
         }
@@ -335,15 +335,15 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
             setlocale(LC_ALL, "C");
             char *end;
             strtod(remaining->data, &end);
-            size_t num = end - remaining->data;
+            ssize num = end - remaining->data;
             if (num == 0) {
-                log_error("failed to parse num");
+                s_log_error("failed to parse num");
                 return false;
             }
-            char *num_str = str_as_new_c_a((Str_s) {remaining->data, num}, self->a);
+            char *num_str = s_str_as_new_c_a((sStr_s) {remaining->data, num}, self->a);
             u_json_append_num(self, child_name, num_str);
-            allocator_free(self->a, num_str);
-            *remaining = str_eat(*remaining, num);
+            s_a_free(self->a, num_str);
+            *remaining = s_str_eat(*remaining, num);
         }
             break;
     }
@@ -356,38 +356,38 @@ static bool parse_r(uJson *self, Str_s *remaining, const char *child_name) {
 //
 
 
-uJson *u_json_new_empty_a(Allocator_i a) {
-    uJson *self = allocator_calloc(a, sizeof *self);
+uJson *u_json_new_empty_a(sAllocator_i a) {
+    uJson *self = s_a_malloc0(a, sizeof *self);
     self->a = a;
     self->type = U_JSON_TYPE_OBJECT;
     return self;
 }
 
-uJson *u_json_new_str_a(Str_s str_to_parse, Allocator_i a) {
-    if (str_empty(str_to_parse)) {
-        log_warn("load failed, str invalid, returning empty uJson");
+uJson *u_json_new_str_a(sStr_s s_str_to_parse, sAllocator_i a) {
+    if (s_str_empty(s_str_to_parse)) {
+        s_log_warn("load failed, str invalid, returning empty uJson");
         return u_json_new_empty_a(a);
     }
     uJson *root = u_json_new_empty_a(a);
-    if (!parse_r(root, &str_to_parse, "root")) {
-        log_warn("load failed, returning empty uJson");
+    if (!parse_r(root, &s_str_to_parse, "root")) {
+        s_log_warn("load failed, returning empty uJson");
         u_json_kill(&root);
         return u_json_new_empty_a(a);
     }
     if (root->arr_size != 1) {
-        log_warn("load failed, multiple root elements, returning empty uJson");
+        s_log_warn("load failed, multiple root elements, returning empty uJson");
         u_json_kill(&root);
         return u_json_new_empty_a(a);
     }
     uJson *self = root->data_arr;
-    allocator_free(a, root);
+    s_a_free(a, root);
     return self;
 }
 
-uJson *u_json_new_file_a(const char *file, Allocator_i a) {
-    String s = file_read(file, true);
-    uJson *self = u_json_new_str(s.str);
-    string_kill(&s);
+uJson *u_json_new_file_a(const char *file, sAllocator_i a) {
+    sString *s = s_file_read(file, true);
+    uJson *self = u_json_new_str(s_string_get_str(s));
+    s_string_kill(&s);
     return self;
 }
 
@@ -396,7 +396,7 @@ void u_json_kill(uJson **self_ptr) {
     if (!self)
         return;
     json_kill_r(self);
-    allocator_free(self->a, self);
+    s_a_free(self->a, self);
     *self_ptr = NULL;
 }
 
@@ -408,28 +408,28 @@ bool u_json_empty(const uJson *self) {
     return false;
 }
 
-String u_json_to_string_a(const uJson *self, Allocator_i a) {
+sString *u_json_to_string_a(const uJson *self, sAllocator_i a) {
     if (!self)
-        return string_new_invalid();
-    String s = string_new_a(128, a);
-    stringify_r(self, &s, 0);
+        return s_string_new_invalid();
+    sString *s = s_string_new_a(128, a);
+    stringify_r(self, s, 0);
     return s;
 }
 
-String u_json_to_string(const uJson *self) {
+sString *u_json_to_string(const uJson *self) {
     if (!self)
-        return string_new_invalid();
-    String s = string_new_a(128, self->a);
-    stringify_r(self, &s, 0);
+        return s_string_new_invalid();
+    sString *s = s_string_new_a(128, self->a);
+    stringify_r(self, s, 0);
     return s;
 }
 
 bool u_json_save_file(const uJson *self, const char *file) {
     if (!self)
         return false;
-    String s = u_json_to_string(self);
-    bool ok = file_write(file, s.str, true);
-    string_kill(&s);
+    sString *s = u_json_to_string(self);
+    bool ok = s_file_write(file, s_string_get_str(s), true);
+    s_string_kill(&s);
     return ok;
 }
 
@@ -529,14 +529,14 @@ double *u_json_get_double(const uJson *self, double *out_data) {
 void u_json_set_name(uJson *self, const char *name) {
     if (!self)
         return;
-    size_t len = strlen(name) + 1;
-    self->name = allocator_realloc(self->a, self->name, len);
+    ssize len = strlen(name) + 1;
+    self->name = s_a_realloc(self->a, self->name, len);
     memcpy(self->name, name, len);
 }
 
 bool u_json_set_bool(uJson *self, bool value) {
     if (!self || self->type != U_JSON_TYPE_BOOL) {
-        log_error("failed to set bool, type missmatch");
+        s_log_error("failed to set bool, type missmatch");
         return false;
     }
     self->data_bool = value;
@@ -545,22 +545,22 @@ bool u_json_set_bool(uJson *self, bool value) {
 
 bool u_json_set_num(uJson *self, const char *value) {
     if (!self || self->type != U_JSON_TYPE_NUM) {
-        log_error("failed to set num, type missmatch");
+        s_log_error("failed to set num, type missmatch");
         return false;
     }
-    size_t len = strlen(value) + 1;
-    self->data_str = allocator_realloc(self->a, self->data_str, len);
+    ssize len = strlen(value) + 1;
+    self->data_str = s_a_realloc(self->a, self->data_str, len);
     memcpy(self->data_str, value, len);
     return true;
 }
 
 bool u_json_set_string(uJson *self, const char *value) {
     if (!self || self->type != U_JSON_TYPE_STRING) {
-        log_error("failed to set string, type missmatch");
+        s_log_error("failed to set string, type missmatch");
         return false;
     }
-    size_t len = strlen(value) + 1;
-    self->data_str = allocator_realloc(self->a, self->data_str, len);
+    ssize len = strlen(value) + 1;
+    self->data_str = s_a_realloc(self->a, self->data_str, len);
     memcpy(self->data_str, value, len);
     return true;
 }
@@ -604,22 +604,22 @@ uJson *u_json_append_bool(uJson *self, const char *name, bool value) {
 
 uJson *u_json_append_num(uJson *self, const char *name, const char *value) {
     if (!value) {
-        log_warn("got NULL for appending a num, appending item null");
+        s_log_warn("got NULL for appending a num, appending item null");
         return u_json_append_null(self, name);
     }
     setlocale(LC_ALL, "C");
     char *end;
     strtod(value, &end);
-    size_t num = end - value;
+    ssize num = end - value;
     if (num == 0) {
-        log_warn("failed to parse appended num, appending item null");
+        s_log_warn("failed to parse appended num, appending item null");
         return u_json_append_null(self, name);
     }
     uJson *child = append_child(self, name);
     if (!child)
         return NULL;
     child->type = U_JSON_TYPE_NUM;
-    child->data_str = allocator_malloc(self->a, num + 1);
+    child->data_str = s_a_malloc(self->a, num + 1);
     memcpy(child->data_str, value, num);
     child->data_str[num] = '\0';
     return child;
@@ -627,15 +627,15 @@ uJson *u_json_append_num(uJson *self, const char *name, const char *value) {
 
 uJson *u_json_append_string(uJson *self, const char *name, const char *value) {
     if (!value) {
-        log_warn("got NULL for appending a string, appending item null");
+        s_log_warn("got NULL for appending a string, appending item null");
         return u_json_append_null(self, name);
     }
     uJson *child = append_child(self, name);
     if (!child)
         return NULL;
     child->type = U_JSON_TYPE_STRING;
-    size_t len = strlen(value) + 1;
-    child->data_str = allocator_malloc(self->a, len);
+    ssize len = strlen(value) + 1;
+    child->data_str = s_a_malloc(self->a, len);
     memcpy(child->data_str, value, len);
     return child;
 }

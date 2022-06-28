@@ -1,10 +1,8 @@
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "rhc/alloc.h"
-#include "rhc/log.h"
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 #include "u/button.h"
 #include "brush.h"
 #include "tool.h"
@@ -15,7 +13,7 @@ static void mode_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     enum brush_modes mode = *((enum brush_modes *) self->additional_data);
     if (u_button_pressed(&self->ro.rect, pointer)) {
-        log_info("tool mode: %i", mode);
+        s_log("tool mode: %i", mode);
         brush.mode = mode;
     }
 }

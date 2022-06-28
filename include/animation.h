@@ -1,8 +1,8 @@
 #ifndef PIXELC_ANIMATION_H
 #define PIXELC_ANIMATION_H
 
-#include "rhc/rhc.h"
-#include "mathc/types/float.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
 
 struct Animation_Globals {

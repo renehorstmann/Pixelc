@@ -3,7 +3,8 @@
 
 // load and save json files from strings or files
 
-#include "rhc/rhc.h"
+#include "s/s.h"
+#include "s/string.h"
 
 typedef struct uJson uJson;
 
@@ -21,37 +22,37 @@ enum u_json_types {
 
 
 // creates a new empty root json element (object type)
-// Allocator version
-uJson *u_json_new_empty_a(Allocator_i a);
+// sAllocator version
+uJson *u_json_new_empty_a(sAllocator_i a);
 
 // creates a new empty root json element (object type)
 static uJson *u_json_new_empty() {
-    return u_json_new_empty_a(RHC_DEFAULT_ALLOCATOR);
+    return u_json_new_empty_a(S_ALLOCATOR_DEFAULT);
 }
 
 
 // parses a json str into the uJson hierarchy
 // returns u_json_new_empty on failure (check with u_json_empty)
-// Allocator version
-uJson *u_json_new_str_a(Str_s str_to_parse, Allocator_i a);
+// sAllocator version
+uJson *u_json_new_str_a(sStr_s s_str_to_parse, sAllocator_i a);
 
 // parses a json str into the uJson hierarchy
 // returns u_json_new_empty on failure (check with u_json_empty)
-static uJson *u_json_new_str(Str_s str_to_parse) {
-    return u_json_new_str_a(str_to_parse, RHC_DEFAULT_ALLOCATOR);
+static uJson *u_json_new_str(sStr_s s_str_to_parse) {
+    return u_json_new_str_a(s_str_to_parse, S_ALLOCATOR_DEFAULT);
 }
 
 // loads a json file
 // calls u_json_new_empty
 // returns u_json_new_empty on failure (check with u_json_empty)
-// Allocator version
-uJson *u_json_new_file_a(const char *file, Allocator_i a);
+// sAllocator version
+uJson *u_json_new_file_a(const char *file, sAllocator_i a);
 
 // loads a json file
 // calls u_json_new_empty
 // returns u_json_new_empty on failure (check with u_json_empty)
 static uJson *u_json_new_file(const char *file) {
-    return u_json_new_file_a(file, RHC_DEFAULT_ALLOCATOR);
+    return u_json_new_file_a(file, S_ALLOCATOR_DEFAULT);
 }
 
 
@@ -65,11 +66,11 @@ bool u_json_empty(const uJson *self);
 
 // creates a string from the uJson hierarchy (recursivly)
 // custom a for the result string
-String u_json_to_string_a(const uJson *self, Allocator_i a);
+sString *u_json_to_string_a(const uJson *self, sAllocator_i a);
 
 // creates a string from the uJson hierarchy (recursivly)
 // uses uJsons a
-String u_json_to_string(const uJson *self);
+sString *u_json_to_string(const uJson *self);
 
 // saves to a json file
 // calls u_json_to_string

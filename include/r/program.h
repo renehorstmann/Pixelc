@@ -6,6 +6,7 @@
 //
 
 #include "core.h"
+#include "s/str.h"
 
 
 // tests if the shader is valid
@@ -19,7 +20,7 @@ static bool r_program_valid(GLuint program) {
 }
 
 // compiles a shader
-GLuint r_programshader_new(Str_s source, GLint shader_type);
+GLuint r_programshader_new(sStr_s source, GLint shader_type);
 
 // compiles a shader, src=file
 GLuint r_programshader_new_file(const char *file, GLint shader_type);

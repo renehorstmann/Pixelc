@@ -1,8 +1,5 @@
-#include "rhc/error.h"
-#include "rhc/alloc.h"
-#include "rhc/log.h"
-#include "mathc/float.h"
-#include "mathc/utils/camera.h"
+#include "m/float.h"
+#include "m/utils/camera.h"
 #include "e/window.h"
 #include "r/texture.h"
 #include "r/ro_single.h"
@@ -62,7 +59,7 @@ static char get_key_char(const TextInput *self, int idx) {
         case TEXTINPUT_SHIFT_ALT:
             return layout_alt[row][col];
         default:
-            assume(false, "wtf");
+            s_assume(false, "wtf");
             return 0;
     }
 }
@@ -84,14 +81,14 @@ static void handle_backspace(TextInput *self) {
 }
 
 static void handle_cancel(TextInput *self) {
-    log_info("textinput canceled: %s", self->text);
+    s_log("textinput canceled: %s", self->text);
     self->state = TEXTINPUT_CANCELED;
 }
 
 static void handle_ok(TextInput *self) {
     if (!self->ok_active)
         return;
-    log_info("textinput finished: %s", self->text);
+    s_log("textinput finished: %s", self->text);
     self->state = TEXTINPUT_DONE;
 }
 
@@ -183,25 +180,38 @@ static void camera(TextInput *self, ivec2 window_size) {
 //
 
 TextInput *textinput_new(const char *title, int opt_max_chars) {
-    TextInput *self = rhc_calloc(sizeof *self);
+    TextInput *self = s_new0(TextInput, 1);
 
     e_input_set_vip_pointer_event(pointer_event, self);
     e_input_set_vip_key_raw_event(key_raw_event, self);
 
     self->state = TEXTINPUT_IN_PROGRESS;
+    self->ok_active = true;
 
     if (opt_max_chars <= 0) {
         opt_max_chars = TEXTINPUT_MAX_CHARS;
     } else if (opt_max_chars > TEXTINPUT_MAX_CHARS) {
-        log_warn("textinput_new: opt_max_chars > TEXTINPUT_MAX_CHARS, reset from (%i) to (%i)",
-                 opt_max_chars, TEXTINPUT_MAX_CHARS);
+        s_log_warn("textinput_new: opt_max_chars > TEXTINPUT_MAX_CHARS, reset from (%i) to (%i)",
+                   opt_max_chars, TEXTINPUT_MAX_CHARS);
         opt_max_chars = TEXTINPUT_MAX_CHARS;
     }
     self->L.max_chars = opt_max_chars;
 
 
     self->L.title = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
-    ro_text_set_text(&self->L.title, title);
+    vec2 title_size = ro_text_set_text(&self->L.title, title);
+    if(title_size.x>85)
+        self->L.title.pose = u_pose_new(-80, 32,
+                                        1, 1);
+    else
+        self->L.title.pose = u_pose_new(-80, 32,
+                                        2, 2);
+
+    self->L.title_shadow = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
+    ro_text_set_text(&self->L.title_shadow, title);
+    ro_text_set_color(&self->L.title_shadow, (vec4) {{0, 0, 0, 0.5}});
+    self->L.title_shadow.pose = self->L.title.pose;
+    u_pose_shift_xy(&self->L.title_shadow.pose, 1, -1);
 
     self->L.textfield = ro_text_new_font85(self->L.max_chars);
     ro_text_set_color(&self->L.textfield, R_COLOR_BLACK);
@@ -216,7 +226,7 @@ TextInput *textinput_new(const char *title, int opt_max_chars) {
     self->L.special = ro_batch_new(3, r_texture_new_file(2, 3, "res/textinput_key_special.png"));
 
     self->L.bg = ro_single_new(r_texture_new_white_pixel());
-    self->L.bg.rect.color = (vec4) {{0, 0, 0, 0.66}};
+    self->bg_color = (vec4) {{0, 0, 0, 0.66}};
 
     self->L.text_bg = ro_single_new(r_texture_new_white_pixel());
     self->L.text_bg.rect.color = (vec4) {{1, 1, 1, 0.5}};
@@ -252,11 +262,18 @@ void textinput_kill(TextInput **self_ptr) {
     e_input_set_vip_pointer_event(NULL, NULL); // reset
     e_input_set_vip_key_raw_event(NULL, NULL); // reset
 
+    ro_text_kill(&self->L.title);
+    ro_text_kill(&self->L.title_shadow);
     ro_text_kill(&self->L.textfield);
     ro_batch_kill(&self->L.keys);
     ro_batch_kill(&self->L.chars);
+    ro_single_kill(&self->L.shift);
+    ro_single_kill(&self->L.space);
+    ro_batch_kill(&self->L.special);
+    ro_single_kill(&self->L.text_bg);
+    ro_single_kill(&self->L.bg);
 
-    rhc_free(self);
+    s_free(self);
     *self_ptr = NULL;
 }
 
@@ -278,14 +295,12 @@ void textinput_update(TextInput *self, float dtime) {
 
     ro_text_set_text(&self->L.textfield, text);
 
-    self->L.title.pose = u_pose_new(-80, 32,
-                                    1.5, 1.5);
-
     u_pose_set_xy(&self->L.textfield.pose, -80, 4);
 
     self->L.text_bg.rect.pose = u_pose_new_aa(
             self->L.cam.left, 6,
             self->L.cam.width, 12);
+    self->L.bg.rect.color = self->bg_color;
 
     int idx = 0;
     for (int r = 0; r < 3; r++) {
@@ -333,6 +348,7 @@ void textinput_render(const TextInput *self) {
     ro_single_render(&self->L.bg, cam_mat);
     ro_single_render(&self->L.text_bg, cam_mat);
 
+    ro_text_render(&self->L.title_shadow, cam_mat);
     ro_text_render(&self->L.title, cam_mat);
     ro_text_render(&self->L.textfield, cam_mat);
     ro_batch_render(&self->L.keys, cam_mat, true);

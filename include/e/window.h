@@ -6,7 +6,7 @@
 //
 
 #include "core.h"
-#include "mathc/types/int.h"
+#include "m/types/int.h"
 
 enum e_window_screen_modes {
     E_WINDOW_MODE_WINDOW,

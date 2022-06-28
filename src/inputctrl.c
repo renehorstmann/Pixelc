@@ -1,5 +1,5 @@
 #include "e/input.h"
-#include "mathc/mat/float.h"
+#include "m/mat/float.h"
 
 #include "multitouchcursor.h"
 #include "dialog.h"

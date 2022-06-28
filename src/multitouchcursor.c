@@ -1,6 +1,6 @@
 #include "r/r.h"
 #include "u/pose.h"
-#include "mathc/float.h"
+#include "m/float.h"
 #include "camera.h"
 #include "palette.h"
 #include "multitouchcursor.h"

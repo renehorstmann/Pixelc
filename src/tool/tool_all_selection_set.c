@@ -2,10 +2,8 @@
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "rhc/alloc.h"
-#include "rhc/log.h"
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 #include "u/button.h"
 #include "canvas.h"
 #include "camera.h"
@@ -26,7 +24,7 @@ static void move_kill(Tool **super_ptr) {
     if (!self)
         return;
     ro_batch_kill(&self->ro);
-    rhc_free(self);
+    s_free(self);
     *super_ptr = NULL;
 }
 
@@ -137,7 +135,7 @@ static void move_pe(struct Tool *super, ePointer_s pointer) {
 
     for (int i = 0; i < 8; i++) {
         if (self->active[i] && u_button_clicked(&self->ro.rects[i], pointer)) {
-            log_info("tool selection set move: %i", i);
+            s_log("tool selection set move: %i", i);
             if (i == 0 && s->left > 0) {
                 s->left--;
                 s->cols++;
@@ -168,7 +166,7 @@ static void move_pe(struct Tool *super, ePointer_s pointer) {
 }
 
 Tool *tool_new_selection_set_move() {
-    SetMove *self = rhc_calloc(sizeof *self);
+    SetMove *self = s_malloc0(sizeof *self);
     self->ro = ro_batch_new(8, r_texture_new_file(2, 8, "res/button_selection_move.png"));
 
     for (int i = 0; i < 8; i++) {
@@ -196,10 +194,10 @@ static void copy_pe(struct Tool *super, ePointer_s pointer) {
     if (u_button_toggled(&self->ro.rect, pointer)) {
         bool pressed = u_button_is_pressed(&self->ro.rect);
         if (pressed) {
-            log_info("tool selection set copy: start");
+            s_log("tool selection set copy: start");
             selectionctrl.mode = SELECTIONCTRL_COPY;
         } else {
-            log_info("tool selection set copy: stop");
+            s_log("tool selection set copy: stop");
             selectionctrl.mode = SELECTIONCTRL_SET;
         }
     }
@@ -225,10 +223,10 @@ static void cut_pe(struct Tool *super, ePointer_s pointer) {
     if (u_button_toggled(&self->ro.rect, pointer)) {
         bool pressed = u_button_is_pressed(&self->ro.rect);
         if (pressed) {
-            log_info("tool selection set cut: start");
+            s_log("tool selection set cut: start");
             selectionctrl.mode = SELECTIONCTRL_CUT;
         } else {
-            log_info("tool selection set cut: stop");
+            s_log("tool selection set cut: stop");
             selectionctrl.mode = SELECTIONCTRL_SET;
         }
     }

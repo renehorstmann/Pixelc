@@ -1,4 +1,4 @@
-#include "mathc/float.h"
+#include "m/float.h"
 #include "r/rect.h"
 
 rRect_s r_rect_new() {

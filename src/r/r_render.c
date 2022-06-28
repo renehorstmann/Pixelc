@@ -1,4 +1,4 @@
-#include "mathc/utils/camera.h"
+#include "m/utils/camera.h"
 #include "r/texture.h"
 #include "r/texture2d.h"
 #include "r/ro_text.h"
@@ -28,28 +28,28 @@ static struct {
 //
 
 void r_render_init(SDL_Window *window) {
-    assume(!r_render.init, "r_render_init should be called only once");
+    s_assume(!r_render.init, "r_render_init should be called only once");
     r_render.init = true;
-    log_info("init");
+    s_log("init");
 
     r_render_error_check("r_render_initBEGIN");
 
     r_render.window = window;
     r_render.clear_color = (vec4) {{0, 0, 0, 1}};
 
-    log_info("OpenGL version: %s", glGetString(GL_VERSION));
+    s_log("OpenGL version: %s", glGetString(GL_VERSION));
 
     int max_vertex_attributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_vertex_attributes);
     if (max_vertex_attributes < 16) {
-        log_warn("OpenGL failed: only has %d/16 vertex attributes", max_vertex_attributes);
+        s_log_warn("OpenGL failed: only has %d/16 vertex attributes", max_vertex_attributes);
         r_exit_failure();
     }
 
     int max_texture_units;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
     if (max_texture_units < 3) {
-        log_warn("OpenGL failed: only has %d/3 framebuffer texture units", max_texture_units);
+        s_log_warn("OpenGL failed: only has %d/3 framebuffer texture units", max_texture_units);
         r_exit_failure();
     }
 
@@ -172,9 +172,9 @@ bool r_render_error_check_impl_(const char *opt_tag) {
         }
 
         if (opt_tag) {
-            log_error("%s: OpenGl error: 0x%04x %s", opt_tag, err, name);
+            s_log_error("%s: OpenGl error: 0x%04x %s", opt_tag, err, name);
         } else {
-            log_error("OpenGl error: 0x%04x %s", err, name);
+            s_log_error("OpenGl error: 0x%04x %s", err, name);
         }
 
         if (errs_size < 32)
@@ -224,9 +224,9 @@ static mat4 camera(int wnd_width, int wnd_height) {
 }
 
 void r_render_show_startup(float block_time, const char *author) {
-    log_info("startup");
+    s_log("startup");
 
-    L.start_up = rhc_calloc(sizeof *L.start_up);
+    L.start_up = s_malloc0(sizeof *L.start_up);
 
     L.start_up->remaining_time = block_time;
 
@@ -235,9 +235,9 @@ void r_render_show_startup(float block_time, const char *author) {
     L.start_up->author_text.pose = u_pose_new(-text_size.x * AUTHOR_SIZE / 2, 0, AUTHOR_SIZE, AUTHOR_SIZE);
     ro_text_set_color(&L.start_up->author_text, R_COLOR_WHITE);
 
-    L.start_up->test = ro_particlerefract_new(1,
-                                              r_texture_new_white_pixel(),
-                                              r_texture_new_white_pixel());
+    rTexture a = r_texture_new_white_pixel();
+    rTexture b = r_texture_new_white_pixel();
+    L.start_up->test = ro_particlerefract_new(1, a, b);
     L.start_up->test.rects[0].color.a = 0;
 }
 
@@ -255,7 +255,7 @@ bool r_render_startup_update(ivec2 window_size, float delta_time) {
 
     // check error and abort
     if (r_render_error_check_impl_("e_r_startup")) {
-        log_error("Unexpected OpenGL errors occured while checking in startup");
+        s_log_error("Unexpected OpenGL errors occured while checking in startup");
         r_exit_failure();
     }
 
@@ -264,7 +264,7 @@ bool r_render_startup_update(ivec2 window_size, float delta_time) {
         // clean up
         ro_text_kill(&L.start_up->author_text);
         ro_particlerefract_kill(&L.start_up->test);
-        rhc_free(L.start_up);
+        s_free(L.start_up);
         L.start_up = NULL;
         return true;
     }

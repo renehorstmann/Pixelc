@@ -6,7 +6,7 @@
 //
 
 #include "core.h"
-#include "mathc/types/int.h"
+#include "m/types/int.h"
 
 // Texture, with sprite grid -> 2D array texture
 typedef struct {

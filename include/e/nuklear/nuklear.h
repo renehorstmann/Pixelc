@@ -3289,7 +3289,7 @@ NK_API int nk_color_pick(struct nk_context*, struct nk_colorf*, enum nk_color_fo
 /// Parameter           | Description
 /// --------------------|-----------------------------------------------------------
 /// __ctx__             | Must point to an previously initialized `nk_context` struct after calling a layouting function
-/// __name__            | String used both as a label as well as a unique identifier
+/// __name__            | sString used both as a label as well as a unique identifier
 /// __min__             | Minimum value not allowed to be underflown
 /// __val__             | Integer pointer to be modified
 /// __max__             | Maximum value not allowed to be overflown
@@ -3310,7 +3310,7 @@ NK_API void nk_property_int(struct nk_context*, const char *name, int min, int *
 /// Parameter           | Description
 /// --------------------|-----------------------------------------------------------
 /// __ctx__             | Must point to an previously initialized `nk_context` struct after calling a layouting function
-/// __name__            | String used both as a label as well as a unique identifier
+/// __name__            | sString used both as a label as well as a unique identifier
 /// __min__             | Minimum value not allowed to be underflown
 /// __val__             | Float pointer to be modified
 /// __max__             | Maximum value not allowed to be overflown
@@ -3331,7 +3331,7 @@ NK_API void nk_property_float(struct nk_context*, const char *name, float min, f
 /// Parameter           | Description
 /// --------------------|-----------------------------------------------------------
 /// __ctx__             | Must point to an previously initialized `nk_context` struct after calling a layouting function
-/// __name__            | String used both as a label as well as a unique identifier
+/// __name__            | sString used both as a label as well as a unique identifier
 /// __min__             | Minimum value not allowed to be underflown
 /// __val__             | Double pointer to be modified
 /// __max__             | Maximum value not allowed to be overflown
@@ -3352,7 +3352,7 @@ NK_API void nk_property_double(struct nk_context*, const char *name, double min,
 /// Parameter           | Description
 /// --------------------|-----------------------------------------------------------
 /// __ctx__             | Must point to an previously initialized `nk_context` struct after calling a layouting function
-/// __name__            | String used both as a label as well as a unique identifier
+/// __name__            | sString used both as a label as well as a unique identifier
 /// __min__             | Minimum value not allowed to be underflown
 /// __val__             | Current integer value to be modified and returned
 /// __max__             | Maximum value not allowed to be overflown
@@ -3375,7 +3375,7 @@ NK_API int nk_propertyi(struct nk_context*, const char *name, int min, int val, 
 /// Parameter           | Description
 /// --------------------|-----------------------------------------------------------
 /// __ctx__             | Must point to an previously initialized `nk_context` struct after calling a layouting function
-/// __name__            | String used both as a label as well as a unique identifier
+/// __name__            | sString used both as a label as well as a unique identifier
 /// __min__             | Minimum value not allowed to be underflown
 /// __val__             | Current float value to be modified and returned
 /// __max__             | Maximum value not allowed to be overflown
@@ -3398,7 +3398,7 @@ NK_API float nk_propertyf(struct nk_context*, const char *name, float min, float
 /// Parameter           | Description
 /// --------------------|-----------------------------------------------------------
 /// __ctx__             | Must point to an previously initialized `nk_context` struct after calling a layouting function
-/// __name__            | String used both as a label as well as a unique identifier
+/// __name__            | sString used both as a label as well as a unique identifier
 /// __min__             | Minimum value not allowed to be underflown
 /// __val__             | Current double value to be modified and returned
 /// __max__             | Maximum value not allowed to be overflown
@@ -6643,7 +6643,7 @@ return 1;
 return 0;
 }
 NK_API int
-nk_strmatch_fuzzy_text(const char *str, int str_len,
+nk_strmatch_fuzzy_text(const char *str, int s_str_len,
 const char *pattern, int *out_score)
 {
 /* Returns true if each character in pattern is found sequentially within str
@@ -6666,7 +6666,7 @@ const char *pattern, int *out_score)
 /* loop variables */
 int score = 0;
 char const * pattern_iter = pattern;
-int str_iter = 0;
+int s_str_iter = 0;
 int prev_matched = nk_false;
 int prev_lower = nk_false;
 /* true so if first letter match gets separator bonus*/
@@ -6679,15 +6679,15 @@ int best_letter_score = 0;
 /* loop over strings */
 NK_ASSERT(str);
 NK_ASSERT(pattern);
-if (!str || !str_len || !pattern) return 0;
-while (str_iter < str_len)
+if (!str || !s_str_len || !pattern) return 0;
+while (s_str_iter < s_str_len)
 {
 const char pattern_letter = *pattern_iter;
-const char str_letter = str[str_iter];
+const char s_str_letter = str[s_str_iter];
 
 int next_match = *pattern_iter != '\0' &&
-nk_to_lower(pattern_letter) == nk_to_lower(str_letter);
-int rematch = best_letter && nk_to_upper(*best_letter) == nk_to_upper(str_letter);
+nk_to_lower(pattern_letter) == nk_to_lower(s_str_letter);
+int rematch = best_letter && nk_to_upper(*best_letter) == nk_to_upper(s_str_letter);
 
 int advanced = next_match && best_letter;
 int pattern_repeat = best_letter && *pattern_iter != '\0';
@@ -6705,7 +6705,7 @@ if (next_match || rematch)
 int new_score = 0;
 /* Apply penalty for each letter before the first pattern match */
 if (pattern_iter == pattern) {
-int count = (int)(&str[str_iter] - str);
+int count = (int)(&str[s_str_iter] - str);
 int penalty = NK_LEADING_LETTER_PENALTY * count;
 if (penalty < NK_MAX_LEADING_LETTER_PENALTY)
 penalty = NK_MAX_LEADING_LETTER_PENALTY;
@@ -6722,7 +6722,7 @@ if (prev_separator)
 new_score += NK_SEPARATOR_BONUS;
 
 /* apply bonus across camel case boundaries */
-if (prev_lower && nk_is_upper(str_letter))
+if (prev_lower && nk_is_upper(s_str_letter))
 new_score += NK_CAMEL_BONUS;
 
 /* update pattern iter IFF the next pattern letter was matched */
@@ -6735,7 +6735,7 @@ if (new_score >= best_letter_score) {
 if (best_letter != 0)
 score += NK_UNMATCHED_LETTER_PENALTY;
 
-best_letter = &str[str_iter];
+best_letter = &str[s_str_iter];
 best_letter_score = new_score;
 }
 prev_matched = nk_true;
@@ -6745,10 +6745,10 @@ prev_matched = nk_false;
 }
 
 /* separators should be more easily defined */
-prev_lower = nk_is_lower(str_letter) != 0;
-prev_separator = str_letter == '_' || str_letter == ' ';
+prev_lower = nk_is_lower(s_str_letter) != 0;
+prev_separator = s_str_letter == '_' || s_str_letter == ' ';
 
-++str_iter;
+++s_str_iter;
 }
 
 /* apply score for last_click match */
@@ -11491,7 +11491,7 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 void my_stbtt_print(float x, float y, char *text)
 {
-/*  assume orthographic projection with units = screen pixels, origin at top left */
+/*  s_assume orthographic projection with units = screen pixels, origin at top left */
 glEnable(GL_TEXTURE_2D);
 glBindTexture(GL_TEXTURE_2D, ftex);
 glBegin(GL_QUADS);
@@ -11745,7 +11745,7 @@ int opengl_fillrule);       /*  true if opengl fill rule; false if DX9 or earlie
 /*  Call GetBakedQuad with char_index = 'character - first_char', and it */
 /*  creates the quad you need to draw and advances the current position. */
 /*  */
-/*  The coordinate system used assumes y increases downwards. */
+/*  The coordinate system used s_assumes y increases downwards. */
 /*  */
 /*  Characters will extend both above and below the current position; */
 /*  see discussion of "BASELINE" above. */
@@ -17042,7 +17042,7 @@ nk_decode_85_byte((char)src[0]) +
 85 * (nk_decode_85_byte((char)src[3]) +
 85 * nk_decode_85_byte((char)src[4]))));
 
-/* we can't assume little-endianess. */
+/* we can't s_assume little-endianess. */
 dst[0] = (unsigned char)((tmp >> 0) & 0xFF);
 dst[1] = (unsigned char)((tmp >> 8) & 0xFF);
 dst[2] = (unsigned char)((tmp >> 16) & 0xFF);

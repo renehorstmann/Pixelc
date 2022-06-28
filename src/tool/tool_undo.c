@@ -9,7 +9,7 @@
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool undo");
+        s_log("tool undo");
         canvas_undo();
     }
 }

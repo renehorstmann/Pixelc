@@ -3,10 +3,8 @@
 #include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "rhc/alloc.h"
-#include "rhc/log.h"
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 #include "animation.h"
 #include "u/button.h"
 #include "canvas.h"
@@ -31,7 +29,7 @@ static void select_kill(Tool **super_ptr) {
     ro_text_kill(&self->layer);
     ro_single_kill(&self->prev);
     ro_single_kill(&self->next);
-    rhc_free(self);
+    s_free(self);
     *super_ptr = NULL;
 }
 
@@ -41,13 +39,13 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
     if (u_button_clicked(&self->prev.rect, pointer)
         && id > 0) {
 
-        log_info("tool layer_prev: %i", id - 1);
+        s_log("tool layer_prev: %i", id - 1);
         canvas.current_layer = id - 1;
     }
     if (u_button_clicked(&self->next.rect, pointer)
         && id < canvas.RO.image.layers - 1) {
 
-        log_info("tool layer_next: %i", id + 1);
+        s_log("tool layer_next: %i", id + 1);
         canvas.current_layer = id + 1;
     }
 
@@ -134,12 +132,12 @@ static void select_update(struct Tool *super, float dtime) {
         self->long_press_time -= dtime;
         if (self->long_press_time <= 0) {
             if (self->pressed == 1) {
-                log_info("tool layer_prev long press");
+                s_log("tool layer_prev long press");
                 canvas.current_layer = 0;
                 animation_longpress(u_pose_get_xy(self->prev.rect.pose),
                                     R_COLOR_BLACK);
             } else if (self->pressed == 2) {
-                log_info("tool layer_next long press");
+                s_log("tool layer_next long press");
                 canvas.current_layer = canvas.RO.image.layers - 1;
                 animation_longpress(u_pose_get_xy(self->next.rect.pose),
                                     R_COLOR_WHITE);
@@ -157,7 +155,7 @@ static void select_render(const struct Tool *super, const mat4 *cam_mat) {
 }
 
 Tool *tool_new_layer_select() {
-    Select *self = rhc_calloc(sizeof *self);
+    Select *self = s_malloc0(sizeof *self);
 
     self->layer = ro_text_new_font55(2);
     self->prev = ro_single_new(r_texture_new_file(2, 1, "res/button_prev.png"));
@@ -181,7 +179,7 @@ static void move_prev_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool layer move_prev");
+        s_log("tool layer move_prev");
         int layer = canvas.current_layer;
         uImage img = u_image_new_clone(canvas.RO.image);
         memcpy(u_image_layer(img, layer),
@@ -215,7 +213,7 @@ static void move_next_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool layer move_next");
+        s_log("tool layer move_next");
         int layer = canvas.current_layer;
         uImage img = u_image_new_clone(canvas.RO.image);
         memcpy(u_image_layer(img, layer),
@@ -251,7 +249,7 @@ static void blend_pe(struct Tool *super, ePointer_s pointer) {
 
     if (u_button_toggled(&self->ro.rect, pointer)) {
         bool pressed = u_button_is_pressed(&self->ro.rect);
-        log_info("tool layer blend: %i", pressed);
+        s_log("tool layer blend: %i", pressed);
         canvas.blend_layers = pressed;
     }
 }
@@ -277,7 +275,7 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        log_info("tool layer add");
+        s_log("tool layer add");
         int layer = canvas.current_layer;
         uImage old = canvas.RO.image;
         uImage img = u_image_new_empty(old.cols, old.rows, old.layers + 1);

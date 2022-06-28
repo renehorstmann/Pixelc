@@ -1,4 +1,4 @@
-#include "rhc/rhc_full.h"
+#include "s/s_full.h"
 #include "e/io.h"
 
 
@@ -12,15 +12,15 @@ static _Thread_local char L_savestate_file[64 + E_IO_SAVESTATE_MAX_FILENAME_LENG
 const char *e_window_get_title();
 
 static bool savestate_filename_valid(const char *filename) {
-    Str_s name = strc(filename);
-    bool valid = str_count(name, '/') == 0 && name.size < E_IO_SAVESTATE_MAX_FILENAME_LENGTH;
+    sStr_s name = s_strc(filename);
+    bool valid = s_str_count(name, '/') == 0 && name.size < E_IO_SAVESTATE_MAX_FILENAME_LENGTH;
     if (!valid)
-        log_error("failed: filename not valid: %s", filename);
+        s_log_error("failed: filename not valid: %s", filename);
     return valid;
 }
 
 
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
 
 #include "emscripten.h"
 
@@ -45,7 +45,7 @@ static void idbfs_mount() {
         e_io_idbfs_synced = false;
     );
     L.mounted = true;
-    log_info("e_io_idbfs: mounted");
+    s_log("e_io_idbfs: mounted");
 
     L.synced = false;
 
@@ -64,12 +64,12 @@ static void idbfs_mount() {
         );
         emscripten_sleep(1);
     }
-    log_info("e_io_idbfs: synced");
+    s_log("e_io_idbfs: synced");
 }
 
 // protected, JS need its name as global
 void e_io_idbfs_synced() {
-    log_trace("e_io_idbfs_synced");
+    s_log_trace("e_io_idbfs_synced");
     L.synced = true;
 }
 
@@ -87,10 +87,10 @@ static void idbfs_save() {
 // protected function
 void e_io_file_upload_done(const char *file, bool ascii, const char *user_file_name) {
     if(strcmp(file, L.file_upload.file) == 0 && ascii == L.file_upload.ascii && L.file_upload.cb) {
-        log_info("file upload done for: %s, ascii: %i", file, ascii);
+        s_log("file upload done for: %s, ascii: %i", file, ascii);
         L.file_upload.cb(L.file_upload.file, L.file_upload.ascii, user_file_name, L.file_upload.ud);
     } else {
-        log_error("file upload done for: %s, ascii: %i, but invalid configuration"
+        s_log_error("file upload done for: %s, ascii: %i, but invalid configuration"
                   "(wrong file, or ascii or callback NULL)", file, ascii);
     }
 }
@@ -102,7 +102,7 @@ void e_io_file_upload_done(const char *file, bool ascii, const char *user_file_n
 void e_io_offer_file_as_download(const char *file) {
     char script[256];
     if(strlen(file) >= sizeof script) {
-        log_error("e_io_offer_file_as_download failed, file length to long");
+        s_log_error("e_io_offer_file_as_download failed, file length to long");
         return;
     }
     snprintf(script, sizeof script, "offer_file_as_download(\'%s\');", file);
@@ -110,8 +110,8 @@ void e_io_offer_file_as_download(const char *file) {
 }
 
 void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallback callback, void *user_data) {
-    if(strlen(file) >= sizeof L.file_upload.file || str_count(strc(file), '/') != 0) {
-        log_error("e_io_ask_for_file_upload failed, file length to long, or got some \'/\'");
+    if(strlen(file) >= sizeof L.file_upload.file || s_str_count(s_strc(file), '/') != 0) {
+        s_log_error("e_io_ask_for_file_upload failed, file length to long, or got some \'/\'");
         return;
     }
     snprintf(L.file_upload.file, sizeof L.file_upload.file, "%s", file);
@@ -146,19 +146,19 @@ const char *e_io_savestate_file_path(const char *filename) {
 }
 
 
-String e_io_savestate_read(const char *filename, bool ascii) {
+sString *e_io_savestate_read(const char *filename, bool ascii) {
     if(!savestate_filename_valid(filename))
-        return string_new_invalid();
-    return file_read(
+        return s_string_new_invalid();
+    return s_file_read(
             e_io_savestate_file_path(filename),
             ascii);
 }
 
 
-bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
+bool e_io_savestate_write(const char *filename, sStr_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
-    bool ok = file_write(
+    bool ok = s_file_write(
             e_io_savestate_file_path(filename),
             content, ascii);
     idbfs_save();
@@ -166,10 +166,10 @@ bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
 }
 
 
-bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
+bool e_io_savestate_append(const char *filename, sStr_s content, bool ascii) {
     if(!savestate_filename_valid(filename))
         return false;
-    bool ok = file_append(
+    bool ok = s_file_append(
             e_io_savestate_file_path(filename),
             content, ascii);
     idbfs_save();
@@ -203,28 +203,28 @@ const char *e_io_savestate_file_path(const char *filename) {
     return L_savestate_file;
 }
 
-String e_io_savestate_read(const char *filename, bool ascii) {
+sString *e_io_savestate_read(const char *filename, bool ascii) {
     if (!savestate_filename_valid(filename))
-        return string_new_invalid();
-    return file_read(
+        return s_string_new_invalid();
+    return s_file_read(
             e_io_savestate_file_path(filename),
             ascii);
 }
 
 
-bool e_io_savestate_write(const char *filename, Str_s content, bool ascii) {
+bool e_io_savestate_write(const char *filename, sStr_s content, bool ascii) {
     if (!savestate_filename_valid(filename))
         return false;
-    return file_write(
+    return s_file_write(
             e_io_savestate_file_path(filename),
             content, ascii);
 }
 
 
-bool e_io_savestate_append(const char *filename, Str_s content, bool ascii) {
+bool e_io_savestate_append(const char *filename, sStr_s content, bool ascii) {
     if (!savestate_filename_valid(filename))
         return false;
-    return file_append(
+    return s_file_append(
             e_io_savestate_file_path(filename),
             content, ascii);
 }

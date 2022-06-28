@@ -2,6 +2,7 @@
 #include "u/pose.h"
 #include "textinput.h"
 #include "canvas.h"
+#include "modal.h"
 #include "dialog.h"
 
 #define BG_A "#776666"
@@ -54,16 +55,13 @@ static void kill_fn() {
     ro_text_kill(&impl->p_rows_text);
     ro_text_kill(&impl->p_rows_num);
     textinput_kill(&impl->textinput);
-    rhc_free(impl);
+    s_free(impl);
 }
 
 static void update(float dtime) {
     Impl *impl = dialog.impl;
 
     if (impl->textinput) {
-        dialog.textinput_active = true;
-
-        textinput_update(impl->textinput, dtime);
 
         char *end;
         int size = strtol(impl->textinput->text, &end, 10);
@@ -91,11 +89,13 @@ static void update(float dtime) {
                     impl->p_rows = size;
                     break;
                 default:
-                    assume(0, "wtf");
+                    s_assume(0, "wtf");
             }
         }
-        if (impl->textinput->state != TEXTINPUT_IN_PROGRESS)
+        if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
+            modal.textinput = NULL;
+        }
     }
 
     char buf[16];
@@ -123,9 +123,6 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->p_cols_num, cam_mat);
     ro_text_render(&impl->p_rows_text, cam_mat);
     ro_text_render(&impl->p_rows_num, cam_mat);
-    if (impl->textinput) {
-        textinput_render(impl->textinput);
-    }
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -158,6 +155,9 @@ static bool pointer_event(ePointer_s pointer) {
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
             impl->textinput_usage = 4;
         }
+
+        if(impl->textinput)
+            modal.textinput = impl->textinput;
     }
 
     return true;
@@ -174,11 +174,11 @@ static void on_action(bool ok) {
 
     dialog_hide();
     if (!ok) {
-        log_info("dialog canvas_size aborted");
+        s_log("dialog canvas_size aborted");
         return;
     }
     if (cols != img.cols || rows != img.rows || layers != img.layers) {
-        log_info("dialog canvas_size: new size %i %i", cols, rows);
+        s_log("dialog canvas_size: new size %i %i", cols, rows);
 
         uImage new_img = u_image_new_zeros(cols, rows, layers);
         if (layers != img.layers) {
@@ -198,7 +198,7 @@ static void on_action(bool ok) {
     }
     if (p_cols != canvas.RO.pattern_cols
         || p_rows != canvas.RO.pattern_rows) {
-        log_info("dialog canvas_size: new pattern size %i %i", p_cols, p_rows);
+        s_log("dialog canvas_size: new pattern size %i %i", p_cols, p_rows);
         canvas_set_pattern_size(p_cols, p_rows);
     }
 }
@@ -209,8 +209,8 @@ static void on_action(bool ok) {
 
 void dialog_create_canvas_size() {
     dialog_hide();
-    log_info("create");
-    Impl *impl = rhc_calloc(sizeof *impl);
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
     int pos;

@@ -1,4 +1,4 @@
-#include "rhc/rhc.h"
+#include "s/s.h"
 #include "brush.h"
 
 
@@ -119,7 +119,7 @@ static uImage kernel_10() {
 
 
 uImage *brush_kernel_defaults_new() {
-    uImage *self = rhc_calloc(sizeof *self * (16));
+    uImage *self = s_malloc0(sizeof *self * (16));
     uImage *it = self;
 
     *it++ = kernel_0();
@@ -144,6 +144,6 @@ void brush_kernel_defaults_kill(uImage **self_ptr) {
         return;
     while (u_image_valid(*it))
         u_image_kill(it++);
-    rhc_free(*self_ptr);
+    s_free(*self_ptr);
     *self_ptr = NULL;
 }

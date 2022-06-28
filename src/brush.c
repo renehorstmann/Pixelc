@@ -1,8 +1,8 @@
 #include "e/io.h"
 #include "r/r.h"
 #include "u/json.h"
-#include "mathc/sca/int.h"
-#include "mathc/sca/uchar.h"
+#include "m/sca/int.h"
+#include "m/sca/uchar.h"
 #include "canvas.h"
 #include "brushmode.h"
 #include "brush.h"
@@ -84,7 +84,7 @@ void brush_init() {
     brushmode_init();
 
     brush.current_color = U_COLOR_TRANSPARENT;
-    brush.secondary_color = U_COLOR_TRANSPARENT;
+    brush.secondary_color = U_COLOR_WHITE;
     brush.mode = BRUSH_MODE_FREE;
     brush.shading_active = false;
     brush.render_hover_preview = true;
@@ -162,7 +162,7 @@ void brush_pointer_event(ePointer_s pointer) {
             brushmode_pipette(pointer);
             break;
         default:
-            log_wtf("unknown mode");
+            s_log_wtf("unknown mode");
     }
 
     L.hovering_change = change;
@@ -214,7 +214,7 @@ bool brush_draw(int c, int r) {
 }
 
 void brush_abort_current_draw() {
-    log_info("abort");
+    s_log("abort");
     if (L.change || (L.hovering && L.hovering_change)) {
         canvas_reload();
         brushmode_reset(); // sets drawing to false
@@ -223,7 +223,7 @@ void brush_abort_current_draw() {
 }
 
 void brush_clear() {
-    log_info("clear");
+    s_log("clear");
     uImage img = canvas.RO.image;
     int layer = canvas.current_layer;
     const Selection *selection = brush.selection_ref;
@@ -240,11 +240,11 @@ void brush_clear() {
 
 void brush_set_kernel(uImage kernel_sink) {
     if (!u_image_valid(kernel_sink)) {
-        log_error("invalid");
+        s_log_error("invalid");
         return;
     }
 
-    log_info("set kernel");
+    s_log("set kernel");
 
     u_image_kill(&brush.RO.kernel);
     brush.RO.kernel = kernel_sink;
@@ -258,11 +258,11 @@ void brush_set_kernel(uImage kernel_sink) {
 
 void brush_load_kernel(int id) {
     if (id < 0 || id >= brush.RO.max_kernels) {
-        log_error("invalid id: %i/%i", id, brush.RO.max_kernels);
+        s_log_error("invalid id: %i/%i", id, brush.RO.max_kernels);
         return;
     }
 
-    log_info("load_kernel[%i] = %s", id, L.kernel_files[id]);
+    s_log("load_kernel[%i] = %s", id, L.kernel_files[id]);
 
     char file[256];
     snprintf(file, sizeof file, "kernel_%s", L.kernel_files[id]);
@@ -277,7 +277,7 @@ void brush_load_kernel(int id) {
 }
 
 void brush_append_kernel(uImage kernel_sink, const char *name) {
-    log_info("append_file: %s", name);
+    s_log("append_file: %s", name);
 
     u_image_save_file(kernel_sink, e_io_savestate_file_path(name));
 
@@ -291,9 +291,9 @@ void brush_append_kernel(uImage kernel_sink, const char *name) {
 
     if (!found) {
         size_t len = strlen(name) + 1;
-        char *clone = rhc_malloc(len);
+        char *clone = s_malloc(len);
         memcpy(clone, name, len);
-        L.kernel_files = rhc_realloc(L.kernel_files, sizeof *L.kernel_files * ++brush.RO.max_kernels);
+        L.kernel_files = s_realloc(L.kernel_files, sizeof *L.kernel_files * ++brush.RO.max_kernels);
         L.kernel_files[brush.RO.max_kernels - 1] = clone;
     }
 
@@ -308,18 +308,18 @@ void brush_append_kernel(uImage kernel_sink, const char *name) {
 
 
 void brush_reset_kernel_files() {
-    log_info("reset kernel files");
+    s_log("reset kernel files");
     uImage *kernels = brush_kernel_defaults_new();
 
     for (int i = 0; i < brush.RO.max_kernels; i++)
-        rhc_free(L.kernel_files[i]);
+        s_free(L.kernel_files[i]);
 
-    L.kernel_files = rhc_realloc(L.kernel_files, sizeof *L.kernel_files * 16);
+    L.kernel_files = s_realloc(L.kernel_files, sizeof *L.kernel_files * 16);
 
     int i;
     for (i = 0; u_image_valid(kernels[i]); i++) {
-        assume(i < 16, "change max default kernels");
-        char *name = rhc_malloc(32);
+        s_assume(i < 16, "change max default kernels");
+        char *name = s_malloc(32);
         snprintf(name, 32, "default_%i.png", i);
         char file[32];
         snprintf(file, 32, "kernel_%s", name);
@@ -344,7 +344,7 @@ void brush_reset_kernel_files() {
 
 
 void brush_save_config() {
-    log_info("save");
+    s_log("save");
 
     uJson *config = u_json_new_file(
             e_io_savestate_file_path("config.json"));
@@ -365,7 +365,7 @@ void brush_save_config() {
 }
 
 void brush_load_config() {
-    log_info("load");
+    s_log("load");
 
     bool reset = false;
 
@@ -383,9 +383,9 @@ void brush_load_config() {
     }
 
     for (int i = 0; i < brush.RO.max_kernels; i++)
-        rhc_free(L.kernel_files[i]);
+        s_free(L.kernel_files[i]);
 
-    L.kernel_files = rhc_realloc(L.kernel_files, sizeof *L.kernel_files * kernels_size);
+    L.kernel_files = s_realloc(L.kernel_files, sizeof *L.kernel_files * kernels_size);
 
     brush.RO.max_kernels = kernels_size;
 
@@ -398,7 +398,7 @@ void brush_load_config() {
         }
 
         size_t len = strlen(file) + 1;
-        char *clone = rhc_malloc(len);
+        char *clone = s_malloc(len);
         memcpy(clone, file, len);
         L.kernel_files[i] = clone;
     }
@@ -410,7 +410,7 @@ void brush_load_config() {
     }
 
     if (id < 0 || id >= brush.RO.max_kernels) {
-        log_warn("invalid id, setting to 0");
+        s_log_warn("invalid id, setting to 0");
         id = 0;
     }
 

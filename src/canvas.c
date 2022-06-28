@@ -3,8 +3,8 @@
 #include "u/image.h"
 #include "u/json.h"
 #include "e/io.h"
-#include "mathc/sca/int.h"
-#include "mathc/mat/float.h"
+#include "m/sca/int.h"
+#include "m/mat/float.h"
 
 #include "canvas.h"
 
@@ -149,14 +149,14 @@ void canvas_render(const mat4 *canvascam_mat) {
 
 void canvas_set_image(uImage image_sink, bool save) {
     if (!u_image_valid(image_sink)) {
-        log_warn("invalid img");
+        s_log_warn("invalid img");
         return;
     }
     if (image_sink.layers > CANVAS_MAX_LAYERS) {
-        log_warn("to much layers!");
+        s_log_warn("to much layers!");
         return;
     }
-    log_info("set_image");
+    s_log("set_image");
 
     u_image_kill(&canvas.RO.image);
     canvas.RO.image = image_sink;
@@ -181,9 +181,9 @@ void canvas_set_pattern_size(int cols, int rows) {
 }
 
 void canvas_save() {
-    log_info("save");
+    s_log("save");
     if (u_image_equals(canvas.RO.image, L.prev_image)) {
-        log_info("failed, not changed");
+        s_log("failed, not changed");
         return;
     }
 
@@ -208,9 +208,9 @@ void canvas_reload() {
 }
 
 void canvas_undo() {
-    log_info("undo");
+    s_log("undo");
     if (L.save_idx == L.save_idx_min) {
-        log_info("failed, on min idx");
+        s_log("failed, on min idx");
         return;
     }
 
@@ -225,9 +225,9 @@ void canvas_undo() {
 }
 
 void canvas_redo() {
-    log_info("redo");
+    s_log("redo");
     if (L.save_idx == L.save_idx_max) {
-        log_info("failed, on max idx");
+        s_log("failed, on max idx");
         return;
     }
 
@@ -249,7 +249,7 @@ bool canvas_redo_available() {
 }
 
 void canvas_save_config() {
-    log_info("save");
+    s_log("save");
 
     uJson *config = u_json_new_file(
             e_io_savestate_file_path("config.json"));
@@ -275,7 +275,7 @@ void canvas_save_config() {
 }
 
 void canvas_load_config() {
-    log_info("load");
+    s_log("load");
 
     uJson *config = u_json_new_file(
             e_io_savestate_file_path("config.json"));
@@ -317,7 +317,7 @@ void canvas_load_config() {
             L.save_layers[i] = tmp_layers[i];
         load_image();
     } else {
-        log_info("failed, saving the empty image as index 0");
+        s_log("failed, saving the empty image as index 0");
         save_image();
     }
 

@@ -7,7 +7,7 @@
 // window functions dont need the eGui handle
 //
 
-#include "mathc/types/float.h"
+#include "m/types/float.h"
 
 struct nk_context;
 
@@ -15,6 +15,10 @@ struct nk_context;
 struct eGui_Globals {
     bool init;
     struct nk_context *ctx;
+
+    // added to the nuklear render to scale the whole nuklear gui
+    // reset this f. e. in the camera
+    float scale;
 };
 extern struct eGui_Globals e_gui;
 

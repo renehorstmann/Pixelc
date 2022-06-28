@@ -1,5 +1,5 @@
-#include "mathc/bool.h"
-#include "mathc/float.h"
+#include "m/bool.h"
+#include "m/float.h"
 #include "camera.h"
 #include "brush.h"
 #include "canvas.h"

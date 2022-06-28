@@ -3,10 +3,8 @@
 #include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
-#include "rhc/alloc.h"
-#include "rhc/log.h"
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 #include "animation.h"
 #include "u/button.h"
 #include "toolbar.h"
@@ -23,7 +21,7 @@ static void tool_button_kill(Tool **super_ptr) {
     if (!self)
         return;
     ro_single_kill(&self->ro);
-    rhc_free(self);
+    s_free(self);
     *super_ptr = NULL;
 }
 
@@ -62,7 +60,7 @@ Tool *tool_button_new(const char *name,
                       const char *tex_file,
                       tool_pointer_event_fun pointer_event,
                       tool_button_active opt_is_active) {
-    ToolButton *self = rhc_calloc(sizeof *self);
+    ToolButton *self = s_malloc0(sizeof *self);
 
     self->ro = ro_single_new(r_texture_new_file(2, 1, tex_file));
     self->ro.rect.pose = u_pose_new(0, 0,

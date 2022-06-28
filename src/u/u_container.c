@@ -1,13 +1,13 @@
-#include "mathc/float.h"
-#include "mathc/sca/int.h"
+#include "m/float.h"
+#include "m/sca/int.h"
 
 #include "u/container.h"
 
 
-uContainer u_container_new_a(int num, float left, float top, Allocator_i a) {
+uContainer u_container_new_a(int num, float left, float top, sAllocator_i a) {
     uContainer self = {0};
     self.a = a;
-    self.items = allocator_calloc(a, sizeof *self.items * num);
+    self.items = s_a_malloc0(a, sizeof *self.items * num);
     self.num = num;
     self.on_integer_positions = true;
     self.left = left;
@@ -17,12 +17,12 @@ uContainer u_container_new_a(int num, float left, float top, Allocator_i a) {
 }
 
 void u_container_kill(uContainer *self) {
-    allocator_free(self->a, self->items);
+    s_a_free(self->a, self->items);
     *self = u_container_new_invalid();
 }
 
 void u_container_set_num(uContainer *self, int num) {
-    self->items = allocator_realloc(self->a, self->items, sizeof *self->items * num);
+    self->items = s_a_realloc(self->a, self->items, sizeof *self->items * num);
     for (int i = self->num; i < num; i++)
         self->items[i] = (uContainerItem_s) {0};
     self->num = num;
@@ -264,7 +264,7 @@ bool u_container_update(uContainer *self) {
                 item->out.left += self->left + (item->out.col * rem_x) / isca_max(1, cols - 1);
                 break;
             default:
-                assume(false, "u_container: invalid align option");
+                s_assume(false, "u_container: invalid align option");
                 break;
         }
 
@@ -282,7 +282,7 @@ bool u_container_update(uContainer *self) {
                 item->out.top += self->top - (item->out.row * rem_y) / isca_max(1, rows - 1);
                 break;
             default:
-                assume(false, "u_container: invalid align option");
+                s_assume(false, "u_container: invalid align option");
                 break;
         }
     }
@@ -322,7 +322,7 @@ bool u_container_update(uContainer *self) {
             self->out.size.x = self->max_size.x;
             break;
         default:
-            assume(false, "u_container: invalid align option");
+            s_assume(false, "u_container: invalid align option");
             break;
     }
 
@@ -344,7 +344,7 @@ bool u_container_update(uContainer *self) {
             self->out.size.y = self->max_size.y;
             break;
         default:
-            assume(false, "u_container: invalid align option");
+            s_assume(false, "u_container: invalid align option");
             break;
     }
 
