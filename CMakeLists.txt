@@ -44,8 +44,8 @@ file(GLOB SRCS
         "${PROJECT_SOURCE_DIR}/src/r/*"
         "${PROJECT_SOURCE_DIR}/src/u/*"
         "${PROJECT_SOURCE_DIR}/src/p/*"
-        "${PROJECT_SOURCE_DIR}/src/tool/*"
         "${PROJECT_SOURCE_DIR}/src/dialog/*"
+        "${PROJECT_SOURCE_DIR}/src/tool/*"
         )
 
 add_executable(pixelc ${SRCS})
@@ -110,7 +110,7 @@ if (PLATFORM_MINGW)
     message("Setup Windows MinGW")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter -Wno-format-truncation")
 
     # mingw is not shipped with a find_package(SDL2) script
     add_definitions(-Dmain=SDL_main)
@@ -151,54 +151,37 @@ if (PLATFORM_MSVC)
     message("Setup Windows MSVC")
 
     # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244 /wd4305 /wd4996 /wd5105")
-
-    if(USE_SANITIZER)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            message("Using MS sanitizer")
-            add_definitions(-DOPTION_SANITIZER)
-            set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address")
-            set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize=address")
-        endif ()
-    endif()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4267 /wd4244 /wd4305 /wd4996 /wd5105")
 
     add_definitions(-Dmain=SDL_main)
     add_definitions(-DOPTION_GLEW)
 
     find_package(SDL2 REQUIRED)
-    find_library(SDL2_IMAGE_LIBRARIES SDL2_image REQUIRED)
-
-
-    # mingw may not find a few libraries, due to missing CMAKE_LIBRARY_PATH lib paths
-    find_library(OPENGL_LIB opengl32 REQUIRED)
-    find_library(GLEW_LIB glew32 REQUIRED)
-    find_library(GLU_LIB glu32 REQUIRED)
-
-    target_include_directories(pixelc PRIVATE ${SDL2_INCLUDE_DIRS})
+    find_package(SDL2-image CONFIG REQUIRED)
+    find_package(GLEW REQUIRED)
 
     target_link_libraries(pixelc
-            ${SDL2_LIBRARIES}
-            ${SDL2_IMAGE_LIBRARIES}
-            ${OPENGL_LIB}
-            ${GLEW_LIB}
-            ${GLU_LIB}
+            SDL2::SDL2
+            SDL2::SDL2main
+            SDL2::SDL2_image
+            GLEW::GLEW
             )
 
     if (USE_SDL_MIXER)
-        find_library(SDL2_MIXER_LIBRARIES SDL2_mixer REQUIRED)
-        target_link_libraries(pixelc ${SDL2_MIXER_LIBRARIES})
+        find_package(SDL2-mixer CONFIG REQUIRED)
+        target_link_libraries(pixelc SDL2::SDL2_mixer)
     endif ()
     if (USE_SDL_NET)
-        find_library(SDL2_NET_LIBRARIES SDL2_net REQUIRED)
-        target_link_libraries(pixelc ${SDL2_NET_LIBRARIES})
+        find_package(SDL2-net CONFIG REQUIRED)
+        target_link_libraries(pixelc SDL2::SDL2_net)
     endif ()
     if (USE_SDL_TTF)
-        find_library(SDL2_TTF_LIBRARIES SDL2_ttf REQUIRED)
-        target_link_libraries(pixelc ${SDL2_TTF_LIBRARIES})
+        find_package(SDL2-ttf CONFIG REQUIRED)
+        target_link_libraries(pixelc SDL2::SDL2_ttf)
     endif ()
     if (USE_FETCH)
-        find_package(CURL REQUIRED)
-        target_link_libraries(pixelc ${CURL_LIBRARIES})
+        find_package(CURL CONFIG REQUIRED)
+        target_link_libraries(pixelc CURL::libcurl)
     endif ()
 endif ()
 
@@ -208,16 +191,16 @@ if (PLATFORM_UNIX)
     message("Setup Unix")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter -Wno-format-truncation")
 
-    if(USE_SANITIZER)
+    if (USE_SANITIZER)
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             message("Using Google sanitizer")
             add_definitions(-DOPTION_SANITIZER)
             set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
             set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
         endif ()
-    endif()
+    endif ()
 
     find_package(SDL2 REQUIRED)
     find_library(SDL2_IMAGE_LIBRARIES SDL2_image REQUIRED)
@@ -262,7 +245,7 @@ if (PLATFORM_MOBILE)
     message("Setup Mobile")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter -Wno-format-truncation")
 
     add_definitions(-DOPTION_GLES)
     add_definitions(-DOPTION_SDL)
@@ -306,3 +289,9 @@ endif ()
 # res
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+if (PLATFORM_MSVC)
+    # also copy res to MSVC subdirs Debug and Release
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res
+            DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+endif()

@@ -12,6 +12,8 @@ static bool s__string_stream_valid(struct sStream_i stream);
 sString *s_string_new_a(ssize start_capacity, sAllocator_i a) {
     s_assume(s_allocator_valid(a), "a needs to be valid");
     sString *self = s_a_new0(a, sString, 1);
+    // at least 8 bytes to be allocated
+    start_capacity = s_max(7, start_capacity);
     self->data = s_a_malloc0(a, start_capacity + 1);
     self->capacity = start_capacity;
     self->allocator = a;
@@ -23,7 +25,7 @@ sString *s_string_new_a(ssize start_capacity, sAllocator_i a) {
     };
     return self;
 }
-// clones sStr_s and appends null
+
 sString *s_string_new_clone_a(sStr_s to_clone, sAllocator_i a) {
     sString *sb = s_string_new_a(to_clone.size, a);
     if (!s_string_valid(sb))
@@ -33,7 +35,6 @@ sString *s_string_new_clone_a(sStr_s to_clone, sAllocator_i a) {
     return sb;
 }
 
-// copies str s into a new string, with old -> replacement.
 sString *s_string_new_replace_a(sStr_s to_replace, sStr_s old, sStr_s replacement, sAllocator_i a) {
     if (s_str_empty(to_replace) || s_str_empty(old) || !s_str_valid(replacement)) {
         return s_string_new_invalid();
@@ -52,7 +53,6 @@ sString *s_string_new_replace_a(sStr_s to_replace, sStr_s old, sStr_s replacemen
     return res;
 }
 
-// concatenates all strs
 sString *s_string_new_cat_a(sStr_s *strs, int n, sAllocator_i a) {
     ssize size = 0;
     for (int i = 0; i < n; i++) {
@@ -80,7 +80,6 @@ void s_string_kill(sString **self_ptr) {
     *self_ptr = NULL;
 }
 
-// size is the sum of characters, not including termination null (as strlen)
 void s_string_set_capacity(sString *self, ssize capacity) {
     if (!s_string_valid(self))
         return;
@@ -95,7 +94,6 @@ void s_string_set_capacity(sString *self, ssize capacity) {
     memset(&self->data[self->size], 0, self->capacity + 1 - self->size);
 }
 
-// size is the sum of characters, not including termination null (as strlen)
 void s_string_resize(sString *self, ssize size) {
     if (size > self->capacity) {
         s_string_set_capacity(self, size * 2);
@@ -106,7 +104,6 @@ void s_string_resize(sString *self, ssize size) {
     self->data[self->size] = '\0';  //just to be sure
 }
 
-// appends a char
 void s_string_push(sString *self, char push) {
     if (!s_string_valid(self))
         return;
@@ -115,7 +112,6 @@ void s_string_push(sString *self, char push) {
     self->data[self->size] = '\0';  //just to be sure
 }
 
-// appends a string
 void s_string_append(sString *self, sStr_s append) {
     if (!s_string_valid(self))
         return;

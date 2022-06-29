@@ -96,7 +96,7 @@ void dialog_hide() {
     if (!dialog_valid())
         return;
     s_log("hide");
-    dialog.kill(dialog.impl);
+    dialog.kill();
     dialog.impl = NULL;
     dialog.id[0] = '\0';
     dialog.opt_on_ok_cb = NULL;

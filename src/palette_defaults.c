@@ -5,7 +5,7 @@
 // private
 // 
 
-static const char *name_0 = "grayscale.png";
+static const char *name_0 = "grayscale";
 
 static uImage palette_0() {
     uImage self = u_image_new_empty(10, 1, 1);
@@ -17,7 +17,7 @@ static uImage palette_0() {
 }
 
 
-static const char *name_1 = "grayscale_alpha.png";
+static const char *name_1 = "grayscale_alpha";
 
 static uImage palette_1() {
     uImage self = u_image_new_empty(10, 4, 1);
@@ -31,140 +31,140 @@ static uImage palette_1() {
 }
 
 
-static const char *name_2 = "endesga 32.png";
+static const char *name_2 = "endesga 32";
 
 static uImage palette_2() {
     return u_image_new_file(1, "res/palettes/endesga-32-1x.png");
 }
 
-static const char *name_3 = "resurrect 64.png";
+static const char *name_3 = "resurrect 64";
 
 static uImage palette_3() {
     return u_image_new_file(1, "res/palettes/resurrect-64-1x.png");
 }
 
-static const char *name_4 = "pear36.png";
+static const char *name_4 = "pear36";
 
 static uImage palette_4() {
     return u_image_new_file(1, "res/palettes/pear36-1x.png");
 }
 
-static const char *name_5 = "aap-64.png";
+static const char *name_5 = "aap-64";
 
 static uImage palette_5() {
     return u_image_new_file(1, "res/palettes/aap-64-1x.png");
 }
 
-static const char *name_6 = "lospec500.png";
+static const char *name_6 = "lospec500";
 
 static uImage palette_6() {
     return u_image_new_file(1, "res/palettes/lospec500-1x.png");
 }
 
-static const char *name_7 = "vinik24.png";
+static const char *name_7 = "vinik24";
 
 static uImage palette_7() {
     return u_image_new_file(1, "res/palettes/vinik24-1x.png");
 }
 
-static const char *name_8 = "journey.png";
+static const char *name_8 = "journey";
 
 static uImage palette_8() {
     return u_image_new_file(1, "res/palettes/journey-1x.png");
 }
 
-static const char *name_9 = "zughy 32.png";
+static const char *name_9 = "zughy 32";
 
 static uImage palette_9() {
     return u_image_new_file(1, "res/palettes/zughy-32-1x.png");
 }
 
-static const char *name_10 = "endedga 64.png";
+static const char *name_10 = "endedga 64";
 
 static uImage palette_10() {
     return u_image_new_file(1, "res/palettes/endesga-64-1x.png");
 }
 
-static const char *name_11 = "sweetie 16.png";
+static const char *name_11 = "sweetie 16";
 
 static uImage palette_11() {
     return u_image_new_file(1, "res/palettes/sweetie-16-1x.png");
 }
 
-static const char *name_12 = "fantasy 24.png";
+static const char *name_12 = "fantasy 24";
 
 static uImage palette_12() {
     return u_image_new_file(1, "res/palettes/fantasy-24-1x.png");
 }
 
-static const char *name_13 = "slso8.png";
+static const char *name_13 = "slso8";
 
 static uImage palette_13() {
     return u_image_new_file(1, "res/palettes/slso8-1x.png");
 }
 
-static const char *name_14 = "alollo.png";
+static const char *name_14 = "alollo";
 
 static uImage palette_14() {
     return u_image_new_file(1, "res/palettes/apollo-1x.png");
 }
 
-static const char *name_15 = "pico-8.png";
+static const char *name_15 = "pico-8";
 
 static uImage palette_15() {
     return u_image_new_file(1, "res/palettes/pico-8-1x.png");
 }
 
-static const char *name_16 = "cc-29.png";
+static const char *name_16 = "cc-29";
 
 static uImage palette_16() {
     return u_image_new_file(1, "res/palettes/cc-29-1x.png");
 }
 
-static const char *name_17 = "oil 6.png";
+static const char *name_17 = "oil 6";
 
 static uImage palette_17() {
     return u_image_new_file(1, "res/palettes/oil-6-1x.png");
 }
 
-static const char *name_18 = "na16.png";
+static const char *name_18 = "na16";
 
 static uImage palette_18() {
     return u_image_new_file(1, "res/palettes/na16-1x.png");
 }
 
-static const char *name_19 = "famicube.png";
+static const char *name_19 = "famicube";
 
 static uImage palette_19() {
     return u_image_new_file(1, "res/palettes/famicube-1x.png");
 }
 
-static const char *name_20 = "chocomilk-8.png";
+static const char *name_20 = "chocomilk-8";
 
 static uImage palette_20() {
     return u_image_new_file(1, "res/palettes/chocomilk-8-1x.png");
 }
 
-static const char *name_21 = "kirokaze gameboy.png";
+static const char *name_21 = "kirokaze gameboy";
 
 static uImage palette_21() {
     return u_image_new_file(1, "res/palettes/kirokaze-gameboy-1x.png");
 }
 
-static const char *name_22 = "steam lords.png";
+static const char *name_22 = "steam lords";
 
 static uImage palette_22() {
     return u_image_new_file(1, "res/palettes/steam-lords-1x.png");
 }
 
-static const char *name_23 = "nes.png";
+static const char *name_23 = "nes";
 
 static uImage palette_23() {
     return u_image_new_file(1, "res/palettes/nintendo-entertainment-system-1x.png");
 }
 
 
-static const char *name_998 = "gameboy.png";
+static const char *name_998 = "gameboy";
 
 static uImage palette_998() {
     uImage self = u_image_new_empty(4, 1, 1);
@@ -178,7 +178,7 @@ static uImage palette_998() {
 }
 
 
-static const char *name_999 = "pixilmatt.png";
+static const char *name_999 = "pixilmatt";
 
 static uImage palette_999() {
     uImage self = u_image_new_empty(37, 1, 1);

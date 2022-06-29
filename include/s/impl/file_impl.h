@@ -44,6 +44,7 @@ sFile *s_file_new_read(const char *file, bool ascii) {
     if (!s_file_valid(&self_stack)) {
         s_error_set("s_file_new_read failed");
         s_log_warn("s_file_new_read failed: %s", file);
+        return NULL;
     }
     sFile *self = s_new(sFile, 1);
     *self = self_stack;
@@ -60,6 +61,7 @@ sFile *s_file_new_write(const char *file, bool ascii) {
     if (!s_file_valid(&self_stack)) {
         s_error_set("s_file_new_write failed");
         s_log_warn("s_file_new_write failed: %s", file);
+        return NULL;
     }
     sFile *self = s_new(sFile, 1);
     *self = self_stack;
@@ -76,6 +78,7 @@ sFile *s_file_new_append(const char *file, bool ascii) {
     if (!s_file_valid(&self_stack)) {
         s_error_set("s_file_new_append failed");
         s_log_warn("s_file_new_append failed: %s", file);
+        return NULL;
     }
     sFile *self = s_new(sFile, 1);
     *self = self_stack;

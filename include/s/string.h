@@ -60,6 +60,7 @@ static sStream_i s_string_get_stream(sString *self) {
 
 
 // allocated start_capacity + 1 (null)
+// start_capacity will be set to a minimum of 7
 sString *s_string_new_a(ssize start_capacity, sAllocator_i a);
 
 // allocated start_capacity + 1 (null)

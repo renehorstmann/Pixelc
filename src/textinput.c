@@ -139,6 +139,13 @@ static void key_raw_event(const SDL_Event *event, void *user_data) {
         // special keys can be set with the virtual keyboard btns
     }
 
+    if (event->key.keysym.scancode == SDL_SCANCODE_KP_0)
+        code = '0';
+    else if (event->key.keysym.scancode >= SDL_SCANCODE_KP_1
+             && event->key.keysym.scancode <= SDL_SCANCODE_KP_9) {
+        code = '1' + event->key.keysym.scancode - SDL_SCANCODE_KP_1;
+    }
+
     if (code >= ' ' && code <= '~')
         append_char(self, (char) code);
     else if (code == SDLK_BACKSPACE)
@@ -201,7 +208,7 @@ TextInput *textinput_new(const char *title, int opt_max_chars) {
     self->L.title = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
     vec2 title_size = ro_text_set_text(&self->L.title, title);
     self->L.title.pose = u_pose_new(-80, 32,
-            title_size.x > 85? 1 : 2, 2);
+                                    title_size.x > 85 ? 1 : 2, 2);
 
 
     self->L.title_shadow = ro_text_new_font85(TEXTINPUT_TITLE_MAX_LENGTH);
@@ -277,7 +284,7 @@ void textinput_kill(TextInput **self_ptr) {
 void textinput_update(TextInput *self, float dtime) {
     camera(self, e_window.size);
 
-    char text[TEXTINPUT_MAX_CHARS];
+    char text[TEXTINPUT_MAX_CHARS+1];
     strcpy(text, self->text);
 
     self->L.blink_time += dtime;
@@ -328,7 +335,7 @@ void textinput_update(TextInput *self, float dtime) {
     if (self->ok_active) {
         set_key_pos(self, &self->L.special.rects[0].pose, 8, 3, 2, 0, 0);
     } else {
-        u_pose_set_xy(&self->L.special.rects[0].pose, FLT_MAX, FLT_MAX);
+        u_pose_set_xy(&self->L.special.rects[0].pose, SCA_MAX, SCA_MAX);
     }
     set_key_pos(self, &self->L.special.rects[1].pose, 0, 3, 2, 0, 0);
     set_key_pos(self, &self->L.special.rects[2].pose, 8, 2, 2, 0, 0);

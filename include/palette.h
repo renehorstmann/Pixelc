@@ -38,6 +38,9 @@ float palette_get_hud_size();
 
 mat4 palette_get_pose();
 
+// returns a new image which has to be killed
+uImage palette_as_image();
+
 bool palette_contains_pos(vec2 pos);
 
 // may return -1, if custom color is selected
@@ -65,6 +68,9 @@ void palette_load_palette(int id);
 //   (which will take the ownership of palette_sink)
 // calls palette_save_config
 void palette_append_file(uImage colors, const char *name);
+
+// returns true if its valid to call palette_append_file
+bool palette_from_image_valid(uImage colors);
 
 // deletes the palette with the given id from the config, may change the current palette to the previous config palette
 // there must be at least 2 palettes in the config to delete a palette (min. 1 palette)

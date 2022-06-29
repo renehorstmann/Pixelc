@@ -372,6 +372,12 @@ mat4 palette_get_pose() {
                       camera_height());
 }
 
+uImage palette_as_image() {
+    uImage ret = u_image_new_empty(palette.RO.palette_size, 1, 1);
+    memcpy(ret.data, palette.RO.palette, u_image_data_size(ret));
+    return ret;
+}
+
 bool palette_contains_pos(vec2 pos) {
     int size = palette_get_hud_size();
     if (camera_is_portrait_mode()) {
@@ -472,7 +478,7 @@ void palette_load_palette(int id) {
     s_log("load_palette[%i] = %s", id, L.palette_files[id]);
 
     char file[256];
-    snprintf(file, sizeof file, "palette_%s", L.palette_files[id]);
+    snprintf(file, sizeof file, "palette_%s.png", L.palette_files[id]);
 
     char name[PALETTE_NAME_MAX];
     snprintf(name, sizeof name, "%s", L.palette_files[id]);
@@ -480,12 +486,15 @@ void palette_load_palette(int id) {
     // name to lower and without .png
     sStr_s name_s = s_strc(name);
     name_s = s_str_tolower(name_s);
-    name_s = s_str_eat_back_str(name_s, s_strc(".png"));
     name_s.data[name_s.size] = '\0';
 
     uImage colors = u_image_new_file(1,
                                      e_io_savestate_file_path(file)
     );
+    if(!u_image_valid(colors)) {
+        s_log_error("invalid image: %i/%i: %s", id, palette.RO.max_palettes, name);
+        return;
+    }
 
     palette.RO.palette_id = id;
     palette_set_palette(colors, name);
@@ -499,7 +508,9 @@ void palette_load_palette(int id) {
 void palette_append_file(uImage colors, const char *name) {
     s_log("append_file: %s", name);
 
-    u_image_save_file(colors, e_io_savestate_file_path(name));
+    char file[256];
+    snprintf(file, sizeof file, "palette_%s.png", name);
+    u_image_save_file(colors, e_io_savestate_file_path(file));
 
     int idx = -1;
     for (int i = 0; i < palette.RO.max_palettes; i++) {
@@ -525,6 +536,11 @@ void palette_append_file(uImage colors, const char *name) {
     palette.RO.palette_id = idx;
     if (palette.auto_save_config)
         palette_save_config();
+}
+
+bool palette_from_image_valid(uImage colors) {
+    int size = colors.cols * colors.rows;
+    return size <= PALETTE_MAX && colors.layers == 1;
 }
 
 void palette_delete_palette(int id) {
@@ -558,7 +574,7 @@ void palette_reset_palette_files() {
         s_assume(i < 32, "change max default palettes");
         char *name = palette_defaults_name_on_heap(i);
         char file[256];
-        snprintf(file, sizeof file, "palette_%s", name);
+        snprintf(file, sizeof file, "palette_%s.png", name);
         u_image_save_file(palettes[i], e_io_savestate_file_path(file));
 
         L.palette_files[i] = name;

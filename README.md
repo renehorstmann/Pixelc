@@ -1,17 +1,20 @@
 # Pixelc
-An opensource tile/sprite editor in C, using SDL2 and OpenGL, also running on Android.
+An opensource tile/sprite editor in C, using SDL2 and OpenGL
+
+**Also runs on fine on smartphones on web browsers**
 
 Based on [some](https://github.com/renehorstmann/some) framework.
 
 Have a look at [Tilec](https://github.com/renehorstmann/Tilec) for an old forked tile map editor.
 
-## Live demo
-Compiled with emscripten [live demo](https://renehorstmann.github.io/pixelc)
+
+## Web version
+[Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten 
 
 ## Status:
 Ready to draw...
 
-![example_image](example.jpg)
+![example_image](example.png)
 
 ## Install and run on Desktop
 Have a look at the section of [some](https://github.com/renehorstmann/some)
@@ -56,6 +59,10 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- palette remove new palette image reatrictions
+  - MAX colors
+  - edit dialog
+
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -63,11 +70,6 @@ python3 -m http.server --bind localhost  # [port]
     - top with title bar
     - flexible middle (flex in height of course)
     - bottom part
-
-- palette dialog
-  - add canvas as palette
-    - name
-  - set current as canvas
 
 - kernel long press dialog
   - shows the current kernel?

@@ -56,13 +56,16 @@ static void set_pose(float palette_hud_size, int c, int r) {
 
 
 void animation_init(int multi_cols, int multi_rows, float size, int frames, float fps) {
+    uImage img = canvas.RO.image;
+    if(img.cols % frames != 0)
+        frames = 1;
+
     L.mcols = multi_cols;
     L.mrows = multi_rows;
     L.size = size;
     L.frames = frames;
     L.fps = fps;
 
-    uImage img = canvas.RO.image;
 
     for (int i = 0; i < img.layers; i++) {
         rTexture tex = r_texture_new(img.cols, img.rows, frames, 1, u_image_layer(img, i));
