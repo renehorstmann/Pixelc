@@ -85,12 +85,22 @@ python3 -m http.server --bind localhost  # [port]
   - how to animate
   - frame times?
   - gif export?
-- options menu
+  
+- tutorial.md
+  - what how to do
+    - how to create a palette
+    - how to use a palette from lospec
+  - multitouchmode
+  - images
+  - disp, etc. explained  
+  
+- options menu?
   - in container stack
   - shows all tools
   - tools can be used (maybe not all? (tooltip))
   - tools can be en/disabled
   - tools can be repositioned (uo down)
+  
 
 - tiles
   - file containing tile names?
