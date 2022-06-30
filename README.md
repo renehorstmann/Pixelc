@@ -59,10 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- palette remove new palette image reatrictions
-  - MAX colors
-  - edit dialog
-
 - dialog background drawn
   - with titel bar
   - nice big shadow

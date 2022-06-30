@@ -12,7 +12,7 @@
 #include "palette.h"
 
 #define COLOR_DROP_SIZE 16.0f
-#define ADDITIONAL_PALETTE_SPACE 64
+#define ADDITIONAL_PALETTE_SPACE 512
 
 #define SWIPE_DISTANCE 50
 
@@ -458,13 +458,7 @@ void palette_set_palette(uImage colors, const char *name) {
         return;
     }
 
-    int size = colors.cols * colors.rows;
-
-    if (size > PALETTE_MAX || colors.layers != 1) {
-        s_log_error("to large, or multiple layers (%i/%i)",
-                  size, PALETTE_MAX);
-        return;
-    }
+    int size = colors.cols * colors.rows * colors.layers;
 
     palette_set_colors(colors.data, size, name);
 }
@@ -536,11 +530,6 @@ void palette_append_file(uImage colors, const char *name) {
     palette.RO.palette_id = idx;
     if (palette.auto_save_config)
         palette_save_config();
-}
-
-bool palette_from_image_valid(uImage colors) {
-    int size = colors.cols * colors.rows;
-    return size <= PALETTE_MAX && colors.layers == 1;
 }
 
 void palette_delete_palette(int id) {

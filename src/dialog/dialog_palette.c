@@ -201,7 +201,7 @@ void dialog_create_palette() {
     impl->to_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 28;
 
-    impl->from_canvas_txt = ro_text_new_font55(128);
+    impl->from_canvas_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->from_canvas_txt, "Set palette\n"
                                              "  from canvas:");
     ro_text_set_color(&impl->from_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
@@ -216,16 +216,6 @@ void dialog_create_palette() {
     impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
     impl->from_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 32;
-
-    if (!palette_from_image_valid(canvas.RO.image)) {
-        ro_text_set_text(&impl->from_canvas_txt, "Canvas needs a\n"
-                                                 "max size of 512\n"
-                                                 "and a single layer\n"
-                                                 "to be used as\n"
-                                                 "a palette!");
-        u_pose_set_h(&impl->from_canvas_txt.pose, 1);
-        impl->from_canvas_name.pose = impl->from_canvas_btn.rect.pose = u_pose_new_hidden();
-    }
 
     dialog.impl_height = pos;
 
