@@ -64,7 +64,7 @@ struct eInput_Globals {
 extern struct eInput_Globals e_input;
 
 
-// creates the input interface
+// initializes the input interface
 void e_input_init();
 
 void e_input_kill();

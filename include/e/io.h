@@ -6,7 +6,6 @@
 //
 
 #include "core.h"
-#include "s/str_type.h"
 #include "s/string.h"
 
 

@@ -3,10 +3,9 @@
 
 //
 // debug gui, nuklear based
-// is a singleton / module
-// window functions dont need the eGui handle
 //
 
+#include "core.h"
 #include "m/types/float.h"
 
 struct nk_context;
