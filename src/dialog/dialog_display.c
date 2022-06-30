@@ -3,6 +3,7 @@
 #include "u/button.h"
 #include "textinput.h"
 #include "camera.h"
+#include "cameractrl.h"
 #include "modal.h"
 #include "dialog.h"
 
@@ -140,8 +141,10 @@ static void on_action(bool ok) {
         save_cam = true;
     }
 
-    if (save_cam)
+    if (save_cam) {
         camera_save_config();
+        cameractrl_set_home();
+    }
 }
 
 //

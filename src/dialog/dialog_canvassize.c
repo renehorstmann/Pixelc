@@ -2,6 +2,7 @@
 #include "u/pose.h"
 #include "textinput.h"
 #include "canvas.h"
+#include "cameractrl.h"
 #include "modal.h"
 #include "dialog.h"
 
@@ -195,6 +196,7 @@ static void on_action(bool ok) {
         new_img.rows = rows;
         new_img.layers = layers;
         canvas_set_image(new_img, true);
+        cameractrl_set_home();
     }
     if (p_cols != canvas.RO.pattern_cols
         || p_rows != canvas.RO.pattern_rows) {

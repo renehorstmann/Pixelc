@@ -91,6 +91,7 @@ static void init() {
 static void update(float dtime) {
     // simulate
     camera_update();
+    cameractrl_update(dtime);
 
     background_update(dtime);
 
@@ -109,6 +110,7 @@ static void update(float dtime) {
     }
     multitouchcursor_update(dtime);
     modal_update(dtime);
+    
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames

@@ -32,6 +32,8 @@ static struct {
     float distance0;
     float distance;
     bool touched;
+    
+    int set_home_cnt;
 
     struct {
         vec2 pointer_pos;
@@ -53,6 +55,49 @@ static void zoom_camera(float new_distance) {
     L.zoom = L.zoom0 / factor;
     camera_set_zoom(L.zoom);
 }
+
+static void set_home() {
+    memset(&L, 0, sizeof(L));
+
+    int rows = canvas.RO.image.rows;
+    int cols = canvas.RO.image.cols;
+    
+    int left = camera.RO.left;
+    int right = camera.RO.right;
+    int top = camera.RO.top;
+    int bottom = camera.RO.bottom;
+    
+    if (camera_is_portrait_mode()) {
+        top -= toolbar_size();
+        bottom += palette_get_hud_size();
+    } else {
+        left += toolbar_size();
+        right -= palette_get_hud_size();
+    }
+    
+    float w = right - left;
+    float h = top - bottom;
+
+    if(w/h >= cols/rows) {
+        // size by height
+        L.zoom = rows / (h*HOME_SIZE);
+    } else {
+        L.zoom = cols / (w*HOME_SIZE);
+    }
+    
+    float cx = (left + right) / 2.0f;
+    float cy = (bottom + top) / 2.0f;
+    
+    L.pos.x = cols/2.0f;
+    L.pos.y = -rows/2.0f;
+    
+    L.pos.x -= cx * L.zoom;
+    L.pos.y -= cy * L.zoom;
+   
+    camera_set_pos(L.pos.x, L.pos.y);
+    camera_set_zoom(L.zoom);
+}
+
 
 static void wheel_event(bool up, void *user_data) {
     if (up)
@@ -138,46 +183,17 @@ void cameractrl_init() {
     e_input_register_wheel_event(wheel_event, NULL);
 }
 
+void cameractrl_update(float dtime) {
+    if(L.set_home_cnt>0) {
+        L.set_home_cnt--;
+        if(L.set_home_cnt<=0) {
+            set_home();
+        }
+    }
+}
+
 void cameractrl_set_home() {
-    memset(&L, 0, sizeof(L));
-
-    int rows = canvas.RO.image.rows;
-    int cols = canvas.RO.image.cols;
-    
-    int left = camera.RO.left;
-    int right = camera.RO.right;
-    int top = camera.RO.top;
-    int bottom = camera.RO.bottom;
-    
-    if (camera_is_portrait_mode()) {
-        top -= toolbar_size();
-        bottom += palette_get_hud_size();
-    } else {
-        left += toolbar_size();
-        right -= palette_get_hud_size();
-    }
-    
-    float w = right - left;
-    float h = top - bottom;
-
-    if(w/h >= cols/rows) {
-        // size by height
-        L.zoom = rows / (h*HOME_SIZE);
-    } else {
-        L.zoom = cols / (w*HOME_SIZE);
-    }
-    
-    float cx = (left + right) / 2.0f;
-    float cy = (bottom + top) / 2.0f;
-    
-    L.pos.x = cols/2.0f;
-    L.pos.y = -rows/2.0f;
-    
-    L.pos.x -= cx * L.zoom;
-    L.pos.y -= cy * L.zoom;
-   
-    camera_set_pos(L.pos.x, L.pos.y);
-    camera_set_zoom(L.zoom);
+    L.set_home_cnt = 1;
 }
 
 bool cameractrl_pointer_event(ePointer_s pointer) {
