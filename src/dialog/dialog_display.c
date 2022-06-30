@@ -59,7 +59,7 @@ static void update(float dtime) {
         }
         if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
-            modal.textinput = NULL;
+            modal_set_textinput(NULL);
         }
     }
 
@@ -89,7 +89,7 @@ static bool pointer_event(ePointer_s pointer) {
     if (pointer.action == E_POINTER_DOWN) {
         if (u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
             impl->textinput = textinput_new("Internal Min. Size", 8);
-            modal.textinput = impl->textinput;
+            modal_set_textinput(impl->textinput);
             snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->size);
             impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
             impl->textinput_usage = 0;

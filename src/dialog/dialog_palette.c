@@ -82,7 +82,7 @@ static void update(float dtime) {
         }
         if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
-            modal.textinput = NULL;
+            modal_set_textinput(NULL);
         }
     }
 }
@@ -137,7 +137,7 @@ static bool pointer_event(ePointer_s pointer) {
     if (u_pose_aa_contains(impl->from_canvas_name_hitbox, pointer.pos.xy)) {
         s_log("palette dialog: change from canvas name");
         impl->textinput = textinput_new("set palette name", 0);
-        modal.textinput = impl->textinput;
+        modal_set_textinput(impl->textinput);
         snprintf(impl->textinput->text, TEXTINPUT_MAX_CHARS, "%s", impl->from_name);
         return true;
     }

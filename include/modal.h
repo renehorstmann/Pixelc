@@ -4,21 +4,25 @@
 #include "textinput.h"
 #include "colorpicker.h"
 
-struct Modal_Globals {
 
-    // set these to NULL to deactivate
-    TextInput *textinput;
-    ColorPicker *colorpicker;
-};
-extern struct Modal_Globals modal;
-
-static bool modal_active() {
-    return modal.textinput || modal.colorpicker;
-}
 
 void modal_update(float dtime);
 
 // modal apps have their own camera
 void modal_render();
+
+// returns true if an modal activity is running
+bool modal_active();
+
+// assumes that no other modal activity is running
+// pass NULL to reset
+void modal_set_textinput(TextInput *set);
+
+
+// assumes that no other modal activity is running
+// pass NULL to reset
+void modal_set_colorpicker(ColorPicker *set);
+
+
 
 #endif //PIXELC_MODAL_H

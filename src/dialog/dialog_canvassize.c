@@ -94,7 +94,7 @@ static void update(float dtime) {
         }
         if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
-            modal.textinput = NULL;
+            modal_set_textinput(NULL);
         }
     }
 
@@ -157,7 +157,7 @@ static bool pointer_event(ePointer_s pointer) {
         }
 
         if(impl->textinput)
-            modal.textinput = impl->textinput;
+            modal_set_textinput(impl->textinput);
     }
 
     return true;

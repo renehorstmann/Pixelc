@@ -21,7 +21,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     if (u_button_pressed(&self->ro.rect, pointer)) {
         s_log("tool rgb");
         picker = colorpicker_new("Set secondary color", brush.current_color);
-        modal.colorpicker = picker;
+        modal_set_colorpicker(picker);
         // copy pointer
         *(ColorPicker**) self->additional_data = picker;
     }
@@ -41,7 +41,7 @@ static bool is_active(struct Tool *super, float dtime) {
         }
         if(picker->state != COLORPICKER_IN_PROGRESS) {
             colorpicker_kill(&picker);
-            modal.colorpicker = NULL;
+            modal_set_colorpicker(NULL);
             // clear the "pointer" of self->additional_data, too
             memset(self->additional_data, 0, sizeof self->additional_data);
         }
