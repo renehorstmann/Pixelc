@@ -1,5 +1,6 @@
 #include "m/int.h"
 #include "m/float.h"
+#include "animation.h"
 #include "canvas.h"
 #include "brush.h"
 #include "brushmode.h"
@@ -171,4 +172,8 @@ void brushmode_pipette(ePointer_s pointer) {
         return;
 
     brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, canvas.current_layer);
+    
+    vec4 flash_color = u_color_to_vec4(brush.secondary_color);
+    flash_color.a = 1;
+    animation_flash(flash_color, 0.5);
 }

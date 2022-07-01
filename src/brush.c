@@ -3,6 +3,7 @@
 #include "u/json.h"
 #include "m/sca/int.h"
 #include "m/sca/uchar.h"
+#include "animation.h"
 #include "canvas.h"
 #include "brushmode.h"
 #include "brush.h"
@@ -112,6 +113,11 @@ void brush_pointer_event(ePointer_s pointer) {
     if (L.hovering && L.hovering_change)
         canvas_reload();
 
+    if(brush.shading_active && pointer.action == E_POINTER_DOWN) {
+        vec4 flash_color = u_color_to_vec4(brush.secondary_color);
+        flash_color.a = 1.0;
+        animation_flash(flash_color, 1.0);
+    }
 
     if (L.hovering && pointer.action == E_POINTER_MOVE) {
         switch (brush.mode) {
@@ -193,6 +199,7 @@ bool brush_draw_pixel(int c, int r, uColor_s kernel_color) {
         return false;
 
     uColor_s *pixel = u_image_pixel(img, c, r, layer);
+    
     if (brush.shading_active) {
         if (!u_color_equals(*pixel, brush.secondary_color))
             return false;

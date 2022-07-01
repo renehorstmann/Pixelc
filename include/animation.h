@@ -18,4 +18,6 @@ void animation_render(const mat4 *camera_mat);
 
 void animation_longpress(vec2 pos, vec4 color);
 
+void animation_flash(vec4 color, float time);
+
 #endif //PIXELC_ANIMATION_H
