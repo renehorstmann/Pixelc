@@ -29,6 +29,7 @@ static void on_delete_action(bool ok) {
 
 typedef struct {
     RoText info;
+    
     RoText delete_txt;
     RoSingle delete_btn;
 
@@ -48,6 +49,7 @@ typedef struct {
 static void kill_fn() {
     Impl *impl = dialog.impl;
     ro_text_kill(&impl->info);
+    
     ro_text_kill(&impl->delete_txt);
     ro_single_kill(&impl->delete_btn);
 
@@ -90,6 +92,7 @@ static void update(float dtime) {
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
     ro_text_render(&impl->info, cam_mat);
+    
     if (palette.RO.max_palettes > 1) {
         ro_text_render(&impl->delete_txt, cam_mat);
         ro_single_render(&impl->delete_btn, cam_mat);
@@ -105,10 +108,9 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
-    if (palette.RO.max_palettes <= 1)
-        return true;
-
-    if (u_button_clicked(&impl->delete_btn.rect, pointer)) {
+    
+    if (palette.RO.max_palettes>1 
+            && u_button_clicked(&impl->delete_btn.rect, pointer)) {
         s_log("delete dialog");
         dialog_create_prompt("Delete", "delete this\npalette?", on_delete_action);
         // return after hide, hide kills this dialog

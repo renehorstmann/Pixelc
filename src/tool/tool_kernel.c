@@ -24,6 +24,7 @@ typedef struct {
     Tool super;
     RoSingle kernel;
     RoSingle minus, plus;
+    mat4 kernel_press_pose;
     int last_kernel_id;
     float long_press_time;
     enum button_pressed pressed;
@@ -65,7 +66,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
         }
         if (self->pressed != BTN_MINUS)
             self->pressed = BTN_NONE;
-    } else if (u_pose_aa_contains(self->kernel.rect.pose, pointer.pos.xy)) {
+    } else if (u_pose_aa_contains(self->kernel_press_pose, pointer.pos.xy)) {
         if (pointer.action == E_POINTER_DOWN) {
             self->pressed = BTN_KERNEL;
             self->long_press_time = TOOL_LONG_PRESS_TIME;
@@ -127,6 +128,10 @@ static void update(struct Tool *super, float dtime) {
             l[1] + 8 + super->in.pos.x,
             t[1] - 8 + super->in.pos.y,
             k_w * 2, k_h * 2);
+            
+    u_pose_aa_set_left(&self->kernel_press_pose, l[1] + super->in.pos.x);
+    u_pose_aa_set_top(&self->kernel_press_pose, t[1] + super->in.pos.y);
+
 
     u_pose_aa_set_left(&self->minus.rect.pose, l[0] + super->in.pos.x);
     u_pose_aa_set_top(&self->minus.rect.pose, t[0] + super->in.pos.y);
@@ -150,7 +155,7 @@ static void update(struct Tool *super, float dtime) {
                                     R_COLOR_WHITE);
             } else if (self->pressed == BTN_KERNEL) {
                 s_log("tool kernel long press");
-                animation_longpress(u_pose_get_xy(self->kernel.rect.pose),
+                animation_longpress(u_pose_get_xy(self->kernel_press_pose),
                                     R_COLOR_CYAN);
                 dialog_create_kernel();
             }
@@ -179,6 +184,8 @@ Tool *tool_new_kernel() {
     self->plus = ro_single_new(r_texture_new_file(2, 1, "res/button_plus.png"));
     self->minus.rect.pose = u_pose_new(0, 0, 16, 16);
     self->plus.rect.pose = u_pose_new(0, 0, 16, 16);
+    
+    self->kernel_press_pose = u_pose_new(0, 0, 16, 16);
 
     snprintf(self->super.name, TOOL_NAME_LEN, "kernel");
     snprintf(self->super.tip, TOOL_TIP_LEN, "select a \nkernel / stamp");
