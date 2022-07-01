@@ -4,11 +4,20 @@
 #include "brush.h"
 #include "camera.h"
 #include "animation.h"
+#include "dialog.h"
 #include "tool.h"
 
 //
 // private
 //
+
+enum button_pressed {
+    BTN_NONE,
+    BTN_MINUS,
+    BTN_KERNEL,
+    BTN_PLUS,
+    BTM_NUM
+};
 
 
 typedef struct {
@@ -17,7 +26,7 @@ typedef struct {
     RoSingle minus, plus;
     int last_kernel_id;
     float long_press_time;
-    int pressed;
+    enum button_pressed pressed;
 } Impl;
 
 
@@ -51,23 +60,30 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     // long press
     if (u_pose_aa_contains(self->minus.rect.pose, pointer.pos.xy)) {
         if (pointer.action == E_POINTER_DOWN) {
-            self->pressed = 1;
+            self->pressed = BTN_MINUS;
             self->long_press_time = TOOL_LONG_PRESS_TIME;
         }
-        if (self->pressed != 1)
-            self->pressed = 0;
+        if (self->pressed != BTN_MINUS)
+            self->pressed = BTN_NONE;
+    } else if (u_pose_aa_contains(self->kernel.rect.pose, pointer.pos.xy)) {
+        if (pointer.action == E_POINTER_DOWN) {
+            self->pressed = BTN_KERNEL;
+            self->long_press_time = TOOL_LONG_PRESS_TIME;
+        }
+        if (self->pressed != BTN_KERNEL)
+            self->pressed = BTN_NONE;
     } else if (u_pose_aa_contains(self->plus.rect.pose, pointer.pos.xy)) {
         if (pointer.action == E_POINTER_DOWN) {
-            self->pressed = 2;
+            self->pressed = BTN_PLUS;
             self->long_press_time = TOOL_LONG_PRESS_TIME;
         }
-        if (self->pressed != 2)
-            self->pressed = 0;
+        if (self->pressed != BTN_PLUS)
+            self->pressed = BTN_NONE;
     } else {
-        self->pressed = 0;
+        self->pressed = BTN_NONE;
     }
     if (pointer.action == E_POINTER_UP)
-        self->pressed = 0;
+        self->pressed = BTN_NONE;
 }
 
 static void update(struct Tool *super, float dtime) {
@@ -119,21 +135,26 @@ static void update(struct Tool *super, float dtime) {
     u_pose_aa_set_top(&self->plus.rect.pose, t[2] + super->in.pos.y);
 
     // check long pressed
-    if (self->pressed && self->long_press_time > 0) {
+    if (self->pressed != BTN_NONE && self->long_press_time > 0) {
         self->long_press_time -= dtime;
         if (self->long_press_time <= 0) {
-            if (self->pressed == 1) {
+            if (self->pressed == BTN_MINUS) {
                 s_log("tool kernel_minus long press");
                 brush_load_kernel(0);
                 animation_longpress(u_pose_get_xy(self->minus.rect.pose),
                                     R_COLOR_BLACK);
-            } else if (self->pressed == 2) {
+            } else if (self->pressed == BTN_PLUS) {
                 s_log("tool kernel_plus long press");
                 brush_load_kernel(brush.RO.max_kernels - 1);
                 animation_longpress(u_pose_get_xy(self->plus.rect.pose),
                                     R_COLOR_WHITE);
+            } else if (self->pressed == BTN_KERNEL) {
+                s_log("tool kernel long press");
+                animation_longpress(u_pose_get_xy(self->kernel.rect.pose),
+                                    R_COLOR_CYAN);
+                dialog_create_kernel();
             }
-            self->pressed = 0;
+            self->pressed = BTN_NONE;
         }
     }
 }

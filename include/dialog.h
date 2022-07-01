@@ -91,4 +91,6 @@ void dialog_create_image_upload();
 
 void dialog_create_palette();
 
+void dialog_create_kernel();
+
 #endif //PIXELC_DIALOG_H
