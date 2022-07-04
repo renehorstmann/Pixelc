@@ -59,6 +59,12 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- rhc + some update to invalid==NULL for heap types?
+  - render objects
+  - texture
+  - String
+  - Stream?
+
 - dialog background drawn
   - with titel bar
   - nice big shadow
