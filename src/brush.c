@@ -1,3 +1,4 @@
+#include <time.h>
 #include "e/io.h"
 #include "r/r.h"
 #include "u/json.h"
@@ -272,45 +273,76 @@ void brush_load_kernel(int id) {
     s_log("load_kernel[%i] = %s", id, L.kernel_files[id]);
 
     char file[256];
-    snprintf(file, sizeof file, "kernel_%s", L.kernel_files[id]);
+    snprintf(file, sizeof file, "kernel_%s.png", L.kernel_files[id]);
+
+    uImage kernel = u_image_new_file(1, e_io_savestate_file_path(file));
+
     brush.RO.kernel_id = id;
-    brush_set_kernel(
-            u_image_new_file(1,
-                             e_io_savestate_file_path(file)
-            ));
+    brush_set_kernel(kernel);
 
     if (brush.auto_save_config)
         brush_save_config();
 }
 
-void brush_append_kernel(uImage kernel_sink, const char *name) {
-    s_log("append_file: %s", name);
+void brush_append_kernel(uImage kernel) {
+    s_log("append_kernel: %i", brush.RO.max_kernels);
 
-    u_image_save_file(kernel_sink, e_io_savestate_file_path(name));
+    // create random name
+    char name[128];
+    srand(time(NULL));
+    for(;;) {
+        int num = rand() % 1000000;
+        snprintf(name, sizeof name, "custom_%i", num);
+        for(int i=0; i<brush.RO.max_kernels; i++) {
+            if(strcmp(L.kernel_files[i], name) == 0)
+                continue;
+        }
+        break;
+    }
 
-    bool found = false;
+    char file[256];
+    snprintf(file, sizeof file, "kernel_%s.png", name);
+    u_image_save_file(kernel, e_io_savestate_file_path(file));
+
+    int idx = -1;
     for (int i = 0; i < brush.RO.max_kernels; i++) {
         if (strcmp(name, L.kernel_files[i]) == 0) {
-            found = true;
+            idx = i;
             break;
         }
     }
 
-    if (!found) {
-        size_t len = strlen(name) + 1;
+    if (idx == -1) {
+        ssize len = strlen(name) + 1;
         char *clone = s_malloc(len);
         memcpy(clone, name, len);
         L.kernel_files = s_realloc(L.kernel_files, sizeof *L.kernel_files * ++brush.RO.max_kernels);
-        L.kernel_files[brush.RO.max_kernels - 1] = clone;
+        idx = brush.RO.max_kernels - 1;
+        L.kernel_files[idx] = clone;
     }
 
     // save the savestate files (needed for web)
     e_io_savestate_save();
 
-    brush_set_kernel(kernel_sink);
-    brush.RO.kernel_id = brush.RO.max_kernels - 1;
-    if (brush.auto_save_config)
-        brush_save_config();
+    brush_load_kernel(idx);
+}
+
+void brush_delete_kernel(int id) {
+    s_assume(id>=0&&id<brush.RO.max_kernels, "not in range");
+    if(brush.RO.max_kernels<=1) {
+        s_log_warn("can not delete, min. 1 kernel");
+        return;
+    }
+    brush.RO.max_kernels--;
+    if(brush.RO.kernel_id >= id) {
+        int load = id-1;
+        load = isca_mod(load, brush.RO.max_kernels);
+        brush_load_kernel(load);
+    }
+    s_free(L.kernel_files[id]);
+    for(int i=id;i<brush.RO.max_kernels;i++)
+        L.kernel_files[i] = L.kernel_files[i+1];
+
 }
 
 
@@ -327,9 +359,9 @@ void brush_reset_kernel_files() {
     for (i = 0; u_image_valid(kernels[i]); i++) {
         s_assume(i < 16, "change max default kernels");
         char *name = s_malloc(32);
-        snprintf(name, 32, "default_%i.png", i);
+        snprintf(name, 32, "default_%i", i);
         char file[32];
-        snprintf(file, 32, "kernel_%s", name);
+        snprintf(file, 32, "kernel_%s.png", name);
         u_image_save_file(kernels[i], e_io_savestate_file_path(file));
 
         L.kernel_files[i] = name;

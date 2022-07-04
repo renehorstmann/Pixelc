@@ -63,7 +63,7 @@ static struct {
 
     TouchID touch_ids[E_MAX_TOUCH_IDS];
     int touch_ids_size;
-
+    
     bool mouse_pressed[E_POINTER_BUTTON_NUM];
 
     RegPointerArray reg_pointer;

@@ -130,7 +130,7 @@ static bool pointer_event(ePointer_s pointer) {
 
     if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("new palette from canvas");
-        palette_append_file(canvas.RO.image, impl->from_name);
+        palette_append_palette(canvas.RO.image, impl->from_name);
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;

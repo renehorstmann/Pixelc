@@ -499,8 +499,8 @@ void palette_load_palette(int id) {
         palette_save_config();
 }
 
-void palette_append_file(uImage colors, const char *name) {
-    s_log("append_file: %s", name);
+void palette_append_palette(uImage colors, const char *name) {
+    s_log("append_palette: %s", name);
 
     char file[256];
     snprintf(file, sizeof file, "palette_%s.png", name);
@@ -515,7 +515,7 @@ void palette_append_file(uImage colors, const char *name) {
     }
 
     if (idx == -1) {
-        size_t len = strlen(name) + 1;
+        ssize len = strlen(name) + 1;
         char *clone = s_malloc(len);
         memcpy(clone, name, len);
         L.palette_files = s_realloc(L.palette_files, sizeof *L.palette_files * ++palette.RO.max_palettes);
@@ -527,9 +527,6 @@ void palette_append_file(uImage colors, const char *name) {
     e_io_savestate_save();
 
     palette_set_palette(colors, L.palette_files[idx]);
-    palette.RO.palette_id = idx;
-    if (palette.auto_save_config)
-        palette_save_config();
 }
 
 void palette_delete_palette(int id) {
@@ -544,6 +541,7 @@ void palette_delete_palette(int id) {
         load = isca_mod(load, palette.RO.max_palettes);
         palette_load_palette(load);
     }
+    s_free(L.palette_files[id]);
     for(int i=id;i<palette.RO.max_palettes;i++)
         L.palette_files[i] = L.palette_files[i+1];
     

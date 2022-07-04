@@ -67,10 +67,8 @@ python3 -m http.server --bind localhost  # [port]
     - flexible middle (flex in height of course)
     - bottom part
 
-- kernel long press dialog
-  - shows the current kernel?
-  - delete this kernel
-  - upload new kernel
+- toolbar background drawn
+  - selection background
 
 - rethink layers and frames?
 

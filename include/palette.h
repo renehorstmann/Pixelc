@@ -67,7 +67,7 @@ void palette_load_palette(int id);
 // saves the given palette into the config and calls palette_set_palette
 //   (which will take the ownership of palette_sink)
 // calls palette_save_config
-void palette_append_file(uImage colors, const char *name);
+void palette_append_palette(uImage colors, const char *name);
 
 // deletes the palette with the given id from the config, may change the current palette to the previous config palette
 // there must be at least 2 palettes in the config to delete a palette (min. 1 palette)

@@ -23,7 +23,7 @@ static sStr_s s_strc(const char *cstring) {
 
 // returns true if the str is empty
 static bool s_str_empty(sStr_s s) {
-    return !s.data || s.size == 0;
+    return !s.data || s.size <= 0;
 }
 
 // prints the str to a stream

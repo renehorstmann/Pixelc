@@ -63,10 +63,14 @@ void brush_set_kernel(uImage kernel_sink);
 // loads a kernel by its id
 void brush_load_kernel(int id);
 
-// saves kernel_sink into the config and calls brush_set_kernel 
-//   (which will take the ownership of kernel_sink)
+// saves kernel into the config and calls brush_load_kernel
 // calls brush_save_config
-void brush_append_kernel(uImage kernel_sink, const char *name);
+void brush_append_kernel(uImage kernel);
+
+// deletes the kernel with the given id from the config, may change the current kernel to the previous config kernel
+// there must be at least 2 kernels in the config to delete a kernel (min. 1 kernel)
+// call brush_save_config to save it
+void brush_delete_kernel(int id);
 
 // creates the default kernel files
 // sets self->kernel to the first new kernel file
