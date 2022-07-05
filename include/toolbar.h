@@ -39,20 +39,21 @@ struct Toolbar_Globals {
             Tool *save;
             Tool *save_hd;
             Tool *import;
+            Tool *display;
+            Tool *size;
+            Tool *camera;
+            Tool *grid;
+            Tool *preview;
+            Tool *layer;
             Tool *clear;
             Tool *undo;
             Tool *redo;
             Tool *selection;
-            Tool *layer;
             Tool *kernel;
             Tool *rgb;
             Tool *secondary_color;
             Tool *shading;
-            Tool *camera;
-            Tool *grid;
-            Tool *preview;
-            Tool *size;
-            Tool *display;
+            
 
             Tool *mode_none;
             Tool *mode_free;
