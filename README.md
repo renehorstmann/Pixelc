@@ -59,12 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- rhc + some update to invalid==NULL for heap types?
-  - render objects
-  - texture
-  - String
-  - Stream?
-
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -77,6 +71,9 @@ python3 -m http.server --bind localhost  # [port]
   - selection background
 
 - rethink layers and frames?
+  - image tabs?
+      - to create a new kernel, palette, etc.
+      - clone
 
 - undo layer change bug
 

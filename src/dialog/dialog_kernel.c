@@ -32,12 +32,12 @@ typedef struct {
 
     RoText delete_txt;
     RoSingle delete_btn;
+    
+    RoText to_canvas_txt;
+    RoSingle to_canvas_btn;
 
-    RoText to_kernel_txt;
-    RoSingle to_kernel_btn;
-
-    RoText from_kernel_txt;
-    RoSingle from_kernel_btn;
+    RoText from_canvas_txt;
+    RoSingle from_canvas_btn;
 } Impl;
 
 static void kill_fn() {
@@ -47,12 +47,12 @@ static void kill_fn() {
 
     ro_text_kill(&impl->delete_txt);
     ro_single_kill(&impl->delete_btn);
-
-    ro_text_kill(&impl->to_kernel_txt);
-    ro_single_kill(&impl->to_kernel_btn);
-
-    ro_text_kill(&impl->from_kernel_txt);
-    ro_single_kill(&impl->from_kernel_btn);
+    
+    ro_text_kill(&impl->to_canvas_txt);
+    ro_single_kill(&impl->to_canvas_btn);
+    
+    ro_text_kill(&impl->from_canvas_txt);
+    ro_single_kill(&impl->from_canvas_btn);
 
     s_free(impl);
 }
@@ -78,11 +78,11 @@ static void render(const mat4 *cam_mat) {
         ro_text_render(&impl->delete_txt, cam_mat);
         ro_single_render(&impl->delete_btn, cam_mat);    }
 
-    ro_text_render(&impl->to_kernel_txt, cam_mat);
-    ro_single_render(&impl->to_kernel_btn, cam_mat);
+    ro_text_render(&impl->to_canvas_txt, cam_mat);
+    ro_single_render(&impl->to_canvas_btn, cam_mat);
 
-    ro_text_render(&impl->from_kernel_txt, cam_mat);
-    ro_single_render(&impl->from_kernel_btn, cam_mat);
+    ro_text_render(&impl->from_canvas_txt, cam_mat);
+    ro_single_render(&impl->from_canvas_btn, cam_mat);
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -96,7 +96,7 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     }
 
-    if (u_button_clicked(&impl->to_kernel_btn.rect, pointer)) {
+    if (u_button_clicked(&impl->to_canvas_btn.rect, pointer)) {
         s_log("copy kernel into canvas");
         // canvas_set_image takes ownership of palette
         uImage kernel = u_image_new_clone(brush.RO.kernel);
@@ -107,7 +107,7 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     }
 
-    if (u_button_clicked(&impl->from_kernel_btn.rect, pointer)) {
+    if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("new kernel from canvas");
         brush_append_kernel(canvas.RO.image);
         dialog_hide();
@@ -160,24 +160,24 @@ void dialog_create_kernel() {
     impl->delete_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
     pos += 16;
 
-    impl->to_kernel_txt = ro_text_new_font55(32);
-    ro_text_set_text(&impl->to_kernel_txt, "Copy into\n"
+    impl->to_canvas_txt = ro_text_new_font55(32);
+    ro_text_set_text(&impl->to_canvas_txt, "Copy into\n"
                                            "       canvas:");
-    ro_text_set_color(&impl->to_kernel_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
-    impl->to_kernel_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
+    ro_text_set_color(&impl->to_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    impl->to_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
-    impl->to_kernel_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
-    impl->to_kernel_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
+    impl->to_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_to.png"));
+    impl->to_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 28;
 
-    impl->from_kernel_txt = ro_text_new_font55(32);
-    ro_text_set_text(&impl->from_kernel_txt, "New kernel\n"
+    impl->from_canvas_txt = ro_text_new_font55(32);
+    ro_text_set_text(&impl->from_canvas_txt, "New kernel\n"
                                              "  from canvas:");
-    ro_text_set_color(&impl->from_kernel_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
-    impl->from_kernel_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
+    ro_text_set_color(&impl->from_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    impl->from_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
-    impl->from_kernel_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
-    impl->from_kernel_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
+    impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
+    impl->from_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 32;
 
     dialog.impl_height = pos;

@@ -246,3 +246,39 @@ Tool *tool_new_selection_set_cut() {
                            cut_pe,
                            cut_is_a);
 }
+
+
+
+static uImage crop_selection() {
+    Selection *s = selectionctrl.selection;
+    s_assume(s, "no selection available?");
+    uImage img = u_image_new_empty(s->cols, s->rows, canvas.RO.image.layers);
+    for(int l=0; l<img.layers; l++) {
+        for(int r=0; r<img.rows; r++) {
+            for(int c=0; c<img.cols; c++) {
+                *u_image_pixel(img, c, r, l) =
+                        *u_image_pixel(canvas.RO.image, c+s->left, r+s->top, l);
+            }
+        }
+    }
+    return img;
+}
+
+static void crop_pe(struct Tool *super, ePointer_s pointer) {
+    ToolButton *self = (ToolButton *) super;
+    if (u_button_clicked(&self->ro.rect, pointer)) {
+        s_log("tool selection set crop");
+        uImage img = crop_selection();
+        canvas_set_image(img, true);
+        selectionctrl_stop();
+    }
+} 
+
+Tool *tool_new_selection_set_crop() {
+    return tool_button_new("crop",
+                           "crops\nthe canvas\n"
+                           "to the selection",
+                           "res/button_crop.png",
+                           crop_pe,
+                           NULL);
+}

@@ -245,7 +245,7 @@ if (PLATFORM_MOBILE)
     message("Setup Mobile")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter -Wno-format-truncation")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter")
 
     add_definitions(-DOPTION_GLES)
     add_definitions(-DOPTION_SDL)

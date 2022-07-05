@@ -193,7 +193,7 @@ void cameractrl_update(float dtime) {
 }
 
 void cameractrl_set_home() {
-    L.set_home_cnt = 1;
+    L.set_home_cnt = 2;
 }
 
 bool cameractrl_pointer_event(ePointer_s pointer) {

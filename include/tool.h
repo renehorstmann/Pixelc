@@ -140,6 +140,8 @@ Tool *tool_new_selection_set_copy();
 
 Tool *tool_new_selection_set_cut();
 
+Tool *tool_new_selection_set_crop();
+
 Tool *tool_new_selection_paste_rotate_l();
 
 Tool *tool_new_selection_paste_rotate_r();

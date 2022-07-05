@@ -568,12 +568,14 @@ void palette_reset_palette_files() {
     }
     palette.RO.max_palettes = i;
 
-    palette.RO.palette_id = 0;
+    int default_id = i-1;
+    palette.RO.palette_id = default_id;
 
     // save the savestate files (needed for web)
     e_io_savestate_save();
 
-    palette_set_palette(palettes[0], L.palette_files[0]);
+    palette_set_palette(palettes[default_id], 
+            L.palette_files[default_id]);
 
     palette_defaults_kill(&palettes);
 

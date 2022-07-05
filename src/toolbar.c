@@ -241,6 +241,7 @@ void toolbar_init(uColor_s active_bg_a, uColor_s active_bg_b,
     toolbar.selection_set_tools.move = tool_new_selection_set_move();
     toolbar.selection_set_tools.copy = tool_new_selection_set_copy();
     toolbar.selection_set_tools.cut = tool_new_selection_set_cut();
+    toolbar.selection_set_tools.crop = tool_new_selection_set_crop();
 
     toolbar.selection_paste_tools.rotate_l = tool_new_selection_paste_rotate_l();
     toolbar.selection_paste_tools.rotate_r = tool_new_selection_paste_rotate_r();

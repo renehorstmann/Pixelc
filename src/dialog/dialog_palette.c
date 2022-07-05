@@ -199,7 +199,7 @@ void dialog_create_palette() {
     ro_text_set_color(&impl->to_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
     impl->to_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
-    impl->to_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    impl->to_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_to.png"));
     impl->to_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 28;
 
@@ -215,7 +215,7 @@ void dialog_create_palette() {
     impl->from_canvas_name.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 27, 1, 2);
     impl->from_canvas_name_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos - 27, DIALOG_WIDTH, 10);
 
-    impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
     impl->from_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 32;
 

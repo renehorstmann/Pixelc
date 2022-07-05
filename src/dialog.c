@@ -16,7 +16,7 @@ struct Dialog_Globals dialog;
 
 void dialog_init() {
     dialog.bg_alpha_layer = ro_single_new(r_texture_new_invalid());
-    dialog.bg_alpha_layer.rect.color = (vec4) {{0, 0, 0, 0.2}};
+    dialog.bg_alpha_layer.rect.color = (vec4) {{0, 0, 0, 0.33}};
     
     dialog.bg = ro_single_new(r_texture_new_invalid());
     dialog.bg_shadow = ro_single_new(r_texture_new_invalid());
