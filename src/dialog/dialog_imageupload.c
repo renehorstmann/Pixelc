@@ -130,9 +130,10 @@ void dialog_create_image_upload() {
 #ifdef __EMSCRIPTEN__
     impl->upload = ro_single_new(r_texture_new_file(2, 1, "res/button_dialog_upload.png"));
     impl->upload_available = true;
-    impl->upload.rect.pose = u_pose_new_aa(DIALOG_LEFT + 8, DIALOG_TOP-62, 64, 16);
+    impl->upload.rect.pose = u_pose_new_aa(DIALOG_LEFT + 8, DIALOG_TOP-pos-18, 64, 16);
 #endif
 
+   
     dialog_set_title("import", (vec4) {{0.6, 0.2, 0.2, 1}});
     dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
     dialog.kill = kill_fn;
