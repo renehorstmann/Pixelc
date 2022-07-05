@@ -4,6 +4,7 @@
 #include "u/image.h"
 #include "u/button.h"
 #include "canvas.h"
+#include "cameractrl.h"
 #include "dialog.h"
 
 #define BG_A "#776666"
@@ -83,6 +84,7 @@ static bool pointer_event(ePointer_s pointer) {
         impl->image_available = u_image_valid(img);
         if(impl->image_available) {
             canvas_set_image(img, true);
+            cameractrl_set_home();
         }
     }
 
