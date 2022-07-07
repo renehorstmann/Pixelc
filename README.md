@@ -59,6 +59,52 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- palette overwrite are you sure prompt
+
+- tabs
+  - canvas:
+    - save/load image layers in a second json file
+    - function to get the image of an id
+      - for the tab select
+
+- layers + sprites + tabs
+  - layers: 
+    - canvas render modes:
+      - all up to current
+      - all but onion skinning
+      - only current
+    - show each individual layer in a list in the layer toolbar
+      - longpress a layer for options
+        - delete
+        - swap left / right
+        - merge left
+  - sprites
+    - 2d grid
+      - in x and y, must be %0 with image size
+    - animate mode:
+      - off
+      - only x+
+      - only y+
+      - x+ than y+
+      - y+ than x+
+    - sprite frame time
+      - reset for all
+        - time or fps
+      - edit individual frame time
+    - canvas render mode:
+      - full image with sprite grid lines
+      - only current sprite 
+      - current sprite with onion skinning the previous
+        - only if animate_mode!=off
+  - tabs
+    - up to X tabs?
+      - would be a fixed size like a 3x3 grid
+    - have their own savestate images
+      - savestate also saves layer size, etc.?
+    - copy selection between tabs
+    
+  
+
 - dialog background drawn
   - with titel bar
   - nice big shadow
@@ -102,7 +148,6 @@ python3 -m http.server --bind localhost  # [port]
 - tiles
   - file containing tile names?
   - direct draw mode, in which you can select a tile in the canvas and directly draw changes there
-- Frame Selection? (or grid shows frames?)
 - background image option?
 
 

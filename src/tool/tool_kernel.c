@@ -188,7 +188,11 @@ Tool *tool_new_kernel() {
     self->kernel_press_pose = u_pose_new(0, 0, 16, 16);
 
     snprintf(self->super.name, TOOL_NAME_LEN, "kernel");
-    snprintf(self->super.tip, TOOL_TIP_LEN, "select a \nkernel / stamp");
+    snprintf(self->super.tip, TOOL_TIP_LEN, "select a \n"
+            "kernel / stamp\n\n"
+            "long press for\n"
+            "first / last\n"
+            "and options");
 
     self->super.kill = kill_fn;
     self->super.update = update;

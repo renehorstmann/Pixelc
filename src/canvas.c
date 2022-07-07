@@ -34,16 +34,16 @@ _Static_assert(CANVAS_MAX_SAVES <= 999, "see save / load image");
 
 static void save_image() {
     char file[128];
-    snprintf(file, sizeof file, "image_%03i.png", L.save_idx);
+    snprintf(file, sizeof file, "image_%02i_%03i.png", canvas.RO.tab_id, L.save_idx);
     u_image_save_file(canvas.RO.image,
                       e_io_savestate_file_path(file));
     e_io_savestate_save();
     L.save_layers[L.save_idx] = canvas.RO.image.layers;
 }
 
-static void load_image() {
+static uImage load_image_file(int tab_id, int save_idx) {
     char file[128];
-    snprintf(file, sizeof file, "image_%03i.png", L.save_idx);
+    snprintf(file, sizeof file, "image_%02i_%03i.png", tab_id, save_idx);
     int layers = L.save_layers[L.save_idx];
     layers = isca_clamp(layers, 1, CANVAS_MAX_LAYERS);
     uImage img = u_image_new_file(1,
@@ -52,6 +52,11 @@ static void load_image() {
         img.rows /= layers;
         img.layers = layers;
     }
+    return img;
+}
+
+static void load_image() {
+    uImage img = load_image_file(canvas.RO.tab_id, L.save_idx);
     canvas_set_image(img, false);
 }
 
@@ -91,6 +96,8 @@ void canvas_init() {
 
     canvas.RO.pattern_cols = 8;
     canvas.RO.pattern_rows = 8;
+    
+    canvas.RO.max_tabs = 9;
 
     for (int i = 0; i < CANVAS_MAX_LAYERS; i++) {
         L.render_objects[i] = ro_single_new(r_texture_new_invalid());
@@ -248,6 +255,19 @@ bool canvas_redo_available() {
     return L.save_idx != L.save_idx_max;
 }
 
+
+void canvas_set_tab_id(int id) {
+    s_assume(id>=0 && id<canvas.RO.max_tabs, "invalid tab id");
+    
+    canvas.RO.tab_id = id;
+    load_image();
+}
+
+uImage canvas_get_tab(int id) {
+    // todo
+    return u_image_new_invalid();
+}
+
 void canvas_save_config() {
     s_log("save");
 
@@ -261,6 +281,7 @@ void canvas_save_config() {
     u_json_append_int(member, "save_idx", L.save_idx);
     u_json_append_int(member, "save_idx_min", L.save_idx_min);
     u_json_append_int(member, "save_idx_max", L.save_idx_max);
+    u_json_append_int(member, "tab_id", canvas.RO.tab_id);
 
     uJson *save_layers = u_json_append_array(member, "save_layers");
     for (int i = 0; i < CANVAS_MAX_SAVES; i++) {
@@ -306,13 +327,16 @@ void canvas_load_config() {
     }
 
     int save_idx, save_idx_min, save_idx_max;
+    int tab_id;
     if (u_json_get_object_int(member, "save_idx", &save_idx)
         && u_json_get_object_int(member, "save_idx_min", &save_idx_min)
         && u_json_get_object_int(member, "save_idx_max", &save_idx_max)
+        && u_json_get_object_int(member, "tab_id", &tab_id)
         && tmp_layers_size > 0) {
         L.save_idx = save_idx;
         L.save_idx_min = save_idx_min;
         L.save_idx_max = save_idx_max;
+        canvas.RO.tab_id = tab_id;
         for (int i = 0; i < tmp_layers_size; i++)
             L.save_layers[i] = tmp_layers[i];
         load_image();

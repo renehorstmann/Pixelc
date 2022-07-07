@@ -29,6 +29,9 @@ struct Canvas_Globals {
 
         int pattern_cols;
         int pattern_rows;
+        
+        int tab_id;
+        int max_tabs;
     } RO;
 };
 extern struct Canvas_Globals canvas;
@@ -68,6 +71,12 @@ void canvas_set_ro_color(vec4 color);
 bool canvas_undo_available();
 
 bool canvas_redo_available();
+
+// sets to a new tab and loads that image
+void canvas_set_tab_id(int id);
+
+// returns a new image of the tab id
+uImage canvas_get_tab(int id);
 
 // saves the config to the savestate config.json 
 // uses object "canvas"

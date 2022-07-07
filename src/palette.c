@@ -444,7 +444,7 @@ void palette_set_colors(const uColor_s *colors, int size, const char *name) {
         }
     }
 
-    palette_set_color(0);
+    palette_set_color(s_min(1, palette.RO.palette_size-1));
     snprintf(palette.RO.palette_name, PALETTE_NAME_MAX, "%s",
             name ? name : "custom palette");
 
