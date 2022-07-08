@@ -111,8 +111,8 @@ void dialog_create_tab() {
         float height = HEIGHT;
 
         impl->img_bg.rects[i].pose = u_pose_new(
-                left + c * (width + OFFSET),
-                top - r * (height + OFFSET),
+                left + c * (WIDTH + OFFSET),
+                top - r * (HEIGHT + OFFSET),
                 width, height);
         impl->img_bg.rects[i].color.a = 0.25;
 
@@ -123,8 +123,8 @@ void dialog_create_tab() {
         }
 
         impl->imgs[i].rect.pose = u_pose_new(
-                left + c * (width + OFFSET),
-                top - r * (height + OFFSET),
+                left + c * (WIDTH + OFFSET),
+                top - r * (HEIGHT + OFFSET),
                 width, height);
 
         u_image_kill(&img);
