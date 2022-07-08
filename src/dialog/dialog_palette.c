@@ -17,6 +17,11 @@
 // private
 //
 
+// local data, because the dialog prompt overwrite would kill impls name
+static struct {
+    char from_name[2 * PALETTE_NAME_MAX]; 
+} L;
+
 static void on_delete_action(bool ok) {
     s_log("delete: %i", ok);
     if (ok) {
@@ -26,10 +31,20 @@ static void on_delete_action(bool ok) {
     dialog_create_palette();
 }
 
+static void on_new_palette_action(bool ok) {
+    s_log("new_palette: %i", ok);
+    if (ok) {
+        palette_append_palette(canvas.RO.image, L.from_name);
+        dialog_hide();
+    } else {
+        dialog_create_palette();
+    }
+}
+
 
 typedef struct {
     RoText info;
-    
+
     RoText delete_txt;
     RoSingle delete_btn;
 
@@ -38,18 +53,16 @@ typedef struct {
 
     RoText from_canvas_txt;
     RoText from_canvas_name;
-    char from_name[2 * PALETTE_NAME_MAX];
     RoSingle from_canvas_btn;
 
     mat4 from_canvas_name_hitbox;
     TextInput *textinput;
-
 } Impl;
 
 static void kill_fn() {
     Impl *impl = dialog.impl;
     ro_text_kill(&impl->info);
-    
+
     ro_text_kill(&impl->delete_txt);
     ro_single_kill(&impl->delete_btn);
 
@@ -67,20 +80,21 @@ static void update(float dtime) {
     Impl *impl = dialog.impl;
     char name[2 * PALETTE_NAME_MAX] = {0};
     {
-        int size = strlen(impl->from_name);
-        strncpy(name, impl->from_name, isca_min(size, 18));
+        int size = strlen(L.from_name);
+        strncpy(name, L.from_name, isca_min(size, 18));
         if (size > 18) {
             strcat(name, "\n  ");
-            strcat(name, impl->from_name + 18);
+            strcat(name, L.from_name + 18);
         }
     }
     ro_text_set_text(&impl->from_canvas_name, name);
     if (impl->textinput) {
         // at least a name with 1 char
+        s_str_toupper(s_strc(impl->textinput->text));
         impl->textinput->ok_active = strlen(impl->textinput->text) >= 1;
         if (impl->textinput->state == TEXTINPUT_DONE) {
-            snprintf(impl->from_name, sizeof impl->from_name, "%s", impl->textinput->text);
-            s_log("new palette name: %s", impl->from_name);
+            snprintf(L.from_name, sizeof L.from_name, "%s", impl->textinput->text);
+            s_log("new palette name: %s", L.from_name);
         }
         if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
@@ -92,7 +106,7 @@ static void update(float dtime) {
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
     ro_text_render(&impl->info, cam_mat);
-    
+
     if (palette.RO.max_palettes > 1) {
         ro_text_render(&impl->delete_txt, cam_mat);
         ro_single_render(&impl->delete_btn, cam_mat);
@@ -108,9 +122,9 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
-    
-    if (palette.RO.max_palettes>1 
-            && u_button_clicked(&impl->delete_btn.rect, pointer)) {
+
+    if (palette.RO.max_palettes > 1
+        && u_button_clicked(&impl->delete_btn.rect, pointer)) {
         s_log("delete dialog");
         dialog_create_prompt("Delete", "delete this\npalette?", on_delete_action);
         // return after hide, hide kills this dialog
@@ -130,8 +144,15 @@ static bool pointer_event(ePointer_s pointer) {
 
     if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("new palette from canvas");
-        palette_append_palette(canvas.RO.image, impl->from_name);
-        dialog_hide();
+        if (palette_name_exists(L.from_name)) {
+            dialog_create_prompt("Overwrite",
+                                 "Do you really\n"
+                                 "want to overwrite\n"
+                                 "the palette?",
+                                 on_new_palette_action);
+        } else {
+            on_new_palette_action(true);
+        }
         // return after hide, hide kills this dialog
         return true;
     }
@@ -140,7 +161,8 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("palette dialog: change from canvas name");
         impl->textinput = textinput_new("set palette name", 0);
         modal_set_textinput(impl->textinput);
-        snprintf(impl->textinput->text, TEXTINPUT_MAX_CHARS, "%s", impl->from_name);
+        snprintf(impl->textinput->text, TEXTINPUT_MAX_CHARS, "%s", L.from_name);
+        impl->textinput->shiftstate = TEXTINPUT_SHIFT_UPPER;
         return true;
     }
 
@@ -210,7 +232,7 @@ void dialog_create_palette() {
     impl->from_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
     impl->from_canvas_name = ro_text_new_font55(2 * PALETTE_NAME_MAX);
-    snprintf(impl->from_name, sizeof impl->from_name, "%s", palette.RO.palette_name);
+    snprintf(L.from_name, sizeof L.from_name, "%s", palette.RO.palette_name);
     ro_text_set_color(&impl->from_canvas_name, (vec4) {{0.2, 0.0, 0.7, 1}});
     impl->from_canvas_name.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 27, 1, 2);
     impl->from_canvas_name_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos - 27, DIALOG_WIDTH, 10);

@@ -69,6 +69,9 @@ void palette_load_palette(int id);
 // calls palette_save_config
 void palette_append_palette(uImage colors, const char *name);
 
+// checks if name exists as palette file, returns true if it exists
+bool palette_name_exists(const char *name);
+
 // deletes the palette with the given id from the config, may change the current palette to the previous config palette
 // there must be at least 2 palettes in the config to delete a palette (min. 1 palette)
 // call palette_save_config to save it

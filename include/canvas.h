@@ -9,6 +9,7 @@
 #define CANVAS_MAX_SIZE 1024
 #define CANVAS_MAX_LAYERS 128
 #define CANVAS_MAX_SAVES 128
+#define CANVAS_MAX_TABS 9
 
 
 struct Canvas_Globals {
@@ -18,9 +19,6 @@ struct Canvas_Globals {
     bool show_grid;
     float alpha;
     bool blend_layers;
-    const char *import_file;
-
-    bool auto_save_config;
 
     // read only
     struct {
@@ -31,7 +29,6 @@ struct Canvas_Globals {
         int pattern_rows;
         
         int tab_id;
-        int max_tabs;
     } RO;
 };
 extern struct Canvas_Globals canvas;

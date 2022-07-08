@@ -59,15 +59,7 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- palette overwrite are you sure prompt
-
-- tabs
-  - canvas:
-    - save/load image layers in a second json file
-    - function to get the image of an id
-      - for the tab select
-
-- layers + sprites + tabs
+- layers + sprites
   - layers: 
     - canvas render modes:
       - all up to current
@@ -96,12 +88,6 @@ python3 -m http.server --bind localhost  # [port]
       - only current sprite 
       - current sprite with onion skinning the previous
         - only if animate_mode!=off
-  - tabs
-    - up to X tabs?
-      - would be a fixed size like a 3x3 grid
-    - have their own savestate images
-      - savestate also saves layer size, etc.?
-    - copy selection between tabs
     
   
 

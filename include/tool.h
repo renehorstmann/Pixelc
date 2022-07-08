@@ -82,6 +82,8 @@ Tool *tool_new_selection();
 
 Tool *tool_new_layer();
 
+Tool *tool_new_tab();
+
 Tool *tool_new_kernel();
 
 Tool *tool_new_rgb();

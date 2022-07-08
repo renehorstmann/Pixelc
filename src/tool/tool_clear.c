@@ -17,6 +17,7 @@ static void on_reset_all(bool ok) {
     dialog_hide();
     if(ok) {
         s_file_write(e_io_savestate_file_path("config.json"), s_strc(""), true);
+        s_file_write(e_io_savestate_file_path("config_save_layers.json"), s_strc(""), true);
         e_io_savestate_save();
         dialog_create_restart();
     }

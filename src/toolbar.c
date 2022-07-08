@@ -207,6 +207,7 @@ void toolbar_init(uColor_s active_bg_a, uColor_s active_bg_b,
     toolbar.tools.redo = tool_new_redo();
     toolbar.tools.selection = tool_new_selection();
     toolbar.tools.layer = tool_new_layer();
+    toolbar.tools.tab = tool_new_tab();
     toolbar.tools.kernel = tool_new_kernel();
     toolbar.tools.rgb = tool_new_rgb();
     toolbar.tools.secondary_color = tool_new_secondary_color();
