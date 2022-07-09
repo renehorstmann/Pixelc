@@ -27,7 +27,7 @@
 #define PLAY_COLS 1
 #define PLAY_ROWS 1
 #define PLAY_SIZE 1.0
-#define PLAY_FRAMES 2
+#define PLAY_FRAMES 4
 #define PLAY_FPS 6.0
 
 
