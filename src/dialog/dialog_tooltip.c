@@ -42,6 +42,9 @@ static void set(const char *name, const char *tip) {
 }
 
 static bool pointer_event(ePointer_s pointer) {
+    if(pointer.action == E_POINTER_HOVER)
+        return false;
+    
     if (palette_contains_pos(pointer.pos.xy)) {
         set("palette", "tip to select\na color\n\n"
                        "swipe left or\nright to change\nthe palette\n\n"

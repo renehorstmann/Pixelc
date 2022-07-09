@@ -153,10 +153,10 @@ bool multitouchcursor_pointer_event(ePointer_s *in_out_pointer) {
             else
                 multitouchcursor.pos.x -= cursor_distance;
 
-            // send MOVE always, like a real cursor
+            // send MOVE or HOVER, like a real cursor
             *in_out_pointer = (ePointer_s) {
                     .pos = multitouchcursor.pos,
-                    .action = E_POINTER_MOVE,
+                    .action = L.pressed? E_POINTER_MOVE : E_POINTER_HOVER,
                     .id = 0
             };
         }

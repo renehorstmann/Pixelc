@@ -120,7 +120,7 @@ void brush_pointer_event(ePointer_s pointer) {
         animation_flash(flash_color, 1.0);
     }
 
-    if (L.hovering && pointer.action == E_POINTER_MOVE) {
+    if (L.hovering && pointer.action == E_POINTER_HOVER) {
         switch (brush.mode) {
             case BRUSH_MODE_FREE:
             case BRUSH_MODE_DOT:

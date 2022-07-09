@@ -62,5 +62,5 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 //
 
 void inputctrl_init() {
-    e_input_register_pointer_event(pointer_event, NULL);
+    e_input_register_pointer_event_with_hovering(pointer_event, NULL);
 }
