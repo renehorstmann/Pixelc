@@ -42,7 +42,7 @@ static void save_image() {
     snprintf(tab_txt, sizeof tab_txt, "tab_%02i", canvas.RO.tab_id);
     snprintf(save_txt, sizeof save_txt, "save_%03i", L.save_idx);
     uJson *config_save_layers = u_json_new_file(
-            e_io_savestate_file_path("config_save_layers.json"));
+            e_io_savestate_file_path("config_canvas_save.json"));
     uJson *tab = u_json_get_object(config_save_layers, tab_txt);
     if(!tab)
         tab = u_json_append_object(config_save_layers, tab_txt);
@@ -53,7 +53,7 @@ static void save_image() {
     u_json_append_int(tab, "save_idx_max", L.save_idx_max);
 
     u_json_save_file(config_save_layers,
-                     e_io_savestate_file_path("config_save_layers.json"));
+                     e_io_savestate_file_path("config_canvas_save.json"));
     e_io_savestate_save();
 
     u_json_kill(&config_save_layers);
@@ -63,7 +63,7 @@ static void load_tab_savesstate(int *out_save_idx, int *out_save_idx_min, int *o
     char tab_txt[16];
     snprintf(tab_txt, sizeof tab_txt, "tab_%02i", tab_id);
     uJson *config_save_layers = u_json_new_file(
-            e_io_savestate_file_path("config_save_layers.json"));
+            e_io_savestate_file_path("config_canvas_save.json"));
     uJson *tab = u_json_get_object(config_save_layers, tab_txt);
     bool ok = true;
     ok &= u_json_get_object_int(tab, "save_idx", out_save_idx) != NULL;
@@ -87,7 +87,7 @@ static uImage load_image_file(int tab_id, int save_idx) {
     snprintf(tab_txt, sizeof tab_txt, "tab_%02i", canvas.RO.tab_id);
     snprintf(save_txt, sizeof save_txt, "save_%03i", L.save_idx);
     uJson *config_save_layers = u_json_new_file(
-            e_io_savestate_file_path("config_save_layers.json"));
+            e_io_savestate_file_path("config_canvas_save.json"));
     uJson *tab = u_json_get_object(config_save_layers, tab_txt);
     int layers;
     if(!u_json_get_object_int(tab, save_txt, &layers))
