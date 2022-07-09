@@ -52,10 +52,10 @@ struct Toolbar_Globals {
             Tool *selection;
             Tool *kernel;
             Tool *rgb;
-            Tool *secondary_color;
             Tool *shading;
+            Tool *secondary_color;
             
-
+            Tool *mode_pipette;
             Tool *mode_none;
             Tool *mode_free;
             Tool *mode_dot;
@@ -67,7 +67,8 @@ struct Toolbar_Globals {
             Tool *mode_fill;
             Tool *mode_fill8;
             Tool *mode_replace;
-            Tool *mode_pipette;
+            
+            
         } tools;
     };
 
