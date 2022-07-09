@@ -41,11 +41,11 @@ struct Toolbar_Globals {
             Tool *import;
             Tool *display;
             Tool *size;
+            Tool *tab;
+            Tool *layer;
             Tool *camera;
             Tool *grid;
             Tool *preview;
-            Tool *layer;
-            Tool *tab;
             Tool *clear;
             Tool *undo;
             Tool *redo;

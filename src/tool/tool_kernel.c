@@ -108,16 +108,16 @@ static void update(struct Tool *super, float dtime) {
     float t[3];
     if (camera_is_portrait_mode()) {
         for (int i = 0; i < 3; i++) {
-            l[i] = 1 + i * 17;
+            l[i] = 1 + i * 18;
             t[i] = -1;
         }
-        super->size = (vec2) {{16 * 3 + 4, 18}};
+        super->size = (vec2) {{16 * 3 + 6, 18}};
     } else {
         for (int i = 0; i < 3; i++) {
             l[i] = 1;
-            t[i] = -1 - i * 17;
+            t[i] = -1 - i * 18;
         }
-        super->size = (vec2) {{18, 16 * 3 + 4}};
+        super->size = (vec2) {{16, 16 * 3 + 6}};
     }
 
     int k_w = brush.RO.kernel.cols;
