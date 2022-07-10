@@ -109,7 +109,9 @@ static bool pointer_event(ePointer_s pointer) {
 
     if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("new kernel from canvas");
-        brush_append_kernel(canvas.RO.image);
+        uImage kernel = u_image_new_clone_merge_down_full(canvas.RO.image);
+        brush_append_kernel(kernel);
+        u_image_kill(&kernel);
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
