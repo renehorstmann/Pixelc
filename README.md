@@ -59,7 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
   
-- layer num starting by 1
 - layer marker for more layers like ...
 
 - sprites

@@ -79,7 +79,7 @@ static void select_update(struct Tool *super, float dtime) {
         ro_single_set_texture(&self->layer, tex);
         
         char num[4];
-        snprintf(num, sizeof num, "%3i", layer);
+        snprintf(num, sizeof num, "%3i", layer+1);
         ro_text_set_text(&self->num, num);
     }
     
