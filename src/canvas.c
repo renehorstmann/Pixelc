@@ -149,7 +149,7 @@ void canvas_init() {
     canvas.ro_color = R_COLOR_WHITE;
 
     canvas.alpha = 1.0;
-    canvas.blend_layers = true;
+    canvas.blend_layers = CANVAS_LAYER_BLEND_ALPHA;
 
     canvas.RO.pose = mat4_eye();
 
@@ -195,9 +195,13 @@ void canvas_update(float dtime) {
 void canvas_render(const mat4 *canvascam_mat) {
     ro_single_render(&L.bg, canvascam_mat);
 
-    if (canvas.blend_layers) {
+    if (canvas.blend_layers != CANVAS_LAYER_BLEND_NONE) {
         for (int i = 0; i < canvas.current_layer; i++) {
-            float alpha = (i + 1.0) / (canvas.current_layer + 1.0);
+            float alpha;
+            if(canvas.blend_layers == CANVAS_LAYER_BLEND_ALPHA)
+                alpha = sca_mix(0, 0.33, (i+1.0) / canvas.current_layer);
+            else
+                alpha = 1;
             L.render_objects[i].rect.color.a = alpha * canvas.alpha;
             ro_single_render(&L.render_objects[i], canvascam_mat);
         }

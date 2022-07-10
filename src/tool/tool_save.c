@@ -49,8 +49,8 @@ Tool *tool_new_save() {
     return tool_button_new("save",
                            "saves the canvas\n"
                            "as image.png\n\n"
-                           "long press\n"
-                           "for options",
+                           "long press to show\n"
+                           "save options",
                            "res/button_save.png",
                            pointer_event,
                            is_active);

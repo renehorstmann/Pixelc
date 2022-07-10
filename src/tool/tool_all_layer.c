@@ -246,28 +246,41 @@ Tool *tool_new_layer_move_next() {
 
 static void blend_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-
-    if (u_button_toggled(&self->ro.rect, pointer)) {
-        bool pressed = u_button_is_pressed(&self->ro.rect);
-        s_log("tool layer blend: %i", pressed);
-        canvas.blend_layers = pressed;
+    
+    if(pointer.action != E_POINTER_DOWN)
+        return;
+     
+    if(u_pose_aa_contains(self->ro.rect.pose, pointer.pos.xy)) {
+        canvas.blend_layers++;
+        canvas.blend_layers %= CANVAS_LAYER_BLEND_NUM_MODES;
+        s_log("canvas layer blend mode: %i", canvas.blend_layers);
     }
 }
 
 static bool blend_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    bool active = canvas.blend_layers;
-    u_button_set_pressed(&self->ro.rect, active);
+    self->ro.rect.sprite.x = canvas.blend_layers;
     // always active
     return true;
 }
 
 Tool *tool_new_layer_blend() {
-    return tool_button_new("blend",
-                           "blends in the\nprevious layers",
+    Tool *super = tool_button_new("blend",
+                           "blends in the\n"
+                           "previous layers\n"
+                           "with or without\n"
+                           "onion skinning",
                            "res/button_blend.png",
                            blend_pe,
                            blend_is_a);
+    ToolButton *self = (ToolButton*) super;
+    // button with 3 instead of 2 modes
+    //     so reload
+    ro_single_set_texture(&self->ro, r_texture_new_file(3, 1, "res/button_blend.png"));
+    super->size = vec2_cast_from_int(self->ro.tex.sprite_size.v);
+    u_pose_set_size(&self->ro.rect.pose, 
+            super->size.x, super->size.y);
+    return super;
 }
 
 

@@ -54,8 +54,8 @@ Tool *tool_new_save_hd() {
                            "The hd version\n"
                            "has a size of\n"
                            "at least 1024px\n\n"
-                           "long press\n"
-                           "for options",
+                           "long press to show\n"
+                           "save options",
                            "res/button_save_hd.png",
                            pointer_event,
                            is_active);

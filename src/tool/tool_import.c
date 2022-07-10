@@ -56,9 +56,9 @@ Tool *tool_new_import() {
     return tool_button_new("import",
                            "tip to load\n"
                            "import.png\n"
-                           "as selection\n"
+                           "as selection\n\n"
                            "long press to show\n"
-                           "import settings",
+                           "import options",
                            "res/button_import.png",
                            pointer_event,
                            is_active);

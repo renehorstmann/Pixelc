@@ -12,13 +12,21 @@
 #define CANVAS_MAX_TABS 9
 
 
+enum canvas_layer_blend_mode {
+    CANVAS_LAYER_BLEND_NONE,
+    CANVAS_LAYER_BLEND_ALPHA,
+    CANVAS_LAYER_BLEND_FULL,
+    CANVAS_LAYER_BLEND_NUM_MODES
+};
+
+
 struct Canvas_Globals {
     vec4 ro_color;
 
     int current_layer;
     bool show_grid;
     float alpha;
-    bool blend_layers;
+    enum canvas_layer_blend_mode blend_layers;
 
     // read only
     struct {
