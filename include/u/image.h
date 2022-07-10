@@ -80,6 +80,16 @@ static uImage u_image_new_clone_merge_down_full(uImage from) {
     return u_image_new_clone_merge_down_full_a(from, from.a);
 }
 
+
+// returns a clone of from, with a layer removed
+// with a custom a
+uImage u_image_new_clone_remove_layer_a(uImage from, int layer_to_remove, sAllocator_i a);
+
+// returns a clone of from, with a layer removed
+static uImage u_image_new_clone_remove_layer(uImage from, int layer_to_remove) {
+    return u_image_new_clone_remove_layer_a(from, layer_to_remove, from.a);
+}
+
 // copy a SDL_Surface into a new image with a costum a
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a);
 

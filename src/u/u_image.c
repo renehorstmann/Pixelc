@@ -102,6 +102,21 @@ uImage u_image_new_clone_merge_down_full_a(uImage from, sAllocator_i a) {
     return self;
 }
 
+uImage u_image_new_clone_remove_layer_a(uImage from, int layer_to_remove, sAllocator_i a) {
+    if(!u_image_valid(from) || layer_to_remove<0 || layer_to_remove>=from.layers)
+        return u_image_new_invalid_a(a);
+    
+    uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers-1, a);
+    int layer = 0;
+    for(int i=0; i<from.layers; i++) {
+        if(i == layer_to_remove)
+            continue;
+        memcpy(u_image_layer(self, layer), u_image_layer(from, i), u_image_layer_data_size(self));
+        layer++;
+    }
+    return self;
+}
+
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a) {
     s_assume(layers > 0, "A single layer needed");
     if (surface->h % layers != 0) {

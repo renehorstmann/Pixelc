@@ -59,10 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- layer dialog:
-  - delete
-  - swap left / right
-  - merge left
 - sprites
   - 2d grid
     - in x and y, must be %0 with image size

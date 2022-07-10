@@ -9,6 +9,7 @@
 #include "u/button.h"
 #include "canvas.h"
 #include "cameractrl.h"
+#include "dialog.h"
 #include "tool.h"
 
 #define SELECT_CURRENT 3
@@ -107,6 +108,8 @@ static void select_update(struct Tool *super, float dtime) {
             self->pressed = false;
             s_log("layer longpress: %i", layer);
             animation_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
+            canvas.current_layer = layer;
+            dialog_create_layer();
         }
     }
 }

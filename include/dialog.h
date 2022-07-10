@@ -97,4 +97,6 @@ void dialog_create_kernel();
 
 void dialog_create_tab();
 
+void dialog_create_layer();
+
 #endif //PIXELC_DIALOG_H
