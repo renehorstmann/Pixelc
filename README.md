@@ -59,6 +59,11 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- hover add layer bug
+  - for cursor or mtc
+  - found by Dentur
+  - assumption: kernel preview stays on the canvas and canvas_reload is not called or on the wrong layer
+
 - sprites
   - 2d grid
     - in x and y, must be %0 with image size
