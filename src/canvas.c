@@ -228,6 +228,8 @@ void canvas_set_image(uImage image_sink, bool save) {
 
     u_image_kill(&canvas.RO.image);
     canvas.RO.image = image_sink;
+    
+    canvas.current_layer = s_min(canvas.current_layer, canvas.RO.image.layers-1);
 
     u_image_kill(&L.prev_image);
     L.prev_image = u_image_new_zeros(image_sink.cols, image_sink.rows, image_sink.layers);

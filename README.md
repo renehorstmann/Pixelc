@@ -61,10 +61,6 @@ python3 -m http.server --bind localhost  # [port]
 
 - layers + sprites
   - layers: 
-    - canvas render modes:
-      - all up to current
-      - all but onion skinning
-      - only current
     - show each individual layer in a list in the layer toolbar
       - longpress a layer for options
         - delete
@@ -101,19 +97,6 @@ python3 -m http.server --bind localhost  # [port]
 
 - toolbar background drawn
   - selection background
-
-- rethink layers and frames?
-  - image tabs?
-      - to create a new kernel, palette, etc.
-      - clone
-
-- undo layer change bug
-
-- preview
-  - instead of animation
-  - how to animate
-  - frame times?
-  - gif export?
   
 - tutorial.md
   - what how to do
