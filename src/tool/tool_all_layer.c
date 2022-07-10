@@ -11,8 +11,7 @@
 #include "cameractrl.h"
 #include "tool.h"
 
-#define SELECT_NUM 5
-#define SELECT_CURRENT 2
+#define SELECT_CURRENT 3
 
 typedef struct {
     Tool super;
@@ -121,7 +120,7 @@ static void select_render(const struct Tool *super, const mat4 *cam_mat) {
 
 
 Tool *tool_new_layer_select(int pos) {
-    assert(pos>=0 && pos<SELECT_NUM);
+    assert(pos>=0 && pos<TOOL_LAYER_SELECT_NUM);
     Select *self = s_new0(Select, 1);
     
     self->super.size = (vec2) {{20, 20}};

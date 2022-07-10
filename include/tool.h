@@ -10,6 +10,8 @@
 #define TOOL_BUTTON_ADDITIONAL_DATA_SIZE 64
 #define TOOL_LONG_PRESS_TIME 0.75
 
+#define TOOL_LAYER_SELECT_NUM 7
+
 
 struct Tool;
 

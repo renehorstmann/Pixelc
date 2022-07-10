@@ -231,7 +231,7 @@ void toolbar_init(uColor_s active_bg_a, uColor_s active_bg_b,
     toolbar.tools.mode_replace = tool_new_mode_replace();
     toolbar.tools.mode_pipette = tool_new_mode_pipette();
 
-    for(int i=0; i<5; i++) {
+    for(int i=0; i<TOOL_LAYER_SELECT_NUM; i++) {
         toolbar.layer_tools.select[i] = tool_new_layer_select(i);
     }
     toolbar.layer_tools.blend = tool_new_layer_blend();

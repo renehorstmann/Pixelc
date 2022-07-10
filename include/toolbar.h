@@ -8,7 +8,7 @@
 #include "tool.h"
 
 #define TOOLBAR_TOOLS_LEN 31
-#define TOOLBAR_LAYER_TOOLS_LEN 7
+#define TOOLBAR_LAYER_TOOLS_LEN (TOOL_LAYER_SELECT_NUM + 2)
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 4
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -75,7 +75,7 @@ struct Toolbar_Globals {
     union {
         Tool *all_layer_tools[TOOLBAR_LAYER_TOOLS_LEN];
         struct {
-            Tool *select[5];
+            Tool *select[TOOL_LAYER_SELECT_NUM];
             Tool *blend;
             Tool *add;
         } layer_tools;
