@@ -59,8 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
   
-- layer marker for more layers like ...
-
 - sprites
   - 2d grid
     - in x and y, must be %0 with image size

@@ -18,6 +18,7 @@ static void on_reset_all(bool ok) {
     if(ok) {
         io_config_clear_files();
         dialog_create_restart();
+    } else {
     }
 }
 

@@ -7,7 +7,7 @@
 #include "r/ro_single.h"
 
 #define CANVAS_MAX_SIZE 1024
-#define CANVAS_MAX_LAYERS 128
+#define CANVAS_MAX_LAYERS 96
 #define CANVAS_MAX_SAVES 128
 #define CANVAS_MAX_TABS 9
 

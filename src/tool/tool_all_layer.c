@@ -79,7 +79,14 @@ static void select_update(struct Tool *super, float dtime) {
         ro_single_set_texture(&self->layer, tex);
         
         char num[4];
-        snprintf(num, sizeof num, "%3i", layer+1);
+        const char *format;
+        if(self->pos==0 && layer>0)
+            format = "+%2i";
+        else if(self->pos==TOOL_LAYER_SELECT_NUM-1 && layer<canvas.RO.image.layers-1)
+            format = "%2i+";
+        else 
+            format = " %2i";
+        snprintf(num, sizeof num, format, layer+1);
         ro_text_set_text(&self->num, num);
     }
     

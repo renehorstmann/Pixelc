@@ -170,7 +170,7 @@ void dialog_create_layer() {
     ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
 
     char info_txt[4];
-    snprintf(info_txt, sizeof info_txt, "%-3i",
+    snprintf(info_txt, sizeof info_txt, "%-2i",
             canvas.current_layer +1);
     ro_text_set_text(&impl->info, info_txt);
     s_log("size is: %s", info_txt);
@@ -224,7 +224,7 @@ void dialog_create_layer() {
     impl->merge_txt = ro_text_new_font55(32);
     char merge_txt[128];
     snprintf(merge_txt, sizeof merge_txt, "Merge layer\n"
-            "into layer: %-3i", canvas.current_layer);
+            "into layer: %-2i", canvas.current_layer);
     ro_text_set_text(&impl->merge_txt, merge_txt);
     ro_text_set_color(&impl->merge_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
     impl->merge_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
