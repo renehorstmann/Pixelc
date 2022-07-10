@@ -5,6 +5,7 @@
 #include "s/s_full.h"
 #include "m/float.h"
 #include "m/int.h"
+#include "io.h"
 #include "brush.h"
 #include "camera.h"
 #include "dialog.h"
@@ -599,8 +600,7 @@ void palette_reset_palette_files() {
 void palette_save_config() {
     s_log("save");
 
-    uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json"));
+    uJson *config = u_json_new_file(io_config_file());
 
     uJson *member = u_json_append_object(config, "palette");
     uJson *palette_files = u_json_append_array(member, "palette_files");
@@ -610,8 +610,7 @@ void palette_save_config() {
 
     u_json_append_int(member, "palette_id", palette.RO.palette_id);
 
-    u_json_save_file(config,
-                     e_io_savestate_file_path("config.json"));
+    u_json_save_file(config, io_config_file());
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -622,8 +621,7 @@ void palette_load_config() {
 
     bool reset = false;
 
-    uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json"));
+    uJson *config = u_json_new_file(io_config_file());
 
 
     uJson *member = u_json_get_object(config, "palette");

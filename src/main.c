@@ -2,6 +2,7 @@
 #include "r/r.h"
 #include "u/u.h"
 
+#include "io.h"
 #include "camera.h"
 #include "background.h"
 #include "canvas.h"
@@ -50,6 +51,8 @@
 static void init() {
 
     // init systems
+    io_init();
+    
     camera_init();
     camera_load_config();
     camera_update();

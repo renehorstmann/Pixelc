@@ -1,9 +1,10 @@
 #include <time.h>
-#include "e/io.h"
 #include "r/r.h"
 #include "u/json.h"
 #include "m/sca/int.h"
 #include "m/sca/uchar.h"
+#include "e/io.h"
+#include "io.h"
 #include "animation.h"
 #include "canvas.h"
 #include "brushmode.h"
@@ -385,8 +386,7 @@ void brush_reset_kernel_files() {
 void brush_save_config() {
     s_log("save");
 
-    uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json"));
+    uJson *config = u_json_new_file(io_config_file());
 
     uJson *member = u_json_append_object(config, "brush");
     uJson *kernel_files = u_json_append_array(member, "kernel_files");
@@ -396,8 +396,7 @@ void brush_save_config() {
 
     u_json_append_int(member, "kernel_id", brush.RO.kernel_id);
 
-    u_json_save_file(config,
-                     e_io_savestate_file_path("config.json"));
+    u_json_save_file(config, io_config_file());
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -408,8 +407,7 @@ void brush_load_config() {
 
     bool reset = false;
 
-    uJson *config = u_json_new_file(
-            e_io_savestate_file_path("config.json"));
+    uJson *config = u_json_new_file(io_config_file());
 
     uJson *member = u_json_get_object(config, "brush");
     uJson *kernel_files = u_json_get_object(member, "kernel_files");

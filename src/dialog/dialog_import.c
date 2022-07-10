@@ -100,7 +100,7 @@ static void on_action(bool ok) {
 //
 
 
-void dialog_create_image_upload() {
+void dialog_create_import() {
     dialog_hide();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);

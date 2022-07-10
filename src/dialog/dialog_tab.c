@@ -26,16 +26,10 @@
 _Static_assert(CANVAS_MAX_TABS == 9, "rewrite this file with a container, etc.");
 
 static uImage create_tab_img(int tab_id) {
-    uImage img = canvas_get_tab(tab_id);
-    s_assume(u_image_valid(img), "should have been valid");
-    for (int i = 1; i < img.layers; i++) {
-        assert(img.layers > 1);
-        uImage tmp = u_image_new_clone_merge_down(img, 1);
-        u_image_kill(&img);
-        img = tmp;
-    }
-    assert(img.layers == 1);
-    return img;
+    uImage layers = canvas_get_tab(tab_id);
+    uImage tab = u_image_new_clone_merge_down_full(layers);
+    u_image_kill(&layers);
+    return tab;
 }
 
 typedef struct {

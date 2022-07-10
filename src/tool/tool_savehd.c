@@ -1,31 +1,46 @@
-#include "e/io.h"
-#include "u/image.h"
-#include "m/int.h"
 #include "u/button.h"
-#include "canvas.h"
+#include "u/pose.h"
+#include "io.h"
+#include "animation.h"
+#include "dialog.h"
 #include "tool.h"
-
-#define HD_MIN_SIZE 1024
 
 //
 // private
 //
 
+_Static_assert(sizeof(TOOL_BUTTON_ADDITIONAL_DATA_SIZE) >= sizeof(float), "wtf");
 
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         s_log("tool save hd");
-        uImage img = canvas.RO.image;
-        int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
-        int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
-        int scale = isca_max(scale_w, scale_h);
-        img = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
-        u_image_save_file(img, "image_hd.png");
-        u_image_kill(&img);
-        e_io_offer_file_as_download("image_hd.png");
+        io_image_hd_save();
     }
 }
+
+static bool is_active(struct Tool *super, float dtime) {
+    ToolButton *self = (ToolButton *) super;
+    float *longpress_time = (float *) self->additional_data;
+    if (!u_button_is_pressed(&self->ro.rect)) {
+        *longpress_time = 0;
+        return true;
+    }
+    if (*longpress_time >= TOOL_LONG_PRESS_TIME)
+        return true;
+    *longpress_time += dtime;
+
+    // check for longpress
+    if (*longpress_time >= TOOL_LONG_PRESS_TIME) {
+        animation_longpress(u_pose_get_xy(self->ro.rect.pose),
+                            R_COLOR_YELLOW);
+        dialog_create_save();
+        u_button_set_pressed(&self->ro.rect, false);
+    }
+    // always actice
+    return true;
+}
+
 
 //
 // public
@@ -33,9 +48,15 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_save_hd() {
     return tool_button_new("save hd",
-                           "saves the canvas\nas hd version\nas image_hd.png\n\n"
-                           "The hd version\nhas a size of\nat least 1024px",
+                           "saves the canvas\n"
+                           "as hd version\n"
+                           "as image_hd.png\n\n"
+                           "The hd version\n"
+                           "has a size of\n"
+                           "at least 1024px\n\n"
+                           "long press\n"
+                           "for options",
                            "res/button_save_hd.png",
                            pointer_event,
-                           NULL);
+                           is_active);
 }

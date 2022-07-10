@@ -17,7 +17,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         uImage img = u_image_new_file(1, "import.png");
         if (!u_image_valid(img)) {
-            dialog_create_image_upload();
+            dialog_create_import();
             return;
         }
         s_log("tool import");
@@ -41,7 +41,7 @@ static bool is_active(struct Tool *super, float dtime) {
     if (*longpress_time >= TOOL_LONG_PRESS_TIME) {
         animation_longpress(u_pose_get_xy(self->ro.rect.pose),
                             R_COLOR_YELLOW);
-        dialog_create_image_upload();
+        dialog_create_import();
         u_button_set_pressed(&self->ro.rect, false);
     }
     // always actice

@@ -71,6 +71,15 @@ static uImage u_image_new_clone_merge_down(uImage from, int layer_to_merge_down)
     return u_image_new_clone_merge_down_a(from, layer_to_merge_down, from.a);
 }
 
+
+// merges all layers down, with a custom a
+uImage u_image_new_clone_merge_down_full_a(uImage from, sAllocator_i a);
+
+// merges all layers down
+static uImage u_image_new_clone_merge_down_full(uImage from) {
+    return u_image_new_clone_merge_down_full_a(from, from.a);
+}
+
 // copy a SDL_Surface into a new image with a costum a
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a);
 

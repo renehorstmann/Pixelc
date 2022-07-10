@@ -87,6 +87,21 @@ uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, sAll
     return self;
 }
 
+uImage u_image_new_clone_merge_down_full_a(uImage from, sAllocator_i a) {
+    if(!u_image_valid(from))
+        return u_image_new_invalid_a(a);
+    if(from.layers == 1)
+        return u_image_new_clone_a(from, a);
+    
+    uImage self = u_image_new_clone_merge_down_a(from, 1, a);
+    while(self.layers>1) {
+        uImage tmp = u_image_new_clone_merge_down(self, 1);
+        u_image_kill(&self);
+        self = tmp;
+    }
+    return self;
+}
+
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a) {
     s_assume(layers > 0, "A single layer needed");
     if (surface->h % layers != 0) {

@@ -1,8 +1,8 @@
 #include "u/button.h"
 #include "u/pose.h"
-#include "e/io.h"
 #include "s/str.h"
 #include "s/file.h"
+#include "io.h"
 #include "brush.h"
 #include "animation.h"
 #include "dialog.h"
@@ -16,9 +16,7 @@ static void on_reset_all(bool ok) {
     s_log("reset all: %i", ok);
     dialog_hide();
     if(ok) {
-        s_file_write(e_io_savestate_file_path("config.json"), s_strc(""), true);
-        s_file_write(e_io_savestate_file_path("config_canvas_save.json"), s_strc(""), true);
-        e_io_savestate_save();
+        io_config_clear_files();
         dialog_create_restart();
     }
 }
