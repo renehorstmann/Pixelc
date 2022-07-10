@@ -108,7 +108,7 @@ void camera_save_config() {
     u_json_append_int(member, "size", camera.size);
     u_json_append_int(member, "rotate_mode", camera.rotate_mode);
 
-    u_json_save_file(config, io_config_file());
+    u_json_save_file(config, io_config_file(), NULL);
     e_io_savestate_save();
 
     u_json_kill(&config);

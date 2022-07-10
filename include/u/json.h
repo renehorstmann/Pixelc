@@ -21,6 +21,12 @@ enum u_json_types {
 };
 
 
+// some options for json saves
+struct uJson_Options {
+    bool array_single_line;
+};
+
+
 // creates a new empty root json element (object type)
 // sAllocator version
 uJson *u_json_new_empty_a(sAllocator_i a);
@@ -66,15 +72,15 @@ bool u_json_empty(const uJson *self);
 
 // creates a string from the uJson hierarchy (recursivly)
 // custom a for the result string
-sString *u_json_to_string_a(const uJson *self, sAllocator_i a);
+sString *u_json_to_string_a(const uJson *self, sAllocator_i a, struct uJson_Options *opt_options);
 
 // creates a string from the uJson hierarchy (recursivly)
 // uses uJsons a
-sString *u_json_to_string(const uJson *self);
+sString *u_json_to_string(const uJson *self, struct uJson_Options *opt_options);
 
 // saves to a json file
 // calls u_json_to_string
-bool u_json_save_file(const uJson *self, const char *file);
+bool u_json_save_file(const uJson *self, const char *file, struct uJson_Options *opt_options);
 
 
 // returns the type of a json item

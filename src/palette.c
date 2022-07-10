@@ -610,7 +610,7 @@ void palette_save_config() {
 
     u_json_append_int(member, "palette_id", palette.RO.palette_id);
 
-    u_json_save_file(config, io_config_file());
+    u_json_save_file(config, io_config_file(), NULL);
     e_io_savestate_save();
 
     u_json_kill(&config);

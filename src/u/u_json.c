@@ -2,7 +2,7 @@
 #include "u/json.h"
 
 
-#define INDENT_TAB 4
+#define INDENT_TAB 2
 
 //
 // private
@@ -21,6 +21,10 @@ struct uJson {
     sAllocator_i a;
 };
 
+
+static bool is_object_or_array(enum u_json_types type) {
+    return type == U_JSON_TYPE_ARRAY || type == U_JSON_TYPE_OBJECT;
+}
 
 static void json_kill_r(uJson *self) {
     s_a_free(self->a, self->name);
@@ -42,7 +46,7 @@ static void json_kill_r(uJson *self) {
 }
 
 static uJson *append_child(uJson *self, const char *name) {
-    if (!self || !(self->type == U_JSON_TYPE_ARRAY || self->type == U_JSON_TYPE_OBJECT))
+    if (!self || !is_object_or_array(self->type))
         return NULL;
 
     uJson *child;
@@ -137,7 +141,7 @@ static sString *create_escapes(sStr_s str) {
     return s;
 }
 
-static void stringify_r(const uJson *self, sString *string, int indent_lvl) {
+static void stringify_r(const uJson *self, sString *string, int indent_lvl, struct uJson_Options options) {
     switch (self->type) {
         case U_JSON_TYPE_NULL:
             s_string_append(string, s_strc("null"));
@@ -157,18 +161,31 @@ static void stringify_r(const uJson *self, sString *string, int indent_lvl) {
         }
             break;
         case U_JSON_TYPE_ARRAY:
-            s_string_append(string, s_strc("[\n"));
-            for (int i = 0; i < self->arr_size; i++) {
-                for (int indent = 0; indent < indent_lvl + INDENT_TAB; indent++)
-                    s_string_push(string, ' ');
-                stringify_r(&self->data_arr[i], string, indent_lvl);
-                if (i < self->arr_size - 1)
-                    s_string_push(string, ',');
-                s_string_push(string, '\n');
+            if(options.array_single_line) {
+                s_string_push(string, '[');
+                for (int i = 0; i < self->arr_size; i++) { 
+                    stringify_r(&self->data_arr[i], string, indent_lvl, options); 
+                    if (i < self->arr_size - 1) 
+                        s_string_append(string, s_strc(", ")); 
+                } 
+                s_string_push(string, ']'); 
+            } else {
+                // !options.array_single_line
+                s_string_append(string, s_strc("[\n"));
+            
+                for (int i = 0; i < self->arr_size; i++) { 
+                    for (int indent = 0; indent < indent_lvl + INDENT_TAB; indent++)
+                        s_string_push(string, ' '); 
+                    stringify_r(&self->data_arr[i], string, indent_lvl, options); 
+                    if (i < self->arr_size - 1) 
+                        s_string_push(string, ',');
+                    s_string_push(string, '\n'); 
+                } 
+                for (int indent = 0; indent < indent_lvl; indent++) 
+                    s_string_push(string, ' '); 
+                s_string_push(string, ']'); 
             }
-            for (int indent = 0; indent < indent_lvl; indent++)
-                s_string_push(string, ' ');
-            s_string_push(string, ']');
+            
             break;
         case U_JSON_TYPE_OBJECT:
             s_string_append(string, s_strc("{\n"));
@@ -178,7 +195,7 @@ static void stringify_r(const uJson *self, sString *string, int indent_lvl) {
                 s_string_push(string, '\"');
                 s_string_append(string, s_strc(self->data_arr[i].name));
                 s_string_append(string, s_strc("\": "));
-                stringify_r(&self->data_arr[i], string, indent_lvl + INDENT_TAB);
+                stringify_r(&self->data_arr[i], string, indent_lvl + INDENT_TAB, options);
                 if (i < self->arr_size - 1)
                     s_string_push(string, ',');
                 s_string_push(string, '\n');
@@ -403,31 +420,37 @@ void u_json_kill(uJson **self_ptr) {
 bool u_json_empty(const uJson *self) {
     if (!self)
         return false;
-    if (self->type == U_JSON_TYPE_ARRAY || self->type == U_JSON_TYPE_OBJECT)
+    if (is_object_or_array(self->type))
         return self->arr_size == 0;
     return false;
 }
 
-sString *u_json_to_string_a(const uJson *self, sAllocator_i a) {
+sString *u_json_to_string_a(const uJson *self, sAllocator_i a, struct uJson_Options *opt_options) {
     if (!self)
         return s_string_new_invalid();
+    struct uJson_Options options = {0};
+    if(opt_options)
+        options = *opt_options;
     sString *s = s_string_new_a(128, a);
-    stringify_r(self, s, 0);
+    stringify_r(self, s, 0, options);
     return s;
 }
 
-sString *u_json_to_string(const uJson *self) {
+sString *u_json_to_string(const uJson *self, struct uJson_Options *opt_options) {
     if (!self)
         return s_string_new_invalid();
+    struct uJson_Options options = {0};
+    if(opt_options)
+        options = *opt_options;
     sString *s = s_string_new_a(128, self->a);
-    stringify_r(self, s, 0);
+    stringify_r(self, s, 0, options);
     return s;
 }
 
-bool u_json_save_file(const uJson *self, const char *file) {
+bool u_json_save_file(const uJson *self, const char *file, struct uJson_Options *opt_options) {
     if (!self)
         return false;
-    sString *s = u_json_to_string(self);
+    sString *s = u_json_to_string(self, opt_options);
     bool ok = s_file_write(file, s_string_get_str(s), true);
     s_string_kill(&s);
     return ok;
@@ -464,13 +487,13 @@ const char *u_json_get_string(const uJson *self) {
 }
 
 int u_json_get_size(const uJson *self) {
-    if (!self || (self->type != U_JSON_TYPE_ARRAY && self->type != U_JSON_TYPE_OBJECT))
+    if (!self || !is_object_or_array(self->type))
         return 0;
     return self->arr_size;
 }
 
 uJson *u_json_get_id(const uJson *self, int id) {
-    if (!self || (self->type != U_JSON_TYPE_ARRAY && self->type != U_JSON_TYPE_OBJECT))
+    if (!self || !is_object_or_array(self->type))
         return NULL;
     if (id < 0 || id >= self->arr_size)
         return NULL;
