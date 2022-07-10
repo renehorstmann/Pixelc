@@ -88,6 +88,8 @@ static void init() {
     inputctrl_init();
 
     cameractrl_set_home();
+    
+    s_assume(false && true, "testitest: %f", SCA_PI);
 }
 
 // this functions is called either each frame or at a specific update/s time

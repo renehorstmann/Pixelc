@@ -112,6 +112,13 @@
         document.write(newContent);
         document.close();
     }
+    
+    function set_assume(text) {
+        var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">' + text + '</h1></body></html>';
+        document.open();
+        document.write(newContent);
+        document.close();
+    }
 
     // called from the engine to offer a download file
     function offer_file_as_download(filename) {
