@@ -47,9 +47,9 @@ void s__s_assume_impl(const char *expression, const char *file, int line, const 
     // exit emscriptens main loop and call js error handler
     char *script = malloc(2*S_ASSUME_MAX_FORMATED_MSG_SIZE);
 #ifdef NDEBUG
-    snprintf(script, sizeof script, "set_assume(\'An assumption in the program failed: %s\', true);", msg);
+    snprintf(script, sizeof script, "set_assume(\'An assumption in the program failed: %s\');", msg);
 #else
-    snprintf(script, sizeof script, "set_assume(\'Assumption failed: %s at %s:%d %s\', true);", expression, file, line, msg);
+    snprintf(script, sizeof script, "set_assume(\'Assumption failed: %s at %s:%d %s\');", expression, file, line, msg);
 #endif
     emscripten_cancel_main_loop();
     emscripten_run_script(script);
