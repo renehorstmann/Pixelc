@@ -298,17 +298,9 @@ static ucvec3 ucvec3_clamp_vec(ucvec3 x, ucvec3 min, ucvec3 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ucvec3 ucvec3_mix(ucvec3 a, ucvec3 b, unsigned char t) {
+static ucvec3 ucvec3_mix(ucvec3 a, ucvec3 b, float t) {
     ucvec3 res;
     ucvecN_mix(res.v, a.v, b.v, t, 3);
-    return res;
-}
-
-
-/** dst = a * (1-t) + b * t */
-static ucvec3 ucvec3_mix_vec(ucvec3 a, ucvec3 b, ucvec3 t) {
-    ucvec3 res;
-    ucvecN_mix_vec(res.v, a.v, b.v, t.v, 3);
     return res;
 }
 

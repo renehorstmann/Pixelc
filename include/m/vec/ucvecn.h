@@ -247,14 +247,14 @@ ucvecN_clamp_vec(unsigned char *dst, const unsigned char *x, const unsigned char
 }
 
 /** dst = a * (1-t) + b * t */
-static void ucvecN_mix(unsigned char *dst, const unsigned char *a, const unsigned char *b, unsigned char t, int n) {
+static void ucvecN_mix(unsigned char *dst, const unsigned char *a, const unsigned char *b, float t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = ucsca_mix(a[i], b[i], t);
 }
 
 /** dst = a * (1-t) + b * t */
 static void
-ucvecN_mix_vec(unsigned char *dst, const unsigned char *a, const unsigned char *b, const unsigned char *t, int n) {
+ucvecN_mix_vec(unsigned char *dst, const unsigned char *a, const unsigned char *b, const float *t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = ucsca_mix(a[i], b[i], t[i]);
 }

@@ -411,14 +411,6 @@ static vec2 vec2_mix(vec2 a, vec2 b, float t) {
 }
 
 
-/** dst = a * (1-t) + b * t */
-static vec2 vec2_mix_vec(vec2 a, vec2 b, vec2 t) {
-    vec2 res;
-    vecN_mix_vec(res.v, a.v, b.v, t.v, 2);
-    return res;
-}
-
-
 /** dst = x < edge ? 0 : 1 */
 static vec2 vec2_step(vec2 x, float edge) {
     vec2 res;

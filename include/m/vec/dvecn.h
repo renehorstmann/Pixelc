@@ -326,13 +326,13 @@ static void dvecN_clamp_vec(double *dst, const double *x, const double *min, con
 }
 
 /** dst = a * (1-t) + b * t */
-static void dvecN_mix(double *dst, const double *a, const double *b, double t, int n) {
+static void dvecN_mix(double *dst, const double *a, const double *b, float t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = dsca_mix(a[i], b[i], t);
 }
 
 /** dst = a * (1-t) + b * t */
-static void dvecN_mix_vec(double *dst, const double *a, const double *b, const double *t, int n) {
+static void dvecN_mix_vec(double *dst, const double *a, const double *b, const float *t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = dsca_mix(a[i], b[i], t[i]);
 }

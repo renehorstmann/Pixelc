@@ -427,14 +427,6 @@ static vec4 vec4_mix(vec4 a, vec4 b, float t) {
 }
 
 
-/** dst = a * (1-t) + b * t */
-static vec4 vec4_mix_vec(vec4 a, vec4 b, vec4 t) {
-    vec4 res;
-    vecN_mix_vec(res.v, a.v, b.v, t.v, 4);
-    return res;
-}
-
-
 /** dst = x < edge ? 0 : 1 */
 static vec4 vec4_step(vec4 x, float edge) {
     vec4 res;

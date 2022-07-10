@@ -322,17 +322,9 @@ static ivec3 ivec3_clamp_vec(ivec3 x, ivec3 min, ivec3 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ivec3 ivec3_mix(ivec3 a, ivec3 b, int t) {
+static ivec3 ivec3_mix(ivec3 a, ivec3 b, float t) {
     ivec3 res;
     ivecN_mix(res.v, a.v, b.v, t, 3);
-    return res;
-}
-
-
-/** dst = a * (1-t) + b * t */
-static ivec3 ivec3_mix_vec(ivec3 a, ivec3 b, ivec3 t) {
-    ivec3 res;
-    ivecN_mix_vec(res.v, a.v, b.v, t.v, 3);
     return res;
 }
 

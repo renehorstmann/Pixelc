@@ -419,14 +419,6 @@ static vec3 vec3_mix(vec3 a, vec3 b, float t) {
 }
 
 
-/** dst = a * (1-t) + b * t */
-static vec3 vec3_mix_vec(vec3 a, vec3 b, vec3 t) {
-    vec3 res;
-    vecN_mix_vec(res.v, a.v, b.v, t.v, 3);
-    return res;
-}
-
-
 /** dst = x < edge ? 0 : 1 */
 static vec3 vec3_step(vec3 x, float edge) {
     vec3 res;

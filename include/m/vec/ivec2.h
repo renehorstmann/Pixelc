@@ -314,17 +314,9 @@ static ivec2 ivec2_clamp_vec(ivec2 x, ivec2 min, ivec2 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ivec2 ivec2_mix(ivec2 a, ivec2 b, int t) {
+static ivec2 ivec2_mix(ivec2 a, ivec2 b, float t) {
     ivec2 res;
     ivecN_mix(res.v, a.v, b.v, t, 2);
-    return res;
-}
-
-
-/** dst = a * (1-t) + b * t */
-static ivec2 ivec2_mix_vec(ivec2 a, ivec2 b, ivec2 t) {
-    ivec2 res;
-    ivecN_mix_vec(res.v, a.v, b.v, t.v, 2);
     return res;
 }
 

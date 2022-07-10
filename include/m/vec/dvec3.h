@@ -412,17 +412,9 @@ static dvec3 dvec3_clamp_vec(dvec3 x, dvec3 min, dvec3 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static dvec3 dvec3_mix(dvec3 a, dvec3 b, double t) {
+static dvec3 dvec3_mix(dvec3 a, dvec3 b, float t) {
     dvec3 res;
     dvecN_mix(res.v, a.v, b.v, t, 3);
-    return res;
-}
-
-
-/** dst = a * (1-t) + b * t */
-static dvec3 dvec3_mix_vec(dvec3 a, dvec3 b, dvec3 t) {
-    dvec3 res;
-    dvecN_mix_vec(res.v, a.v, b.v, t.v, 3);
     return res;
 }
 

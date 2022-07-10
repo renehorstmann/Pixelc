@@ -263,13 +263,13 @@ static void ivecN_clamp_vec(int *dst, const int *x, const int *min, const int *m
 }
 
 /** dst = a * (1-t) + b * t */
-static void ivecN_mix(int *dst, const int *a, const int *b, int t, int n) {
+static void ivecN_mix(int *dst, const int *a, const int *b, float t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = isca_mix(a[i], b[i], t);
 }
 
 /** dst = a * (1-t) + b * t */
-static void ivecN_mix_vec(int *dst, const int *a, const int *b, const int *t, int n) {
+static void ivecN_mix_vec(int *dst, const int *a, const int *b, const float *t, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = isca_mix(a[i], b[i], t[i]);
 }
