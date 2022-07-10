@@ -16,6 +16,7 @@
 
 
 typedef struct {
+    void *user_data;
     RoText info;
 } Impl;
 
@@ -46,11 +47,13 @@ static bool pointer_event(ePointer_s pointer) {
 //
 
 
-void dialog_create_prompt(const char *title, const char *msg, dialog_on_action_cb on_action) {
+void dialog_create_prompt(const char *title, const char *msg, 
+        dialog_on_action_cb on_action, void *user_data) {
     dialog_hide();
     s_log("prompt: %s", title);
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
+    impl->user_data = user_data;
 
     impl->info = ro_text_new_font55(128);
     ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
@@ -69,3 +72,10 @@ void dialog_create_prompt(const char *title, const char *msg, dialog_on_action_c
     dialog.opt_on_ok_cb = on_action;
 }
 
+      
+void *dialog_prompt_get_user_data(const char *title) {
+    if(strcmp(dialog.id, title) != 0)
+        return NULL;
+    Impl *impl = dialog.impl;
+    return impl->user_data;
+}

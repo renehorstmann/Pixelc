@@ -14,11 +14,17 @@
 
 static void on_reset_all(bool ok) {
     s_log("reset all: %i", ok);
-    dialog_hide();
     if(ok) {
         io_config_clear_files();
         dialog_create_restart();
     } else {
+        ToolButton *self = dialog_prompt_get_user_data("reset app");
+        if(!self) {
+            s_log_error("could not get prompt user data");
+        } else {
+            u_button_set_pressed(&self->ro.rect, false);
+        }
+        dialog_hide();
     }
 }
 
@@ -46,7 +52,7 @@ static bool is_active(struct Tool *super, float dtime) {
     if (*longpress_time >= TOOL_LONG_PRESS_TIME) {
         animation_longpress(u_pose_get_xy(self->ro.rect.pose),
                             R_COLOR_RED);
-        dialog_create_prompt("reset app", "reset the\nwhole app?", on_reset_all);
+        dialog_create_prompt("reset app", "reset the\nwhole app?", on_reset_all, self);
     }
     // always actice
     return true;

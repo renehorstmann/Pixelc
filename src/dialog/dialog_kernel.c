@@ -91,7 +91,7 @@ static bool pointer_event(ePointer_s pointer) {
     if (brush.RO.max_kernels>1 
             && u_button_clicked(&impl->delete_btn.rect, pointer)) {
         s_log("delete dialog");
-        dialog_create_prompt("Delete", "delete this\nkernel?", on_delete_action);
+        dialog_create_prompt("Delete", "delete this\nkernel?", on_delete_action, NULL);
         // return after hide, hide kills this dialog
         return true;
     }

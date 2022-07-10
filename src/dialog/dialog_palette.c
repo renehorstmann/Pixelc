@@ -126,7 +126,7 @@ static bool pointer_event(ePointer_s pointer) {
     if (palette.RO.max_palettes > 1
         && u_button_clicked(&impl->delete_btn.rect, pointer)) {
         s_log("delete dialog");
-        dialog_create_prompt("Delete", "delete this\npalette?", on_delete_action);
+        dialog_create_prompt("Delete", "delete this\npalette?", on_delete_action, NULL);
         // return after hide, hide kills this dialog
         return true;
     }
@@ -149,7 +149,7 @@ static bool pointer_event(ePointer_s pointer) {
                                  "Do you really\n"
                                  "want to overwrite\n"
                                  "the palette?",
-                                 on_new_palette_action);
+                                 on_new_palette_action, NULL);
         } else {
             on_new_palette_action(true);
         }
