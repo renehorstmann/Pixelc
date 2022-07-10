@@ -59,31 +59,28 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- layers + sprites
-  - layers: 
-    - show each individual layer in a list in the layer toolbar
-      - longpress a layer for options
-        - delete
-        - swap left / right
-        - merge left
-  - sprites
-    - 2d grid
-      - in x and y, must be %0 with image size
-    - animate mode:
-      - off
-      - only x+
-      - only y+
-      - x+ than y+
-      - y+ than x+
-    - sprite frame time
-      - reset for all
-        - time or fps
-      - edit individual frame time
-    - canvas render mode:
-      - full image with sprite grid lines
-      - only current sprite 
-      - current sprite with onion skinning the previous
-        - only if animate_mode!=off
+- layer dialog:
+  - delete
+  - swap left / right
+  - merge left
+- sprites
+  - 2d grid
+    - in x and y, must be %0 with image size
+  - animate mode:
+    - off
+    - only x+
+    - only y+
+    - x+ than y+
+    - y+ than x+
+  - sprite frame time
+    - reset for all
+      - time or fps
+    - edit individual frame time
+  - canvas render mode:
+    - full image with sprite grid lines
+    - only current sprite 
+    - current sprite with onion skinning the previous
+      - only if animate_mode!=off
     
   
 

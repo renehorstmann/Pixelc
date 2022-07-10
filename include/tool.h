@@ -126,11 +126,7 @@ Tool *tool_new_mode_replace();
 
 Tool *tool_new_mode_pipette();
 
-Tool *tool_new_layer_select();
-
-Tool *tool_new_layer_move_prev();
-
-Tool *tool_new_layer_move_next();
+Tool *tool_new_layer_select(int pos);
 
 Tool *tool_new_layer_blend();
 
