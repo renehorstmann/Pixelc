@@ -105,7 +105,7 @@
 <script type='text/javascript'>
 
     // called from the engine on error
-    // startup check or s_assume fails
+    // startup checks
     function set_exit_failure_error_msg() {
         var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">Potato Browsers are not supported!</h1><p style="color:silver;">Full WebGL2.0 is needed!</p></body></html>';
         document.open();
@@ -113,6 +113,7 @@
         document.close();
     }
     
+    // called from s_assume
     function set_assume(text) {
         var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">' + text + '</h1></body></html>';
         document.open();
