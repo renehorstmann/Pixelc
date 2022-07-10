@@ -56,8 +56,10 @@ static void save_image() {
     u_json_append_int(state, NULL, canvas.RO.image.layers);
     u_json_append_int(state, NULL, canvas.current_layer);
 
+    // saves same space in the config file
     struct uJson_Options options = {0};
     options.array_single_line = true;
+    
     u_json_save_file(config_save_layers,
                      io_config_canvas_save_file(),
                      &options);
