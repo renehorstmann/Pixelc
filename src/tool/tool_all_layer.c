@@ -57,7 +57,6 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
         s_log("setting current layer to: %i", layer);
         self->pressed = false;
         canvas.current_layer = layer;
-        cameractrl_set_home();
     }
 }
 
