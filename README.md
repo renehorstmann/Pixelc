@@ -78,6 +78,7 @@ python3 -m http.server --bind localhost  # [port]
     - sprite grid line
     - + current sprite with onion skinning the previous
       - only if animate_mode!=off
+  - add row/col buttons
     
 - dialog colors, toolbar colors
   - or drawn
