@@ -213,7 +213,7 @@ void canvas_render(const mat4 *canvascam_mat) {
         for (int i = 0; i < canvas.current_layer; i++) {
             float alpha;
             if(canvas.blend_layers == CANVAS_LAYER_BLEND_ALPHA)
-                alpha = sca_mix(0, 0.33, (i+1.0) / canvas.current_layer);
+                alpha = i==canvas.current_layer-1? 0.33 : 0.033;
             else
                 alpha = 1;
             L.render_objects[i].rect.color.a = alpha * canvas.alpha;
