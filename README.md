@@ -58,12 +58,13 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
-  
+
 - sprites
   - 2d grid
     - in x and y, must be %0 with image size
+    - else will be turned off
   - animate mode:
-    - off
+    - off - via preview btn
     - only x+
     - only y+
     - x+ than y+
@@ -71,26 +72,16 @@ python3 -m http.server --bind localhost  # [port]
   - sprite frame time
     - reset for all
       - time or fps
-    - edit individual frame time
+    - edit individual frame time?
+      - extra dialog?
   - canvas render mode:
-    - full image with sprite grid lines
-    - only current sprite 
-    - current sprite with onion skinning the previous
+    - sprite grid line
+    - + current sprite with onion skinning the previous
       - only if animate_mode!=off
     
-  
+- dialog colors, toolbar colors
+  - or drawn
 
-- dialog background drawn
-  - with titel bar
-  - nice big shadow
-  - 3 parts (width is fixed)
-    - top with title bar
-    - flexible middle (flex in height of course)
-    - bottom part
-
-- toolbar background drawn
-  - selection background
-  
 - tutorial.md
   - what how to do
     - how to create a palette
@@ -99,14 +90,6 @@ python3 -m http.server --bind localhost  # [port]
   - images
   - disp, etc. explained  
   
-- options menu?
-  - in container stack
-  - shows all tools
-  - tools can be used (maybe not all? (tooltip))
-  - tools can be en/disabled
-  - tools can be repositioned (uo down)
-  
-
 - tiles
   - file containing tile names?
   - direct draw mode, in which you can select a tile in the canvas and directly draw changes there
