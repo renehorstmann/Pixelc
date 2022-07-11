@@ -241,7 +241,7 @@ static bool add_is_a(struct Tool *super, float dtime) {
 Tool *tool_new_layer_add() {
     return tool_button_new("add",
                            "adds a layer\n"
-                           "on top of the\n"
+                           "next to the\n"
                            "current layer",
                            "res/button_plus.png",
                            add_pe,
