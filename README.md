@@ -60,6 +60,9 @@ python3 -m http.server --bind localhost  # [port]
 # Todo
 
 - sprites
+  - as layers
+    - save a json for each image
+
   - 2d grid
     - in x and y, must be %0 with image size
     - else will be turned off
@@ -79,6 +82,7 @@ python3 -m http.server --bind localhost  # [port]
     - + current sprite with onion skinning the previous
       - only if animate_mode!=off
   - add row/col buttons
+  - gif export?
     
 - dialog colors, toolbar colors
   - or drawn
