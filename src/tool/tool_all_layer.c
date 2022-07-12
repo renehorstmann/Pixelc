@@ -56,6 +56,7 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
     if(self->pressed && pointer.action == E_POINTER_UP) {
         s_log("setting current layer to: %i", layer);
         self->pressed = false;
+        canvas_reload();
         canvas.current_layer = layer;
     }
 }
@@ -114,6 +115,7 @@ static void select_update(struct Tool *super, float dtime) {
             self->pressed = false;
             s_log("layer longpress: %i", layer);
             animation_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
+            canvas_reload();
             canvas.current_layer = layer;
             dialog_create_layer();
         }
@@ -208,6 +210,7 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         s_log("tool layer add");
+        canvas_reload();
         int layer = canvas.current_layer;
         uImage old = canvas.RO.image;
         uImage img = u_image_new_empty(old.cols, old.rows, old.layers + 1);

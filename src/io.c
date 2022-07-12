@@ -33,6 +33,7 @@ void io_config_clear_files() {
 
 void io_image_save() {
     s_log("save merged: %i", io.image_save_merged);
+    canvas_reload();
     if(io.image_save_merged) {
         uImage img = u_image_new_clone_merge_down_full(canvas.RO.image);
         u_image_save_file(img, "image.png");
@@ -45,6 +46,7 @@ void io_image_save() {
 
 void io_image_hd_save() {
     s_log("save merged: %i", io.image_save_merged);
+    canvas_reload();
     uImage img = canvas.RO.image;
     if(io.image_save_merged) {
         img = u_image_new_clone_merge_down_full(img);
