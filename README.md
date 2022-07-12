@@ -59,6 +59,10 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- sebi bug
+  - hover toolbar needs to call canvas_reload some times
+    - if the image changes, like for layers, rtc.
+
 - sprites
   - as layers
     - save a json for each image

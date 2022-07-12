@@ -189,13 +189,13 @@ Tool *tool_new_layer_blend() {
                            "previous layers\n"
                            "with or without\n"
                            "onion skinning",
-                           "res/button_blend.png",
+                           "res/button_blend3.png",
                            blend_pe,
                            blend_is_a);
     ToolButton *self = (ToolButton*) super;
     // button with 3 instead of 2 modes
     //     so reload
-    ro_single_set_texture(&self->ro, r_texture_new_file(3, 1, "res/button_blend.png"));
+    ro_single_set_texture(&self->ro, r_texture_new_file(3, 1, "res/button_blend3.png"));
     super->size = vec2_cast_from_int(self->ro.tex.sprite_size.v);
     u_pose_set_size(&self->ro.rect.pose, 
             super->size.x, super->size.y);

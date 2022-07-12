@@ -53,10 +53,6 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
     if (go && selectionctrl_pointer_event(c_pointer))
         go = set_go;
 
-    // remove hover previews
-    if(!go)
-        canvas_reload();
-
     if (go)
         brush_pointer_event(c_pointer);
 }
