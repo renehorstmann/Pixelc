@@ -41,7 +41,7 @@ static struct {
 
     e_window_main_loop_fn main_loop_fn;
     void *main_loop_user_data;
-    Uint32 last_time_ms;
+    su32 last_time_ms;
 
     RegPause reg_pause_e[E_WINDOW_MAX_PAUSE_EVENTS];
     int reg_pause_e_size;
@@ -60,7 +60,7 @@ static void loop() {
         return;
     }
 
-    uint32_t time_ms = SDL_GetTicks();
+    su32 time_ms = SDL_GetTicks();
     int deltatime_ms = time_ms - L.last_time_ms;
     L.last_time_ms = time_ms;
     float deltatime = deltatime_ms / 1000.0f;

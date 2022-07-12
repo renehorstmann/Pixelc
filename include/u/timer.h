@@ -2,7 +2,7 @@
 #define U_TIMER_H
 
 //
-// A timer based on (default:) u_window.timu_ms with milliseconds accuracy
+// A timer based on (default:) e_window.time_ms with milliseconds accuracy
 // So only updated before the update function
 // For a high precision timer based on monotonic time, see sTimer_s in s/time.h
 //
@@ -18,7 +18,7 @@
 #endif
 
 typedef struct {
-    uint32_t start_time_ms;
+    su32 start_time_ms;
 } uTimer_s;
 
 // creates a new timer with the u_window time (updated each time before the update function)

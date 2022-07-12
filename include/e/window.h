@@ -43,7 +43,7 @@ struct eWindow_Globals {
     float frame_deltatime;
     // time between updates
     // if e_simple update_dtime_ms are used, this time is a multitude that time
-    uint32_t time_ms;
+    su32 time_ms;
     int deltatime_ms;
     float deltatime;
 };

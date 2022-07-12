@@ -7,12 +7,12 @@
 
 #include "s/s.h"
 
-static const uint32_t uPRAND_MAX = 0xefffffff;
+static const su32 uPRAND_MAX = 0xefffffff;
 
-void u_pseed(uint32_t seed);
+void u_pseed(su32 seed);
 
 // [0 : uPRAND_MAX)
-uint32_t u_prand();
+su32 u_prand();
 
 
 #ifdef MAHTC_UTILS_RANDOM

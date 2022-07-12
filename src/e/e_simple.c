@@ -11,7 +11,7 @@ struct eSimple_Globals e_simple;
 static struct {
     e_simple_init_fn init_fn;
     int update_deltatime_ms;
-    uint32_t time_ms;
+    su32 time_ms;
     bool started;
 } L;
 

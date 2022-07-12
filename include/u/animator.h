@@ -26,10 +26,10 @@ typedef struct {
     // offset to the timer time
     // used by set_frame to offset to the desired frame
     // use rand()%_full_frame_time_ms() to select a random frame
-    uint32_t time_offset_ms;
+    su32 time_offset_ms;
     
     // maximal time for the elapsed timer time
-    uint32_t time_stop_ms;
+    su32 time_stop_ms;
 } uAnimator_s;
 
 
@@ -82,15 +82,15 @@ static void u_animator_set_stop_frame(uAnimator_s *self, int frame, int add_full
 
 // returns the current frame
 static int u_animator_frame(uAnimator_s self) {
-    uint32_t time = u_timer_elapsed_ms(self.timer);
+    su32 time = u_timer_elapsed_ms(self.timer);
     time += self.time_offset_ms;
     // min(time, stop_time):
     time = time < self.time_stop_ms? time : self.time_stop_ms;
     
     time %= u_animator_cycle_time_ms(self);
     int frame = 0;
-    while(time >= (uint32_t) self.frame_time_ms[frame]) {
-        time -= (uint32_t) self.frame_time_ms[frame];
+    while(time >= (su32) self.frame_time_ms[frame]) {
+        time -= (su32) self.frame_time_ms[frame];
         frame++;
     }
     return frame;
