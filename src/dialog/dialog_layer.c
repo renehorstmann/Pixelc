@@ -19,10 +19,11 @@
 static void on_delete_action(bool ok) {
     s_log("delete: %i", ok);
     if (ok) {
-       uImage img = u_image_new_clone_remove_layer(canvas.RO.image, canvas.current_layer);
-       canvas_set_image(img, true);
-    }
-    dialog_hide();
+        uImage img = u_image_new_clone_remove_layer(canvas.RO.image, canvas.current_layer);
+        canvas_set_image(img, true);
+        dialog_create_layer();
+    } else 
+        dialog_hide();
 }
 
 
@@ -142,7 +143,7 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("merge layer: %i", canvas.current_layer);
         uImage img = u_image_new_clone_merge_down(canvas.RO.image, canvas.current_layer);
         canvas_set_image(img, true);
-        dialog_hide();
+        dialog_create_layer();
         // return after hide, hide kills this dialog
         return true;
     }

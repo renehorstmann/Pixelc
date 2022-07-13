@@ -38,6 +38,8 @@ void dialog_init() {
     dialog.ok.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 10 - dialog.ok.tex.sprite_size.x, 0,
                                         dialog.ok.tex.sprite_size.x, dialog.ok.tex.sprite_size.y);
 
+    // just to be sure a tmp change is removed
+    canvas_reload();
 }
 
 
