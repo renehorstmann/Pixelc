@@ -60,9 +60,6 @@ python3 -m http.server --bind localhost  # [port]
 # Todo
 
 - sprites
-  - canvas
-    - render stuff for sprites
-      - onion skinning modes that turn each other off
   - animation button opens toolbar as with layers
     - same options as for layers
     - and frame time for that frame

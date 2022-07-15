@@ -172,15 +172,32 @@ static void blend_pe(struct Tool *super, ePointer_s pointer) {
         return;
      
     if(u_pose_aa_contains(self->ro.rect.pose, pointer.pos.xy)) {
-        canvas.blend_layers++;
-        canvas.blend_layers %= CANVAS_LAYER_BLEND_NUM_MODES;
-        s_log("canvas layer blend mode: %i", canvas.blend_layers);
+        switch(canvas.blend_mode) {
+        case CANVAS_BLEND_LAYER_ONION:
+            canvas.blend_mode = CANVAS_BLEND_LAYER_FULL;
+            break;
+        case CANVAS_BLEND_LAYER_FULL:
+            canvas.blend_mode = CANVAS_BLEND_NONE;
+            break;
+        default:
+            canvas.blend_mode = CANVAS_BLEND_LAYER_ONION;
+        }
+        s_log("canvas blend mode: %i", canvas.blend_mode);
     }
 }
 
 static bool blend_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    self->ro.rect.sprite.x = canvas.blend_layers;
+    switch(canvas.blend_mode) {
+    case CANVAS_BLEND_LAYER_ONION:
+        self->ro.rect.sprite.x = 1;
+        break;
+    case CANVAS_BLEND_LAYER_FULL:
+        self->ro.rect.sprite.x = 2;
+        break;
+    default:
+        self->ro.rect.sprite.x = 0;
+    }
     // always active
     return true;
 }

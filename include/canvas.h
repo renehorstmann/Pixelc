@@ -13,11 +13,13 @@
 #define CANVAS_MAX_TABS 9
 
 
-enum canvas_layer_blend_mode {
-    CANVAS_LAYER_BLEND_NONE,
-    CANVAS_LAYER_BLEND_ALPHA,
-    CANVAS_LAYER_BLEND_FULL,
-    CANVAS_LAYER_BLEND_NUM_MODES
+enum canvas_blend_mode {
+    CANVAS_BLEND_NONE,
+    CANVAS_BLEND_FRAMES_ONION,
+    CANVAS_BLEND_FRAMES_FULL,
+    CANVAS_BLEND_LAYER_ONION,
+    CANVAS_BLEND_LAYER_FULL,
+    CANVAS_BLEND_NUM_MODES
 };
 
 
@@ -26,7 +28,7 @@ struct Canvas_Globals {
 
     bool show_grid;
     float alpha;
-    enum canvas_layer_blend_mode blend_layers;
+    enum canvas_blend_mode blend_mode;
     
     float frame_times[CANVAS_MAX_FRAMES];
 

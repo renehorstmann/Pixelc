@@ -22,7 +22,7 @@ struct Canvas_Globals canvas;
 
 static struct {
     uImage prev_image;
-    RoSingle render_objects[CANVAS_MAX_LAYERS];
+    RoSingle ro;
 
     RoSingle bg;
     RoSingle grid;
@@ -137,11 +137,10 @@ static void load_image() {
 
 // updates the ro tex and sizes
 static void update_render_objects() {
-    for (int i = 0; i < canvas.RO.image.layers; i++) {
-        rTexture tex = r_texture_new(canvas.RO.image.cols, canvas.RO.image.rows, 1, 1,
-                                     u_image_layer(canvas.RO.image, i));
-        ro_single_set_texture(&L.render_objects[i], tex);
-    }
+    uSprite s = canvas.RO.sprite;
+    rTexture tex = r_texture_new_sprite_buffer(s.img.cols, s.img.rows, s.cols, s.rows, s.img.data);
+    
+    ro_single_set_texture(&L.ro, tex);
 
     u_pose_set_size(&L.grid.rect.uv, canvas.RO.image.cols, canvas.RO.image.rows);
     {
@@ -163,7 +162,7 @@ void canvas_init() {
     canvas.ro_color = R_COLOR_WHITE;
 
     canvas.alpha = 1.0;
-    canvas.blend_layers = CANVAS_LAYER_BLEND_ALPHA;
+    canvas.blend_mode = CANVAS_BLEND_LAYER_ONION;
     
     for(int i=0; i<CANVAS_MAX_FRAMES; i++) {
         canvas.frame_times[i] = DEFAULT_FRAME_TIME;
@@ -174,10 +173,8 @@ void canvas_init() {
     canvas.RO.pattern_cols = 8;
     canvas.RO.pattern_rows = 8;
 
-    for (int i = 0; i < CANVAS_MAX_LAYERS; i++) {
-        L.render_objects[i] = ro_single_new(r_texture_new_invalid());
-    }
-
+    L.ro = ro_single_new(r_texture_new_invalid());
+        
     rTexture grid_tex = r_texture_new_file(1, 1, "res/canvas_grid.png");
     r_texture_wrap_repeat(grid_tex);
     L.grid = ro_single_new(grid_tex);
@@ -197,14 +194,12 @@ void canvas_update(float dtime) {
 
     canvas.RO.pose = u_pose_new_aa(0, 0, canvas.RO.image.cols, canvas.RO.image.rows);
 
-    for (int i = 0; i < canvas.RO.image.layers; i++) {
-        r_texture_set(L.render_objects[i].tex, u_image_layer(canvas.RO.image, i));
+    r_texture_set_sprite_buffer(L.ro.tex, canvas.RO.sprite.img.data);
 
-        // set pose
-        L.render_objects[i].rect.pose = canvas.RO.pose;
+    // set pose
+    L.ro.rect.pose = canvas.RO.pose;
 
-        L.render_objects[i].rect.color = canvas.ro_color;
-    }
+    L.ro.rect.color = canvas.ro_color;
 
     L.grid.rect.pose = canvas.RO.pose;
     L.bg.rect.pose = canvas.RO.pose;
@@ -212,22 +207,61 @@ void canvas_update(float dtime) {
 
 void canvas_render(const mat4 *canvascam_mat) {
     ro_single_render(&L.bg, canvascam_mat);
-
-    if (canvas.blend_layers != CANVAS_LAYER_BLEND_NONE) {
-        for (int i = 0; i < canvas.RO.current_image_layer; i++) {
-            float alpha;
-            if(canvas.blend_layers == CANVAS_LAYER_BLEND_ALPHA)
-                alpha = i==canvas.RO.current_image_layer-1? 0.33 : 0.05;
-            else
+    
+    switch(canvas.blend_mode) {
+    case CANVAS_BLEND_NONE:
+        L.ro.rect.color.a = 1;
+        L.ro.rect.sprite.x = canvas.RO.current_frame;
+        L.ro.rect.sprite.y = canvas.RO.current_layer;
+        ro_single_render(&L.ro, canvascam_mat);
+        break;
+    case CANVAS_BLEND_FRAMES_ONION:
+        L.ro.rect.sprite.y = canvas.RO.current_layer;
+        for(int i=0; i<=canvas.RO.current_frame; i++) {
+            float alpha = 0.05;
+            if(i==canvas.RO.current_frame-1)
+                alpha = 0.33;
+            else if(i==canvas.RO.current_frame)
                 alpha = 1;
-            L.render_objects[i].rect.color.a = alpha * canvas.alpha;
-            ro_single_render(&L.render_objects[i], canvascam_mat);
+            L.ro.rect.color.a = alpha;
+            L.ro.rect.sprite.x = i;
+            ro_single_render(&L.ro, canvascam_mat);
         }
+        break;
+    case CANVAS_BLEND_FRAMES_FULL:
+        L.ro.rect.color.a = 1;
+        L.ro.rect.sprite.y = canvas.RO.current_layer;
+        for(int i=0; i<=canvas.RO.current_frame; i++) {
+            L.ro.rect.sprite.x = i;
+            ro_single_render(&L.ro, canvascam_mat);
+        }
+        break;
+    case CANVAS_BLEND_LAYER_ONION:
+        L.ro.rect.sprite.x = canvas.RO.current_frame;
+        for(int i=0; i<=canvas.RO.current_layer; i++) {
+            float alpha = 0.05;
+            if(i==canvas.RO.current_layer-1)
+                alpha = 0.33;
+            else if(i==canvas.RO.current_layer)
+                alpha = 1;
+            L.ro.rect.color.a = alpha;
+            L.ro.rect.sprite.y = i;
+            ro_single_render(&L.ro, canvascam_mat);
+        }
+        break;
+    case CANVAS_BLEND_LAYER_FULL:
+        L.ro.rect.color.a = 1;
+        L.ro.rect.sprite.x = canvas.RO.current_frame;
+        for(int i=0; i<=canvas.RO.current_layer; i++) {
+            L.ro.rect.sprite.y = i;
+            ro_single_render(&L.ro, canvascam_mat);
+        }
+        break;
+    default:
+        s_assume(false, "invalid blend mode");
     }
 
-    L.render_objects[canvas.RO.current_image_layer].rect.color.a = 1.0;
-    ro_single_render(&L.render_objects[canvas.RO.current_image_layer], canvascam_mat);
-
+    
     if (canvas.show_grid)
         ro_single_render(&L.grid, canvascam_mat);
 
