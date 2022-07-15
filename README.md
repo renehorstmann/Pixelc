@@ -61,8 +61,6 @@ python3 -m http.server --bind localhost  # [port]
 
 - sprites
   - canvas
-    - load and save frame times
-      - default to 0.25 seconds = 4 fps
     - render stuff for sprites
       - onion skinning modes that turn each other off
   - animation button opens toolbar as with layers

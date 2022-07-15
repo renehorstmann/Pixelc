@@ -12,7 +12,7 @@
 
 #define DEFAULT_WIDTH 32
 #define DEFAULT_HEIGHT 32
-
+#define DEFAULT_FRAME_TIME 0.25
 
 struct Canvas_Globals canvas;
 
@@ -76,7 +76,7 @@ static void save_image() {
 }
 
 
-static uSprite load_image_file(int tab_id, int save_idx) {
+static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_frame_times) {
     if(tab_id<0 
             || tab_id>=CANVAS_MAX_TABS
             || save_idx<0
@@ -99,6 +99,21 @@ static uSprite load_image_file(int tab_id, int save_idx) {
         layers = frames = 1;
     }
     
+    if(update_curennt_frame_times) {
+        uJson *frame_times = u_json_get_object(state, "frame_times");
+        bool ok = u_json_get_size(frame_times) >= frames;
+        for(int i=0; ok && i<frames; i++) {
+            ok &= u_json_get_id_float(frame_times, i, &canvas.frame_times[i]) != NULL;
+        }
+        
+        if(!ok) {
+            s_log_warn("failed to grep frame times");
+            for(int i=0; i<CANVAS_MAX_FRAMES; i++) {
+                canvas.frame_times[i] = DEFAULT_FRAME_TIME;
+            }
+        }
+    }
+    
     u_json_kill(&state);
     
     uSprite sprite = u_sprite_new_file(
@@ -115,7 +130,8 @@ static uSprite load_image_file(int tab_id, int save_idx) {
 static void load_image() {
     uSprite sprite = load_image_file(
             canvas.RO.tab_id, 
-            L.tab_saves[canvas.RO.tab_id].save_idx);
+            L.tab_saves[canvas.RO.tab_id].save_idx,
+            true);
     canvas_set_sprite(sprite, false);
 }
 
@@ -148,6 +164,10 @@ void canvas_init() {
 
     canvas.alpha = 1.0;
     canvas.blend_layers = CANVAS_LAYER_BLEND_ALPHA;
+    
+    for(int i=0; i<CANVAS_MAX_FRAMES; i++) {
+        canvas.frame_times[i] = DEFAULT_FRAME_TIME;
+    }
 
     canvas.RO.pose = mat4_eye();
 
@@ -363,7 +383,7 @@ void canvas_set_tab_id(int id) {
 uSprite canvas_get_tab(int id) {
     s_log("id=%i", id);
     s_assume(id>=0 && id<CANVAS_MAX_TABS, "invalid tab id");
-    return load_image_file(id, L.tab_saves[id].save_idx);
+    return load_image_file(id, L.tab_saves[id].save_idx, false);
 }
 
 void canvas_save_config() {
@@ -429,7 +449,7 @@ void canvas_load_config() {
         ok &= u_json_get_object_int(tab, "save_idx_min", &L.tab_saves[t].save_idx_min) != NULL;
         
         if(!ok) {
-            s_log("failed to load tab %i info, resetting to 0", t);
+            s_log_debug("failed to load tab %i info, resetting to 0", t);
             memset(&L.tab_saves[t], 0, sizeof L.tab_saves[t]);
         }
     }
