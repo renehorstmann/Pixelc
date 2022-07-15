@@ -1,6 +1,6 @@
 #include "m/int.h"
 #include "m/float.h"
-#include "animation.h"
+#include "feedback.h"
 #include "canvas.h"
 #include "brush.h"
 #include "brushmode.h"
@@ -176,5 +176,5 @@ void brushmode_pipette(ePointer_s pointer) {
     
     vec4 flash_color = u_color_to_vec4(brush.secondary_color);
     flash_color.a = 1;
-    animation_flash(flash_color, 0.5);
+    feedback_flash(flash_color, 0.5);
 }

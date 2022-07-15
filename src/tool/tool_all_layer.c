@@ -5,7 +5,7 @@
 #include "u/pose.h"
 #include "m/float.h"
 #include "m/sca/int.h"
-#include "animation.h"
+#include "feedback.h"
 #include "u/button.h"
 #include "canvas.h"
 #include "cameractrl.h"
@@ -114,7 +114,7 @@ static void select_update(struct Tool *super, float dtime) {
         if(self->long_press_time<=0) {
             self->pressed = false;
             s_log("layer longpress: %i", layer);
-            animation_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
+            feedback_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
             canvas_reload();
             canvas_set_layer(layer);
             dialog_create_layer();

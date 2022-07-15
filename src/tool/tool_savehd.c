@@ -1,7 +1,7 @@
 #include "u/button.h"
 #include "u/pose.h"
 #include "io.h"
-#include "animation.h"
+#include "feedback.h"
 #include "dialog.h"
 #include "tool.h"
 
@@ -32,7 +32,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
     // check for longpress
     if (*longpress_time >= TOOL_LONG_PRESS_TIME) {
-        animation_longpress(u_pose_get_xy(self->ro.rect.pose),
+        feedback_longpress(u_pose_get_xy(self->ro.rect.pose),
                             R_COLOR_YELLOW);
         dialog_create_save();
         u_button_set_pressed(&self->ro.rect, false);

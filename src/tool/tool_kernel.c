@@ -3,7 +3,7 @@
 #include "u/button.h"
 #include "brush.h"
 #include "camera.h"
-#include "animation.h"
+#include "feedback.h"
 #include "dialog.h"
 #include "tool.h"
 
@@ -146,16 +146,16 @@ static void update(struct Tool *super, float dtime) {
             if (self->pressed == BTN_MINUS) {
                 s_log("tool kernel_minus long press");
                 brush_load_kernel(0);
-                animation_longpress(u_pose_get_xy(self->minus.rect.pose),
+                feedback_longpress(u_pose_get_xy(self->minus.rect.pose),
                                     R_COLOR_BLACK);
             } else if (self->pressed == BTN_PLUS) {
                 s_log("tool kernel_plus long press");
                 brush_load_kernel(brush.RO.max_kernels - 1);
-                animation_longpress(u_pose_get_xy(self->plus.rect.pose),
+                feedback_longpress(u_pose_get_xy(self->plus.rect.pose),
                                     R_COLOR_WHITE);
             } else if (self->pressed == BTN_KERNEL) {
                 s_log("tool kernel long press");
-                animation_longpress(u_pose_get_xy(self->kernel_press_pose),
+                feedback_longpress(u_pose_get_xy(self->kernel_press_pose),
                                     R_COLOR_CYAN);
                 dialog_create_kernel();
             }

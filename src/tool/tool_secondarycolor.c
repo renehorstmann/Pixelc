@@ -3,7 +3,7 @@
 #include "u/button.h"
 #include "brush.h"
 #include "palette.h"
-#include "animation.h"
+#include "feedback.h"
 #include "tool.h"
 
 //
@@ -74,7 +74,7 @@ static void update(struct Tool *super, float dtime) {
             brush.secondary_color = brush.current_color;
             vec4 col = u_color_to_vec4(brush.current_color);
             col.a = 1;
-            animation_longpress(u_pose_get_xy(self->color_drop.rect.pose),
+            feedback_longpress(u_pose_get_xy(self->color_drop.rect.pose),
                                 col);
         }
     }

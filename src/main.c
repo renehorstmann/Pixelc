@@ -16,6 +16,7 @@
 #include "inputctrl.h"
 #include "multitouchcursor.h"
 #include "modal.h"
+#include "feedback.h"
 
 //
 // options
@@ -86,6 +87,8 @@ static void init() {
     multitouchcursor_init();
 
     inputctrl_init();
+    
+    feedback_init();
 
     cameractrl_set_home();
     
@@ -115,6 +118,7 @@ static void update(float dtime) {
     multitouchcursor_update(dtime);
     modal_update(dtime);
     
+    feedback_update(dtime);
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
@@ -123,6 +127,7 @@ static void render(float dtime) {
     const mat4 *canvas_cam = &camera.matrices.vp;
 
     background_render(hud_cam);
+    animation_render(hud_cam);
     canvas_render(canvas_cam);
     selectionctrl_render(canvas_cam);
     toolbar_render(hud_cam);
@@ -132,7 +137,7 @@ static void render(float dtime) {
         multitouchcursor_render(hud_cam);
     }
     modal_render();
-    animation_render(hud_cam);
+    feedback_render(hud_cam);
 }
 
 int main(int argc, char **argv) {

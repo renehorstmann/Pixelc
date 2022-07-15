@@ -9,7 +9,7 @@
 #include "brush.h"
 #include "camera.h"
 #include "dialog.h"
-#include "animation.h"
+#include "feedback.h"
 #include "palette.h"
 
 #define COLOR_DROP_SIZE 16.0f
@@ -235,7 +235,7 @@ void palette_update(float dtime) {
         if(L.action.longpress_time<0) {
             // stop actions
             L.action.swiping = false;
-            animation_longpress(L.action.start, (vec4) {{0.8, 0.1, 0.1, 1.0}});
+            feedback_longpress(L.action.start, (vec4) {{0.8, 0.1, 0.1, 1.0}});
             dialog_create_palette();
         }
     }

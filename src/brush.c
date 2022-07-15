@@ -5,7 +5,7 @@
 #include "m/sca/uchar.h"
 #include "e/io.h"
 #include "io.h"
-#include "animation.h"
+#include "feedback.h"
 #include "canvas.h"
 #include "brushmode.h"
 #include "brush.h"
@@ -118,7 +118,7 @@ void brush_pointer_event(ePointer_s pointer) {
     if(brush.shading_active && pointer.action == E_POINTER_DOWN) {
         vec4 flash_color = u_color_to_vec4(brush.secondary_color);
         flash_color.a = 1.0;
-        animation_flash(flash_color, 1.0);
+        feedback_flash(flash_color, 1.0);
     }
 
     if (L.hovering && pointer.action == E_POINTER_HOVER) {

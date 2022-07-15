@@ -65,7 +65,6 @@ python3 -m http.server --bind localhost  # [port]
       - default to 0.25 seconds = 4 fps
     - render stuff for sprites
       - onion skinning modes that turn each other off
-  - rename animation to effects
   - animation button opens toolbar as with layers
     - same options as for layers
     - and frame time for that frame

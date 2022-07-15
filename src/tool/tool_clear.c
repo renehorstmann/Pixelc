@@ -4,7 +4,7 @@
 #include "s/file.h"
 #include "io.h"
 #include "brush.h"
-#include "animation.h"
+#include "feedback.h"
 #include "dialog.h"
 #include "tool.h"
 
@@ -50,7 +50,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
     // check for longpress
     if (*longpress_time >= TOOL_LONG_PRESS_TIME) {
-        animation_longpress(u_pose_get_xy(self->ro.rect.pose),
+        feedback_longpress(u_pose_get_xy(self->ro.rect.pose),
                             R_COLOR_RED);
         dialog_create_prompt("reset app", "reset the\nwhole app?", on_reset_all, self);
     }
