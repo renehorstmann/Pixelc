@@ -60,28 +60,19 @@ python3 -m http.server --bind localhost  # [port]
 # Todo
 
 - sprites
-  - as layers
-    - save a json for each image
-
-  - 2d grid
-    - in x and y, must be %0 with image size
-    - else will be turned off
-  - animate mode:
-    - off - via preview btn
-    - only x+
-    - only y+
-    - x+ than y+
-    - y+ than x+
-  - sprite frame time
-    - reset for all
-      - time or fps
-    - edit individual frame time?
-      - extra dialog?
-  - canvas render mode:
-    - sprite grid line
-    - + current sprite with onion skinning the previous
-      - only if animate_mode!=off
-  - add row/col buttons
+  - canvas
+    - load and save frame times
+      - default to 0.25 seconds = 4 fps
+    - render stuff for sprites
+      - onion skinning modes that turn each other off
+  - rename animation to effects
+  - animation button opens toolbar as with layers
+    - same options as for layers
+    - and frame time for that frame
+    - option to set all frame times (fps btn?)
+  - size dialog needs frames
+  - size dialog can morph the full image into frames
+    - red text if not valid
   - gif export?
     
 - dialog colors, toolbar colors

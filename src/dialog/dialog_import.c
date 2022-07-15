@@ -80,10 +80,10 @@ static bool pointer_event(ePointer_s pointer) {
     
     if (impl->image_available && u_button_clicked(&impl->to_canvas_btn.rect, pointer)) {
         s_log("import to canvas");
-        uImage img = u_image_new_file(1, "import.png");
-        impl->image_available = u_image_valid(img);
+        uSprite sprite = u_sprite_new_file(1, 1, "import.png");
+        impl->image_available = u_sprite_valid(sprite);
         if(impl->image_available) {
-            canvas_set_image(img, true);
+            canvas_set_sprite(sprite, true);
             cameractrl_set_home();
         }
     }

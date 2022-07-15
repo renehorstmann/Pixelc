@@ -3,11 +3,12 @@
 
 #include "m/types/int.h"
 #include "m/types/float.h"
-#include "u/image.h"
+#include "u/sprite.h"
 #include "r/ro_single.h"
 
 #define CANVAS_MAX_SIZE 1024
 #define CANVAS_MAX_LAYERS 96
+#define CANVAS_MAX_FRAMES 96
 #define CANVAS_MAX_SAVES 128
 #define CANVAS_MAX_TABS 9
 
@@ -23,16 +24,26 @@ enum canvas_layer_blend_mode {
 struct Canvas_Globals {
     vec4 ro_color;
 
-    int current_layer;
     bool show_grid;
     float alpha;
     enum canvas_layer_blend_mode blend_layers;
+    
+    float frame_times[CANVAS_MAX_FRAMES];
 
     // read only
     struct {
         mat4 pose; // = u_pose_new_aa(0, 0, cols, rows)
+        
+        uSprite sprite;
+        
+        int current_frame;
+        int current_layer;
+        
+        // just to directly read the image from the sprite
         uImage image;
-
+        
+        int current_image_layer;
+        
         int pattern_cols;
         int pattern_rows;
         
@@ -49,9 +60,14 @@ void canvas_update(float dtime);
 void canvas_render(const mat4 *canvascam_mat);
 
 
+void canvas_set_frame(int sprite_col);
+
+void canvas_set_layer(int sprite_row);
+
+
 // sets a new image for the canvas
 // canvas will take the ownership of image_sink
-void canvas_set_image(uImage image_sink, bool save);
+void canvas_set_sprite(uSprite image_sink, bool save);
 
 void canvas_set_pattern_size(int cols, int rows);
 
@@ -81,7 +97,7 @@ bool canvas_redo_available();
 void canvas_set_tab_id(int id);
 
 // returns a new image of the tab id
-uImage canvas_get_tab(int id);
+uSprite canvas_get_tab(int id);
 
 // saves the config to the savestate config.json 
 // uses object "canvas"

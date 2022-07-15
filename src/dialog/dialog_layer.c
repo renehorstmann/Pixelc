@@ -19,8 +19,8 @@
 static void on_delete_action(bool ok) {
     s_log("delete: %i", ok);
     if (ok) {
-        uImage img = u_image_new_clone_remove_layer(canvas.RO.image, canvas.current_layer);
-        canvas_set_image(img, true);
+        uSprite sprite = u_sprite_new_clone_remove_row(canvas.RO.sprite, canvas.RO.current_layer);
+        canvas_set_sprite(sprite, true);
         dialog_create_layer();
     } else 
         dialog_hide();
@@ -77,11 +77,11 @@ static void render(const mat4 *cam_mat) {
 
     ro_text_render(&impl->swap_txt, cam_mat);
     
-    if(canvas.current_layer<canvas.RO.image.layers-1) {
+    if(canvas.RO.current_layer<canvas.RO.sprite.rows-1) {
         ro_single_render(&impl->swap_next_btn, cam_mat);
     }
     
-    if(canvas.current_layer>0) {
+    if(canvas.RO.current_layer>0) {
         ro_single_render(&impl->swap_prev_btn, cam_mat);
         
         ro_text_render(&impl->merge_txt, cam_mat);
@@ -102,47 +102,41 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     }
 
-    if (canvas.current_layer>0 
+    if (canvas.RO.current_layer>0 
             && u_button_clicked(&impl->swap_prev_btn.rect, pointer)) {
-        s_log("swap with prev layer: %i", canvas.current_layer);
+        s_log("swap with prev layer: %i", canvas.RO.current_layer);
         
-        uImage swap = u_image_new_clone(canvas.RO.image);
-        memcpy(u_image_layer(swap, canvas.current_layer-1), 
-                u_image_layer(canvas.RO.image, canvas.current_layer),    
-                u_image_layer_data_size(swap));
-        memcpy(u_image_layer(swap, canvas.current_layer), 
-                u_image_layer(canvas.RO.image, canvas.current_layer-1),    
-                u_image_layer_data_size(swap));
+        uSprite swap = u_sprite_new_clone_swap_rows(
+                canvas.RO.sprite,
+                canvas.RO.current_layer-1,
+                canvas.RO.current_layer);
         
-        canvas_set_image(swap, true);
+        canvas_set_sprite(swap, true);
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
     }
     
-    if (canvas.current_layer<(canvas.RO.image.layers-1) 
+    if (canvas.RO.current_layer<(canvas.RO.sprite.rows-1) 
             && u_button_clicked(&impl->swap_next_btn.rect, pointer)) {
-        s_log("swap with next layer: %i", canvas.current_layer);
+        s_log("swap with next layer: %i", canvas.RO.current_layer);
         
-        uImage swap = u_image_new_clone(canvas.RO.image);
-        memcpy(u_image_layer(swap, canvas.current_layer+1), 
-                u_image_layer(canvas.RO.image, canvas.current_layer),    
-                u_image_layer_data_size(swap));
-        memcpy(u_image_layer(swap, canvas.current_layer), 
-                u_image_layer(canvas.RO.image, canvas.current_layer+1),    
-                u_image_layer_data_size(swap));
+        uSprite swap = u_sprite_new_clone_swap_rows(
+                canvas.RO.sprite,
+                canvas.RO.current_layer+1,
+                canvas.RO.current_layer);
         
-        canvas_set_image(swap, true);
+        canvas_set_sprite(swap, true);
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
     }
 
-    if (canvas.current_layer>0 
+    if (canvas.RO.current_layer>0 
             && u_button_clicked(&impl->merge_btn.rect, pointer)) {
-        s_log("merge layer: %i", canvas.current_layer);
-        uImage img = u_image_new_clone_merge_down(canvas.RO.image, canvas.current_layer);
-        canvas_set_image(img, true);
+        s_log("merge layer: %i", canvas.RO.current_layer);
+        uSprite sprite = u_sprite_new_clone_merge_row_down(canvas.RO.sprite, canvas.RO.current_layer);
+        canvas_set_sprite(sprite, true);
         dialog_create_layer();
         // return after hide, hide kills this dialog
         return true;
@@ -172,13 +166,13 @@ void dialog_create_layer() {
 
     char info_txt[4];
     snprintf(info_txt, sizeof info_txt, "%-2i",
-            canvas.current_layer +1);
+            canvas.RO.current_layer +1);
     ro_text_set_text(&impl->info, info_txt);
     s_log("size is: %s", info_txt);
     impl->info.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
     
     uImage img = canvas.RO.image;
-    rTexture tex = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, canvas.current_layer));
+    rTexture tex = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, canvas.RO.current_image_layer));
     impl->layer = ro_single_new(tex);
     
     float width = 16;
@@ -225,7 +219,7 @@ void dialog_create_layer() {
     impl->merge_txt = ro_text_new_font55(32);
     char merge_txt[128];
     snprintf(merge_txt, sizeof merge_txt, "Merge layer\n"
-            "into layer: %-2i", canvas.current_layer);
+            "into layer: %-2i", canvas.RO.current_layer);
     ro_text_set_text(&impl->merge_txt, merge_txt);
     ro_text_set_color(&impl->merge_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
     impl->merge_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);

@@ -24,6 +24,7 @@
 
 #include "rect.h"
 #include "texture.h"
+#include "texture2d.h"
 
 // Like RoParticle, but with refraction
 typedef struct {
@@ -54,7 +55,7 @@ void ro_particlerefract_kill(RoParticleRefract *self);
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
 // if update is true, update is called before rendering
-void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_ms, int num, const mat4 *camera_mat,
+void ro_particlerefract_render_sub(const RoParticleRefract *self, su32 time_ms, int num, const mat4 *camera_mat,
                                    float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
@@ -66,7 +67,7 @@ void ro_particlerefract_set_texture_refraction(RoParticleRefract *self, rTexture
 // renders the particles with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
-static void ro_particlerefract_render(const RoParticleRefract *self, uint32_t time_ms, const mat4 *camera_mat,
+static void ro_particlerefract_render(const RoParticleRefract *self, su32 time_ms, const mat4 *camera_mat,
                                       float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
     ro_particlerefract_render_sub(self, time_ms, self->num, camera_mat, scale, opt_view_aabb, opt_framebuffer);
 }

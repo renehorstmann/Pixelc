@@ -135,7 +135,8 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("copy palette into canvas");
         uImage palette = palette_as_image();
         // canvas_set_image takes ownership of palette
-        canvas_set_image(palette, true);
+        uSprite sprite = {palette, 1, 1};
+        canvas_set_sprite(sprite, true);
         cameractrl_set_home();
         dialog_hide();
         // return after hide, hide kills this dialog

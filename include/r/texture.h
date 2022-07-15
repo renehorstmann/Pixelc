@@ -27,7 +27,13 @@ static rTexture r_texture_new_invalid() {
 }
 
 // returns a new texture from an optional buffer
+// the buffer image data will be reordered to fit in the 3d array
 rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer);
+
+// returns a new texture from a sprite buffer
+// see u/sprite.h
+// in contrast to r_texture_new, the buffer will NOT be reordered
+rTexture r_texture_new_sprite_buffer(int sprite_size_x, int sprite_size_y, int sprites_cols, int sprites_rows, const void *opt_buffer);
 
 // returns a new texture, loaded from an SDL_Surface
 rTexture r_texture_new_sdl_surface(int sprites_cols, int sprites_rows, const SDL_Surface *img);
@@ -43,7 +49,14 @@ void r_texture_kill(rTexture *self);
 // updates the texture with the given buffer
 // buffer has to be the size of:
 //     4 * sprite_size.x * _y * sprites.x * _y
+// the buffer image data will be reordered to fit in the 3d array
 void r_texture_set(rTexture self, const void *buffer);
+
+// updates the texture with the given sprite buffer
+// buffer has to be the size of:
+//     4 * sprite_size.x * _y * sprites.x * _y
+// in contrast to r_texture_set, the buffer will NOT be reordered
+void r_texture_set_sprite_buffer(rTexture self, const void *buffer);
 
 // r_texture_get not available
 // gles3 does not support 3D (2D_ARRAY) there

@@ -90,14 +90,35 @@ static uImage u_image_new_clone_remove_layer(uImage from, int layer_to_remove) {
     return u_image_new_clone_remove_layer_a(from, layer_to_remove, from.a);
 }
 
+
+// returns a clone of from, with a new zero'd layer
+// layer_behind may be -1 to insert at the beginning
+// with a custom a
+uImage u_image_new_clone_insert_layer_a(uImage from, int layer_behind, sAllocator_i a);
+
+// returns a clone of from, with a new zero'd layer
+// layer_behind may be -1 to insert at the beginning
+static uImage u_image_new_clone_insert_layer(uImage from, int layer_behind) {
+    return u_image_new_clone_insert_layer_a(from, layer_behind, from.a);
+}
+
+
+// returns a new clone of from, with the layers a and b swapped
+// with a custom a
+uImage u_image_new_clone_swap_layers_a(uImage from, int layer_a, int layer_b, sAllocator_i a);
+
+// returns a new clone of from, with the laywrs a and b swapped
+static uImage u_image_new_clone_swap_layers(uImage from, int layer_a, int layer_b) {
+    return u_image_new_clone_swap_layers_a(from, layer_a, layer_b, from.a);
+}
+
 // copy a SDL_Surface into a new image with a costum a
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a);
 
 
 // copy a SDL_Surface into a new image
 static uImage u_image_new_sdl_surface(int layers, struct SDL_Surface *surface) {
-    return u_image_new_sdl_surface_a(layers, surface,
-                                     s_allocator_new());
+    return u_image_new_sdl_surface_a(layers, surface, S_ALLOCATOR_DEFAULT);
 }
 
 // loads an image from a file (.png) with a costum a
@@ -105,8 +126,7 @@ uImage u_image_new_file_a(int layers, const char *file, sAllocator_i a);
 
 // loads an image from a file (.png)
 static uImage u_image_new_file(int layers, const char *file) {
-    return u_image_new_file_a(layers, file,
-                              s_allocator_new());
+    return u_image_new_file_a(layers, file, S_ALLOCATOR_DEFAULT);
 }
 
 void u_image_kill(uImage *self);
@@ -135,14 +155,14 @@ void u_image_rotate(uImage *self, bool right);
 void u_image_mirror(uImage self, bool vertical);
 
 // returns the size of the byte array of a single layer
-static size_t u_image_layer_data_size(uImage self) {
+static ssize u_image_layer_data_size(uImage self) {
     if (!u_image_valid(self))
         return 0;
     return self.cols * self.rows * sizeof *self.data;
 }
 
 // returns the size of the byte array
-static size_t u_image_data_size(uImage self) {
+static ssize u_image_data_size(uImage self) {
     return u_image_layer_data_size(self) * self.layers;
 }
 

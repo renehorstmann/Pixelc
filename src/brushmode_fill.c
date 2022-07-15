@@ -15,8 +15,8 @@ bool brushmode_fill(ePointer_s pointer, bool mode8) {
         return false;
 
     uImage img = canvas.RO.image;
-    int layer = canvas.current_layer;
-
+    int layer = canvas.RO.current_image_layer;
+    
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     if (!u_image_contains(img, cr.x, cr.y))
         return false;
@@ -73,8 +73,8 @@ bool brushmode_replace(ePointer_s pointer) {
         return false;
 
     uImage img = canvas.RO.image;
-    int layer = canvas.current_layer;
-
+    int layer = canvas.RO.current_image_layer;
+    
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     if (!u_image_contains(img, cr.x, cr.y))
         return false;

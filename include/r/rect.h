@@ -35,7 +35,7 @@ typedef struct {
     float delta_time;   // delta_time computed in the render function
 
     // not used in the shader:
-    uint32_t start_time_ms;   // delta_time = (current_time - start_time)/1000.0f
+    su32 start_time_ms;   // delta_time = (current_time - start_time)/1000.0f
 } rParticleRect_s;
 
 

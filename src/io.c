@@ -19,48 +19,60 @@ const char *io_config_file() {
     return e_io_savestate_file_path("config.json");
 }
 
-const char *io_config_canvas_save_file() {
-    return e_io_savestate_file_path("config_canvas_save.json");
-}
-
 void io_config_clear_files() {
     s_log("emptying the files");
     s_file_write(io_config_file(), s_strc(""), true);
-
-    s_file_write(io_config_canvas_save_file(), s_strc(""), true);
+    
     e_io_savestate_save();
 }
 
 void io_image_save() {
-    s_log("save merged: %i", io.image_save_merged);
     canvas_reload();
+    uSprite c = canvas.RO.sprite;
+    s_log("save merged: %i, size: %i %i %i %i", 
+            io.image_save_merged, 
+            c.img.cols, c.img.rows,
+            c.cols, c.rows);
+    
     if(io.image_save_merged) {
-        uImage img = u_image_new_clone_merge_down_full(canvas.RO.image);
-        u_image_save_file(img, "image.png");
-        u_image_kill(&img);
+        uSprite sprite = u_sprite_new_clone_merge_row_down_full(c);
+        
+        s_log_debug("merged size: %i %i %i %i",
+                sprite.img.cols, sprite.img.rows,
+                sprite.cols, sprite.rows);
+        u_sprite_save_file(sprite, "image.png");
+        u_sprite_kill(&sprite);
     } else {
-        u_image_save_file(canvas.RO.image, "image.png");
+        u_sprite_save_file(c, "image.png");
     }
     e_io_offer_file_as_download("image.png");
 }
 
 void io_image_hd_save() {
-    s_log("save merged: %i", io.image_save_merged);
     canvas_reload();
-    uImage img = canvas.RO.image;
+    uSprite c = canvas.RO.sprite;
+    s_log("save merged: %i, size: %i %i %i %i", 
+            io.image_save_merged, 
+            c.img.cols, c.img.rows,
+            c.cols, c.rows);
+    
+    uSprite sprite = c;
     if(io.image_save_merged) {
-        img = u_image_new_clone_merge_down_full(img);
+        sprite = u_sprite_new_clone_merge_row_down_full(sprite);
+        s_log_debug("merged size: %i %i %i %i",
+                sprite.img.cols, sprite.img.rows,
+                sprite.cols, sprite.rows);
     }
     
-    int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
-    int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
+    int scale_w = sca_ceil((float) HD_MIN_SIZE / sprite.img.cols);
+    int scale_h = sca_ceil((float) HD_MIN_SIZE / sprite.img.rows);
     int scale = isca_max(scale_w, scale_h);
-    uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
+    uSprite hd = u_sprite_new_clone_scaled(sprite.img.cols * scale, sprite.img.rows * scale, false, sprite);
     
-    u_image_save_file(hd, "image_hd.png");
-    u_image_kill(&hd);
+    u_sprite_save_file(hd, "image_hd.png");
+    u_sprite_kill(&hd);
     if(io.image_save_merged) {
-        u_image_kill(&img);
+        u_sprite_kill(&sprite);
     }
     e_io_offer_file_as_download("image_hd.png");
 }

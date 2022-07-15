@@ -29,13 +29,13 @@ RoParticle ro_particle_new(int num, rTexture tex_sink);
 void ro_particle_kill(RoParticle *self);
 
 // renders a subset of the particles
-void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, const mat4 *camera_mat);
+void ro_particle_render_sub(const RoParticle *self, su32 time_ms, int num, const mat4 *camera_mat);
 
 // resets the texture, if .owns_tex is true, it will delete the old texture
 void ro_particle_set_texture(RoParticle *self, rTexture tex_sink);
 
 // renders the particles into the gpu
-static void ro_particle_render(const RoParticle *self, uint32_t time_ms, const mat4 *camera_mat) {
+static void ro_particle_render(const RoParticle *self, su32 time_ms, const mat4 *camera_mat) {
     ro_particle_render_sub(self, time_ms, self->num, camera_mat);
 }
 

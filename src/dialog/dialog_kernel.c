@@ -100,7 +100,8 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("copy kernel into canvas");
         // canvas_set_image takes ownership of palette
         uImage kernel = u_image_new_clone(brush.RO.kernel);
-        canvas_set_image(kernel, true);
+        uSprite sprite = {kernel, 1, 1};
+        canvas_set_sprite(sprite, true);
         cameractrl_set_home();
         dialog_hide();
         // return after hide, hide kills this dialog
@@ -109,9 +110,9 @@ static bool pointer_event(ePointer_s pointer) {
 
     if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("new kernel from canvas");
-        uImage kernel = u_image_new_clone_merge_down_full(canvas.RO.image);
-        brush_append_kernel(kernel);
-        u_image_kill(&kernel);
+        uSprite sprite = u_sprite_new_clone_merge_row_down_full(canvas.RO.sprite);
+        brush_append_kernel(sprite.img);
+        u_sprite_kill(&sprite);
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;

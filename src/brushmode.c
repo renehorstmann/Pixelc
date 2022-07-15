@@ -167,11 +167,12 @@ void brushmode_pipette(ePointer_s pointer) {
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
     uImage img = canvas.RO.image;
+    int layer = canvas.RO.current_image_layer;
 
     if (!u_image_contains(img, cr.x, cr.y))
         return;
 
-    brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, canvas.current_layer);
+    brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, layer);
     
     vec4 flash_color = u_color_to_vec4(brush.secondary_color);
     flash_color.a = 1;

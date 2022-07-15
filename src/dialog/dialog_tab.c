@@ -26,10 +26,15 @@
 _Static_assert(CANVAS_MAX_TABS == 9, "rewrite this file with a container, etc.");
 
 static uImage create_tab_img(int tab_id) {
-    uImage layers = canvas_get_tab(tab_id);
-    uImage tab = u_image_new_clone_merge_down_full(layers);
-    u_image_kill(&layers);
-    return tab;
+    uSprite layers = canvas_get_tab(tab_id);
+    uSprite tab = u_sprite_new_clone_merge_row_down_full(layers);
+    u_sprite_kill(&layers);
+    
+    // moveing tab as image
+    uImage img = tab.img;
+    // just use the first frame
+    img.layers = 1;
+    return img;
 }
 
 typedef struct {

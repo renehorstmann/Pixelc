@@ -166,9 +166,10 @@ static bool pointer_event(ePointer_s pointer) {
 
 static void on_action(bool ok) {
     Impl *impl = dialog.impl;
-    uImage img = canvas.RO.image;
+    uSprite sprite = canvas.RO.sprite;
     int cols = impl->cols;
     int rows = impl->rows;
+    int frames = 1;
     int layers = impl->layers;
     int p_cols = impl->p_cols;
     int p_rows = impl->p_rows;
@@ -178,24 +179,21 @@ static void on_action(bool ok) {
         s_log("dialog canvas_size aborted");
         return;
     }
-    if (cols != img.cols || rows != img.rows || layers != img.layers) {
-        s_log("dialog canvas_size: new size %i %i", cols, rows);
+    if (cols != sprite.img.cols 
+            || rows != sprite.img.rows 
+            || frames != sprite.cols
+            || layers != sprite.rows) {
+        s_log("dialog canvas_size: new size %i %i, %i %i", cols, rows, frames, layers);
 
-        uImage new_img = u_image_new_zeros(cols, rows, layers);
-        if (layers != img.layers) {
-            // copy top left as if there were no layers
-            new_img.rows *= layers;
-            new_img.layers = 1;
-            img.rows *= img.layers;
-            img.layers = 1;
-        }
+        uSprite new_sprite = u_sprite_new_zeros(cols, rows, frames, layers);
+        
+        
+        // deeper layer copy?
+        
+        
+        u_image_copy_top_left(new_sprite.img, sprite.img);
 
-        u_image_copy_top_left(new_img, img);
-
-        // reset the size to use layers and udpate the canvas
-        new_img.rows = rows;
-        new_img.layers = layers;
-        canvas_set_image(new_img, true);
+        canvas_set_sprite(new_sprite, true);
         cameractrl_set_home();
     }
     if (p_cols != canvas.RO.pattern_cols

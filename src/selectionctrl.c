@@ -109,7 +109,7 @@ static void setup_selection(ePointer_s pointer) {
 
 static void move_selection(ePointer_s pointer) {
     uImage img = canvas.RO.image;
-    int layer = canvas.current_layer;
+    int layer = canvas.RO.current_image_layer;
 
     ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
 
@@ -211,7 +211,7 @@ void selectionctrl_paste_image(uImage img) {
     selectionctrl.selection = selection_new(0, 0, img.cols, img.rows);
     selection_copy(selectionctrl.selection, img, 0);
     canvas_reload();
-    selection_paste(selectionctrl.selection, canvas.RO.image, canvas.current_layer);
+    selection_paste(selectionctrl.selection, canvas.RO.image, canvas.RO.current_image_layer);
     selectionctrl.mode = SELECTIONCTRL_PASTE;
 }
 

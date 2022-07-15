@@ -13,8 +13,6 @@ void io_init();
 
 const char *io_config_file();
 
-const char *io_config_canvas_save_file();
-
 void io_config_clear_files();
 
 void io_image_save();

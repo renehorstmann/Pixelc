@@ -14,7 +14,7 @@ static void update_canvas() {
     if (!s)
         return;
     canvas_reload();
-    selection_paste(s, canvas.RO.image, canvas.current_layer);
+    selection_paste(s, canvas.RO.image, canvas.RO.current_image_layer);
 }
 
 

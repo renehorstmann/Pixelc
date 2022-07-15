@@ -192,7 +192,7 @@ void brush_pointer_event(ePointer_s pointer) {
 
 bool brush_draw_pixel(int c, int r, uColor_s kernel_color) {
     uImage img = canvas.RO.image;
-    int layer = canvas.current_layer;
+    int layer = canvas.RO.current_image_layer;
     if (!u_image_contains(img, c, r))
         return false;
 
@@ -200,7 +200,7 @@ bool brush_draw_pixel(int c, int r, uColor_s kernel_color) {
     if (selection && !selection_contains(selection, c, r))
         return false;
 
-    uColor_s *pixel = u_image_pixel(img, c, r, layer);
+    uColor_s *pixel = u_image_pixel(img, c, r,layer);
     
     if (brush.shading_active) {
         if (!u_color_equals(*pixel, brush.secondary_color))
@@ -234,7 +234,7 @@ void brush_abort_current_draw() {
 void brush_clear() {
     s_log("clear");
     uImage img = canvas.RO.image;
-    int layer = canvas.current_layer;
+    int layer = canvas.RO.current_image_layer;
     const Selection *selection = brush.selection_ref;
     for (int r = 0; r < img.rows; r++) {
         for (int c = 0; c < img.cols; c++) {

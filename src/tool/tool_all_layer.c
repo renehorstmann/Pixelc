@@ -39,7 +39,7 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
     Select *self = (Select *) super;
     
     uImage img = canvas.RO.image;
-    int layer = self->pos - SELECT_CURRENT + canvas.current_layer;
+    int layer = self->pos - SELECT_CURRENT + canvas.RO.current_layer;
     if(layer<0 || layer>=img.layers)
         return;
     
@@ -57,7 +57,7 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
         s_log("setting current layer to: %i", layer);
         self->pressed = false;
         canvas_reload();
-        canvas.current_layer = layer;
+        canvas_set_layer(layer);
     }
 }
 
@@ -65,7 +65,7 @@ static void select_update(struct Tool *super, float dtime) {
     Select *self = (Select *) super;
     
     uImage img = canvas.RO.image;
-    int layer = self->pos - SELECT_CURRENT + canvas.current_layer;
+    int layer = self->pos - SELECT_CURRENT + canvas.RO.current_layer;
     if(layer<0 || layer>=img.layers) {
         // empty
         self->bg.rect.color.a = 0;
@@ -116,7 +116,7 @@ static void select_update(struct Tool *super, float dtime) {
             s_log("layer longpress: %i", layer);
             animation_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
             canvas_reload();
-            canvas.current_layer = layer;
+            canvas_set_layer(layer);
             dialog_create_layer();
         }
     }
@@ -211,28 +211,12 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         s_log("tool layer add");
         canvas_reload();
-        int layer = canvas.current_layer;
-        uImage old = canvas.RO.image;
-        uImage img = u_image_new_empty(old.cols, old.rows, old.layers + 1);
+        int layer = canvas.RO.current_layer;
+        uSprite old = canvas.RO.sprite;
+        uSprite sprite = u_sprite_new_clone_insert_row(old, layer);
 
-        // copy until current layer
-        memcpy(img.data, old.data, u_image_layer_data_size(img) * (layer + 1));
-
-        // set next (new) layer to 0
-        memset(u_image_layer(img, layer + 1), 0,
-               u_image_layer_data_size(img));
-
-        // copy tail
-        if (layer < old.layers - 1) {
-            memcpy(u_image_layer(img, layer + 2),
-                   u_image_layer(old, layer + 1),
-                   u_image_layer_data_size(img)
-                   * (old.layers - layer - 1)
-            );
-        }
-
-        canvas.current_layer++;
-        canvas_set_image(img, true);
+        canvas_set_sprite(sprite, true);
+        canvas_set_layer(layer+1);
     }
 }
 

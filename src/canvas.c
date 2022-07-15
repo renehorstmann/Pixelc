@@ -10,6 +10,10 @@
 #include "canvas.h"
 
 
+#define DEFAULT_WIDTH 32
+#define DEFAULT_HEIGHT 32
+
+
 struct Canvas_Globals canvas;
 
 //
@@ -23,9 +27,14 @@ static struct {
     RoSingle bg;
     RoSingle grid;
 
-    int save_idx;
-    int save_idx_max;
-    int save_idx_min;
+    struct {
+        int current_layer;
+        int current_frame;
+        int save_idx;
+        int save_idx_max;
+        int save_idx_min;
+    } tab_saves[CANVAS_MAX_TABS];
+
 } L;
 
 _Static_assert(CANVAS_MAX_SAVES <= 999, "see save / load image");
@@ -33,106 +42,81 @@ _Static_assert(CANVAS_MAX_SAVES <= 999, "see save / load image");
 
 
 static void save_image() {
-    char file[128];
-    snprintf(file, sizeof file, "image_%02i_%03i.png", canvas.RO.tab_id, L.save_idx);
-    u_image_save_file(canvas.RO.image,
-                      e_io_savestate_file_path(file));
-
-    char tab_txt[16];
-    char save_txt[16];
-    snprintf(tab_txt, sizeof tab_txt, "tab_%02i", canvas.RO.tab_id);
-    snprintf(save_txt, sizeof save_txt, "img_%03i", L.save_idx);
-    uJson *config_save_layers = u_json_new_file(
-            io_config_canvas_save_file());
-    uJson *tab = u_json_get_object(config_save_layers, tab_txt);
-    if(!tab)
-        tab = u_json_append_object(config_save_layers, tab_txt);
-        
-    u_json_append_int(tab, "save_idx", L.save_idx);
-    u_json_append_int(tab, "save_idx_min", L.save_idx_min);
-    u_json_append_int(tab, "save_idx_max", L.save_idx_max);
+    char file_png[128];
+    char file_json[128];
+    snprintf(file_png, sizeof file_png, "image_%02i_%03i.png", 
+            canvas.RO.tab_id, 
+            L.tab_saves[canvas.RO.tab_id].save_idx);
+    snprintf(file_json, sizeof file_json, "image_%02i_%03i.json", 
+            canvas.RO.tab_id, 
+            L.tab_saves[canvas.RO.tab_id].save_idx);
     
-    uJson *state = u_json_append_array(tab, save_txt);
-    u_json_append_int(state, NULL, canvas.RO.image.layers);
-    u_json_append_int(state, NULL, canvas.current_layer);
+    u_image_save_file(canvas.RO.image,
+            e_io_savestate_file_path(file_png));
 
+    uJson *state = u_json_new_file(e_io_savestate_file_path(file_json));
+    u_json_append_int(state, "layer", canvas.RO.sprite.rows);
+    u_json_append_int(state, "frames", canvas.RO.sprite.cols);
+    
+    uJson *frame_times = u_json_append_array(state, "frame_times");
+    for(int i=0; i<canvas.RO.sprite.cols; i++) {
+        u_json_append_float(frame_times, NULL, canvas.frame_times[i]);
+    }
+    
     // saves same space in the config file
     struct uJson_Options options = {0};
     options.array_single_line = true;
     
-    u_json_save_file(config_save_layers,
-                     io_config_canvas_save_file(),
-                     &options);
+    u_json_save_file(state,
+            e_io_savestate_file_path(file_json),
+            &options);
     e_io_savestate_save();
 
-    u_json_kill(&config_save_layers);
+    u_json_kill(&state);
 }
 
-static void load_tab_savesstate(int *out_save_idx, int *out_save_idx_min, int *out_save_idx_max, int tab_id) {
-    char tab_txt[16];
-    snprintf(tab_txt, sizeof tab_txt, "tab_%02i", tab_id);
-    uJson *config_save_layers = u_json_new_file(
-            io_config_canvas_save_file());
-    uJson *tab = u_json_get_object(config_save_layers, tab_txt);
-    bool ok = true;
-    ok &= u_json_get_object_int(tab, "save_idx", out_save_idx) != NULL;
-    ok &= u_json_get_object_int(tab, "save_idx_min", out_save_idx_min) != NULL;
-    ok &= u_json_get_object_int(tab, "save_idx_max", out_save_idx_max) != NULL;
-    if(!ok) {
-        *out_save_idx = *out_save_idx_min = *out_save_idx_max = -1;
-    }
-    u_json_kill(&config_save_layers);
-}
 
-static uImage load_image_file(int tab_id, int save_idx, int *opt_savestate_layer) {
+static uSprite load_image_file(int tab_id, int save_idx) {
     if(tab_id<0 
             || tab_id>=CANVAS_MAX_TABS
             || save_idx<0
             || save_idx>=CANVAS_MAX_SAVES)
-        return u_image_new_zeros(32, 32, 1);
+        return u_sprite_new_zeros(DEFAULT_WIDTH, DEFAULT_HEIGHT, 1, 1);
 
-    char tab_txt[16];
-    char save_txt[16];
-    snprintf(tab_txt, sizeof tab_txt, "tab_%02i", canvas.RO.tab_id);
-    snprintf(save_txt, sizeof save_txt, "img_%03i", L.save_idx);
-    uJson *config_save_layers = u_json_new_file(
-            io_config_canvas_save_file());
-    uJson *tab = u_json_get_object(config_save_layers, tab_txt);
-    uJson *state = u_json_get_object(tab, save_txt);
-    int layers;
-    int current_layer;
-    if(!u_json_get_id_int(state, 0, &layers)
-         || !u_json_get_id_int(state, 1, &current_layer)) {
-        layers = 1;
-        current_layer = 0;
-    }
-    u_json_kill(&config_save_layers);
+    char file_png[128];
+    char file_json[128];
+    snprintf(file_png, sizeof file_png, "image_%02i_%03i.png", 
+            tab_id, save_idx);
+    snprintf(file_json, sizeof file_json, "image_%02i_%03i.json", 
+            tab_id, save_idx);
+    
 
-    char file[128];
-    snprintf(file, sizeof file, "image_%02i_%03i.png", tab_id, save_idx);
-    layers = isca_clamp(layers, 1, CANVAS_MAX_LAYERS);
-    uImage img = u_image_new_file(1,
-                                  e_io_savestate_file_path(file));
-    if(!u_image_valid(img)) {
-        return u_image_new_zeros(32, 32, 1);
+    uJson *state = u_json_new_file(e_io_savestate_file_path(file_json));
+    int layers, frames;
+    if(!u_json_get_object_int(state, "layer", &layers)
+        || !u_json_get_object_int(state, "frames", &frames)) {
+        s_log_warn("failed to load img info");
+        layers = frames = 1;
     }
-    if (img.rows % layers == 0) {
-        img.rows /= layers;
-        img.layers = layers;
+    
+    u_json_kill(&state);
+    
+    uSprite sprite = u_sprite_new_file(
+            frames, layers,
+            e_io_savestate_file_path(file_png));
+    
+    if(!u_sprite_valid(sprite)) {
+        return u_sprite_new_zeros(DEFAULT_WIDTH, DEFAULT_HEIGHT, 1, 1);
     }
-    if(opt_savestate_layer)
-        *opt_savestate_layer = current_layer;
-    return img;
+    
+    return sprite;
 }
 
 static void load_image() {
-    uImage img = load_image_file(canvas.RO.tab_id, L.save_idx, &canvas.current_layer);
-    if(canvas.RO.tab_id<0 || canvas.RO.tab_id>=CANVAS_MAX_TABS)
-        canvas.RO.tab_id = 0;
-    if(L.save_idx<0 || L.save_idx>=CANVAS_MAX_SAVES) {
-        L.save_idx = L.save_idx_min = L.save_idx_max = 0;
-            }
-    canvas_set_image(img, false);
+    uSprite sprite = load_image_file(
+            canvas.RO.tab_id, 
+            L.tab_saves[canvas.RO.tab_id].save_idx);
+    canvas_set_sprite(sprite, false);
 }
 
 // updates the ro tex and sizes
@@ -185,8 +169,8 @@ void canvas_init() {
     r_texture_wrap_repeat(bg_tex);
     L.bg = ro_single_new(bg_tex);
 
-    uImage img = u_image_new_zeros(32, 32, 1);
-    canvas_set_image(img, false);
+    uSprite sprite = u_sprite_new_zeros(DEFAULT_WIDTH, DEFAULT_HEIGHT, 1, 1);
+    canvas_set_sprite(sprite, false);
 }
 
 void canvas_update(float dtime) {
@@ -210,10 +194,10 @@ void canvas_render(const mat4 *canvascam_mat) {
     ro_single_render(&L.bg, canvascam_mat);
 
     if (canvas.blend_layers != CANVAS_LAYER_BLEND_NONE) {
-        for (int i = 0; i < canvas.current_layer; i++) {
+        for (int i = 0; i < canvas.RO.current_image_layer; i++) {
             float alpha;
             if(canvas.blend_layers == CANVAS_LAYER_BLEND_ALPHA)
-                alpha = i==canvas.current_layer-1? 0.33 : 0.05;
+                alpha = i==canvas.RO.current_image_layer-1? 0.33 : 0.05;
             else
                 alpha = 1;
             L.render_objects[i].rect.color.a = alpha * canvas.alpha;
@@ -221,37 +205,65 @@ void canvas_render(const mat4 *canvascam_mat) {
         }
     }
 
-    L.render_objects[canvas.current_layer].rect.color.a = 1.0;
-    ro_single_render(&L.render_objects[canvas.current_layer], canvascam_mat);
+    L.render_objects[canvas.RO.current_image_layer].rect.color.a = 1.0;
+    ro_single_render(&L.render_objects[canvas.RO.current_image_layer], canvascam_mat);
 
     if (canvas.show_grid)
         ro_single_render(&L.grid, canvascam_mat);
 
 }
 
-void canvas_set_image(uImage image_sink, bool save) {
-    if (!u_image_valid(image_sink)) {
+void canvas_set_frame(int sprite_col) {
+    s_log("frame: %i/%i", sprite_col, canvas.RO.sprite.cols);
+    s_assume(sprite_col>=0&&sprite_col<canvas.RO.sprite.cols, "invalid frame");
+    canvas.RO.current_frame = sprite_col;
+    canvas.RO.current_image_layer = u_sprite_pos_to_layer(canvas.RO.sprite.cols, 
+            canvas.RO.current_frame,
+            canvas.RO.current_layer);
+}
+
+void canvas_set_layer(int sprite_row) {
+    s_log("layer: %i/%i", sprite_row, canvas.RO.sprite.rows);
+    s_assume(sprite_row>=0&&sprite_row<canvas.RO.sprite.rows, "invalid layer");
+    canvas.RO.current_layer = sprite_row;
+    canvas.RO.current_image_layer = u_sprite_pos_to_layer(canvas.RO.sprite.cols, 
+            canvas.RO.current_frame,
+            canvas.RO.current_layer);
+}
+
+
+void canvas_set_sprite(uSprite image_sink, bool save) {
+    if (!u_sprite_valid(image_sink)) {
         s_log_warn("invalid img");
         return;
     }
-    if (image_sink.layers > CANVAS_MAX_LAYERS) {
+    if (image_sink.rows > CANVAS_MAX_LAYERS) {
         s_log_warn("to much layers!");
+        return;
+    }
+    if (image_sink.cols > CANVAS_MAX_FRAMES) {
+        s_log_warn("to much frames!");
         return;
     }
     s_log("set_image");
 
-    u_image_kill(&canvas.RO.image);
-    canvas.RO.image = image_sink;
+    u_sprite_kill(&canvas.RO.sprite);
+    canvas.RO.sprite = image_sink;
+    canvas.RO.image = canvas.RO.sprite.img;
     
-    canvas.current_layer = s_min(canvas.current_layer, canvas.RO.image.layers-1);
+    canvas.RO.current_frame = s_min(canvas.RO.current_frame, canvas.RO.sprite.cols-1);
+    canvas.RO.current_layer = s_min(canvas.RO.current_layer, canvas.RO.sprite.rows-1);
+    canvas.RO.current_image_layer = u_sprite_pos_to_layer(canvas.RO.sprite.cols, 
+            canvas.RO.current_frame, 
+            canvas.RO.current_layer);
 
     u_image_kill(&L.prev_image);
-    L.prev_image = u_image_new_zeros(image_sink.cols, image_sink.rows, image_sink.layers);
+    L.prev_image = u_image_new_zeros(image_sink.img.cols, image_sink.img.rows, image_sink.cols * image_sink.rows);
    
     if (save) {
         canvas_save();
     } else {
-        u_image_copy(L.prev_image, image_sink);
+        u_image_copy(L.prev_image, image_sink.img);
     }
 
     update_render_objects();
@@ -275,12 +287,13 @@ void canvas_save() {
 
     u_image_copy(L.prev_image, canvas.RO.image);
 
-    L.save_idx++;
-    L.save_idx %= CANVAS_MAX_SAVES;
-    L.save_idx_max = L.save_idx;
-    if (L.save_idx == L.save_idx_min) {
-        L.save_idx_min++;
-        L.save_idx_min %= CANVAS_MAX_SAVES;
+    int t = canvas.RO.tab_id;
+    L.tab_saves[t].save_idx++;
+    L.tab_saves[t].save_idx %= CANVAS_MAX_SAVES;
+    L.tab_saves[t].save_idx_max = L.tab_saves[t].save_idx;
+    if (L.tab_saves[t].save_idx == L.tab_saves[t].save_idx_min) {
+        L.tab_saves[t].save_idx_min++;
+        L.tab_saves[t].save_idx_min %= CANVAS_MAX_SAVES;
     }
 
     canvas_save_config();
@@ -292,14 +305,15 @@ void canvas_reload() {
 
 void canvas_undo() {
     s_log("undo");
-    if (L.save_idx == L.save_idx_min) {
+    int t = canvas.RO.tab_id;
+    if (L.tab_saves[t].save_idx == L.tab_saves[t].save_idx_min) {
         s_log("failed, on min idx");
         return;
     }
 
-    L.save_idx--;
-    if (L.save_idx < 0)
-        L.save_idx = CANVAS_MAX_SAVES - 1;
+    L.tab_saves[t].save_idx--;
+    if (L.tab_saves[t].save_idx < 0)
+        L.tab_saves[t].save_idx = CANVAS_MAX_SAVES - 1;
 
     load_image();
     canvas_save_config();
@@ -307,13 +321,14 @@ void canvas_undo() {
 
 void canvas_redo() {
     s_log("redo");
-    if (L.save_idx == L.save_idx_max) {
+    int t = canvas.RO.tab_id;
+    if (L.tab_saves[t].save_idx == L.tab_saves[t].save_idx_max) {
         s_log("failed, on max idx");
         return;
     }
 
-    L.save_idx++;
-    L.save_idx %= CANVAS_MAX_SAVES;
+    L.tab_saves[t].save_idx++;
+    L.tab_saves[t].save_idx %= CANVAS_MAX_SAVES;
 
     load_image();
 
@@ -321,29 +336,34 @@ void canvas_redo() {
 }
 
 bool canvas_undo_available() {
-    return L.save_idx != L.save_idx_min;
+    int t = canvas.RO.tab_id;
+    return L.tab_saves[t].save_idx != L.tab_saves[t].save_idx_min;
 }
 
 bool canvas_redo_available() {
-    return L.save_idx != L.save_idx_max;
+    int t = canvas.RO.tab_id;
+    return L.tab_saves[t].save_idx != L.tab_saves[t].save_idx_max;
 }
 
 
 void canvas_set_tab_id(int id) {
     s_assume(id>=0 && id<CANVAS_MAX_TABS, "invalid tab id");
+    L.tab_saves[canvas.RO.tab_id].current_layer = canvas.RO.current_layer;
+    L.tab_saves[canvas.RO.tab_id].current_frame = canvas.RO.current_frame;
     canvas_save_config();
     canvas.RO.tab_id = id;
-    load_tab_savesstate(&L.save_idx, &L.save_idx_min, &L.save_idx_max, id);
     load_image();
     u_image_kill(&L.prev_image);
     L.prev_image = u_image_new_clone(canvas.RO.image);
+    
+    canvas_set_frame(L.tab_saves[id].current_frame);
+    canvas_set_layer(L.tab_saves[id].current_layer);
 }
 
-uImage canvas_get_tab(int id) {
+uSprite canvas_get_tab(int id) {
+    s_log("id=%i", id);
     s_assume(id>=0 && id<CANVAS_MAX_TABS, "invalid tab id");
-    int idx, min, max;
-    load_tab_savesstate(&idx, &min, &max, id);
-    return load_image_file(id, idx, NULL);
+    return load_image_file(id, L.tab_saves[id].save_idx);
 }
 
 void canvas_save_config() {
@@ -358,6 +378,23 @@ void canvas_save_config() {
     u_json_append_int(member, "pattern_cols", canvas.RO.pattern_cols);
     u_json_append_int(member, "pattern_rows", canvas.RO.pattern_rows);
     u_json_append_int(member, "tab_id", canvas.RO.tab_id);
+    
+    
+    L.tab_saves[canvas.RO.tab_id].current_layer = canvas.RO.current_layer;
+    L.tab_saves[canvas.RO.tab_id].current_frame = canvas.RO.current_frame;
+    
+    for(int t=0; t<CANVAS_MAX_TABS; t++) {
+        char name[16];
+        snprintf(name, sizeof name, "tab_%02i", t);
+        
+        uJson *tab = u_json_append_object(member, name);
+        
+        u_json_append_int(tab, "current_layer", L.tab_saves[t].current_layer);
+        u_json_append_int(tab, "current_frame", L.tab_saves[t].current_frame);
+        u_json_append_int(tab, "save_idx", L.tab_saves[t].save_idx);
+        u_json_append_int(tab, "save_idx_max", L.tab_saves[t].save_idx_max);
+        u_json_append_int(tab, "save_idx_min", L.tab_saves[t].save_idx_min);
+    }
 
     u_json_save_file(config,io_config_file(), NULL);
     e_io_savestate_save();
@@ -378,12 +415,29 @@ void canvas_load_config() {
         canvas.RO.pattern_cols = pattern_cols;
         canvas.RO.pattern_rows = pattern_rows;
     }
+    
+    for(int t=0; t<CANVAS_MAX_TABS; t++) {
+        char name[16];
+        snprintf(name, sizeof name, "tab_%02i", t);
+        
+        uJson *tab = u_json_get_object(member, name);
+        bool ok = true;
+        ok &= u_json_get_object_int(tab, "current_layer", &L.tab_saves[t].current_layer) != NULL;
+        ok &= u_json_get_object_int(tab, "current_frame", &L.tab_saves[t].current_frame) != NULL;
+        ok &= u_json_get_object_int(tab, "save_idx", &L.tab_saves[t].save_idx) != NULL;
+        ok &= u_json_get_object_int(tab, "save_idx_max", &L.tab_saves[t].save_idx_max) != NULL;
+        ok &= u_json_get_object_int(tab, "save_idx_min", &L.tab_saves[t].save_idx_min) != NULL;
+        
+        if(!ok) {
+            s_log("failed to load tab %i info, resetting to 0", t);
+            memset(&L.tab_saves[t], 0, sizeof L.tab_saves[t]);
+        }
+    }
 
 
     int tab_id;
     if ( u_json_get_object_int(member, "tab_id", &tab_id)) {
         canvas.RO.tab_id = tab_id;
-        load_tab_savesstate(&L.save_idx, &L.save_idx_min, &L.save_idx_max, tab_id);
         load_image();
     } else {
         s_log("failed, saving the empty image as index 0");

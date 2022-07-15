@@ -54,7 +54,7 @@ static void set_pose(float palette_hud_size, int c, int r) {
     }
 
     mat4 pose = u_pose_new(floorf(x), floorf(y), w, h);
-    for (int i = 0; i <= canvas.current_layer; i++) {
+    for (int i = 0; i <= canvas.RO.current_image_layer; i++) {
         L.ro[i].rects[r * L.mcols + c].pose = pose;
     }
 }
@@ -134,14 +134,14 @@ void animation_update(float palette_hud_size, float dtime) {
 
     L.time = fmodf(L.time + dtime, L.frames / L.fps);
     float frame = floorf(L.time * L.fps);
-    for (int i = 0; i <= canvas.current_layer; i++) {
+    for (int i = 0; i <= canvas.RO.current_image_layer; i++) {
         for (int j = 0; j < L.ro[i].num; j++) {
             L.ro[i].rects[j].sprite.x = frame;
         }
     }
 
     uImage img = canvas.RO.image;
-    for (int i = 0; i <= canvas.current_layer; i++) {
+    for (int i = 0; i <= canvas.RO.current_image_layer; i++) {
         r_texture_set(L.ro[i].tex, u_image_layer(img, i));
     }
 }
@@ -158,7 +158,7 @@ void animation_render(const mat4 *cam_mat) {
         return;
     }
 
-    for (int i = 0; i <= canvas.current_layer; i++) {
+    for (int i = 0; i <= canvas.RO.current_image_layer; i++) {
         ro_batch_render(&L.ro[i], cam_mat, true);
     }
 }

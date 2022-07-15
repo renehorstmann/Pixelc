@@ -9,7 +9,7 @@
 //
 
 uImage u_image_new_empty_a(int cols, int rows, int layers, sAllocator_i a) {
-    size_t data_size = cols * rows * layers * sizeof(uColor_s);
+    ssize data_size = cols * rows * layers * sizeof(uColor_s);
 
     if (data_size <= 0) {
         s_error_set("image new failed");
@@ -21,31 +21,27 @@ uImage u_image_new_empty_a(int cols, int rows, int layers, sAllocator_i a) {
             {s_a_malloc(a, data_size),
              cols, rows, layers,
              a};
-    if (!u_image_valid(self))
-        return u_image_new_invalid_a(a);
     return self;
 }
 
 uImage u_image_new_zeros_a(int cols, int rows, int layers, sAllocator_i a) {
     uImage self = u_image_new_empty_a(cols, rows, layers, a);
-    if (!u_image_valid(self))
-        return self;
     memset(self.data, 0, u_image_data_size(self));
     return self;
 }
 
 uImage u_image_new_clone_a(uImage from, sAllocator_i a) {
+    if(!u_image_valid(from))
+        return u_image_new_invalid_a(a);
     uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers, a);
-    if (!u_image_valid(self))
-        return u_image_new_invalid();
     memcpy(self.data, from.data, u_image_data_size(from));
     return self;
 }
 
 uImage u_image_new_clone_scaled_a(int cols, int rows, uImage from, bool filter_linear, sAllocator_i a) {
+    if(!u_image_valid(from))
+        return u_image_new_invalid_a(a);
     uImage self = u_image_new_empty_a(cols, rows, from.layers, a);
-    if (!u_image_valid(self))
-        return u_image_new_invalid();
     for (int l = 0; l < self.layers; l++) {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -59,15 +55,15 @@ uImage u_image_new_clone_scaled_a(int cols, int rows, uImage from, bool filter_l
 }
 
 uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, sAllocator_i a) {
+    if(!u_image_valid(from))
+        return u_image_new_invalid_a(a);
     if (from.layers <= 1 || layer_to_merge_down <= 0 || layer_to_merge_down >= from.layers) {
         s_error_set("image new clone merge down failed");
         s_log_error("failed: wrong layer to merge: %i/%i", layer_to_merge_down, from.layers);
-        return u_image_new_invalid();
+        return u_image_new_invalid_a(a);
     }
     uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers - 1, a);
-    if (!u_image_valid(self))
-        return u_image_new_invalid();
-
+    
     // layers to clone up to layer_to_merge_down-1
     if (layer_to_merge_down > 1)
         memcpy(self.data, from.data, sizeof(uColor_s) * self.cols * self.rows * (layer_to_merge_down - 1));
@@ -115,6 +111,35 @@ uImage u_image_new_clone_remove_layer_a(uImage from, int layer_to_remove, sAlloc
         layer++;
     }
     return self;
+}
+
+uImage u_image_new_clone_insert_layer_a(uImage from, int layer_behind, sAllocator_i a) {
+    if(!u_image_valid(from) || layer_behind<-1 || layer_behind>=from.layers) 
+        return u_image_new_invalid_a(a);
+    uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers+1, a);
+    if(layer_behind>=0)
+        memcpy(self.data, from.data,
+                u_image_layer_data_size(from) * (layer_behind+1));
+    memset(u_image_layer(self, layer_behind+1), 0, 
+            u_image_layer_data_size(from));
+    if(layer_behind<from.layers-1) 
+        memcpy(u_image_layer(self, layer_behind+2),
+                u_image_layer(from,layer_behind+1),
+                u_image_layer_data_size(from) * (from.layers-layer_behind-1));
+    return self;
+}
+
+uImage u_image_new_clone_swap_layers_a(uImage from, int layer_a, int layer_b, sAllocator_i a) {
+    if(!u_image_valid(from))
+        return u_image_new_invalid_a(a);
+    uImage swap = u_image_new_clone_a(from, a);
+    memcpy(u_image_layer(swap, layer_a), 
+            u_image_layer(from, layer_b),    
+            u_image_layer_data_size(swap));
+    memcpy(u_image_layer(swap, layer_b), 
+            u_image_layer(from, layer_a),    
+            u_image_layer_data_size(swap));
+    return swap;
 }
 
 uImage u_image_new_sdl_surface_a(int layers, struct SDL_Surface *surface, sAllocator_i a) {
@@ -228,7 +253,7 @@ bool u_image_copy(uImage self, uImage from) {
         return false;
     }
 
-    size_t size = u_image_data_size(self);
+    ssize size = u_image_data_size(self);
     memcpy(self.data, from.data, size);
     return true;
 }

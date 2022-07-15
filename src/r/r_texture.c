@@ -36,8 +36,6 @@ static void reorder(ucvec4 *dst, const ucvec4 *src, ivec2 sprite_size, ivec2 spr
 //
 
 rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer) {
-    r_render_error_check("r_texture_newBEGIN");
-
     s_assume(image_cols > 0 && image_rows > 0
            && sprites_cols > 0 && sprites_rows > 0
            && image_cols % sprites_cols == 0
@@ -47,21 +45,44 @@ rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int spr
            sprites_cols, sprites_rows
     );
 
-    rTexture self = {
-            0,
-            {{image_cols / sprites_cols, image_rows / sprites_rows}},
-            {{sprites_cols, sprites_rows}}
-    };
-
     // reorder vertical
     void *tmp_buffer = NULL;
-    if (opt_buffer && self.sprites.x > 1) {
+    if (opt_buffer && sprites_cols > 1) {
         tmp_buffer = s_malloc(4 * image_cols * image_rows);
 
-        reorder(tmp_buffer, opt_buffer, self.sprite_size, self.sprites);
+        reorder(tmp_buffer, opt_buffer,
+                (ivec2) {{image_cols/sprites_cols, image_rows/sprites_rows}},
+                (ivec2) {{sprites_cols, sprites_rows}});
         opt_buffer = tmp_buffer;
     }
 
+    rTexture self = r_texture_new_sprite_buffer(
+            image_cols/sprites_cols,
+            image_rows/sprites_rows,
+            sprites_cols, sprites_rows,
+            opt_buffer);
+    
+    // NULL safe free
+    s_free(tmp_buffer);
+    
+    return self;
+}
+
+rTexture r_texture_new_sprite_buffer(int sprite_size_x, int sprite_size_y, int sprites_cols, int sprites_rows, const void *opt_buffer) {
+    r_render_error_check("r_texture_new_sprite_bufferBEGIN");
+    s_assume(sprite_size_x > 0 && sprite_size_y > 0
+           && sprites_cols > 0 && sprites_rows > 0,
+           "texture sprite size invalid: %i, %i ; %i %i", 
+           sprite_size_x, sprite_size_y,
+           sprites_cols, sprites_rows
+    );
+    
+    rTexture self = {
+            0,
+            {{sprite_size_x, sprite_size_y}},
+            {{sprites_cols, sprites_rows}}
+    };
+    
     glGenTextures(1, &self.tex);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self.tex);
 
@@ -69,15 +90,13 @@ rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int spr
                  self.sprite_size.x,
                  self.sprite_size.y,
                  self.sprites.x * self.sprites.y,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, opt_buffer);
+                 0, GL_RGBA, GL_UNSIGNED_BYTE,opt_buffer);
 
 
     r_texture_filter_nearest(self);
     r_texture_wrap_clamp(self);
-
-    // NULL safe free
-    s_free(tmp_buffer);
-    r_render_error_check("r_texture_new");
+    
+    r_render_error_check("r_texture_new_sprite_buffer");
     return self;
 }
 
@@ -117,7 +136,6 @@ void r_texture_kill(rTexture *self) {
 }
 
 void r_texture_set(rTexture self, const void *buffer) {
-    r_render_error_check("r_texture_setBEGIN");
     if (!r_texture_valid(self) || !buffer)
         return;
 
@@ -132,6 +150,17 @@ void r_texture_set(rTexture self, const void *buffer) {
         buffer = tmp_buffer;
     }
 
+    r_texture_set_sprite_buffer(self, buffer);
+    
+    // NULL safe free
+    s_free(tmp_buffer);
+}
+
+void r_texture_set_sprite_buffer(rTexture self, const void *buffer) {
+    r_render_error_check("r_texture_set_sprite_bufferBEGIN");
+    if (!r_texture_valid(self) || !buffer)
+        return;
+        
     glBindTexture(GL_TEXTURE_2D_ARRAY, self.tex);
     glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
                     0, 0, 0,
@@ -139,10 +168,7 @@ void r_texture_set(rTexture self, const void *buffer) {
                     self.sprite_size.y,
                     self.sprites.x * self.sprites.y,
                     GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-    // NULL safe free
-    s_free(tmp_buffer);
-    r_render_error_check("r_texture_set");
+    r_render_error_check("r_texture_set_sprite_buffer");
 }
 
 

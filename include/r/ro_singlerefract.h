@@ -24,6 +24,7 @@
 
 #include "rect.h"
 #include "texture.h"
+#include "texture2d.h"
 
 
 // Like RoSingle, but with refraction
