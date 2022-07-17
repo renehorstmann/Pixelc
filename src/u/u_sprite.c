@@ -298,9 +298,9 @@ void u_sprite_kill(uSprite *self) {
 uImage u_sprite_reorder_to_new_image_a(uSprite self, sAllocator_i a) {
     if(!u_sprite_valid(self))
         return u_image_new_invalid_a(a);
-    uImage img = u_image_new_empty_a(self.img.cols, self.img.rows, self.rows, a);
+    uImage img = u_image_new_empty_a(self.img.cols*self.cols, self.img.rows, self.rows, a);
     reorder_back(img.data, self.img.data, 
-            (ivec2) {{img.cols, img.rows}},
+            (ivec2) {{self.img.cols, self.img.rows}},
             (ivec2) {{self.cols, self.rows}});
     return img;
 }

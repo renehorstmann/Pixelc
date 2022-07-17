@@ -68,7 +68,9 @@ python3 -m http.server --bind localhost  # [port]
   - size dialog can morph the full image into frames
     - red text if not valid
     - button as full image
-  - gif export?
+    
+- json export (frame times)
+- gif export?
     
 - dialog colors, toolbar colors,
   - or drawn

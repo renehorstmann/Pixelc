@@ -17,7 +17,7 @@
 typedef struct {
     Tool super;
     RoSingle bg;
-    RoSingle layer;
+    RoSingle frame;
     RoText num;
     int pos;
     float long_press_time;
@@ -29,7 +29,7 @@ static void select_kill(Tool **super_ptr) {
    if(!self)
        return;
    ro_single_kill(&self->bg);
-   ro_single_kill(&self->layer);
+   ro_single_kill(&self->frame);
    ro_text_kill(&self->num);
    s_free(self);
    *super_ptr = NULL;
@@ -39,8 +39,8 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
     Select *self = (Select *) super;
     
     uSprite sprite = canvas.RO.sprite;
-    int layer = self->pos - SELECT_CURRENT + canvas.RO.current_layer;
-    if(layer<0 || layer>=sprite.rows)
+    int frame = self->pos - SELECT_CURRENT + canvas.RO.current_frame;
+    if(frame<0 || frame>=sprite.cols)
         return;
     
     if(!u_pose_aa_contains(self->bg.rect.pose, pointer.pos.xy)) {
@@ -54,10 +54,10 @@ static void select_pe(struct Tool *super, ePointer_s pointer) {
     }
     
     if(self->pressed && pointer.action == E_POINTER_UP) {
-        s_log("setting current layer to: %i", layer);
+        s_log("setting current frame to: %i", frame);
         self->pressed = false;
         canvas_reload();
-        canvas_set_layer(layer);
+        canvas_set_frame(frame);
     }
 }
 
@@ -65,29 +65,20 @@ static void select_update(struct Tool *super, float dtime) {
     Select *self = (Select *) super;
     
     uSprite sprite = canvas.RO.sprite;
-    int layer = self->pos - SELECT_CURRENT + canvas.RO.current_layer;
-    if(layer<0 || layer>=sprite.rows) {
-        // empty
-        self->bg.rect.color.a = 0;
-        self->layer.rect.color.a = 0;
-        ro_text_set_text(&self->num, "");
-    } else {
+    int frame = self->pos - SELECT_CURRENT + canvas.RO.current_frame;
+    if(frame>=0 && frame<sprite.cols) {
         self->bg.rect.color.a = self->pos==SELECT_CURRENT? 0.5 : 0.25;
-        self->layer.rect.color.a = 1;
-        
-        ro_single_set_texture(&self->layer, canvas.RO.tex);
-        self->layer.rect.sprite.x = canvas.RO.current_frame;
-        self->layer.rect.sprite.y = layer;
+        self->frame.rect.color.a = 1;
         
         char num[4];
         const char *format;
-        if(self->pos==0 && layer>0)
+        if(self->pos==0 && frame>0)
             format = "+%2i";
-        else if(self->pos==TOOL_LAYER_SELECT_NUM-1 && layer<canvas.RO.image.layers-1)
+        else if(self->pos==TOOL_FRAMES_SELECT_NUM-1 && frame<sprite.cols-1)
             format = "%2i+";
         else 
             format = " %2i";
-        snprintf(num, sizeof num, format, layer+1);
+        snprintf(num, sizeof num, format, frame+1);
         ro_text_set_text(&self->num, num);
     }
     
@@ -105,7 +96,7 @@ static void select_update(struct Tool *super, float dtime) {
         width = width * sprite.img.cols / sprite.img.rows;
     }
     
-    self->layer.rect.pose = u_pose_new(x, y, width, height);
+    self->frame.rect.pose = u_pose_new(x, y, width, height);
     
     u_pose_set_xy(&self->num.pose, x-8, y-4);
             
@@ -114,25 +105,40 @@ static void select_update(struct Tool *super, float dtime) {
         self->long_press_time -= dtime;
         if(self->long_press_time<=0) {
             self->pressed = false;
-            s_log("layer longpress: %i", layer);
+            s_log("frames longpress: %i", frame);
             feedback_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
             canvas_reload();
-            canvas_set_layer(layer);
-            dialog_create_layer();
+            canvas_set_frame(frame);
+            //dialog_create_frames();
         }
     }
 }
 
 static void select_render(const struct Tool *super, const mat4 *cam_mat) {
     Select *self = (Select *) super;
+    
+    
+    uSprite sprite = canvas.RO.sprite;
+    int frame = self->pos - SELECT_CURRENT + canvas.RO.current_frame;
+    if(frame<0 || frame>=sprite.cols) 
+       return;
+        
     ro_single_render(&self->bg, cam_mat);
-    ro_single_render(&self->layer, cam_mat);
+    
+    ro_single_set_texture(&self->frame, canvas.RO.tex);
+    self->frame.rect.sprite.x = frame;
+    for(int i=0;i<=canvas.RO.current_layer; i++) {
+        self->frame.rect.sprite.y = i;
+        ro_single_render(&self->frame, cam_mat);
+    }
+    
     ro_text_render(&self->num, cam_mat);
+    
 }
 
 
-Tool *tool_new_layer_select(int pos) {
-    assert(pos>=0 && pos<TOOL_LAYER_SELECT_NUM);
+Tool *tool_new_frames_select(int pos) {
+    assert(pos>=0 && pos<TOOL_FRAMES_SELECT_NUM);
     Select *self = s_new0(Select, 1);
     
     self->super.size = (vec2) {{20, 20}};
@@ -144,19 +150,19 @@ Tool *tool_new_layer_select(int pos) {
             (vec3) {{0.8, 0.8, 0.8}}
             : (vec3) {{0.2, 0.2, 0.2}};
     
-    self->layer = ro_single_new(canvas.RO.tex);
-    self->layer.owns_tex = false;
+    self->frame = ro_single_new(canvas.RO.tex);
+    self->frame.owns_tex = false;
     
     self->num = ro_text_new_font55(4);
     ro_text_set_color(&self->num, pos==SELECT_CURRENT? 
             (vec4) {{0.2, 0.2, 0.8, 1}}
             : (vec4) {{0.2, 0.2, 0.2, 1}});
     
-    snprintf(self->super.name, TOOL_NAME_LEN, "layer"); 
+    snprintf(self->super.name, TOOL_NAME_LEN, "frames"); 
     snprintf(self->super.tip, TOOL_TIP_LEN, "select a\n"
-            "canvas layer\n\n"
+            "canvas frame\n\n"
             "long press for\n"
-            "layer options"); 
+            "frames options"); 
     
     self->super.kill = select_kill; 
     self->super.update = select_update; 
@@ -175,14 +181,14 @@ static void blend_pe(struct Tool *super, ePointer_s pointer) {
      
     if(u_pose_aa_contains(self->ro.rect.pose, pointer.pos.xy)) {
         switch(canvas.blend_mode) {
-        case CANVAS_BLEND_LAYER_ONION:
-            canvas.blend_mode = CANVAS_BLEND_LAYER_FULL;
+        case CANVAS_BLEND_FRAMES_ONION:
+            canvas.blend_mode = CANVAS_BLEND_FRAMES_FULL;
             break;
-        case CANVAS_BLEND_LAYER_FULL:
+        case CANVAS_BLEND_FRAMES_FULL:
             canvas.blend_mode = CANVAS_BLEND_NONE;
             break;
         default:
-            canvas.blend_mode = CANVAS_BLEND_LAYER_ONION;
+            canvas.blend_mode = CANVAS_BLEND_FRAMES_ONION;
         }
         s_log("canvas blend mode: %i", canvas.blend_mode);
     }
@@ -191,10 +197,10 @@ static void blend_pe(struct Tool *super, ePointer_s pointer) {
 static bool blend_is_a(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
     switch(canvas.blend_mode) {
-    case CANVAS_BLEND_LAYER_ONION:
+    case CANVAS_BLEND_FRAMES_ONION:
         self->ro.rect.sprite.x = 1;
         break;
-    case CANVAS_BLEND_LAYER_FULL:
+    case CANVAS_BLEND_FRAMES_FULL:
         self->ro.rect.sprite.x = 2;
         break;
     default:
@@ -204,10 +210,10 @@ static bool blend_is_a(struct Tool *super, float dtime) {
     return true;
 }
 
-Tool *tool_new_layer_blend() {
+Tool *tool_new_frames_blend() {
     Tool *super = tool_button_new("blend",
                            "blends in the\n"
-                           "previous layers\n"
+                           "previous frames\n"
                            "with or without\n"
                            "onion skinning",
                            "res/button_blend3.png",
@@ -228,26 +234,26 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
-        s_log("tool layer add");
+        s_log("tool frames add");
         canvas_reload();
-        int layer = canvas.RO.current_layer;
+        int frame = canvas.RO.current_frame;
         uSprite old = canvas.RO.sprite;
-        uSprite sprite = u_sprite_new_clone_insert_row(old, layer);
+        uSprite sprite = u_sprite_new_clone_insert_col(old, frame);
 
         canvas_set_sprite(sprite, true);
-        canvas_set_layer(layer+1);
+        canvas_set_frame(frame+1);
     }
 }
 
 static bool add_is_a(struct Tool *super, float dtime) {
-    return canvas.RO.image.layers < CANVAS_MAX_LAYERS;
+    return canvas.RO.sprite.cols < CANVAS_MAX_FRAMES;
 }
 
-Tool *tool_new_layer_add() {
+Tool *tool_new_frames_add() {
     return tool_button_new("add",
-                           "adds a layer\n"
+                           "adds a frame\n"
                            "next to the\n"
-                           "current layer",
+                           "current frame",
                            "res/button_plus.png",
                            add_pe,
                            add_is_a);

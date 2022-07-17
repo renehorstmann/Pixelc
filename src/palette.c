@@ -528,7 +528,7 @@ void palette_append_palette(uImage colors, const char *name) {
     // save the savestate files (needed for web)
     e_io_savestate_save();
 
-    palette_set_palette(colors, L.palette_files[idx]);
+    palette_load_palette(idx);
 }
 
 bool palette_name_exists(const char *name) {

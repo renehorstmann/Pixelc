@@ -11,6 +11,7 @@
 #define TOOL_LONG_PRESS_TIME 0.75
 
 #define TOOL_LAYER_SELECT_NUM 7
+#define TOOL_FRAMES_SELECT_NUM 7
 
 
 struct Tool;
@@ -84,6 +85,8 @@ Tool *tool_new_selection();
 
 Tool *tool_new_layer();
 
+Tool *tool_new_frames();
+
 Tool *tool_new_tab();
 
 Tool *tool_new_kernel();
@@ -97,8 +100,6 @@ Tool *tool_new_shading();
 Tool *tool_new_camera();
 
 Tool *tool_new_grid();
-
-Tool *tool_new_preview();
 
 Tool *tool_new_size();
 
@@ -133,6 +134,12 @@ Tool *tool_new_layer_select(int pos);
 Tool *tool_new_layer_blend();
 
 Tool *tool_new_layer_add();
+
+Tool *tool_new_frames_select(int pos);
+
+Tool *tool_new_frames_blend();
+
+Tool *tool_new_frames_add();
 
 Tool *tool_new_selection_set_move();
 

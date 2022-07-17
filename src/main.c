@@ -36,12 +36,7 @@
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
 
-#define TB_ACTIVE_BG_A "#9999bb"
-#define TB_ACTIVE_BG_B "#888888"
-#define TB_SECONDARY_BG_A "#bb9999"
-#define TB_SECONDARY_BG_B "#888888"
-#define TB_SELECTION_BG_A "#99bb99"
-#define TB_SELECTION_BG_B "#888888"
+
 
 //
 // end of options
@@ -76,13 +71,7 @@ static void init() {
     
     dialog_init();
 
-    toolbar_init(u_color_from_hex(TB_ACTIVE_BG_A),
-                 u_color_from_hex(TB_ACTIVE_BG_B),
-                 u_color_from_hex(TB_SECONDARY_BG_A),
-                 u_color_from_hex(TB_SECONDARY_BG_B),
-                 u_color_from_hex(TB_SELECTION_BG_A),
-                 u_color_from_hex(TB_SELECTION_BG_B)
-    );
+    toolbar_init();
 
     multitouchcursor_init();
 

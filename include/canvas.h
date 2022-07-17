@@ -37,6 +37,7 @@ struct Canvas_Globals {
         mat4 pose; // = u_pose_new_aa(0, 0, cols, rows)
         
         uSprite sprite;
+        rTexture tex;
         
         int current_frame;
         int current_layer;

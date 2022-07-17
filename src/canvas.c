@@ -116,9 +116,11 @@ static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_fra
     
     u_json_kill(&state);
     
-    uSprite sprite = u_sprite_new_file(
-            frames, layers,
+    uImage image = u_image_new_file(
+            frames * layers,
             e_io_savestate_file_path(file_png));
+            
+    uSprite sprite = {image, frames, layers};
     
     if(!u_sprite_valid(sprite)) {
         return u_sprite_new_zeros(DEFAULT_WIDTH, DEFAULT_HEIGHT, 1, 1);
@@ -141,6 +143,7 @@ static void update_render_objects() {
     rTexture tex = r_texture_new_sprite_buffer(s.img.cols, s.img.rows, s.cols, s.rows, s.img.data);
     
     ro_single_set_texture(&L.ro, tex);
+    canvas.RO.tex = tex;
 
     u_pose_set_size(&L.grid.rect.uv, canvas.RO.image.cols, canvas.RO.image.rows);
     {
@@ -493,6 +496,7 @@ void canvas_load_config() {
     if ( u_json_get_object_int(member, "tab_id", &tab_id)) {
         canvas.RO.tab_id = tab_id;
         load_image();
+        canvas_set_layer(canvas.RO.sprite.rows-1);
     } else {
         s_log("failed, saving the empty image as index 0");
         save_image();

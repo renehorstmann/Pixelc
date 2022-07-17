@@ -34,9 +34,9 @@ typedef struct {
     RoText delete_txt;
     RoSingle delete_btn;
     
-    RoText swap_txt;
-    RoSingle swap_prev_btn;
-    RoSingle swap_next_btn;
+    RoText move_txt;
+    RoSingle move_prev_btn;
+    RoSingle move_next_btn;
 
     RoText merge_txt;
     RoSingle merge_btn;
@@ -50,9 +50,9 @@ static void kill_fn() {
     ro_text_kill(&impl->delete_txt);
     ro_single_kill(&impl->delete_btn);
     
-    ro_text_kill(&impl->swap_txt);
-    ro_single_kill(&impl->swap_prev_btn);
-    ro_single_kill(&impl->swap_next_btn);
+    ro_text_kill(&impl->move_txt);
+    ro_single_kill(&impl->move_prev_btn);
+    ro_single_kill(&impl->move_next_btn);
     
     ro_text_kill(&impl->merge_txt);
     ro_single_kill(&impl->merge_btn);
@@ -75,14 +75,14 @@ static void render(const mat4 *cam_mat) {
         
     }
 
-    ro_text_render(&impl->swap_txt, cam_mat);
+    ro_text_render(&impl->move_txt, cam_mat);
     
     if(canvas.RO.current_layer<canvas.RO.sprite.rows-1) {
-        ro_single_render(&impl->swap_next_btn, cam_mat);
+        ro_single_render(&impl->move_next_btn, cam_mat);
     }
     
     if(canvas.RO.current_layer>0) {
-        ro_single_render(&impl->swap_prev_btn, cam_mat);
+        ro_single_render(&impl->move_prev_btn, cam_mat);
         
         ro_text_render(&impl->merge_txt, cam_mat);
         ro_single_render(&impl->merge_btn, cam_mat);
@@ -103,8 +103,8 @@ static bool pointer_event(ePointer_s pointer) {
     }
 
     if (canvas.RO.current_layer>0 
-            && u_button_clicked(&impl->swap_prev_btn.rect, pointer)) {
-        s_log("swap with prev layer: %i", canvas.RO.current_layer);
+            && u_button_clicked(&impl->move_prev_btn.rect, pointer)) {
+        s_log("move with prev layer: %i", canvas.RO.current_layer);
         
         uSprite swap = u_sprite_new_clone_swap_rows(
                 canvas.RO.sprite,
@@ -112,14 +112,15 @@ static bool pointer_event(ePointer_s pointer) {
                 canvas.RO.current_layer);
         
         canvas_set_sprite(swap, true);
-        dialog_hide();
+        canvas_set_layer(canvas.RO.current_layer-1);
+        dialog_create_layer();
         // return after hide, hide kills this dialog
         return true;
     }
     
     if (canvas.RO.current_layer<(canvas.RO.sprite.rows-1) 
-            && u_button_clicked(&impl->swap_next_btn.rect, pointer)) {
-        s_log("swap with next layer: %i", canvas.RO.current_layer);
+            && u_button_clicked(&impl->move_next_btn.rect, pointer)) {
+        s_log("move with next layer: %i", canvas.RO.current_layer);
         
         uSprite swap = u_sprite_new_clone_swap_rows(
                 canvas.RO.sprite,
@@ -127,7 +128,8 @@ static bool pointer_event(ePointer_s pointer) {
                 canvas.RO.current_layer);
         
         canvas_set_sprite(swap, true);
-        dialog_hide();
+        canvas_set_layer(canvas.RO.current_layer+1);
+        dialog_create_layer();
         // return after hide, hide kills this dialog
         return true;
     }
@@ -171,10 +173,14 @@ void dialog_create_layer() {
     s_log("size is: %s", info_txt);
     impl->info.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
     
-    uImage img = canvas.RO.image;
-    rTexture tex = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, canvas.RO.current_image_layer));
-    impl->layer = ro_single_new(tex);
+    impl->layer = ro_single_new(canvas.RO.tex);
+    impl->layer.owns_tex = false;
+    impl->layer.rect.sprite = (vec2) {{
+        canvas.RO.current_frame,
+        canvas.RO.current_layer
+    }};
     
+    uImage img = canvas.RO.image;
     float width = 16;
     float height = 16;
     if(img.cols > img.rows) {
@@ -197,22 +203,22 @@ void dialog_create_layer() {
     impl->delete_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
     pos += 24;
 
-    impl->swap_txt = ro_text_new_font55(64);
+    impl->move_txt = ro_text_new_font55(64);
     if(canvas.RO.image.layers<=1) {
-        ro_text_set_text(&impl->swap_txt, "Need more than\n"
+        ro_text_set_text(&impl->move_txt, "Need more than\n"
                 "a single layer\n"
                 "for layer options");
     } else {
-        ro_text_set_text(&impl->swap_txt, "swap layer:");
+        ro_text_set_text(&impl->move_txt, "move layer:");
     }
-    ro_text_set_color(&impl->swap_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
-    impl->swap_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
+    ro_text_set_color(&impl->move_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    impl->move_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
 
-    impl->swap_prev_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_move_prev.png"));
-    impl->swap_prev_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos, 16, 16);
+    impl->move_prev_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_move_prev.png"));
+    impl->move_prev_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos, 16, 16);
     
-    impl->swap_next_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_move_next.png"));
-    impl->swap_next_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
+    impl->move_next_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_move_next.png"));
+    impl->move_next_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
     
     pos += 20;
 

@@ -9,6 +9,7 @@
 
 #define TOOLBAR_TOOLS_LEN 31
 #define TOOLBAR_LAYER_TOOLS_LEN (TOOL_LAYER_SELECT_NUM + 2)
+#define TOOLBAR_FRAMES_TOOLS_LEN (TOOL_FRAMES_SELECT_NUM + 2)
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 4
 #define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
 
@@ -29,6 +30,7 @@ static bool toolbar_container_valid(const ToolbarContainer *self) {
 
 struct Toolbar_Globals {
     ToolbarContainer active;
+    ToolbarContainer frames;
     ToolbarContainer layer;
     ToolbarContainer selection;
 
@@ -42,10 +44,10 @@ struct Toolbar_Globals {
             Tool *display;
             Tool *size;
             Tool *tab;
+            Tool *frames;
             Tool *layer;
             Tool *camera;
             Tool *grid;
-            Tool *preview;
             Tool *clear;
             Tool *undo;
             Tool *redo;
@@ -73,6 +75,15 @@ struct Toolbar_Globals {
     };
 
     union {
+        Tool *all_frames_tools[TOOLBAR_FRAMES_TOOLS_LEN];
+        struct {
+            Tool *select[TOOL_FRAMES_SELECT_NUM];
+            Tool *blend;
+            Tool *add;
+        } frames_tools;
+    };
+
+    union {
         Tool *all_layer_tools[TOOLBAR_LAYER_TOOLS_LEN];
         struct {
             Tool *select[TOOL_LAYER_SELECT_NUM];
@@ -80,7 +91,7 @@ struct Toolbar_Globals {
             Tool *add;
         } layer_tools;
     };
-
+    
 
     union {
         Tool *all_selection_set_tools[TOOLBAR_SELECTION_SET_TOOLS_LEN];
@@ -108,9 +119,7 @@ struct Toolbar_Globals {
 extern struct Toolbar_Globals toolbar;
 
 
-void toolbar_init(uColor_s active_bg_a, uColor_s active_bg_b,
-                  uColor_s secondary_bg_a, uColor_s secondary_bg_b,
-                  uColor_s selection_bg_a, uColor_s selection_bg_b);
+void toolbar_init();
 
 void toolbar_update(float dtime);
 
@@ -127,8 +136,13 @@ bool toolbar_contains(vec2 pos);
 // returns NULL if not found
 Tool *toolbar_get_tool_by_pos(vec2 pos);
 
+void toolbar_show_frames();
+
+void toolbar_hide_frames();
+
 void toolbar_show_layer();
 
 void toolbar_hide_layer();
+
 
 #endif //PIXELC_TOOLBAR_H
