@@ -109,7 +109,7 @@ static void select_update(struct Tool *super, float dtime) {
             feedback_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
             canvas_reload();
             canvas_set_frame(frame);
-            //dialog_create_frames();
+            dialog_create_frame();
         }
     }
 }

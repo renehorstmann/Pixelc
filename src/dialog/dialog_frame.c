@@ -19,9 +19,9 @@
 static void on_delete_action(bool ok) {
     s_log("delete: %i", ok);
     if (ok) {
-        uSprite sprite = u_sprite_new_clone_remove_row(canvas.RO.sprite, canvas.RO.current_layer);
+        uSprite sprite = u_sprite_new_clone_remove_col(canvas.RO.sprite, canvas.RO.current_frame);
         canvas_set_sprite(sprite, true);
-        dialog_create_layer();
+        dialog_create_frame();
     } else 
         dialog_hide();
 }
@@ -29,7 +29,7 @@ static void on_delete_action(bool ok) {
 
 typedef struct {
     RoText info;
-    RoSingle layer;
+    RoSingle frame;
 
     RoText delete_txt;
     RoSingle delete_btn;
@@ -45,7 +45,7 @@ typedef struct {
 static void kill_fn() {
     Impl *impl = dialog.impl;
     ro_text_kill(&impl->info);
-    ro_single_kill(&impl->layer);
+    ro_single_kill(&impl->frame);
 
     ro_text_kill(&impl->delete_txt);
     ro_single_kill(&impl->delete_btn);
@@ -67,9 +67,9 @@ static void update(float dtime) {
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
     ro_text_render(&impl->info, cam_mat);
-    ro_single_render(&impl->layer, cam_mat);
+    ro_single_render(&impl->frame, cam_mat);
     
-    if (canvas.RO.sprite.rows > 1) {
+    if (canvas.RO.sprite.cols > 1) {
         ro_text_render(&impl->delete_txt, cam_mat);
         ro_single_render(&impl->delete_btn, cam_mat);
         
@@ -77,11 +77,11 @@ static void render(const mat4 *cam_mat) {
 
     ro_text_render(&impl->move_txt, cam_mat);
     
-    if(canvas.RO.current_layer<canvas.RO.sprite.rows-1) {
+    if(canvas.RO.current_frame<canvas.RO.sprite.rows-1) {
         ro_single_render(&impl->move_next_btn, cam_mat);
     }
     
-    if(canvas.RO.current_layer>0) {
+    if(canvas.RO.current_frame>0) {
         ro_single_render(&impl->move_prev_btn, cam_mat);
         
         ro_text_render(&impl->merge_txt, cam_mat);
@@ -92,54 +92,54 @@ static void render(const mat4 *cam_mat) {
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
 
-    if(canvas.RO.sprite.rows<=1)
+    if(canvas.RO.sprite.cols<=1)
         return true;
 
     if (u_button_clicked(&impl->delete_btn.rect, pointer)) {
         s_log("delete dialog");
-        dialog_create_prompt("Delete", "delete this\nlayer?", on_delete_action, NULL);
+        dialog_create_prompt("Delete", "delete this\nframe?", on_delete_action, NULL);
         // return after hide, hide kills this dialog
         return true;
     }
 
-    if (canvas.RO.current_layer>0 
+    if (canvas.RO.current_frame>0 
             && u_button_clicked(&impl->move_prev_btn.rect, pointer)) {
-        s_log("move with prev layer: %i", canvas.RO.current_layer);
+        s_log("move with prev frame: %i", canvas.RO.current_frame);
         
-        uSprite swap = u_sprite_new_clone_swap_rows(
+        uSprite swap = u_sprite_new_clone_swap_cols(
                 canvas.RO.sprite,
-                canvas.RO.current_layer-1,
-                canvas.RO.current_layer);
+                canvas.RO.current_frame-1,
+                canvas.RO.current_frame);
         
         canvas_set_sprite(swap, true);
-        canvas_set_layer(canvas.RO.current_layer-1);
-        dialog_create_layer();
+        canvas_set_frame(canvas.RO.current_frame-1);
+        dialog_create_frame();
         // return after hide, hide kills this dialog
         return true;
     }
     
-    if (canvas.RO.current_layer<(canvas.RO.sprite.rows-1) 
+    if (canvas.RO.current_frame<(canvas.RO.sprite.rows-1) 
             && u_button_clicked(&impl->move_next_btn.rect, pointer)) {
-        s_log("move with next layer: %i", canvas.RO.current_layer);
+        s_log("move with next frame: %i", canvas.RO.current_frame);
         
-        uSprite swap = u_sprite_new_clone_swap_rows(
+        uSprite swap = u_sprite_new_clone_swap_cols(
                 canvas.RO.sprite,
-                canvas.RO.current_layer+1,
-                canvas.RO.current_layer);
+                canvas.RO.current_frame+1,
+                canvas.RO.current_frame);
         
         canvas_set_sprite(swap, true);
-        canvas_set_layer(canvas.RO.current_layer+1);
-        dialog_create_layer();
+        canvas_set_frame(canvas.RO.current_frame+1);
+        dialog_create_frame();
         // return after hide, hide kills this dialog
         return true;
     }
 
-    if (canvas.RO.current_layer>0 
+    if (canvas.RO.current_frame>0 
             && u_button_clicked(&impl->merge_btn.rect, pointer)) {
-        s_log("merge layer: %i", canvas.RO.current_layer);
-        uSprite sprite = u_sprite_new_clone_merge_row_down(canvas.RO.sprite, canvas.RO.current_layer);
+        s_log("merge frame: %i", canvas.RO.current_frame);
+        uSprite sprite = u_sprite_new_clone_merge_col_down(canvas.RO.sprite, canvas.RO.current_frame);
         canvas_set_sprite(sprite, true);
-        dialog_create_layer();
+        dialog_create_frame();
         // return after hide, hide kills this dialog
         return true;
     }
@@ -156,7 +156,7 @@ static void on_action(bool ok) {
 // public
 //
 
-void dialog_create_layer() {
+void dialog_create_frame() {
     dialog_hide();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
@@ -168,16 +168,16 @@ void dialog_create_layer() {
 
     char info_txt[4];
     snprintf(info_txt, sizeof info_txt, "%-2i",
-            canvas.RO.current_layer +1);
+            canvas.RO.current_frame +1);
     ro_text_set_text(&impl->info, info_txt);
     s_log("size is: %s", info_txt);
     impl->info.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
     
-    impl->layer = ro_single_new(canvas.RO.tex);
-    impl->layer.owns_tex = false;
-    impl->layer.rect.sprite = (vec2) {{
+    impl->frame = ro_single_new(canvas.RO.tex);
+    impl->frame.owns_tex = false;
+    impl->frame.rect.sprite = (vec2) {{
         canvas.RO.current_frame,
-        canvas.RO.current_layer
+        canvas.RO.current_frame
     }};
     
     uImage img = canvas.RO.image;
@@ -189,7 +189,7 @@ void dialog_create_layer() {
         width = width * img.cols / img.rows;
     }
     
-    impl->layer.rect.pose = u_pose_new(DIALOG_LEFT+48, DIALOG_TOP - 4 - pos, width, height);
+    impl->frame.rect.pose = u_pose_new(DIALOG_LEFT+48, DIALOG_TOP - 4 - pos, width, height);
     
     pos += 18;
     
@@ -204,12 +204,12 @@ void dialog_create_layer() {
     pos += 24;
 
     impl->move_txt = ro_text_new_font55(64);
-    if(canvas.RO.sprite.rows<=1) {
+    if(canvas.RO.sprite.cols<=1) {
         ro_text_set_text(&impl->move_txt, "Need more than\n"
-                "a single layer\n"
-                "for layer options");
+                "a single frame\n"
+                "for frame options");
     } else {
-        ro_text_set_text(&impl->move_txt, "move layer:");
+        ro_text_set_text(&impl->move_txt, "move frame:");
     }
     ro_text_set_color(&impl->move_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
     impl->move_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
@@ -224,8 +224,8 @@ void dialog_create_layer() {
 
     impl->merge_txt = ro_text_new_font55(32);
     char merge_txt[128];
-    snprintf(merge_txt, sizeof merge_txt, "Merge layer\n"
-            "into layer: %-2i", canvas.RO.current_layer);
+    snprintf(merge_txt, sizeof merge_txt, "Merge frame\n"
+            "into frame: %-2i", canvas.RO.current_frame);
     ro_text_set_text(&impl->merge_txt, merge_txt);
     ro_text_set_color(&impl->merge_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
     impl->merge_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
@@ -236,7 +236,7 @@ void dialog_create_layer() {
 
     dialog.impl_height = pos;
 
-    dialog_set_title("layer", (vec4) {{0.2, 0.2, 0.2, 1}});
+    dialog_set_title("frame", (vec4) {{0.2, 0.2, 0.2, 1}});
     dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
     dialog.kill = kill_fn;
     dialog.update = update;
