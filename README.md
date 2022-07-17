@@ -59,18 +59,26 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- sprites
-  - animation button opens toolbar as with layers
-    - same options as for layers
-    - and frame time for that frame
-    - option to set all frame times (fps btn?)
-  - size dialog needs frames
-  - size dialog can morph the full image into frames
-    - red text if not valid
-    - button as full image
-    
-- json export (frame times)
-- gif export?
+- animation play on frames pressed
+- frame time in frame dialog
+- frames condig dialog on btn long press
+  - frametimes reset all
+    - btn fps, btn ms
+  - animation size
+  - repeat H
+  - repeat V
+  - morph frames from image?
+- size dialog 
+  - needs frames
+  - without pattern
+- save dialog
+  - hd min px size
+  - json frame times
+  - gif
+  - gif hd
+- pattern dialog on grid longpress
+  - pattern size
+  - blend button for pattern
     
 - dialog colors, toolbar colors,
   - or drawn
