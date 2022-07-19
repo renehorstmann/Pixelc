@@ -42,9 +42,12 @@ struct Canvas_Globals {
         int current_frame;
         int current_layer;
         
-        // just to directly read the image from the sprite
-        uImage image;
+        bool frames_enabled;
+        bool layers_enabled;
         
+        // just to directly read the image from the sprite
+        // deprecated
+        uImage image;
         int current_image_layer;
         
         int pattern_cols;
@@ -67,6 +70,11 @@ void canvas_set_frame(int sprite_col);
 
 void canvas_set_layer(int sprite_row);
 
+// turns on or off sprite.cols
+void canvas_enable_frames(bool enable);
+
+// turns on or off sprite.rows
+void canvas_enable_layers(bool enable);
 
 // sets a new image for the canvas
 // canvas will take the ownership of image_sink
@@ -79,7 +87,7 @@ void canvas_set_pattern_size(int cols, int rows);
 void canvas_save();
 
 // reloads the last saved image (for aborting a draw operation)
-// uses the uImage L.prev_image in memory
+// uses the uSprite L.prev_image in memory
 void canvas_reload();
 
 // reloads the last saved image

@@ -10,7 +10,7 @@
 #define TB_ACTIVE_BG_B "#888888"
 #define TB_SELECTION_BG_A "#99bb99"
 #define TB_SELECTION_BG_B "#888888"
-#define TB_FRAMES_BG_A "#9999bb"
+#define TB_FRAMES_BG_A "#bbbb99"
 #define TB_FRAMES_BG_B "#888888"
 #define TB_LAYER_BG_A "#bb9999"
 #define TB_LAYER_BG_B "#888888"

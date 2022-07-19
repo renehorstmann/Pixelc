@@ -27,6 +27,9 @@ static struct {
     RoSingle bg;
     RoSingle grid;
 
+    int frames;
+    int layers;
+
     struct {
         int current_layer;
         int current_frame;
@@ -55,8 +58,8 @@ static void save_image() {
             e_io_savestate_file_path(file_png));
 
     uJson *state = u_json_new_file(e_io_savestate_file_path(file_json));
-    u_json_append_int(state, "layer", canvas.RO.sprite.rows);
-    u_json_append_int(state, "frames", canvas.RO.sprite.cols);
+    u_json_append_int(state, "layer", L.layers);
+    u_json_append_int(state, "frames", L.frames);
     
     uJson *frame_times = u_json_append_array(state, "frame_times");
     for(int i=0; i<canvas.RO.sprite.cols; i++) {
@@ -134,7 +137,17 @@ static void load_image() {
             canvas.RO.tab_id, 
             L.tab_saves[canvas.RO.tab_id].save_idx,
             true);
+    L.frames = sprite.cols;
+    L.layers = sprite.rows;
     canvas_set_sprite(sprite, false);
+    if(!canvas.RO.frames_enabled) {
+        canvas.RO.frames_enabled = true;
+        canvas_enable_frames(false);
+    }
+    if(!canvas.RO.layers_enabled) {
+        canvas.RO.layers_enabled = true;
+        canvas_enable_layers(false);
+    }
 }
 
 // updates the ro tex and sizes
@@ -288,6 +301,48 @@ void canvas_set_layer(int sprite_row) {
             canvas.RO.current_layer);
 }
 
+void canvas_enable_frames(bool enable) {
+    s_log("enable: %i", enable);
+    canvas_reload();
+    if(enable == canvas.RO.frames_enabled) {
+        s_log_warn("nothing changed");
+        return;
+    }
+    canvas.RO.frames_enabled = enable;
+    if(enable) {
+        uImage img = canvas.RO.sprite.img;
+        img.layers = canvas.RO.sprite.rows;
+        uSprite sprite = u_sprite_new_reorder_from_image(L.frames, img);
+        canvas_set_sprite(sprite, false);
+    } else {
+        uImage img = u_sprite_reorder_to_new_image(canvas.RO.sprite);
+        uSprite sprite = {img, 1, img.layers};
+        canvas_set_sprite(sprite, false);
+    }
+}
+
+
+void canvas_enable_layers(bool enable) {
+    s_log("enable: %i", enable);
+    canvas_reload();
+    if(enable == canvas.RO.layers_enabled) {
+        s_log_warn("nothing changed");
+        return;
+    }
+    canvas.RO.layers_enabled = enable;
+    if(enable) {
+        uSprite sprite = u_sprite_new_clone(canvas.RO.sprite);
+        sprite.img.layers *= L.layers;
+        sprite.rows = L.layers;
+        canvas_set_sprite(sprite, false);
+    } else {
+        uSprite sprite = u_sprite_new_clone(canvas.RO.sprite);
+        sprite.img.layers /= sprite.rows;
+        sprite.rows = 1;
+        canvas_set_sprite(sprite, false);
+    }
+}
+
 
 void canvas_set_sprite(uSprite image_sink, bool save) {
     if (!u_sprite_valid(image_sink)) {
@@ -303,6 +358,9 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
         return;
     }
     s_log("set_image");
+    
+    canvas.RO.frames_enabled = image_sink.cols>1;
+    canvas.RO.layers_enabled = image_sink.rows>1;
 
     u_sprite_kill(&canvas.RO.sprite);
     canvas.RO.sprite = image_sink;
@@ -324,7 +382,9 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
     }
 
     update_render_objects();
+    
 }
+
 
 void canvas_set_pattern_size(int cols, int rows) {
     cols = isca_clamp(cols, 1, canvas.RO.image.cols);
