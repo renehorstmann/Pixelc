@@ -27,9 +27,6 @@ static struct {
     RoSingle bg;
     RoSingle grid;
 
-    int frames;
-    int layers;
-
     struct {
         int current_layer;
         int current_frame;
@@ -58,8 +55,8 @@ static void save_image() {
             e_io_savestate_file_path(file_png));
 
     uJson *state = u_json_new_file(e_io_savestate_file_path(file_json));
-    u_json_append_int(state, "layer", L.layers);
-    u_json_append_int(state, "frames", L.frames);
+    u_json_append_int(state, "layer", canvas.RO.layers);
+    u_json_append_int(state, "frames", canvas.RO.frames);
     
     uJson *frame_times = u_json_append_array(state, "frame_times");
     for(int i=0; i<canvas.RO.sprite.cols; i++) {
@@ -137,17 +134,7 @@ static void load_image() {
             canvas.RO.tab_id, 
             L.tab_saves[canvas.RO.tab_id].save_idx,
             true);
-    L.frames = sprite.cols;
-    L.layers = sprite.rows;
     canvas_set_sprite(sprite, false);
-    if(!canvas.RO.frames_enabled) {
-        canvas.RO.frames_enabled = true;
-        canvas_enable_frames(false);
-    }
-    if(!canvas.RO.layers_enabled) {
-        canvas.RO.layers_enabled = true;
-        canvas_enable_layers(false);
-    }
 }
 
 // updates the ro tex and sizes
@@ -166,6 +153,59 @@ static void update_render_objects() {
     }
 }
 
+// according to layers_, frames_enabled and L.layers, frames
+static void update_sprite() {
+    uSprite c = canvas.RO.sprite;
+    
+    // check frames, morph to full image
+    if(!canvas.RO.frames_enabled && c.cols>1) {
+        s_log("frames to full: %i", c.cols);
+        uImage img = u_sprite_reorder_to_new_image(c);
+        u_sprite_kill(&c);
+        c = (uSprite) {img, 1, img.layers};
+    }
+    
+    // check frames, morph into frames cols
+    if(canvas.RO.frames_enabled && c.cols==1) {
+        s_log("frames to sprite: %i", canvas.RO.frames);
+        uImage img = c.img;
+        
+        uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, img);
+        u_sprite_kill(&c);
+        c = sprite;
+    }
+    
+    // check layers, show full imahe
+    if(!canvas.RO.layers_enabled && c.rows>1) {
+        s_log("layers to full: %i", c.rows);
+        c.img.layers /= c.rows;
+        c.img.rows *= c.rows;
+        c.rows = 1;
+    
+    } 
+    
+    // check layers, use layers
+    if(canvas.RO.layers_enabled && c.rows==1) {
+        s_log("layers to sprite: %i", canvas.RO.layers);
+        c.img.layers *= canvas.RO.layers;
+        c.img.rows /= canvas.RO.layers;
+        c.rows = canvas.RO.layers;
+    }
+    
+    canvas.RO.sprite = c;
+    canvas.RO.image = c.img;
+    
+    canvas.RO.current_frame = s_min(canvas.RO.current_frame, c.cols-1);
+    canvas.RO.current_layer = s_min(canvas.RO.current_layer, c.rows-1);
+    canvas.RO.current_image_layer = u_sprite_pos_to_layer(c.cols, 
+            canvas.RO.current_frame, 
+            canvas.RO.current_layer);
+
+    u_image_kill(&L.prev_image);
+    L.prev_image = u_image_new_clone(c.img);
+    
+    update_render_objects();
+}
 
 
 
@@ -186,6 +226,9 @@ void canvas_init() {
 
     canvas.RO.pose = mat4_eye();
 
+    canvas.RO.frames = 1;
+    canvas.RO.layers = 1;
+    
     canvas.RO.pattern_cols = 8;
     canvas.RO.pattern_rows = 8;
 
@@ -309,16 +352,7 @@ void canvas_enable_frames(bool enable) {
         return;
     }
     canvas.RO.frames_enabled = enable;
-    if(enable) {
-        uImage img = canvas.RO.sprite.img;
-        img.layers = canvas.RO.sprite.rows;
-        uSprite sprite = u_sprite_new_reorder_from_image(L.frames, img);
-        canvas_set_sprite(sprite, false);
-    } else {
-        uImage img = u_sprite_reorder_to_new_image(canvas.RO.sprite);
-        uSprite sprite = {img, 1, img.layers};
-        canvas_set_sprite(sprite, false);
-    }
+    update_sprite();
 }
 
 
@@ -330,17 +364,7 @@ void canvas_enable_layers(bool enable) {
         return;
     }
     canvas.RO.layers_enabled = enable;
-    if(enable) {
-        uSprite sprite = u_sprite_new_clone(canvas.RO.sprite);
-        sprite.img.layers *= L.layers;
-        sprite.rows = L.layers;
-        canvas_set_sprite(sprite, false);
-    } else {
-        uSprite sprite = u_sprite_new_clone(canvas.RO.sprite);
-        sprite.img.layers /= sprite.rows;
-        sprite.rows = 1;
-        canvas_set_sprite(sprite, false);
-    }
+    update_sprite();
 }
 
 
@@ -357,32 +381,30 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
         s_log_warn("to much frames!");
         return;
     }
+    if(!canvas.RO.frames_enabled && image_sink.cols>1) {
+        s_log_warn("frames not enabled!");
+        return;
+    }
+    if(!canvas.RO.layers_enabled && image_sink.rows>1) {
+        s_log_warn("layers not enabled!");
+        return;
+    }
     s_log("set_image");
     
-    canvas.RO.frames_enabled = image_sink.cols>1;
-    canvas.RO.layers_enabled = image_sink.rows>1;
-
+    if(canvas.RO.frames_enabled)
+        canvas.RO.frames = image_sink.cols;
+    if(canvas.RO.layers_enabled)
+        canvas.RO.layers = image_sink.rows;
+    
     u_sprite_kill(&canvas.RO.sprite);
     canvas.RO.sprite = image_sink;
-    canvas.RO.image = canvas.RO.sprite.img;
+    update_sprite();
     
-    canvas.RO.current_frame = s_min(canvas.RO.current_frame, canvas.RO.sprite.cols-1);
-    canvas.RO.current_layer = s_min(canvas.RO.current_layer, canvas.RO.sprite.rows-1);
-    canvas.RO.current_image_layer = u_sprite_pos_to_layer(canvas.RO.sprite.cols, 
-            canvas.RO.current_frame, 
-            canvas.RO.current_layer);
-
-    u_image_kill(&L.prev_image);
-    L.prev_image = u_image_new_zeros(image_sink.img.cols, image_sink.img.rows, image_sink.cols * image_sink.rows);
-   
     if (save) {
+        // bypass equals test
+        L.prev_image.data[0].x++;
         canvas_save();
-    } else {
-        u_image_copy(L.prev_image, image_sink.img);
-    }
-
-    update_render_objects();
-    
+    }     
 }
 
 

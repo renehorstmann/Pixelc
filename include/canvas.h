@@ -39,6 +39,9 @@ struct Canvas_Globals {
         uSprite sprite;
         rTexture tex;
         
+        int frames;
+        int layers;
+        
         int current_frame;
         int current_layer;
         
