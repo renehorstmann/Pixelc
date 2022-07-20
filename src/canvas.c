@@ -134,6 +134,8 @@ static void load_image() {
             canvas.RO.tab_id, 
             L.tab_saves[canvas.RO.tab_id].save_idx,
             true);
+    canvas.RO.frames = sprite.cols;
+    canvas.RO.layers = sprite.rows;
     canvas_set_sprite(sprite, false);
 }
 
@@ -331,8 +333,8 @@ void canvas_render(const mat4 *canvascam_mat) {
 }
 
 void canvas_set_frame(int sprite_col) {
+    sprite_col = sca_clamp(sprite_col, 0, canvas.RO.sprite.cols-1);
     s_log("frame: %i/%i", sprite_col, canvas.RO.sprite.cols);
-    s_assume(sprite_col>=0&&sprite_col<canvas.RO.sprite.cols, "invalid frame");
     canvas.RO.current_frame = sprite_col;
     canvas.RO.current_image_layer = u_sprite_pos_to_layer(canvas.RO.sprite.cols, 
             canvas.RO.current_frame,
@@ -340,8 +342,8 @@ void canvas_set_frame(int sprite_col) {
 }
 
 void canvas_set_layer(int sprite_row) {
+    sprite_row = sca_clamp(sprite_row, 0, canvas.RO.sprite.rows-1);
     s_log("layer: %i/%i", sprite_row, canvas.RO.sprite.rows);
-    s_assume(sprite_row>=0&&sprite_row<canvas.RO.sprite.rows, "invalid layer");
     canvas.RO.current_layer = sprite_row;
     canvas.RO.current_image_layer = u_sprite_pos_to_layer(canvas.RO.sprite.cols, 
             canvas.RO.current_frame,
@@ -383,14 +385,6 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
     }
     if (image_sink.cols > CANVAS_MAX_FRAMES) {
         s_log_warn("to much frames!");
-        return;
-    }
-    if(!canvas.RO.frames_enabled && image_sink.cols>1) {
-        s_log_warn("frames not enabled!");
-        return;
-    }
-    if(!canvas.RO.layers_enabled && image_sink.rows>1) {
-        s_log_warn("layers not enabled!");
         return;
     }
     s_log("set_image");
