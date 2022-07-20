@@ -157,23 +157,9 @@ static void update_render_objects() {
 static void update_sprite() {
     uSprite c = canvas.RO.sprite;
     
-    // check frames, morph to full image
-    if(!canvas.RO.frames_enabled && c.cols>1) {
-        s_log("frames to full: %i", c.cols);
-        uImage img = u_sprite_reorder_to_new_image(c);
-        u_sprite_kill(&c);
-        c = (uSprite) {img, 1, img.layers};
-    }
-    
-    // check frames, morph into frames cols
-    if(canvas.RO.frames_enabled && c.cols==1) {
-        s_log("frames to sprite: %i", canvas.RO.frames);
-        uImage img = c.img;
-        
-        uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, img);
-        u_sprite_kill(&c);
-        c = sprite;
-    }
+    uImage img = u_sprite_reorder_to_new_image(c);
+    u_sprite_kill(&c);
+    c = (uSprite) {img, 1, img.layers};
     
     // check layers, show full imahe
     if(!canvas.RO.layers_enabled && c.rows>1) {
@@ -191,6 +177,24 @@ static void update_sprite() {
         c.img.rows /= canvas.RO.layers;
         c.rows = canvas.RO.layers;
     }
+    
+    // check frames, morph to full image
+    if(!canvas.RO.frames_enabled && c.cols>1) {
+        s_log("frames to full: %i", c.cols);
+        // noop, is full in the moment
+    }
+    
+    // check frames, morph into frames cols
+    if(canvas.RO.frames_enabled && c.cols==1) {
+        s_log("frames to sprite: %i", canvas.RO.frames);
+        uImage img = c.img;
+        
+        uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, c.img);
+        u_sprite_kill(&c);
+        c = sprite;
+    }
+    
+    
     
     canvas.RO.sprite = c;
     canvas.RO.image = c.img;
