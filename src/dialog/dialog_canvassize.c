@@ -210,7 +210,7 @@ void dialog_create_canvas_size() {
     impl->rows_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
     impl->rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
 
-    pos = 50;
+    pos = 55;
     impl->frames = canvas.RO.frames;
     impl->frames_text = ro_text_new_font55(7);
     ro_text_set_text(&impl->frames_text, "frames:");

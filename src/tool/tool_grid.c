@@ -15,6 +15,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     bool pressed = u_button_is_pressed(&self->ro.rect);
     s_log("tool grid: %i", pressed);
     canvas.show_grid = pressed;
+    canvas.alpha = pressed? 0.8 : 1.0;
 }
 
 static bool is_active(struct Tool *super, float dtime) {

@@ -308,7 +308,7 @@ void canvas_render(const mat4 *canvascam_mat) {
     
     switch(canvas.blend_mode) {
     case CANVAS_BLEND_NONE:
-        L.ro.rect.color.a = 1;
+        L.ro.rect.color.a = canvas.alpha;
         L.ro.rect.sprite.x = canvas.RO.current_frame;
         L.ro.rect.sprite.y = canvas.RO.current_layer;
         ro_single_render(&L.ro, canvascam_mat);
@@ -321,13 +321,13 @@ void canvas_render(const mat4 *canvascam_mat) {
                 alpha = 0.33;
             else if(i==canvas.RO.current_frame)
                 alpha = 1;
-            L.ro.rect.color.a = alpha;
+            L.ro.rect.color.a = alpha*canvas.alpha;
             L.ro.rect.sprite.x = i;
             ro_single_render(&L.ro, canvascam_mat);
         }
         break;
     case CANVAS_BLEND_FRAMES_FULL:
-        L.ro.rect.color.a = 1;
+        L.ro.rect.color.a = canvas.alpha;
         L.ro.rect.sprite.y = canvas.RO.current_layer;
         for(int i=0; i<=canvas.RO.current_frame; i++) {
             L.ro.rect.sprite.x = i;
@@ -342,13 +342,13 @@ void canvas_render(const mat4 *canvascam_mat) {
                 alpha = 0.33;
             else if(i==canvas.RO.current_layer)
                 alpha = 1;
-            L.ro.rect.color.a = alpha;
+            L.ro.rect.color.a = alpha*canvas.alpha;
             L.ro.rect.sprite.y = i;
             ro_single_render(&L.ro, canvascam_mat);
         }
         break;
     case CANVAS_BLEND_LAYER_FULL:
-        L.ro.rect.color.a = 1;
+        L.ro.rect.color.a = canvas.alpha;
         L.ro.rect.sprite.x = canvas.RO.current_frame;
         for(int i=0; i<=canvas.RO.current_layer; i++) {
             L.ro.rect.sprite.y = i;
