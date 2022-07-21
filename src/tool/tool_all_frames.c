@@ -235,11 +235,10 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         s_log("tool frames add");
-        canvas_reload();
         int frame = canvas.RO.current_frame;
-        uSprite old = canvas.RO.sprite;
+        uSprite old = canvas_get_sprite();
         uSprite sprite = u_sprite_new_clone_insert_col(old, frame);
-
+        u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
         canvas_set_frame(frame+1);
     }

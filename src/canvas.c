@@ -367,6 +367,32 @@ void canvas_render(const mat4 *canvascam_mat) {
     }
 }
 
+uImage canvas_get_full_image() {
+    canvas_reload();
+    uImage img = u_sprite_reorder_to_new_image(canvas.RO.sprite);
+    img.rows *= img.layers;
+    img.layers = 1;
+    return img;
+}
+
+uImage canvas_get_merged_image() {
+    uImage img = canvas_get_full_image();
+    img.rows /= canvas.RO.layers;
+    img.layers = canvas.RO.layers;
+    uImage merged = u_image_new_clone_merge_down_full(img);
+    u_image_kill(&img);
+    return merged;
+}
+
+uSprite canvas_get_sprite() {
+    uImage img = canvas_get_full_image();
+    img.rows /= canvas.RO.layers;
+    img.layers = canvas.RO.layers;
+    uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, img);
+    u_image_kill(&img);
+    return sprite;
+}
+
 void canvas_set_frame(int sprite_col) {
     sprite_col = sca_clamp(sprite_col, 0, canvas.RO.sprite.cols-1);
     s_log("frame: %i/%i", sprite_col, canvas.RO.sprite.cols);
@@ -426,10 +452,11 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
             image_sink.img.cols, image_sink.img.rows, 
             image_sink.cols, image_sink.rows);
     
-    if(canvas.RO.frames_enabled)
-        canvas.RO.frames = image_sink.cols;
-    if(canvas.RO.layers_enabled)
-        canvas.RO.layers = image_sink.rows;
+    
+    canvas.RO.cols = image_sink.img.cols;
+    canvas.RO.rows = image_sink.img.rows;
+    canvas.RO.frames = image_sink.cols;
+    canvas.RO.layers = image_sink.rows;
     
     u_sprite_kill(&canvas.RO.sprite);
     canvas.RO.sprite = image_sink;
@@ -605,6 +632,7 @@ void canvas_load_config() {
         if(!ok) {
             s_log_debug("failed to load tab %i info, resetting to 0", t);
             memset(&L.tab_saves[t], 0, sizeof L.tab_saves[t]);
+            break;
         }
     }
 

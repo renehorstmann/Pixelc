@@ -27,53 +27,39 @@ void io_config_clear_files() {
 }
 
 void io_image_save() {
-    canvas_reload();
-    uSprite c = canvas.RO.sprite;
-    s_log("save merged: %i, size: %i %i %i %i", 
+    uImage img;
+    if(io.image_save_merged)
+        img = canvas_get_merged_image();
+    else
+        img = canvas_get_full_image();
+    s_log("save merged: %i, size: %i %i", 
             io.image_save_merged, 
-            c.img.cols, c.img.rows,
-            c.cols, c.rows);
+            img.cols, img.rows);
     
-    if(io.image_save_merged) {
-        uSprite sprite = u_sprite_new_clone_merge_row_down_full(c);
-        
-        s_log_debug("merged size: %i %i %i %i",
-                sprite.img.cols, sprite.img.rows,
-                sprite.cols, sprite.rows);
-        u_sprite_save_file(sprite, "image.png");
-        u_sprite_kill(&sprite);
-    } else {
-        u_sprite_save_file(c, "image.png");
-    }
+    u_image_save_file(img, "image.png");
+    u_image_kill(&img);
     e_io_offer_file_as_download("image.png");
 }
 
 void io_image_hd_save() {
-    canvas_reload();
-    uSprite c = canvas.RO.sprite;
-    s_log("save merged: %i, size: %i %i %i %i", 
+    uImage img;
+    if(io.image_save_merged)
+        img = canvas_get_merged_image();
+    else
+        img = canvas_get_full_image();
+    s_log("save merged hd: %i, size: %i %i", 
             io.image_save_merged, 
-            c.img.cols, c.img.rows,
-            c.cols, c.rows);
+            img.cols, img.rows);
     
-    uSprite sprite = c;
-    if(io.image_save_merged) {
-        sprite = u_sprite_new_clone_merge_row_down_full(sprite);
-        s_log_debug("merged size: %i %i %i %i",
-                sprite.img.cols, sprite.img.rows,
-                sprite.cols, sprite.rows);
-    }
     
-    int scale_w = sca_ceil((float) HD_MIN_SIZE / sprite.img.cols);
-    int scale_h = sca_ceil((float) HD_MIN_SIZE / sprite.img.rows);
+    int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
+    int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
     int scale = isca_max(scale_w, scale_h);
-    uSprite hd = u_sprite_new_clone_scaled(sprite.img.cols * scale, sprite.img.rows * scale, false, sprite);
+    uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
     
-    u_sprite_save_file(hd, "image_hd.png");
-    u_sprite_kill(&hd);
-    if(io.image_save_merged) {
-        u_sprite_kill(&sprite);
-    }
+    u_image_save_file(hd, "image_hd.png");
+    u_image_kill(&hd);
+    u_image_kill(&img);
     e_io_offer_file_as_download("image_hd.png");
 }
 

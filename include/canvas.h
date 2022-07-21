@@ -36,12 +36,12 @@ struct Canvas_Globals {
     struct {
         mat4 pose; // = u_pose_new_aa(0, 0, cols, rows)
         
+        int cols, rows;
+        int frames, layers;
+        
         uSprite sprite;
         rTexture tex;
-        
-        int frames;
-        int layers;
-        
+                
         int current_frame;
         int current_layer;
         
@@ -67,6 +67,17 @@ void canvas_update(float dtime);
 
 void canvas_render(const mat4 *canvascam_mat);
 
+// returns a new image with a single layer
+// calls canvas_reload first
+uImage canvas_get_full_image();
+
+// returns a new image, with the layers merged
+// calls canvas_reload first
+uImage canvas_get_merged_image();
+
+// returns a new sprite
+// calls canvas_reload first
+uSprite canvas_get_sprite();
 
 void canvas_set_frame(int sprite_col);
 

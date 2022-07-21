@@ -59,10 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- canvas enable frames/layers
-  - morphs from and to sprite cols/rows
-  - show full image, if frames/layers btn is not pressed
-
 - animation play on frames pressed
 - frame time in frame dialog
 - frames condig dialog on btn long press
@@ -71,10 +67,6 @@ python3 -m http.server --bind localhost  # [port]
   - animation size
   - repeat H
   - repeat V
-  - morph frames from image?
-- size dialog 
-  - needs frames
-  - without pattern
 - save dialog
   - hd min px size
   - json frame times

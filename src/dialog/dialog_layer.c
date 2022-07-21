@@ -19,7 +19,9 @@
 static void on_delete_action(bool ok) {
     s_log("delete: %i", ok);
     if (ok) {
+        uSprite old = canvas_get_sprite();
         uSprite sprite = u_sprite_new_clone_remove_row(canvas.RO.sprite, canvas.RO.current_layer);
+        u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
         dialog_create_layer();
     } else 
@@ -106,11 +108,12 @@ static bool pointer_event(ePointer_s pointer) {
             && u_button_clicked(&impl->move_prev_btn.rect, pointer)) {
         s_log("move with prev layer: %i", canvas.RO.current_layer);
         
+        uSprite old = canvas_get_sprite();
         uSprite swap = u_sprite_new_clone_swap_rows(
-                canvas.RO.sprite,
+                old,
                 canvas.RO.current_layer-1,
                 canvas.RO.current_layer);
-        
+        u_sprite_kill(&old);
         canvas_set_sprite(swap, true);
         canvas_set_layer(canvas.RO.current_layer-1);
         dialog_create_layer();
@@ -122,11 +125,12 @@ static bool pointer_event(ePointer_s pointer) {
             && u_button_clicked(&impl->move_next_btn.rect, pointer)) {
         s_log("move with next layer: %i", canvas.RO.current_layer);
         
+        uSprite old = canvas_get_sprite();
         uSprite swap = u_sprite_new_clone_swap_rows(
-                canvas.RO.sprite,
+                old,
                 canvas.RO.current_layer+1,
                 canvas.RO.current_layer);
-        
+        u_sprite_kill(&old);
         canvas_set_sprite(swap, true);
         canvas_set_layer(canvas.RO.current_layer+1);
         dialog_create_layer();
@@ -137,7 +141,10 @@ static bool pointer_event(ePointer_s pointer) {
     if (canvas.RO.current_layer>0 
             && u_button_clicked(&impl->merge_btn.rect, pointer)) {
         s_log("merge layer: %i", canvas.RO.current_layer);
-        uSprite sprite = u_sprite_new_clone_merge_row_down(canvas.RO.sprite, canvas.RO.current_layer);
+        
+        uSprite old = canvas_get_sprite();
+        uSprite sprite = u_sprite_new_clone_merge_row_down(old, canvas.RO.current_layer);
+        u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
         dialog_create_layer();
         // return after hide, hide kills this dialog

@@ -39,12 +39,8 @@ Tool *tool_new_size() {
     return tool_button_new("size",
                            "change the\n"
                            "canvas size,\n"
-                           "layer size\n"
-                           "and pattern size.\n\n"
-                           "if the layer size\n"
-                           "changes, the image\n"
-                           "is copied, as there\n"
-                           "were no layers",
+                           "frames size\n"
+                           "and layer size",
                            "res/button_size.png",
                            pointer_event,
                            is_active);

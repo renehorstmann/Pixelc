@@ -19,7 +19,9 @@
 static void on_delete_action(bool ok) {
     s_log("delete: %i", ok);
     if (ok) {
-        uSprite sprite = u_sprite_new_clone_remove_col(canvas.RO.sprite, canvas.RO.current_frame);
+        uSprite old = canvas_get_sprite();
+        uSprite sprite = u_sprite_new_clone_remove_col(old, canvas.RO.current_frame);
+        u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
         dialog_create_frame();
     } else 
@@ -106,11 +108,12 @@ static bool pointer_event(ePointer_s pointer) {
             && u_button_clicked(&impl->move_prev_btn.rect, pointer)) {
         s_log("move with prev frame: %i", canvas.RO.current_frame);
         
+        uSprite old = canvas_get_sprite();
         uSprite swap = u_sprite_new_clone_swap_cols(
-                canvas.RO.sprite,
+                old,
                 canvas.RO.current_frame-1,
                 canvas.RO.current_frame);
-        
+        u_sprite_kill(&old);
         canvas_set_sprite(swap, true);
         canvas_set_frame(canvas.RO.current_frame-1);
         dialog_create_frame();
@@ -122,11 +125,12 @@ static bool pointer_event(ePointer_s pointer) {
             && u_button_clicked(&impl->move_next_btn.rect, pointer)) {
         s_log("move with next frame: %i", canvas.RO.current_frame);
         
+        uSprite old = canvas_get_sprite();
         uSprite swap = u_sprite_new_clone_swap_cols(
-                canvas.RO.sprite,
+                old,
                 canvas.RO.current_frame+1,
                 canvas.RO.current_frame);
-        
+        u_sprite_kill(&old);
         canvas_set_sprite(swap, true);
         canvas_set_frame(canvas.RO.current_frame+1);
         dialog_create_frame();
@@ -137,7 +141,9 @@ static bool pointer_event(ePointer_s pointer) {
     if (canvas.RO.current_frame>0 
             && u_button_clicked(&impl->merge_btn.rect, pointer)) {
         s_log("merge frame: %i", canvas.RO.current_frame);
-        uSprite sprite = u_sprite_new_clone_merge_col_down(canvas.RO.sprite, canvas.RO.current_frame);
+        uSprite old = canvas_get_sprite();
+        uSprite sprite = u_sprite_new_clone_merge_col_down(old, canvas.RO.current_frame);
+        u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
         dialog_create_frame();
         // return after hide, hide kills this dialog

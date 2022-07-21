@@ -229,11 +229,10 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
 
     if (self->active && u_button_clicked(&self->ro.rect, pointer)) {
         s_log("tool layer add");
-        canvas_reload();
         int layer = canvas.RO.current_layer;
-        uSprite old = canvas.RO.sprite;
+        uSprite old = canvas_get_sprite();
         uSprite sprite = u_sprite_new_clone_insert_row(old, layer);
-
+        u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
         canvas_set_layer(layer+1);
     }
