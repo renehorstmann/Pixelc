@@ -51,7 +51,7 @@ static void save_image() {
             canvas.RO.tab_id, 
             L.tab_saves[canvas.RO.tab_id].save_idx);
     
-    u_image_save_file(canvas.RO.image,
+    u_sprite_save_file(canvas.RO.sprite,
             e_io_savestate_file_path(file_png));
 
     uJson *state = u_json_new_file(e_io_savestate_file_path(file_json));
@@ -116,12 +116,10 @@ static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_fra
     
     u_json_kill(&state);
     
-    uImage image = u_image_new_file(
-            frames * layers,
+    uSprite sprite = u_sprite_new_file(
+            frames, layers,
             e_io_savestate_file_path(file_png));
             
-    uSprite sprite = {image, frames, layers};
-    
     if(!u_sprite_valid(sprite)) {
         return u_sprite_new_zeros(DEFAULT_WIDTH, DEFAULT_HEIGHT, 1, 1);
     }
@@ -387,7 +385,9 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
         s_log_warn("to much frames!");
         return;
     }
-    s_log("set_image");
+    s_log("set_sprite: size %i:%i sprite: %i:%i",
+            image_sink.img.cols, image_sink.img.rows, 
+            image_sink.cols, image_sink.rows);
     
     if(canvas.RO.frames_enabled)
         canvas.RO.frames = image_sink.cols;

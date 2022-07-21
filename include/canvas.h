@@ -49,7 +49,6 @@ struct Canvas_Globals {
         bool layers_enabled;
         
         // just to directly read the image from the sprite
-        // deprecated
         uImage image;
         int current_image_layer;
         
@@ -98,10 +97,6 @@ void canvas_undo();
 
 // redos the undo (loads the next saved image, if available)
 void canvas_redo();
-
-// sets the render object color for vertex color effects
-// default = R_COLOR_WHITE
-void canvas_set_ro_color(vec4 color);
 
 bool canvas_undo_available();
 
