@@ -26,6 +26,8 @@ static struct {
 
     RoSingle bg;
     RoSingle grid;
+    
+    RoBatch sprite_grid;
 
     struct {
         int current_layer;
@@ -151,6 +153,32 @@ static void update_render_objects() {
         float h = (float) canvas.RO.image.rows / (2 * canvas.RO.pattern_rows);
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
+    
+    int idx = 0;
+    if(!canvas.RO.frames_enabled) {
+        int img_cols = canvas.RO.sprite.img.cols/canvas.RO.frames;
+        for(int i=1; i<canvas.RO.frames; i++) {
+            L.sprite_grid.rects[idx].pose = u_pose_new_aa(
+                   i*img_cols-0.5, 0, 1, canvas.RO.sprite.img.rows
+            );
+            L.sprite_grid.rects[idx].sprite.x = 0;
+            idx++;
+        }
+    }
+    if(!canvas.RO.layers_enabled) {
+        int img_rows = canvas.RO.sprite.img.rows/canvas.RO.layers;
+        for(int i=1; i<canvas.RO.layers; i++) {
+            L.sprite_grid.rects[idx].pose = u_pose_new_aa(
+                   0, -(i*img_rows-0.5), canvas.RO.sprite.img.cols, 1
+            );
+            L.sprite_grid.rects[idx].sprite.x = 1;
+            idx++;
+        }
+    }
+    for(; idx<L.sprite_grid.num; idx++) {
+        L.sprite_grid.rects[idx].pose = u_pose_new_hidden();
+    }
+    ro_batch_update(&L.sprite_grid);
 }
 
 // according to layers_, frames_enabled and L.layers, frames
@@ -241,6 +269,13 @@ void canvas_init() {
     rTexture grid_tex = r_texture_new_file(1, 1, "res/canvas_grid.png");
     r_texture_wrap_repeat(grid_tex);
     L.grid = ro_single_new(grid_tex);
+    
+    L.sprite_grid = ro_batch_new(
+            CANVAS_MAX_FRAMES+CANVAS_MAX_LAYERS,
+            r_texture_new_file(2, 1, "res/canvas_sprite_grid.png"));
+    for(int i=0; i<L.sprite_grid.num; i++) {
+        L.sprite_grid.rects[i].color.a = 0.2;
+    }
 
     uColor_s buf[4];
     buf[0] = buf[3] = u_color_from_hex("#999999");
@@ -325,9 +360,11 @@ void canvas_render(const mat4 *canvascam_mat) {
     }
 
     
-    if (canvas.show_grid)
+    if (canvas.show_grid) {
         ro_single_render(&L.grid, canvascam_mat);
 
+        ro_batch_render(&L.sprite_grid, canvascam_mat, false);
+    }
 }
 
 void canvas_set_frame(int sprite_col) {
