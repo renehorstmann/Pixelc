@@ -19,6 +19,10 @@ void io_image_save();
 
 void io_image_hd_save();
 
+void io_gif_save();
+
+void io_gif_hd_save();
+
 void io_image_import();
 
 

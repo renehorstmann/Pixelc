@@ -59,11 +59,7 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- save dialog
-  - hd min px size
-  - json frame times
-  - gif
-  - gif hd
+- save gif in animation dialog
     
 - dialog colors, toolbar colors,
   - or drawn

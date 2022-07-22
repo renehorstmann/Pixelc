@@ -63,6 +63,14 @@ void io_image_hd_save() {
     e_io_offer_file_as_download("image_hd.png");
 }
 
+void io_gif_save() {
+    
+}
+
+void io_gif_hd_save() {
+    
+}
+
 void io_image_import() {
     s_log("import");
     

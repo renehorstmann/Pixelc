@@ -3,6 +3,7 @@
 #include "u/pose.h"
 #include "modal.h"
 #include "animation.h"
+#include "io.h"
 #include "dialog.h"
 
 #define BG_A "#667766"
@@ -21,6 +22,10 @@ typedef struct {
     RoSingle repeat_h;
     RoSingle repeat_v;
     
+    RoText save_txt;
+    RoSingle save;
+    RoSingle save_hd;
+    
     TextInput *textinput;
 } Impl;
 
@@ -32,6 +37,10 @@ static void kill_fn() {
     ro_text_kill(&impl->repeat_txt);
     ro_single_kill(&impl->repeat_h);
     ro_single_kill(&impl->repeat_v);
+    
+    ro_text_kill(&impl->save_txt);
+    ro_single_kill(&impl->save);
+    ro_single_kill(&impl->save_hd);
     
     textinput_kill(&impl->textinput);
     
@@ -74,6 +83,9 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->repeat_txt, cam_mat);
     ro_single_render(&impl->repeat_h, cam_mat);
     ro_single_render(&impl->repeat_v, cam_mat);
+    ro_text_render(&impl->save_txt, cam_mat);
+    ro_single_render(&impl->save, cam_mat);
+    ro_single_render(&impl->save_hd, cam_mat);
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -115,6 +127,16 @@ static bool pointer_event(ePointer_s pointer) {
         }
     }
     
+    if(u_button_clicked(&impl->save.rect, pointer)) {
+        s_log("save gif");
+        io_gif_save();
+    }
+    
+    if(u_button_clicked(&impl->save_hd.rect, pointer)) {
+        s_log("save hd gif");
+        io_gif_hd_save();
+    }
+    
     return true;
 }
 
@@ -143,7 +165,7 @@ void dialog_create_animation() {
     impl->size_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
     impl->size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
     
-    pos += 20;
+    pos += 16;
     
     impl->repeat_txt = ro_text_new_font55(8);
     ro_text_set_text(&impl->repeat_txt, "repeat:");
@@ -159,8 +181,22 @@ void dialog_create_animation() {
     impl->repeat_v.rect.sprite.y = 1;
     impl->repeat_v.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
     
-    pos += 20;
+    pos += 24;
+    
+    impl->save_txt = ro_text_new_font55(16);
+    ro_text_set_text(&impl->save_txt, "save .gif:");
+    
+    ro_text_set_color(&impl->save_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    impl->save_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
 
+    impl->save = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
+    impl->save.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos, 16, 16);
+    
+    impl->save_hd = ro_single_new(r_texture_new_file(2, 1, "res/button_save_hd.png"));
+    impl->save_hd.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
+    
+    pos += 8;
+    
     dialog.impl_height = pos;
     
     dialog_set_title("animation", (vec4) {{0.2, 0.6, 0.2, 1}});
