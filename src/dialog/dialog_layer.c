@@ -249,6 +249,6 @@ void dialog_create_layer() {
     dialog.update = update;
     dialog.render = render;
     dialog.pointer_event = pointer_event;
-    dialog.opt_on_cancel_cb = on_action;
-//    dialog.opt_on_ok_cb = on_action;
+//    dialog.opt_on_cancel_cb = on_action;
+    dialog.opt_on_ok_cb = on_action;
 }

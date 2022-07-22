@@ -59,21 +59,11 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- frame time in frame dialog
-- frames config dialog on btn long press
-  - frametimes reset all
-    - btn fps, btn ms
-  - animation size
-  - repeat H
-  - repeat V
 - save dialog
   - hd min px size
   - json frame times
   - gif
   - gif hd
-- pattern dialog on grid longpress
-  - pattern size
-  - blend button for pattern
     
 - dialog colors, toolbar colors,
   - or drawn

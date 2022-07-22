@@ -452,7 +452,10 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
             image_sink.img.cols, image_sink.img.rows, 
             image_sink.cols, image_sink.rows);
     
-    
+    // new frames copy last frame time
+    for(int i=canvas.RO.frames; i<image_sink.cols; i++) {
+        canvas.frame_times[i] = canvas.frame_times[canvas.RO.frames-1];
+    }
     canvas.RO.cols = image_sink.img.cols;
     canvas.RO.rows = image_sink.img.rows;
     canvas.RO.frames = image_sink.cols;

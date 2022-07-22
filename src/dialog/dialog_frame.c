@@ -7,6 +7,7 @@
 #include "brush.h"
 #include "canvas.h"
 #include "cameractrl.h"
+#include "modal.h"
 #include "dialog.h"
 
 #define BG_A "#776666"
@@ -42,6 +43,12 @@ typedef struct {
 
     RoText merge_txt;
     RoSingle merge_btn;
+    
+    RoText frametime_txt;
+    RoText frametime_num;
+    mat4 frametime_hitbox;
+    
+    TextInput *textinput;
 } Impl;
 
 static void kill_fn() {
@@ -58,12 +65,36 @@ static void kill_fn() {
     
     ro_text_kill(&impl->merge_txt);
     ro_single_kill(&impl->merge_btn);
+    
+    ro_text_kill(&impl->frametime_txt);
+    ro_text_kill(&impl->frametime_num);
 
+    textinput_kill(&impl->textinput);
+    
     s_free(impl);
 }
 
 static void update(float dtime) {
-    // noop
+    Impl *impl = dialog.impl;
+    if(impl->textinput) {
+        char *end;
+        float time = (float) strtod(impl->textinput->text, &end);
+        bool ok = end && end != impl->textinput->text && time>0 && time<1000;
+        
+        impl->textinput->ok_active = ok;
+        
+        if (impl->textinput->state == TEXTINPUT_DONE) {
+            canvas.frame_times[canvas.RO.current_frame] = time;
+        }
+        if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
+            textinput_kill(&impl->textinput);
+            modal_set_textinput(NULL);
+        }
+    }
+    
+    char buf[16];
+    snprintf(buf, sizeof buf, "%.2f", canvas.frame_times[canvas.RO.current_frame]);
+    ro_text_set_text(&impl->frametime_num, buf);
 }
 
 static void render(const mat4 *cam_mat) {
@@ -89,6 +120,9 @@ static void render(const mat4 *cam_mat) {
         ro_text_render(&impl->merge_txt, cam_mat);
         ro_single_render(&impl->merge_btn, cam_mat);
     }
+    
+    ro_text_render(&impl->frametime_txt, cam_mat);
+    ro_text_render(&impl->frametime_num, cam_mat);
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -148,6 +182,14 @@ static bool pointer_event(ePointer_s pointer) {
         dialog_create_frame();
         // return after hide, hide kills this dialog
         return true;
+    }
+    
+    if(u_pose_aa_contains(impl->frametime_hitbox, pointer.pos.xy)) {
+        s_log("edit frame time");
+        impl->textinput = textinput_new("Frame Time", 0);
+        modal_set_textinput(impl->textinput);
+        snprintf(impl->textinput->text, TEXTINPUT_MAX_CHARS, "%.2f", canvas.frame_times[canvas.RO.current_frame]);
+        impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
     }
 
     return true;
@@ -239,6 +281,15 @@ void dialog_create_frame() {
     impl->merge_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
     impl->merge_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 32;
+    
+    impl->frametime_txt = ro_text_new_font55(5);
+    ro_text_set_text(&impl->frametime_txt, "time:");
+    ro_text_set_color(&impl->frametime_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    impl->frametime_num = ro_text_new_font55(8);
+    ro_text_set_color(&impl->frametime_num, (vec4) {{0.1, 0.1, 0.9, 1}});
+    impl->frametime_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
+    impl->frametime_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
+    impl->frametime_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
 
     dialog.impl_height = pos;
 
@@ -248,6 +299,6 @@ void dialog_create_frame() {
     dialog.update = update;
     dialog.render = render;
     dialog.pointer_event = pointer_event;
-    dialog.opt_on_cancel_cb = on_action;
-//    dialog.opt_on_ok_cb = on_action;
+//    dialog.opt_on_cancel_cb = on_action;
+    dialog.opt_on_ok_cb = on_action;
 }
