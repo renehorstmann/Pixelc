@@ -2,13 +2,94 @@
 #include "s/str.h"
 #include "e/io.h"
 #include "m/int.h"
+#include "m/uchar.h"
 #include "canvas.h"
+#include "gifenc.h"
 #include "io.h"
+
 
 #define HD_MIN_SIZE 1024
 
 
 struct Io_Globals io;
+
+
+//
+// private
+//
+
+
+#define TYPE int
+#define KEY uColor_s
+#define CLASS ColorMap
+#define FN_NAME colormap
+#include "s/hashmap_trivial.h"
+
+
+
+static void save_gif(uSprite sprite, const char *file) {
+    s_assume(sprite.rows == 1, "only for frames");
+    
+    int w = sprite.img.cols;
+    int h = sprite.img.rows;
+    
+    ucvec3 *palette = s_new0(ucvec3, 256);
+    // pos 0 == transparent
+    int size = 1;
+    
+    ColorMap cm = colormap_new(256);
+    for(int idx = 0; idx<w*h*sprite.img.layers; idx++) {
+        uColor_s col = *u_image_pixel_index(sprite.img, idx, 0);
+        if(col.a == 0) {
+            continue;
+        }
+        int *pos = colormap_get(&cm, col);
+        if(*pos<=0) {
+            palette[size] = col.rgb;
+            *pos = size;
+            size++;
+            if(size>=256) {
+                break;
+            }
+        }
+    }
+    
+    ge_GIF *gif = ge_new_gif(
+        file,  /* file name */
+        w, h,           /* canvas size */
+        (su8*) palette,
+        8,              /* palette depth == log2(# of colors) */
+        0,             /* transparency at palette[0] */
+        0               /* infinite loop */
+    );
+    
+    /* draw some frames */
+    for (int frame = 0; frame < sprite.cols; frame++) {
+        for (int idx = 0; idx < w*h; idx++) {
+            uColor_s col = *u_image_pixel_index(sprite.img, idx, frame);
+            int col_id = 0;
+            if(col.a != 0) {
+                int *pos = colormap_get(&cm, col);
+                if(*pos>0 && *pos<256)
+                    col_id = *pos;
+            }
+            gif->frame[idx] = (su8) col_id;
+        }
+        
+        // gifenc delay uses 1/100 of a second
+        ge_add_frame(gif, sca_ceil(100*canvas.frame_times[frame]));
+    }
+    
+    /* remember to close the GIF */
+    ge_close_gif(gif);
+    
+    s_free(palette);
+}
+
+
+//
+// public
+//
 
 
 void io_init() {
@@ -64,11 +145,47 @@ void io_image_hd_save() {
 }
 
 void io_gif_save() {
+    uImage img;
+    if(io.image_save_merged)
+        img = canvas_get_merged_image();
+    else
+        img = canvas_get_full_image();
+    s_log("save gif merged: %i, size: %i %i", 
+            io.image_save_merged, 
+            img.cols, img.rows);
+            
+            
+    uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, img);
     
+    save_gif(sprite, "animation.gif");
+    u_sprite_kill(&sprite);
+    u_image_kill(&img);
+    e_io_offer_file_as_download("animation.gif");
 }
 
 void io_gif_hd_save() {
+    uImage img;
+    if(io.image_save_merged)
+        img = canvas_get_merged_image();
+    else
+        img = canvas_get_full_image();
+    s_log("save gif merged hd: %i, size: %i %i", 
+            io.image_save_merged, 
+            img.cols, img.rows);
     
+    
+    int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
+    int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
+    int scale = isca_max(scale_w, scale_h);
+    uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
+    
+    uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, hd);
+    
+    save_gif(sprite, "animation_hd.gif");
+    u_sprite_kill(&sprite);
+    u_image_kill(&img);
+    u_image_kill(&hd);
+    e_io_offer_file_as_download("animation_hd.gif");
 }
 
 void io_image_import() {

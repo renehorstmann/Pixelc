@@ -41,7 +41,7 @@
 #endif
 
 #ifndef KEY_KILL_FN
-#error hashmap.h needs a function to kill a key(key key_clone_fn(key to_clone, sAllocator_i a))
+#error hashmap.h needs a function to kill a key(void key_kill_fn(key to_kill, sAllocator_i a))
 #endif
 
 #ifndef KEY_EQUALS_FN
@@ -49,7 +49,7 @@
 #endif
 
 #ifndef KEY_HASH_FN
-#error hashmap.h needs a function to hash a key (unsigned key_hash_fn(key k))
+#error hashmap.h needs a function to hash a key (su32 key_hash_fn(key k))
 #endif
 
 
@@ -150,7 +150,7 @@ static void S_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
 // int *foo_get(Foo *self, const char *key)
 static TYPE *S_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
     // key hash
-    unsigned hash = KEY_HASH_FN(key) % self->size;
+    su32 hash = KEY_HASH_FN(key) % self->size;
     
     // first item in hash map array
     ITEM **item = &self->map[hash];
@@ -176,7 +176,7 @@ static TYPE *S_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
 // void foo_remove(Foo *self, const char *key)
 void S_NAME_CONCAT2(FN_NAME, _remove)(CLASS *self, KEY key) {
     // key hash
-    unsigned hash = KEY_HASH_FN(key) % self->size;
+    su32 hash = KEY_HASH_FN(key) % self->size;
 
     // first item in hash map array
     ITEM **item = &self->map[hash];

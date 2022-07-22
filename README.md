@@ -59,7 +59,9 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- save gif in animation dialog
+- update rhc and some (hashmap)
+
+- change time for all frames, or fps
     
 - dialog colors, toolbar colors,
   - or drawn
