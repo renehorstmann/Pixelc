@@ -23,24 +23,9 @@
 //
 
 
-// animation + tiles
-// screen size is >=180 pixel
-// 16 Pixel * 11 cols = 180...
-#define PLAY_COLS 1
-#define PLAY_ROWS 1
-#define PLAY_SIZE 1.0
-#define PLAY_FRAMES 4
-#define PLAY_FPS 6.0
-
-
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
 
-
-
-//
-// end of options
-//
 
 
 // this function will be called at the start of the app
@@ -58,7 +43,7 @@ static void init() {
     canvas_init();
     canvas_load_config();
 
-    animation_init(PLAY_COLS, PLAY_ROWS, PLAY_SIZE, PLAY_FRAMES, PLAY_FPS);
+    animation_init();
     selectionctrl_init();
 
     brush_init();
@@ -80,7 +65,6 @@ static void init() {
     feedback_init();
 
     cameractrl_set_home();
-    
 }
 
 // this functions is called either each frame or at a specific update/s time
@@ -94,7 +78,7 @@ static void update(float dtime) {
 
     canvas_update(dtime);
     palette_update(dtime);
-    animation_update(palette_get_hud_size(), dtime);
+    animation_update(dtime);
 
     selectionctrl_update(dtime);
     brush.selection_ref = selectionctrl.selection;

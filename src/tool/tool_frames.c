@@ -2,6 +2,7 @@
 #include "toolbar.h"
 #include "canvas.h"
 #include "cameractrl.h"
+#include "animation.h"
 #include "tool.h"
 
 //
@@ -32,9 +33,11 @@ static bool is_active(struct Tool *super, float dtime) {
     bool active = toolbar_container_valid(&toolbar.frames);
     if(!canvas.RO.frames_enabled && active) {
         toolbar_hide_frames();
+        animation.show = false;
     }
     if(canvas.RO.frames_enabled && !active) {
         toolbar_show_frames();
+        animation.show = true;
     }
     // always active
     return true;

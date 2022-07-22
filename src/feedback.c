@@ -9,7 +9,7 @@
 #define FLASH_ALPHA 0.5
 
 
-struct {
+static struct {
 
     struct {
         RoSingle ro;
