@@ -85,3 +85,4 @@ René Horstmann
 - The app and its assets are licenced under GPLv3, see LICENCE.
 - The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
 - Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
+- the .gif encoder [gifenc](https://github.com/lecram/gifenc) is licenced under public domain
