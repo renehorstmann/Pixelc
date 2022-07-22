@@ -45,7 +45,7 @@ void animation_update(float dtime) {
         top = camera.RO.bottom + phs + h;
     } else {
         left = camera.RO.right - phs - w;
-        top = camera.RO.bottom + h; 
+        top = camera.RO.bottom + h;
     }
     
     L.time -= dtime;

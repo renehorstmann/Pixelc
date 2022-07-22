@@ -77,9 +77,16 @@ static void set_home() {
     
     float w = right - left;
     float h = top - bottom;
+    
+    s_log_debug("cr wh: %i %i  %f %f", cols, rows, w, h);
 
-    if(w/h >= cols/rows) {
-        // size by height
+    bool adjust_by_height = false;
+    if(w>h && (w/h >= cols/rows))
+        adjust_by_height = true;
+    if(w<h && (h/w <= rows/cols))
+        adjust_by_height = true;
+        
+    if(adjust_by_height) {
         L.zoom = rows / (h*HOME_SIZE);
     } else {
         L.zoom = cols / (w*HOME_SIZE);
