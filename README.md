@@ -59,9 +59,8 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- animation play on frames pressed
 - frame time in frame dialog
-- frames condig dialog on btn long press
+- frames config dialog on btn long press
   - frametimes reset all
     - btn fps, btn ms
   - animation size
