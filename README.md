@@ -59,8 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- save frame times bug?
-
 - dialog animation
   - change time for all frames, or fps
     

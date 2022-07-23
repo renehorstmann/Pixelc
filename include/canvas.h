@@ -116,6 +116,7 @@ uSprite canvas_get_tab(int id);
 
 // saves the config to the savestate config.json 
 // uses object "canvas"
+// also saves the current image as savestate
 void canvas_save_config();
 
 // loads the config from the savestate config.json

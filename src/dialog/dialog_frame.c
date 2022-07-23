@@ -85,6 +85,7 @@ static void update(float dtime) {
         
         if (impl->textinput->state == TEXTINPUT_DONE) {
             canvas.frame_times[canvas.RO.current_frame] = time;
+            canvas_save_config();
         }
         if (impl->textinput->state != TEXTINPUT_IN_PROGRESS) {
             textinput_kill(&impl->textinput);
