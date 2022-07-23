@@ -59,6 +59,18 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
+- save frame times bug?
+
+- dialog save
+  - single save btn in the toolbar
+  - hd min px size
+  - merge layers btn
+  - save png
+    - save and hd btn
+  - save gif
+    - save and hd btn
+    - removed from animation dialog
+
 - change time for all frames, or fps
     
 - dialog colors, toolbar colors,
