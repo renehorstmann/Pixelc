@@ -58,8 +58,13 @@ static void save_gif(uSprite sprite, const char *file) {
     ColorMapItem_s *item;
     while((item = colormap_iter_next(&iter))
     !=  NULL) {
+        uColor_s k = item->key;
         s_log_wtf("k|t: %i %i %i %i|%i", item->key.r, item->key.g, item->key.b, item->key.a, item->value);
+        int *pos = colormap_get(&cm, k);
+        s_log_wtf("pos: %i", *pos);
     }
+    
+    
     
     ge_GIF *gif = ge_new_gif(
         file,  /* file name */

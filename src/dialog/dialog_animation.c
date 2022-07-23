@@ -3,6 +3,7 @@
 #include "u/pose.h"
 #include "modal.h"
 #include "animation.h"
+#include "canvas.h"
 #include "io.h"
 #include "dialog.h"
 
@@ -153,6 +154,7 @@ static void on_action(bool ok) {
 
 void dialog_create_animation() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
