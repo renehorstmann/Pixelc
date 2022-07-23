@@ -59,10 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- update rhc and some (hashmap)
-
-- change gifencs raw file writes to c std fwrite
-
 - change time for all frames, or fps
     
 - dialog colors, toolbar colors,
