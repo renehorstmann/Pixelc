@@ -1,7 +1,7 @@
 # Pixelc
 An opensource tile/sprite editor in C, using SDL2 and OpenGL
 
-**Also runs on fine on smartphones on web browsers**
+>bAlso runs fine on smartphones on web browsers
 
 Based on [some](https://github.com/renehorstmann/some) framework.
 
