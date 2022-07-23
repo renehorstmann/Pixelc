@@ -65,6 +65,8 @@ static void init() {
     feedback_init();
 
     cameractrl_set_home();
+    
+    dialog_create_startup();
 }
 
 // this functions is called either each frame or at a specific update/s time

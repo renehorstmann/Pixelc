@@ -59,12 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- first start dialog
-  - welcome msg
-  - hint to github.com/renehorstmann/pixelc tutorial
-  - hint to set disp settings with the disp btn
-  - show this dialog again btn
-
 - dialog colors, toolbar colors,
   - or drawn
 

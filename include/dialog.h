@@ -106,4 +106,6 @@ void dialog_create_layer();
 
 void dialog_create_animation();
 
+void dialog_create_startup();
+
 #endif //PIXELC_DIALOG_H
