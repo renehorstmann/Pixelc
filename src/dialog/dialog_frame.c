@@ -110,7 +110,7 @@ static void render(const mat4 *cam_mat) {
 
     ro_text_render(&impl->move_txt, cam_mat);
     
-    if(canvas.RO.current_frame<canvas.RO.sprite.rows-1) {
+    if(canvas.RO.current_frame<canvas.RO.sprite.cols-1) {
         ro_single_render(&impl->move_next_btn, cam_mat);
     }
     
@@ -155,7 +155,7 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     }
     
-    if (canvas.RO.current_frame<(canvas.RO.sprite.rows-1) 
+    if (canvas.RO.current_frame<(canvas.RO.sprite.cols-1) 
             && u_button_clicked(&impl->move_next_btn.rect, pointer)) {
         s_log("move with next frame: %i", canvas.RO.current_frame);
         
