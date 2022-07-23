@@ -115,32 +115,33 @@ static void render(const mat4 *cam_mat) {
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
 
-    if (pointer.id == 0 && pointer.action == E_POINTER_DOWN) {
-        if (u_pose_aa_contains(impl->cols_hitbox, pointer.pos.xy)) {
-            impl->textinput = textinput_new("Set canvas cols", 8);
-            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->cols);
-            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
-            impl->textinput_usage = 0;
-        } else if (u_pose_aa_contains(impl->rows_hitbox, pointer.pos.xy)) {
-            impl->textinput = textinput_new("Set canvas rows", 8);
-            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->rows);
-            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
-            impl->textinput_usage = 1;
-        } else if (u_pose_aa_contains(impl->frames_hitbox, pointer.pos.xy)) {
-            impl->textinput = textinput_new("Set frames", 8);
-            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->frames);
-            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
-            impl->textinput_usage = 2;
-        } else if (u_pose_aa_contains(impl->layers_hitbox, pointer.pos.xy)) {
-            impl->textinput = textinput_new("Set layers", 8);
-            snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->layers);
-            impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
-            impl->textinput_usage = 3;
-        } 
+    if (pointer.id != 0 || pointer.action != E_POINTER_DOWN)
+        return true;
+        
+    if (u_pose_aa_contains(impl->cols_hitbox, pointer.pos.xy)) {
+        impl->textinput = textinput_new("Set canvas cols", 8);
+        snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->cols);
+        impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+        impl->textinput_usage = 0;
+    } else if (u_pose_aa_contains(impl->rows_hitbox, pointer.pos.xy)) {
+        impl->textinput = textinput_new("Set canvas rows", 8);
+        snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->rows);
+        impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+        impl->textinput_usage = 1;
+    } else if (u_pose_aa_contains(impl->frames_hitbox, pointer.pos.xy)) {
+        impl->textinput = textinput_new("Set frames", 8);
+        snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->frames);
+        impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+        impl->textinput_usage = 2;
+    } else if (u_pose_aa_contains(impl->layers_hitbox, pointer.pos.xy)) {
+        impl->textinput = textinput_new("Set layers", 8);   
+        snprintf(impl->textinput->text, sizeof impl->textinput->text, "%i", impl->layers);
+        impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
+        impl->textinput_usage = 3;
+    } 
 
-        if(impl->textinput)
-            modal_set_textinput(impl->textinput);
-    }
+    if(impl->textinput)
+        modal_set_textinput(impl->textinput);
 
     return true;
 }

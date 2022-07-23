@@ -90,8 +90,11 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
-
-    if(u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
+    
+    
+    if(pointer.id == 0 
+            && pointer.action == E_POINTER_DOWN 
+            && u_pose_aa_contains(impl->size_hitbox, pointer.pos.xy)) {
         s_log("edit animation size");
         impl->textinput = textinput_new("Size", 0);
         modal_set_textinput(impl->textinput);
