@@ -59,9 +59,6 @@ python3 -m http.server --bind localhost  # [port]
 
 # Todo
 
-- dialog animation
-  - change time for all frames, or fps
-    
 - dialog colors, toolbar colors,
   - or drawn
 
