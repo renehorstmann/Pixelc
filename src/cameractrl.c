@@ -193,9 +193,8 @@ void cameractrl_init() {
 void cameractrl_update(float dtime) {
     if(L.set_home_cnt>0) {
         L.set_home_cnt--;
-        if(L.set_home_cnt<=0) {
+        if(L.set_home_cnt<=0)
             set_home();
-        }
     }
 }
 
