@@ -25,7 +25,6 @@ static struct {
     RoSingle ro;
 
     RoSingle bg;
-    RoSingle grid;
     
     RoBatch sprite_grid;
 
@@ -147,10 +146,9 @@ static void update_render_objects() {
     ro_single_set_texture(&L.ro, tex);
     canvas.RO.tex = tex;
 
-    u_pose_set_size(&L.grid.rect.uv, canvas.RO.image.cols, canvas.RO.image.rows);
     {
-        float w = (float) canvas.RO.image.cols / (2 * canvas.RO.pattern_cols);
-        float h = (float) canvas.RO.image.rows / (2 * canvas.RO.pattern_rows);
+        float w = 2.0 * canvas.RO.image.cols / L.bg.tex.sprite_size.x;
+        float h = 2.0 * canvas.RO.image.rows / L.bg.tex.sprite_size.y;
         u_pose_set_size(&L.bg.rect.uv, w, h);
     }
     
@@ -261,26 +259,16 @@ void canvas_init() {
     canvas.RO.frames = 1;
     canvas.RO.layers = 1;
     
-    canvas.RO.pattern_cols = 8;
-    canvas.RO.pattern_rows = 8;
-
     L.ro = ro_single_new(r_texture_new_invalid());
-        
-    rTexture grid_tex = r_texture_new_file(1, 1, "res/canvas_grid.png");
-    r_texture_wrap_repeat(grid_tex);
-    L.grid = ro_single_new(grid_tex);
     
     L.sprite_grid = ro_batch_new(
             CANVAS_MAX_FRAMES+CANVAS_MAX_LAYERS,
             r_texture_new_file(2, 1, "res/canvas_sprite_grid.png"));
     for(int i=0; i<L.sprite_grid.num; i++) {
-        L.sprite_grid.rects[i].color.a = 0.2;
+        L.sprite_grid.rects[i].color = (vec4) {{0.33, 0.66, 0.33, 0.33}};
     }
 
-    uColor_s buf[4];
-    buf[0] = buf[3] = u_color_from_hex("#999999");
-    buf[1] = buf[2] = u_color_from_hex("#777777");
-    rTexture bg_tex = r_texture_new(2, 2, 1, 1, buf);
+    rTexture bg_tex = r_texture_new_file(1, 1, "res/canvas_pattern.png");
     r_texture_wrap_repeat(bg_tex);
     L.bg = ro_single_new(bg_tex);
 
@@ -299,7 +287,6 @@ void canvas_update(float dtime) {
 
     L.ro.rect.color = canvas.ro_color;
 
-    L.grid.rect.pose = canvas.RO.pose;
     L.bg.rect.pose = canvas.RO.pose;
 }
 
@@ -361,8 +348,6 @@ void canvas_render(const mat4 *canvascam_mat) {
 
     
     if (canvas.show_grid) {
-        ro_single_render(&L.grid, canvascam_mat);
-
         ro_batch_render(&L.sprite_grid, canvascam_mat, false);
     }
 }
@@ -472,16 +457,6 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
     }     
 }
 
-
-void canvas_set_pattern_size(int cols, int rows) {
-    cols = isca_clamp(cols, 1, canvas.RO.image.cols);
-    rows = isca_clamp(rows, 1, canvas.RO.image.rows);
-    canvas.RO.pattern_cols = cols;
-    canvas.RO.pattern_rows = rows;
-    update_render_objects();
-    canvas_save_config();
-}
-
 void canvas_save() {
     s_log("save");
     if (u_image_equals(canvas.RO.image, L.prev_image)) {
@@ -579,8 +554,6 @@ void canvas_save_config() {
 
     uJson *member = u_json_append_object(config, "canvas");
 
-    u_json_append_int(member, "pattern_cols", canvas.RO.pattern_cols);
-    u_json_append_int(member, "pattern_rows", canvas.RO.pattern_rows);
     u_json_append_int(member, "tab_id", canvas.RO.tab_id);
     
     
@@ -613,12 +586,6 @@ void canvas_load_config() {
 
     uJson *member = u_json_get_object(config, "canvas");
 
-    int pattern_cols, pattern_rows;
-    if (u_json_get_object_int(member, "pattern_cols", &pattern_cols)
-        && u_json_get_object_int(member, "pattern_rows", &pattern_rows)) {
-        canvas.RO.pattern_cols = pattern_cols;
-        canvas.RO.pattern_rows = pattern_rows;
-    }
     
     for(int t=0; t<CANVAS_MAX_TABS; t++) {
         char name[16];

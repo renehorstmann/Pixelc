@@ -71,7 +71,8 @@ python3 -m http.server --bind localhost  # [port]
     - save and hd btn
     - removed from animation dialog
 
-- change time for all frames, or fps
+- dialog animation
+  - change time for all frames, or fps
     
 - dialog colors, toolbar colors,
   - or drawn

@@ -52,9 +52,6 @@ struct Canvas_Globals {
         uImage image;
         int current_image_layer;
         
-        int pattern_cols;
-        int pattern_rows;
-        
         int tab_id;
     } RO;
 };
@@ -92,8 +89,6 @@ void canvas_enable_layers(bool enable);
 // sets a new image for the canvas
 // canvas will take the ownership of image_sink
 void canvas_set_sprite(uSprite image_sink, bool save);
-
-void canvas_set_pattern_size(int cols, int rows);
 
 // saves an image (for reload, undo and redo)
 // only saves if the image changed
