@@ -33,10 +33,13 @@ static void save_gif(uSprite sprite, const char *file) {
     int w = sprite.img.cols;
     int h = sprite.img.rows;
     
+    // gifenc expects a color palatte and frames that use indices of the palettes as pixels
+    // max. palette size is 256
     ucvec3 *palette = s_new0(ucvec3, 256);
     // pos 0 == transparent
     int size = 1;
     
+    // hashmap from uColor_s as key to the color palette
     ColorMap cm = colormap_new(256);
     for(int idx = 0; idx<w*h*sprite.img.layers; idx++) {
         uColor_s col = *u_image_pixel_index(sprite.img, idx, 0);
@@ -54,17 +57,6 @@ static void save_gif(uSprite sprite, const char *file) {
         }
     }
     
-    ColorMapIter_s iter = colormap_iter_new(&cm);
-    ColorMapItem_s *item;
-    while((item = colormap_iter_next(&iter))
-    !=  NULL) {
-        uColor_s k = item->key;
-        s_log_wtf("k|t: %i %i %i %i|%i", item->key.r, item->key.g, item->key.b, item->key.a, item->value);
-        int *pos = colormap_get(&cm, k);
-        s_log_wtf("pos: %i", *pos);
-    }
-    
-    
     
     ge_GIF *gif = ge_new_gif(
         file,  /* file name */
@@ -80,12 +72,13 @@ static void save_gif(uSprite sprite, const char *file) {
         for (int idx = 0; idx < w*h; idx++) {
             uColor_s col = *u_image_pixel_index(sprite.img, idx, frame);
             int col_id = 0;
+            
+            // grab color index of the palette via the hashmap
             if(col.a != 0) {
                 int *pos = colormap_get(&cm, col);
                 if(*pos>0 && *pos<256)
                     col_id = *pos;
             }
-            s_log_wtf("fip: %i %i %i", frame, idx, col_id);
             gif->frame[idx] = (su8) col_id;
         }
         
