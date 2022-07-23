@@ -8,8 +8,6 @@
 #include "io.h"
 
 
-#define HD_MIN_SIZE 1024
-
 
 struct Io_Globals io;
 
@@ -100,6 +98,7 @@ static void save_gif(uSprite sprite, const char *file) {
 
 void io_init() {
     io.image_save_merged = true;
+    io.hd_min_size = 1024;
 }
 
 const char *io_config_file() {
@@ -139,8 +138,8 @@ void io_image_hd_save() {
             img.cols, img.rows);
     
     
-    int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
-    int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
+    int scale_w = sca_ceil((float) io.hd_min_size / img.cols);
+    int scale_h = sca_ceil((float) io.hd_min_size / img.rows);
     int scale = isca_max(scale_w, scale_h);
     uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
     
@@ -180,8 +179,8 @@ void io_gif_hd_save() {
             img.cols, img.rows);
     
     
-    int scale_w = sca_ceil((float) HD_MIN_SIZE / img.cols);
-    int scale_h = sca_ceil((float) HD_MIN_SIZE / img.rows);
+    int scale_w = sca_ceil((float) io.hd_min_size / img.cols);
+    int scale_h = sca_ceil((float) io.hd_min_size / img.rows);
     int scale = isca_max(scale_w, scale_h);
     uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
     

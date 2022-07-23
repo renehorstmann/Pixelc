@@ -7,7 +7,7 @@
 #include "selectionctrl.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 31
+#define TOOLBAR_TOOLS_LEN 30
 #define TOOLBAR_LAYER_TOOLS_LEN (TOOL_LAYER_SELECT_NUM + 2)
 #define TOOLBAR_FRAMES_TOOLS_LEN (TOOL_FRAMES_SELECT_NUM + 2)
 #define TOOLBAR_SELECTION_SET_TOOLS_LEN 4
@@ -39,7 +39,6 @@ struct Toolbar_Globals {
         struct {
             Tool *tooltip;
             Tool *save;
-            Tool *save_hd;
             Tool *import;
             Tool *display;
             Tool *size;

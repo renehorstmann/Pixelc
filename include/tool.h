@@ -71,8 +71,6 @@ Tool *tool_new_tooltip();
 
 Tool *tool_new_save();
 
-Tool *tool_new_save_hd();
-
 Tool *tool_new_import();
 
 Tool *tool_new_clear();

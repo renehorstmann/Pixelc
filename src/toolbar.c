@@ -203,7 +203,6 @@ void toolbar_init() {
 
     toolbar.tools.tooltip = tool_new_tooltip();
     toolbar.tools.save = tool_new_save();
-    toolbar.tools.save_hd = tool_new_save_hd();
     toolbar.tools.import = tool_new_import();
     toolbar.tools.clear = tool_new_clear();
     toolbar.tools.undo = tool_new_undo();

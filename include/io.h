@@ -6,6 +6,9 @@
 struct Io_Globals {
     // defaults to true
     bool image_save_merged;
+    
+    // defaults to 1024
+    int hd_min_size;
 };
 extern struct Io_Globals io;
 
