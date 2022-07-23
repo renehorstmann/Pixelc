@@ -73,6 +73,7 @@ static void save_gif(uSprite sprite, const char *file) {
                 if(*pos>0 && *pos<256)
                     col_id = *pos;
             }
+            s_log_wtf("fip: %i %i %i", frame, idx, col_id);
             gif->frame[idx] = (su8) col_id;
         }
         
