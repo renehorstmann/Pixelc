@@ -62,6 +62,8 @@ python3 -m http.server --bind localhost  # [port]
 - dialog colors, toolbar colors,
   - or drawn
 
+- android apk
+
 - tutorial.md
   - what how to do
     - how to create a palette
@@ -70,11 +72,14 @@ python3 -m http.server --bind localhost  # [port]
   - images
   - disp, etc. explained  
   
-- tiles
-  - file containing tile names?
-  - direct draw mode, in which you can select a tile in the canvas and directly draw changes there
-- background image option?
-
+- tilec
+  - module userargs (also in some_examples)
+    - title
+    - args as text
+    - upload files for web
+  - new fork from pixelc
+  - isometric tiles (grid size < tile_size)
+    - 16x8 with a 32x32 tile
 
 ## Author
 René Horstmann
