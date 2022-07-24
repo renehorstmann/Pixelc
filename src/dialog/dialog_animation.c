@@ -164,6 +164,7 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("update all frame times sec: %f", impl->time);
         for(int i=0; i<CANVAS_MAX_FRAMES; i++)
             canvas.frame_times[i] = impl->time;
+        canvas_save_config();
     }
     
     if(u_button_clicked(&impl->time_fps_btn.rect, pointer)) {
@@ -171,6 +172,7 @@ static bool pointer_event(ePointer_s pointer) {
         float sec = 1.0/impl->time;
         for(int i=0; i<CANVAS_MAX_FRAMES; i++)
             canvas.frame_times[i] = sec;
+        canvas_save_config();
     }
     
     return true;
