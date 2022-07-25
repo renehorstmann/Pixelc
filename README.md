@@ -84,5 +84,10 @@ René Horstmann
 ## Licence
 - The app and its assets are licenced under GPLv3, see LICENCE.
 - The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
+    - [SDL2](https://www.libsdl.org/) (zlib License)
+    - [Emscripten](emscripten.org) (MIT License)
+    - [nuklear](https://github.com/Immediate-Mode-UI/Nuklear) for debug gui windows (MIT License)
+    - [curl](https://curl.se/docs/copyright.html) (MIT like License)
+
 - Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
 - the .gif encoder [gifenc](https://github.com/lecram/gifenc) is licenced under public domain
