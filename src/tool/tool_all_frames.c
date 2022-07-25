@@ -159,9 +159,9 @@ Tool *tool_new_frames_select(int pos) {
             : (vec4) {{0.2, 0.2, 0.2, 1}});
     
     snprintf(self->super.name, TOOL_NAME_LEN, "frames"); 
-    snprintf(self->super.tip, TOOL_TIP_LEN, "select a\n"
+    snprintf(self->super.tip, TOOL_TIP_LEN, "Select a\n"
             "canvas frame\n\n"
-            "long press for\n"
+            "Long press for\n"
             "frames options"); 
     
     self->super.kill = select_kill; 
@@ -212,7 +212,7 @@ static bool blend_is_a(struct Tool *super, float dtime) {
 
 Tool *tool_new_frames_blend() {
     Tool *super = tool_button_new("blend",
-                           "blends in the\n"
+                           "Blends in the\n"
                            "previous frames\n"
                            "with or without\n"
                            "onion skinning",
@@ -250,7 +250,7 @@ static bool add_is_a(struct Tool *super, float dtime) {
 
 Tool *tool_new_frames_add() {
     return tool_button_new("add",
-                           "adds a frame\n"
+                           "Adds a frame\n"
                            "next to the\n"
                            "current frame",
                            "res/button_plus.png",

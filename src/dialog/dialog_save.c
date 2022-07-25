@@ -8,8 +8,10 @@
 #include "modal.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+
+static const uColor_s BG_A_COLOR = {{136, 136, 102, 255}};
+static const uColor_s BG_B_COLOR = {{143, 143, 102, 255}};
+static const vec4 TITLE_COLOR = {{0, 0.6, 0.3, 1}};
 
 //
 // private
@@ -124,22 +126,30 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("save png");
         io_image_save();
         dialog_hide();
+        // return after hide, hide kills this dialog
+        return true;
     }
     if(u_button_clicked(&impl->png_hd_btn.rect, pointer)) {
         s_log("save png hd");
         io_image_hd_save();
         dialog_hide();
+        // return after hide, hide kills this dialog
+        return true;
     }
     
     if(u_button_clicked(&impl->gif_btn.rect, pointer)) {
         s_log("save gif");
         io_gif_save();
         dialog_hide();
+        // return after hide, hide kills this dialog
+        return true;
     }
     if(u_button_clicked(&impl->gif_hd_btn.rect, pointer)) {
         s_log("save gif hd");
         io_gif_hd_save();
         dialog_hide();
+        // return after hide, hide kills this dialog
+        return true;
     }
     return true;
 }
@@ -164,9 +174,9 @@ void dialog_create_save() {
     
     impl->hd_size_txt = ro_text_new_font55(16);
     ro_text_set_text(&impl->hd_size_txt, "hd min size:");
-    ro_text_set_color(&impl->hd_size_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->hd_size_txt, DIALOG_TEXT_COLOR);
     impl->hd_size_num = ro_text_new_font55(8);
-    ro_text_set_color(&impl->hd_size_num, (vec4) {{0.1, 0.1, 0.9, 1}});
+    ro_text_set_color(&impl->hd_size_num, DIALOG_TEXT_EDIT_COLOR);
     impl->hd_size_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos, 1, 2);
     impl->hd_size_num.pose = u_pose_new(DIALOG_LEFT + 80, DIALOG_TOP - pos, 1, 2);
     impl->hd_size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
@@ -174,7 +184,7 @@ void dialog_create_save() {
     pos += 20;
 
     impl->merge_txt = ro_text_new_font55(32);
-    ro_text_set_color(&impl->merge_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->merge_txt, DIALOG_TEXT_COLOR);
     ro_text_set_text(&impl->merge_txt, "save layers\n"
             "      merged?");
     impl->merge_txt.pose = u_pose_new(DIALOG_LEFT+6, DIALOG_TOP - pos, 1, 2);
@@ -190,7 +200,7 @@ void dialog_create_save() {
     impl->png_txt = ro_text_new_font55(16);
     ro_text_set_text(&impl->png_txt, "save .png:");
     
-    ro_text_set_color(&impl->png_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->png_txt, DIALOG_TEXT_COLOR);
     impl->png_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
 
     impl->png_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
@@ -204,7 +214,7 @@ void dialog_create_save() {
     impl->gif_txt = ro_text_new_font55(16);
     ro_text_set_text(&impl->gif_txt, "save .gif:");
     
-    ro_text_set_color(&impl->gif_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->gif_txt, DIALOG_TEXT_COLOR);
     impl->gif_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
 
     impl->gif_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
@@ -217,8 +227,8 @@ void dialog_create_save() {
     
     dialog.impl_height = pos;
 
-    dialog_set_title("save", (vec4) {{0.6, 0.2, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("save", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

@@ -21,7 +21,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_camera() {
     return tool_button_new("camera",
-                           "resets the camera",
+                           "Resets the camera",
                            "res/button_camera.png",
                            pointer_event,
                            NULL);

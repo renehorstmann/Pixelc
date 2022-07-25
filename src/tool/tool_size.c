@@ -15,7 +15,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     bool pressed = u_button_is_pressed(&self->ro.rect);
     if (pressed) {
         s_log("tool size start");
-        dialog_create_canvas_size();
+        dialog_create_size();
     } else {
         s_log("tool size stop");
         dialog_hide();
@@ -37,7 +37,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_size() {
     return tool_button_new("size",
-                           "change the\n"
+                           "Change the\n"
                            "canvas size,\n"
                            "frames size\n"
                            "and layer size",

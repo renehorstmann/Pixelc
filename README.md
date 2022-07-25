@@ -1,18 +1,36 @@
 # Pixelc
 An opensource tile/sprite editor in C, using SDL2 and OpenGL
 
-> Also runs fine on smartphones on web browsers
+> Main target are touch devices such as smartphones and tablets.
+> Runs also fine on desktops.
 
 Based on [some](https://github.com/renehorstmann/some) framework.
-
-Have a look at [Tilec](https://github.com/renehorstmann/Tilec) for an old forked tile map editor.
-
 
 ## Web version
 [Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten 
 
+## Tutorial
+A documentation / tutorial can be found [here / doc.md](doc.md)
+Or just use the tooltip tool ![img](res/button_tooltip.png)
+
+## Highlights:
+- Multitouchmode for a great touch experience
+- Full mobile friendly [WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten
+- Frames and a .gif export
+- Layers
+- Onion Skinning for frames and layers
+- Multiple drawing modes
+- Shading
+- Selections
+- Undo and Redo system that also works on App reload
+- 9 Image Tabs
+- Contains the most popular [LOSCPEC](https://lospec.com/palette-list) palettes
+- Custom Brush / Kernel / Stamps
+- Custom Palettes
+- **COMPLETELY FREE and open**
+- and many more
+
 ## Status:
-Ready to draw...
 
 ![example_image](example.png)
 
@@ -58,28 +76,7 @@ python3 -m http.server --bind localhost  # [port]
 
 
 # Todo
-
-- dialog colors, toolbar colors,
-  - or drawn
-
-- android apk
-
-- tutorial.md
-  - what how to do
-    - how to create a palette
-    - how to use a palette from lospec
-  - multitouchmode
-  - images
-  - disp, etc. explained  
-  
-- tilec
-  - module userargs (also in some_examples)
-    - title
-    - args as text
-    - upload files for web
-  - new fork from pixelc
-  - isometric tiles (grid size < tile_size)
-    - 16x8 with a 32x32 tile
+- android .apk for the Play Store
 
 ## Author
 René Horstmann

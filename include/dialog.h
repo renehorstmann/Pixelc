@@ -15,6 +15,11 @@
 #define DIALOG_LEFT -60
 #define DIALOG_TOP 60
 
+static const vec4 DIALOG_TEXT_COLOR = {{0.9, 0.9, 0.9, 1.0}};
+static const vec4 DIALOG_TEXT_EDIT_COLOR = {{0.1, 0.1, 0.9, 1}};
+static const vec4 DIALOG_TEXT_DELETE_COLOR = {{0.7, 0.0, 0.2, 1.0}};
+
+
 typedef void (*dialog_on_action_cb)(bool ok);
 
 typedef void (*dialog_kill_fun)();
@@ -86,7 +91,7 @@ void dialog_create_restart();
 
 void dialog_create_tooltip();
 
-void dialog_create_canvas_size();
+void dialog_create_size();
 
 void dialog_create_display();
 

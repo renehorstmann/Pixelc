@@ -39,7 +39,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_selection() {
     return tool_button_new("selection",
-                           "toggle a\ncanvas selection",
+                           "Toggle a\ncanvas selection",
                            "res/button_selection.png",
                            pointer_event,
                            is_active);

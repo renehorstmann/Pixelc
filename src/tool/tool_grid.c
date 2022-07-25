@@ -31,7 +31,11 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_grid() {
     return tool_button_new("grid",
-                           "shows or hides\na pixel grid",
+                           "Blends in the\n"
+                           "background\n"
+                           "pixel grid\n\n"
+                           "Shows the borders\n"
+                           "of frames, layers",
                            "res/button_grid.png",
                            pointer_event,
                            is_active);

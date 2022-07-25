@@ -5,8 +5,10 @@
 #include "toolbar.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+
+static const uColor_s BG_A_COLOR = {{102, 136, 102, 255}};
+static const uColor_s BG_B_COLOR = {{102, 143, 102, 255}};
+static const vec4 TITLE_COLOR = {{0.7, 0.7, 0.7, 1}};
 
 //
 // private
@@ -46,10 +48,10 @@ static bool pointer_event(ePointer_s pointer) {
         return false;
     
     if (palette_contains_pos(pointer.pos.xy)) {
-        set("palette", "tip to select\na color\n\n"
-                       "swipe left or\nright to change\nthe palette\n\n"
-                       "swipe up for\nmultitouchmode\n\n"
-                       "hold for options");
+        set("palette", "Tip to select\na color\n\n"
+                       "Swipe left or\nright to change\nthe palette\n\n"
+                       "Swipe up for\nmultitouchmode\n\n"
+                       "Hold for options");
         return true;
     }
     Tool *tool = toolbar_get_tool_by_pos(pointer.pos.xy);
@@ -59,11 +61,6 @@ static bool pointer_event(ePointer_s pointer) {
         return false;
     set(tool->name, tool->tip);
     return true;
-}
-
-static void on_action(bool ok) {
-    s_log("tooltip closed, ok=%i", ok);
-    dialog_hide();
 }
 
 //
@@ -77,20 +74,18 @@ void dialog_create_tooltip() {
     dialog.impl = impl;
 
     impl->name = ro_text_new_font55(TOOL_NAME_LEN);
-    ro_text_set_color(&impl->name, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->name, DIALOG_TEXT_COLOR);
 
     impl->tip = ro_text_new_font85(TOOL_TIP_LEN);
 
     impl->name.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - 18, 1, 2);
     impl->tip.pose = u_pose_new(DIALOG_LEFT + 2, DIALOG_TOP - 36, 1, 1);
-    set("tooltip", "click on a tool\nto get its tip");
+    set("tooltip", "Click on a tool\nto get its tip");
 
-    dialog_set_title("tooltip", (vec4) {{0.2, 0.6, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("tooltip", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;
     dialog.pointer_event = pointer_event;
-//    dialog.opt_on_cancel_cb = tooltip_on_action;
-//    dialog.opt_on_ok_cb = tooltip_on_action;
 }

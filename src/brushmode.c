@@ -115,8 +115,11 @@ bool brushmode_dot(ePointer_s pointer) {
 }
 
 bool brushmode_free(ePointer_s pointer) {
+    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+
     if (pointer.action == E_POINTER_DOWN) {
         brushmode.L.is_drawing = true;
+        brushmode.L.start = cr;
     } else if (pointer.action != E_POINTER_MOVE) {
         brushmode.L.is_drawing = false;
     }
@@ -124,8 +127,9 @@ bool brushmode_free(ePointer_s pointer) {
     if (!brushmode.L.is_drawing)
         return false;
 
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
-    return brush_draw(cr.x, cr.y);
+    bool ret = lineto(brushmode.L.start, cr);
+    brushmode.L.start = cr;
+    return ret;
 }
 
 bool brushmode_func(ePointer_s pointer, enum brushmode_func func) {

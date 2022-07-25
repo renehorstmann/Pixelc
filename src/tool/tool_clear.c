@@ -64,10 +64,10 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_clear() {
     return tool_button_new("clear",
-                           "resets the canvas\n"
+                           "Resets the canvas\n"
                            "or selection\n"
                            "to transparent\n\n"
-                           "hold to reset\n"
+                           "Hold to reset\n"
                            "everything",
                            "res/button_clear.png",
                            pointer_event,

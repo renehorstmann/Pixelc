@@ -102,7 +102,7 @@ Tool *tool_new_secondary_color() {
     self->color_drop.rect.pose = self->bg.rect.pose;
 
     snprintf(self->super.name, TOOL_NAME_LEN, "secondary color");
-    snprintf(self->super.tip, TOOL_TIP_LEN, "tip to use\n\nhold to set");
+    snprintf(self->super.tip, TOOL_TIP_LEN, "Tip to use\n\nHold to set");
 
     self->super.size = vec2_cast_from_int(self->bg.tex.sprite_size.v);
 

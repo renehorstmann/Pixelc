@@ -7,13 +7,13 @@
 
 
 #define TB_ACTIVE_BG_A "#9999bb"
-#define TB_ACTIVE_BG_B "#888888"
+#define TB_ACTIVE_BG_B "#8888aa"
 #define TB_SELECTION_BG_A "#99bb99"
-#define TB_SELECTION_BG_B "#888888"
+#define TB_SELECTION_BG_B "#88aa88"
 #define TB_FRAMES_BG_A "#bbbb99"
-#define TB_FRAMES_BG_B "#888888"
+#define TB_FRAMES_BG_B "#aaaa88"
 #define TB_LAYER_BG_A "#bb9999"
-#define TB_LAYER_BG_B "#888888"
+#define TB_LAYER_BG_B "#aa8888"
 
 struct Toolbar_Globals toolbar;
 
@@ -43,6 +43,7 @@ static ToolbarContainer toolbar_container_new(Tool **tools, int tools_len, uColo
     rTexture tex = r_texture_new(2, 2, 1, 1, buf);
     r_texture_wrap_repeat(tex);
     self.bg = ro_single_new(tex);
+    self.bg_packed = true;
 
     return self;
 }
@@ -93,19 +94,21 @@ static void toolbar_container_update(ToolbarContainer *self, float start_pos, fl
     }
 
     // bg
-    float bg_w, bg_h;
-    if (camera_is_portrait_mode()) {
-        bg_w = camera_width();
-        bg_h = self->container.out.size.y;
-    } else {
-        bg_w = self->container.out.size.x;
-        bg_h = camera_height();
+    float bg_l = self->container.out.left;
+    float bg_t = self->container.out.top;
+    float bg_w = self->container.out.size.x;
+    float bg_h = self->container.out.size.y;
+    if(!self->bg_packed) {
+        if (camera_is_portrait_mode()) {
+            bg_l = camera.RO.left;
+            bg_w = camera_width();
+        } else {
+            bg_t = camera.RO.top;
+            bg_h = camera_height();
+        }
     }
 
-
-    bg_w = self->container.out.size.x;
-    bg_h = self->container.out.size.y;
-    self->bg.rect.pose = u_pose_new_aa(self->container.out.left, self->container.out.top, bg_w, bg_h);
+    self->bg.rect.pose = u_pose_new_aa(bg_l, bg_t, bg_w, bg_h);
     self->bg.rect.uv = u_pose_new(0, 0, bg_w / 2, bg_h / 2);
 }
 
@@ -175,8 +178,8 @@ static void show_selection_set() {
     s_log("toolbar: show_selection_set");
     toolbar_container_kill(&toolbar.selection);
     toolbar.selection = toolbar_container_new(
-            toolbar.all_selection_set_tools,
-            TOOLBAR_SELECTION_SET_TOOLS_LEN,
+            toolbar.selection_set_tools,
+            toolbar.selection_set_tools_size,
             u_color_from_hex(TB_SELECTION_BG_A),
             u_color_from_hex(TB_SELECTION_BG_B));
     toolbar.selection.align = U_CONTAINER_ALIGN_CENTER;
@@ -187,11 +190,37 @@ static void show_selection_move() {
     s_log("toolbar: show_selection_move");
     toolbar_container_kill(&toolbar.selection);
     toolbar.selection = toolbar_container_new(
-            toolbar.all_selection_paste_tools,
-            TOOLBAR_SELECTION_PASTE_TOOLS_LEN,
+            toolbar.selection_paste_tools,
+            toolbar.selection_paste_tools_size,
             u_color_from_hex(TB_SELECTION_BG_A),
             u_color_from_hex(TB_SELECTION_BG_B));
     toolbar.selection.align = U_CONTAINER_ALIGN_CENTER;
+}
+
+
+static void add_tool(Tool *tool) {
+    s_assume(toolbar.tools_size<TOOLBAR_MAX_TOOLS, "too many tools?");
+    toolbar.tools[toolbar.tools_size++] = tool;
+}
+
+static void add_frames_tool(Tool *tool) {
+    s_assume(toolbar.frames_tools_size<TOOLBAR_MAX_TOOLS, "too many tools?");
+    toolbar.frames_tools[toolbar.frames_tools_size++] = tool;
+}
+
+static void add_layer_tool(Tool *tool) {
+    s_assume(toolbar.layer_tools_size<TOOLBAR_MAX_TOOLS, "too many tools?");
+    toolbar.layer_tools[toolbar.layer_tools_size++] = tool;
+}
+
+static void add_selection_set_tool(Tool *tool) {
+    s_assume(toolbar.selection_set_tools_size<TOOLBAR_MAX_TOOLS, "too many tools?");
+    toolbar.selection_set_tools[toolbar.selection_set_tools_size++] = tool;
+}
+
+static void add_selection_paste_tool(Tool *tool) {
+    s_assume(toolbar.selection_paste_tools_size<TOOLBAR_MAX_TOOLS, "too many tools?");
+    toolbar.selection_paste_tools[toolbar.selection_paste_tools_size++] = tool;
 }
 
 
@@ -201,69 +230,70 @@ static void show_selection_move() {
 
 void toolbar_init() {
 
-    toolbar.tools.tooltip = tool_new_tooltip();
-    toolbar.tools.save = tool_new_save();
-    toolbar.tools.import = tool_new_import();
-    toolbar.tools.clear = tool_new_clear();
-    toolbar.tools.undo = tool_new_undo();
-    toolbar.tools.redo = tool_new_redo();
-    toolbar.tools.selection = tool_new_selection();
-    toolbar.tools.layer = tool_new_layer();
-    toolbar.tools.frames = tool_new_frames();
-    toolbar.tools.tab = tool_new_tab();
-    toolbar.tools.kernel = tool_new_kernel();
-    toolbar.tools.rgb = tool_new_rgb();
-    toolbar.tools.secondary_color = tool_new_secondary_color();
-    toolbar.tools.shading = tool_new_shading();
-    toolbar.tools.camera = tool_new_camera();
-    toolbar.tools.grid = tool_new_grid();
-    toolbar.tools.size = tool_new_size();
-    toolbar.tools.display = tool_new_display();
+    add_tool(tool_new_tooltip());
+    add_tool(tool_new_save());
+    add_tool(tool_new_import());
+    add_tool(tool_new_display());
+    add_tool(tool_new_size());
+    add_tool(tool_new_tab());
+    add_tool(tool_new_frames());
+    add_tool(tool_new_layer());
+    add_tool(tool_new_camera());
+    add_tool(tool_new_grid());
+    add_tool(tool_new_clear());
+    add_tool(tool_new_undo());
+    add_tool(tool_new_redo());
+    add_tool(tool_new_selection());
+    add_tool(tool_new_kernel());
+    add_tool(tool_new_rgb());
+    add_tool(tool_new_shading());
+    add_tool(tool_new_secondary_color());
 
-    toolbar.tools.mode_none = tool_new_mode_none();
-    toolbar.tools.mode_free = tool_new_mode_free();
-    toolbar.tools.mode_dot = tool_new_mode_dot();
-    toolbar.tools.mode_line = tool_new_mode_line();
-    toolbar.tools.mode_rect = tool_new_mode_rect();
-    toolbar.tools.mode_circle = tool_new_mode_circle();
-    toolbar.tools.mode_dither = tool_new_mode_dither();
-    toolbar.tools.mode_dither_inv = tool_new_mode_dither_inv();
-    toolbar.tools.mode_fill = tool_new_mode_fill();
-    toolbar.tools.mode_fill8 = tool_new_mode_fill8();
-    toolbar.tools.mode_replace = tool_new_mode_replace();
-    toolbar.tools.mode_pipette = tool_new_mode_pipette();
+    add_tool(tool_new_mode_pipette());
+    add_tool(tool_new_mode_none());
+    add_tool(tool_new_mode_free());
+    add_tool(tool_new_mode_dot());
+    add_tool(tool_new_mode_line());
+    add_tool(tool_new_mode_rect());
+    add_tool(tool_new_mode_circle());
+    add_tool(tool_new_mode_dither());
+    add_tool(tool_new_mode_dither_inv());
+    add_tool(tool_new_mode_fill());
+    add_tool(tool_new_mode_fill8());
+    add_tool(tool_new_mode_replace());
 
     for(int i=0; i<TOOL_FRAMES_SELECT_NUM; i++) {
-        toolbar.frames_tools.select[i] = tool_new_frames_select(i);
+        add_frames_tool(tool_new_frames_select(i));
     }
-    toolbar.frames_tools.blend = tool_new_frames_blend();
-    toolbar.frames_tools.add = tool_new_frames_add();
+    add_frames_tool(tool_new_frames_blend());
+    add_frames_tool(tool_new_frames_add());
 
     for(int i=0; i<TOOL_LAYER_SELECT_NUM; i++) {
-        toolbar.layer_tools.select[i] = tool_new_layer_select(i);
+        add_layer_tool(tool_new_layer_select(i));
     }
-    toolbar.layer_tools.blend = tool_new_layer_blend();
-    toolbar.layer_tools.add = tool_new_layer_add();
+    add_layer_tool(tool_new_layer_blend());
+    add_layer_tool(tool_new_layer_add());
 
     
 
-    toolbar.selection_set_tools.move = tool_new_selection_set_move();
-    toolbar.selection_set_tools.copy = tool_new_selection_set_copy();
-    toolbar.selection_set_tools.cut = tool_new_selection_set_cut();
-    toolbar.selection_set_tools.crop = tool_new_selection_set_crop();
+    add_selection_set_tool(tool_new_selection_set_move());
+    add_selection_set_tool(tool_new_selection_set_copy());
+    add_selection_set_tool(tool_new_selection_set_cut());
+    add_selection_set_tool(tool_new_selection_set_crop());
 
-    toolbar.selection_paste_tools.rotate_l = tool_new_selection_paste_rotate_l();
-    toolbar.selection_paste_tools.rotate_r = tool_new_selection_paste_rotate_r();
-    toolbar.selection_paste_tools.mirror_v = tool_new_selection_paste_mirror_v();
-    toolbar.selection_paste_tools.mirror_h = tool_new_selection_paste_mirror_h();
-    toolbar.selection_paste_tools.blend = tool_new_selection_paste_blend();
-    toolbar.selection_paste_tools.copy = tool_new_selection_paste_copy();
-    toolbar.selection_paste_tools.ok = tool_new_selection_paste_ok();
+    add_selection_paste_tool(tool_new_selection_paste_rotate_l());
+    add_selection_paste_tool(tool_new_selection_paste_rotate_r());
+    add_selection_paste_tool(tool_new_selection_paste_mirror_v());
+    add_selection_paste_tool(tool_new_selection_paste_mirror_h());
+    add_selection_paste_tool(tool_new_selection_paste_blend());
+    add_selection_paste_tool(tool_new_selection_paste_copy());
+    add_selection_paste_tool(tool_new_selection_paste_ok());
     
-    toolbar.active = toolbar_container_new(toolbar.all_tools, TOOLBAR_TOOLS_LEN, 
+    toolbar.active = toolbar_container_new(toolbar.tools, toolbar.tools_size,
             u_color_from_hex(TB_ACTIVE_BG_A),
             u_color_from_hex(TB_ACTIVE_BG_B));
     toolbar.active.align = U_CONTAINER_ALIGN_CENTER;
+    toolbar.active.bg_packed = false;
 }
 
 void toolbar_update(float dtime) {
@@ -376,8 +406,8 @@ void toolbar_show_frames() {
     s_log("show");
     toolbar_container_kill(&toolbar.frames);
     toolbar.frames = toolbar_container_new(
-            toolbar.all_frames_tools,
-            TOOLBAR_FRAMES_TOOLS_LEN,
+            toolbar.frames_tools,
+            toolbar.frames_tools_size,
             u_color_from_hex(TB_FRAMES_BG_A),
             u_color_from_hex(TB_FRAMES_BG_B));
     toolbar.frames.align = U_CONTAINER_ALIGN_CENTER;
@@ -392,8 +422,8 @@ void toolbar_show_layer() {
     s_log("show");
     toolbar_container_kill(&toolbar.layer);
     toolbar.layer = toolbar_container_new(
-            toolbar.all_layer_tools,
-            TOOLBAR_LAYER_TOOLS_LEN,
+            toolbar.layer_tools,
+            toolbar.layer_tools_size,
             u_color_from_hex(TB_LAYER_BG_A),
             u_color_from_hex(TB_LAYER_BG_B));
     toolbar.layer.align = U_CONTAINER_ALIGN_CENTER;

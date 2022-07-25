@@ -192,8 +192,3 @@ void io_gif_hd_save() {
     u_image_kill(&hd);
     e_io_offer_file_as_download("animation_hd.gif");
 }
-
-void io_image_import() {
-    s_log("import");
-    
-}

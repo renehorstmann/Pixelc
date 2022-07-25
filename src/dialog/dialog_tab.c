@@ -8,8 +8,9 @@
 #include "cameractrl.h"
 #include "dialog.h"
 
-#define BG_A "#666666"
-#define BG_B "#777777"
+static const uColor_s BG_A_COLOR = {{102, 124, 136, 255}};
+static const uColor_s BG_B_COLOR = {{102, 136, 143, 255}};
+static const vec4 TITLE_COLOR = {{0.6, 0.6, 0.2, 1}};
 
 #define ROWS 3
 #define COLS 3
@@ -74,6 +75,7 @@ static bool pointer_event(ePointer_s pointer) {
             canvas_set_tab_id(i);
             cameractrl_set_home();
             dialog_hide();
+            // return after hide, hide kills this dialog
             return true;
         }
     }
@@ -133,8 +135,8 @@ void dialog_create_tab() {
 
     dialog.impl_height = 110;
 
-    dialog_set_title("tab", (vec4) {{0.2, 0.6, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("tab", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

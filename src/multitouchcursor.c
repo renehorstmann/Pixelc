@@ -24,7 +24,7 @@ static struct {
     bool pressed;
 } L;
 
-static const vec4 COLOR_NORMAL = {{0.75, 0.75, 0.75, 0.5}};
+static const vec4 COLOR_NORMAL = {{0.9, 0.9, 0.9, 0.5}};
 static const vec4 COLOR_PRESSED = {{1, 1, 1, 0.75}};
 
 

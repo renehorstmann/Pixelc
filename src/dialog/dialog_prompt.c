@@ -7,8 +7,9 @@
 #include "palette.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+static const uColor_s BG_A_COLOR = {{136, 136, 136, 255}};
+static const uColor_s BG_B_COLOR = {{143, 143, 143, 255}};
+static const vec4 TITLE_COLOR = {{0.7, 0.2, 0.2, 1}};
 
 //
 // private
@@ -56,14 +57,14 @@ void dialog_create_prompt(const char *title, const char *msg,
     impl->user_data = user_data;
 
     impl->info = ro_text_new_font55(128);
-    ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
     vec2 size = ro_text_set_text(&impl->info, msg);
     impl->info.pose = u_pose_new(DIALOG_LEFT+6, DIALOG_TOP - 20, 1, 2);
     
     dialog.impl_height = 22+size.y;
 
-    dialog_set_title(title, (vec4) {{0.6, 0.2, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title(title, TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

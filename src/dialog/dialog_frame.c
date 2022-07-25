@@ -10,8 +10,9 @@
 #include "modal.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+static const uColor_s BG_A_COLOR = {{136, 136, 102, 255}};
+static const uColor_s BG_B_COLOR = {{143, 143, 102, 255}};
+static const vec4 TITLE_COLOR = {{0.2, 0.2, 0.6, 1}};
 
 //
 // private
@@ -185,7 +186,9 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     }
     
-    if(u_pose_aa_contains(impl->frametime_hitbox, pointer.pos.xy)) {
+    if(pointer.id==0
+            && pointer.action == E_POINTER_DOWN
+            && u_pose_aa_contains(impl->frametime_hitbox, pointer.pos.xy)) {
         s_log("edit frame time");
         impl->textinput = textinput_new("Frame Time", 0);
         modal_set_textinput(impl->textinput);
@@ -213,7 +216,7 @@ void dialog_create_frame() {
 
     int pos = 24;
     impl->info = ro_text_new_font55(32);
-    ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
 
     char info_txt[4];
     snprintf(info_txt, sizeof info_txt, "%-2i",
@@ -245,7 +248,7 @@ void dialog_create_frame() {
 
     impl->delete_txt = ro_text_new_font55(7);
     ro_text_set_text(&impl->delete_txt, "Delete:");
-    ro_text_set_color(&impl->delete_txt, (vec4) {{0.7, 0.0, 0.2, 1.0}});
+    ro_text_set_color(&impl->delete_txt, DIALOG_TEXT_DELETE_COLOR);
     impl->delete_txt.pose = u_pose_new(DIALOG_LEFT + 50, DIALOG_TOP - pos - 3, 1, 2);
 
     impl->delete_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_delete.png"));
@@ -260,7 +263,7 @@ void dialog_create_frame() {
     } else {
         ro_text_set_text(&impl->move_txt, "move frame:");
     }
-    ro_text_set_color(&impl->move_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->move_txt, DIALOG_TEXT_COLOR);
     impl->move_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
 
     impl->move_prev_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_move_prev.png"));
@@ -276,7 +279,7 @@ void dialog_create_frame() {
     snprintf(merge_txt, sizeof merge_txt, "Merge frame\n"
             "into frame: %-2i", canvas.RO.current_frame);
     ro_text_set_text(&impl->merge_txt, merge_txt);
-    ro_text_set_color(&impl->merge_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->merge_txt, DIALOG_TEXT_COLOR);
     impl->merge_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
     impl->merge_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
@@ -285,17 +288,17 @@ void dialog_create_frame() {
     
     impl->frametime_txt = ro_text_new_font55(5);
     ro_text_set_text(&impl->frametime_txt, "time:");
-    ro_text_set_color(&impl->frametime_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->frametime_txt, DIALOG_TEXT_COLOR);
     impl->frametime_num = ro_text_new_font55(8);
-    ro_text_set_color(&impl->frametime_num, (vec4) {{0.1, 0.1, 0.9, 1}});
+    ro_text_set_color(&impl->frametime_num, DIALOG_TEXT_EDIT_COLOR);
     impl->frametime_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
     impl->frametime_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
     impl->frametime_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
 
     dialog.impl_height = pos;
 
-    dialog_set_title("frame", (vec4) {{0.2, 0.2, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("frame", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

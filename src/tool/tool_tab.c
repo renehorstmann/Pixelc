@@ -38,7 +38,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_tab() {
     return tool_button_new("tab",
-                           "select one of\n"
+                           "Select one of\n"
                            "nine different\n"
                            "images to edit",
                            "res/button_tab.png",

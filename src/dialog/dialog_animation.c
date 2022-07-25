@@ -7,9 +7,10 @@
 #include "io.h"
 #include "dialog.h"
 
-#define BG_A "#667766"
-#define BG_B "#778877"
 
+static const uColor_s BG_A_COLOR = {{102, 136, 102, 255}};
+static const uColor_s BG_B_COLOR = {{102, 143, 102, 255}};
+static const vec4 TITLE_COLOR = {{0.6, 0.6, 0.2, 1}};
 //
 // private
 //
@@ -197,9 +198,9 @@ void dialog_create_animation() {
 
     impl->size_txt = ro_text_new_font55(5);
     ro_text_set_text(&impl->size_txt, "size:");
-    ro_text_set_color(&impl->size_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->size_txt, DIALOG_TEXT_COLOR);
     impl->size_num = ro_text_new_font55(8);
-    ro_text_set_color(&impl->size_num, (vec4) {{0.1, 0.1, 0.9, 1}});
+    ro_text_set_color(&impl->size_num, DIALOG_TEXT_EDIT_COLOR);
     impl->size_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos, 1, 2);
     impl->size_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
     impl->size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
@@ -209,7 +210,7 @@ void dialog_create_animation() {
     impl->repeat_txt = ro_text_new_font55(8);
     ro_text_set_text(&impl->repeat_txt, "repeat:");
     
-    ro_text_set_color(&impl->repeat_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->repeat_txt, DIALOG_TEXT_COLOR);
     impl->repeat_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 2, 1, 2);
 
     impl->repeat_h = ro_single_new(r_texture_new_file(2, 2, "res/button_repeat.png"));
@@ -226,9 +227,9 @@ void dialog_create_animation() {
     impl->time_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->time_txt, "reset all \n"
             "frame times:");
-    ro_text_set_color(&impl->time_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->time_txt, DIALOG_TEXT_COLOR);
     impl->time_num = ro_text_new_font55(8);
-    ro_text_set_color(&impl->time_num, (vec4) {{0.1, 0.1, 0.9, 1}});
+    ro_text_set_color(&impl->time_num, DIALOG_TEXT_EDIT_COLOR);
     impl->time_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 2, 1, 2);
     impl->time_num.pose = u_pose_new(DIALOG_LEFT + 84, DIALOG_TOP - pos, 1, 2);
     impl->time_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
@@ -244,8 +245,8 @@ void dialog_create_animation() {
     
     dialog.impl_height = pos;
     
-    dialog_set_title("animation", (vec4) {{0.2, 0.6, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("animation", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

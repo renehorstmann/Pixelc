@@ -48,7 +48,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_layer() {
     return tool_button_new("layer",
-                           "enable / disable\n"
+                           "Enable / Disable\n"
                            "layers",
                            "res/button_layer.png",
                            pointer_event,

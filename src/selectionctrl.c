@@ -121,22 +121,6 @@ static void move_selection(ePointer_s pointer) {
     if (!L.moving)
         return;
 
-    if (selectionctrl.mode == SELECTIONCTRL_COPY
-        || selectionctrl.mode == SELECTIONCTRL_CUT) {
-        if (!u_image_contains(img, cr.x, cr.y))
-            return;
-
-        if (selectionctrl.mode == SELECTIONCTRL_COPY)
-            selection_copy(selectionctrl.selection, img, layer);
-        else
-            selection_cut(selectionctrl.selection, img, layer, U_COLOR_TRANSPARENT);
-
-        canvas_save();
-        selectionctrl.mode = SELECTIONCTRL_PASTE;
-
-        selectionctrl.show_ok = true;
-    }
-
     if (pointer.action == E_POINTER_DOWN) {
         if (!selection_contains(selectionctrl.selection, cr.x, cr.y)) {
             // touched outside the selection, so pushing the selection center into that position
@@ -169,6 +153,22 @@ void selectionctrl_init() {
 }
 
 void selectionctrl_update(float dtime) {
+    if (selectionctrl.mode == SELECTIONCTRL_COPY
+        || selectionctrl.mode == SELECTIONCTRL_CUT) {
+        uImage img = canvas.RO.image;
+        int layer = canvas.RO.current_image_layer;
+
+        if (selectionctrl.mode == SELECTIONCTRL_COPY)
+            selection_copy(selectionctrl.selection, img, layer);
+        else
+            selection_cut(selectionctrl.selection, img, layer, U_COLOR_TRANSPARENT);
+
+        canvas_save();
+        selection_paste(selectionctrl.selection, img, layer);
+        selectionctrl.mode = SELECTIONCTRL_PASTE;
+
+        selectionctrl.show_ok = true;
+    }
     setup_border();
 }
 

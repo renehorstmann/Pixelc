@@ -189,8 +189,8 @@ Tool *tool_new_kernel() {
 
     snprintf(self->super.name, TOOL_NAME_LEN, "kernel");
     snprintf(self->super.tip, TOOL_TIP_LEN, "select a \n"
-            "kernel / stamp\n\n"
-            "long press for\n"
+            "Kernel / Stamp\n\n"
+            "Long press for\n"
             "first / last\n"
             "and options");
 

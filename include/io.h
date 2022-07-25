@@ -26,7 +26,5 @@ void io_gif_save();
 
 void io_gif_hd_save();
 
-void io_image_import();
-
 
 #endif //PIXELC_IO_H

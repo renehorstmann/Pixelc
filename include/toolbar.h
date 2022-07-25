@@ -7,11 +7,7 @@
 #include "selectionctrl.h"
 #include "tool.h"
 
-#define TOOLBAR_TOOLS_LEN 30
-#define TOOLBAR_LAYER_TOOLS_LEN (TOOL_LAYER_SELECT_NUM + 2)
-#define TOOLBAR_FRAMES_TOOLS_LEN (TOOL_FRAMES_SELECT_NUM + 2)
-#define TOOLBAR_SELECTION_SET_TOOLS_LEN 4
-#define TOOLBAR_SELECTION_PASTE_TOOLS_LEN 7
+#define TOOLBAR_MAX_TOOLS 64
 
 
 typedef struct {
@@ -22,6 +18,7 @@ typedef struct {
     enum u_container_align align;
 
     RoSingle bg;
+    bool bg_packed;
 } ToolbarContainer;
 
 static bool toolbar_container_valid(const ToolbarContainer *self) {
@@ -34,86 +31,20 @@ struct Toolbar_Globals {
     ToolbarContainer layer;
     ToolbarContainer selection;
 
-    union {
-        Tool *all_tools[TOOLBAR_TOOLS_LEN];
-        struct {
-            Tool *tooltip;
-            Tool *save;
-            Tool *import;
-            Tool *display;
-            Tool *size;
-            Tool *tab;
-            Tool *frames;
-            Tool *layer;
-            Tool *camera;
-            Tool *grid;
-            Tool *clear;
-            Tool *undo;
-            Tool *redo;
-            Tool *selection;
-            Tool *kernel;
-            Tool *rgb;
-            Tool *shading;
-            Tool *secondary_color;
-            
-            Tool *mode_pipette;
-            Tool *mode_none;
-            Tool *mode_free;
-            Tool *mode_dot;
-            Tool *mode_line;
-            Tool *mode_rect;
-            Tool *mode_circle;
-            Tool *mode_dither;
-            Tool *mode_dither_inv;
-            Tool *mode_fill;
-            Tool *mode_fill8;
-            Tool *mode_replace;
-            
-            
-        } tools;
-    };
+    Tool *tools[TOOLBAR_MAX_TOOLS];
+    int tools_size;
 
-    union {
-        Tool *all_frames_tools[TOOLBAR_FRAMES_TOOLS_LEN];
-        struct {
-            Tool *select[TOOL_FRAMES_SELECT_NUM];
-            Tool *blend;
-            Tool *add;
-        } frames_tools;
-    };
+    Tool *frames_tools[TOOLBAR_MAX_TOOLS];
+    int frames_tools_size;
 
-    union {
-        Tool *all_layer_tools[TOOLBAR_LAYER_TOOLS_LEN];
-        struct {
-            Tool *select[TOOL_LAYER_SELECT_NUM];
-            Tool *blend;
-            Tool *add;
-        } layer_tools;
-    };
-    
+    Tool *layer_tools[TOOLBAR_MAX_TOOLS];
+    int layer_tools_size;
 
-    union {
-        Tool *all_selection_set_tools[TOOLBAR_SELECTION_SET_TOOLS_LEN];
-        struct {
-            Tool *move;
-            Tool *cut;
-            Tool *copy;
-            Tool *crop;
-        } selection_set_tools;
-    };
+    Tool *selection_set_tools[TOOLBAR_MAX_TOOLS];
+    int selection_set_tools_size;
 
-    union {
-        Tool *all_selection_paste_tools[TOOLBAR_SELECTION_PASTE_TOOLS_LEN];
-        struct {
-            Tool *rotate_l;
-            Tool *rotate_r;
-            Tool *mirror_v;
-            Tool *mirror_h;
-            Tool *blend;
-            Tool *copy;
-            Tool *ok;
-        } selection_paste_tools;
-    };
+    Tool *selection_paste_tools[TOOLBAR_MAX_TOOLS];
+    int selection_paste_tools_size;
 };
 extern struct Toolbar_Globals toolbar;
 

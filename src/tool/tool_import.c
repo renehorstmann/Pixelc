@@ -54,10 +54,10 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_import() {
     return tool_button_new("import",
-                           "tip to load\n"
+                           "Tip to load\n"
                            "import.png\n"
                            "as selection\n\n"
-                           "long press to show\n"
+                           "Long press to show\n"
                            "import options",
                            "res/button_import.png",
                            pointer_event,

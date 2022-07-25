@@ -7,8 +7,9 @@
 #include "modal.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+static const uColor_s BG_A_COLOR = {{136, 102, 136, 255}};
+static const uColor_s BG_B_COLOR = {{143, 102, 143, 255}};
+static const vec4 TITLE_COLOR = {{0.2, 0.2, 0.6, 1}};
 
 //
 // private
@@ -165,9 +166,9 @@ void dialog_create_display() {
     impl->size = camera.size;
     impl->size_text = ro_text_new_font55(5);
     ro_text_set_text(&impl->size_text, "size:");
-    ro_text_set_color(&impl->size_text, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->size_text, DIALOG_TEXT_COLOR);
     impl->size_num = ro_text_new_font55(4);
-    ro_text_set_color(&impl->size_num, (vec4) {{0.1, 0.1, 0.9, 1}});
+    ro_text_set_color(&impl->size_num, DIALOG_TEXT_EDIT_COLOR);
     impl->size_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
     impl->size_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
     impl->size_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, 64, 10 + 8);
@@ -184,7 +185,7 @@ void dialog_create_display() {
     impl->mode_text = ro_text_new_font55(12);
     ro_text_set_text(&impl->mode_text, "rotate mode:");
     impl->mode_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
-    ro_text_set_color(&impl->mode_text, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->mode_text, DIALOG_TEXT_COLOR);
 
     pos = 60;
     for (int i = 0; i < 3; i++) {
@@ -192,8 +193,8 @@ void dialog_create_display() {
         impl->buttons.rects[i + 2].pose = u_pose_new_aa(DIALOG_LEFT + 56 + i * 20, DIALOG_TOP - pos + 4, 16, 16);
     }
 
-    dialog_set_title("display", (vec4) {{0.8, 0.2, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("display", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.impl_height = pos;
     dialog.kill = kill_fn;
     dialog.update = update;

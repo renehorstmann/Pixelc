@@ -4,11 +4,12 @@
 #include "u/button.h"
 #include "u/json.h"
 #include "m/float.h"
+#include "m/utils/color.h"
 #include "io.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+static const uColor_s BG_A_COLOR = {{136, 136, 136, 255}};
+static const uColor_s BG_B_COLOR = {{143, 143, 143, 255}};
 
 //
 // private
@@ -90,6 +91,8 @@ static bool pointer_event(ePointer_s pointer) {
             save_no_reshow();
         }
         dialog_create_display();
+        // return after hide, hide kills this dialog
+        return true;
     }
     
     if(u_button_toggled(&impl->reshow_toggle.rect, pointer)) {
@@ -131,13 +134,13 @@ void dialog_create_startup() {
             " /renehorstmann\n"
             " /pixelc\n\n"
             "for a tutorial");
-    ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
     impl->info.pose = u_pose_new(DIALOG_LEFT + 2, DIALOG_TOP - pos, 1, 1);
     
     pos += 60;
 
     impl->disp_txt = ro_text_new_font55(64);
-    ro_text_set_color(&impl->disp_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->disp_txt, DIALOG_TEXT_COLOR);
     ro_text_set_text(&impl->disp_txt, "using a\n"
             "big screen?\n"
             "change the\n"
@@ -153,7 +156,7 @@ void dialog_create_startup() {
     pos += 30;
     
     impl->reshow_txt = ro_text_new_font55(32);
-    ro_text_set_color(&impl->reshow_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->reshow_txt, DIALOG_TEXT_COLOR);
     ro_text_set_text(&impl->reshow_txt, "reshow\n"
             "this dialog?");
     impl->reshow_txt.pose = u_pose_new(DIALOG_LEFT+4, DIALOG_TOP - pos, 1, 1);
@@ -169,8 +172,13 @@ void dialog_create_startup() {
     
     dialog.impl_height = pos;
 
-    dialog_set_title("Pixelc", (vec4) {{0.6, 0.2, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("Pixelc", vec4_set(1));
+    for(int i=0; i<6; i++) {
+        vec3 hsv = {{i*360.0/6.0, 0.8, 0.8}};
+        dialog.title.ro.rects[i].color.rgb = vec3_hsv2rgb(hsv);
+    }
+    ro_batch_update(&dialog.title.ro);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

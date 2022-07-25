@@ -7,8 +7,9 @@
 #include "cameractrl.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+static const uColor_s BG_A_COLOR = {{136, 136, 102, 255}};
+static const uColor_s BG_B_COLOR = {{143, 143, 102, 255}};
+static const vec4 TITLE_COLOR = {{0, 0.6, 0.3, 1}};
 
 //
 // private
@@ -109,7 +110,7 @@ void dialog_create_import() {
     float pos = 22;
 
     impl->info = ro_text_new_font55(64);
-    ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
 
     set_info("import.png");
 
@@ -119,7 +120,7 @@ void dialog_create_import() {
     impl->to_canvas_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->to_canvas_txt, "Copy into\n"
                                            "       canvas:");
-    ro_text_set_color(&impl->to_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->to_canvas_txt, DIALOG_TEXT_COLOR);
     impl->to_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
     
@@ -136,8 +137,8 @@ void dialog_create_import() {
 #endif
 
    
-    dialog_set_title("import", (vec4) {{0.6, 0.2, 0.2, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("import", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

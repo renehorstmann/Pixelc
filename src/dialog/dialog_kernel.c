@@ -9,8 +9,10 @@
 #include "cameractrl.h"
 #include "dialog.h"
 
-#define BG_A "#776666"
-#define BG_B "#887777"
+
+static const uColor_s BG_A_COLOR = {{136, 102, 136, 255}};
+static const uColor_s BG_B_COLOR = {{143, 102, 143, 255}};
+static const vec4 TITLE_COLOR = {{0.7, 0.7, 0.7, 1}};
 
 //
 // private
@@ -138,7 +140,7 @@ void dialog_create_kernel() {
 
     int pos = 24;
     impl->info = ro_text_new_font55(32);
-    ro_text_set_color(&impl->info, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
 
     char info_txt[32];
     snprintf(info_txt, sizeof info_txt, "%ix%i",
@@ -156,7 +158,7 @@ void dialog_create_kernel() {
 
     impl->delete_txt = ro_text_new_font55(7);
     ro_text_set_text(&impl->delete_txt, "Delete:");
-    ro_text_set_color(&impl->delete_txt, (vec4) {{0.7, 0.0, 0.2, 1.0}});
+    ro_text_set_color(&impl->delete_txt, DIALOG_TEXT_DELETE_COLOR);
     impl->delete_txt.pose = u_pose_new(DIALOG_LEFT + 50, DIALOG_TOP - pos - 3, 1, 2);
 
     impl->delete_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_delete.png"));
@@ -166,7 +168,7 @@ void dialog_create_kernel() {
     impl->to_canvas_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->to_canvas_txt, "Copy into\n"
                                            "       canvas:");
-    ro_text_set_color(&impl->to_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->to_canvas_txt, DIALOG_TEXT_COLOR);
     impl->to_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
     impl->to_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_to.png"));
@@ -176,7 +178,7 @@ void dialog_create_kernel() {
     impl->from_canvas_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->from_canvas_txt, "New kernel\n"
                                              "  from canvas:");
-    ro_text_set_color(&impl->from_canvas_txt, (vec4) {{0.9, 0.9, 0.9, 1}});
+    ro_text_set_color(&impl->from_canvas_txt, DIALOG_TEXT_COLOR);
     impl->from_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
     impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
@@ -185,8 +187,8 @@ void dialog_create_kernel() {
 
     dialog.impl_height = pos;
 
-    dialog_set_title("kernel", (vec4) {{0.2, 0.6, 0.6, 1}});
-    dialog_set_bg_color(u_color_from_hex(BG_A), u_color_from_hex(BG_B));
+    dialog_set_title("kernel", TITLE_COLOR);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;
     dialog.update = update;
     dialog.render = render;

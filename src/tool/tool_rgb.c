@@ -57,7 +57,7 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_rgb() {
     return tool_button_new("rgb",
-                           "set the\n"
+                           "Set the\n"
                            "secondary color\n"
                            "with a color picker",
                            "res/button_rgb.png",

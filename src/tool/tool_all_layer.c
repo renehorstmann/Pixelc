@@ -153,9 +153,9 @@ Tool *tool_new_layer_select(int pos) {
             : (vec4) {{0.2, 0.2, 0.2, 1}});
     
     snprintf(self->super.name, TOOL_NAME_LEN, "layer"); 
-    snprintf(self->super.tip, TOOL_TIP_LEN, "select a\n"
+    snprintf(self->super.tip, TOOL_TIP_LEN, "Select a\n"
             "canvas layer\n\n"
-            "long press for\n"
+            "Long press for\n"
             "layer options"); 
     
     self->super.kill = select_kill; 
@@ -206,7 +206,7 @@ static bool blend_is_a(struct Tool *super, float dtime) {
 
 Tool *tool_new_layer_blend() {
     Tool *super = tool_button_new("blend",
-                           "blends in the\n"
+                           "Blends in the\n"
                            "previous layers\n"
                            "with or without\n"
                            "onion skinning",
@@ -244,7 +244,7 @@ static bool add_is_a(struct Tool *super, float dtime) {
 
 Tool *tool_new_layer_add() {
     return tool_button_new("add",
-                           "adds a layer\n"
+                           "Adds a layer\n"
                            "next to the\n"
                            "current layer",
                            "res/button_plus.png",

@@ -75,10 +75,10 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_frames() {
     return tool_button_new("frames",
-                           "enable / disable\n"
+                           "Enable / disable\n"
                            "frames and show\n"
                            "the animation\n\n"
-                           "hold for\n"
+                           "Hold for\n"
                            "animation options",
                            "res/button_play.png",
                            pointer_event,
