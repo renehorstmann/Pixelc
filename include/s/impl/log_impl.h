@@ -10,7 +10,7 @@
 #include "../log.h"
 
 #ifdef OPTION_SDL
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 #endif
 
 #define S_LOG_MAX_LENGTH 4096     // Should be the same as SDL's log max

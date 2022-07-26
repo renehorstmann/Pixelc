@@ -1,17 +1,22 @@
 # Pixelc
-An opensource tile/sprite editor in C, using SDL2 and OpenGL
+An opensource tile/sprite editor in C, using SDL2 and OpenGL.
 
 > Main target are touch devices such as smartphones and tablets.
 > Runs also fine on desktops.
 
 Based on [some](https://github.com/renehorstmann/some) framework.
 
-## Web version
-[Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten 
+## WebApp
+[Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten.
+
+> Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling
+
+![example_image](example.png)
 
 ## Tutorial
 A documentation / tutorial can be found [here / doc.md](doc.md)
-Or just use the tooltip tool ![img](res/button_tooltip.png)
+
+Or just use the tooltip tool. ![img](res/button_tooltip.png)
 
 ## Highlights:
 - Multitouchmode for a great touch experience
@@ -30,12 +35,9 @@ Or just use the tooltip tool ![img](res/button_tooltip.png)
 - **COMPLETELY FREE and open**
 - and many more
 
-## Status:
-
-![example_image](example.png)
 
 ## Install and run on Desktop
-Have a look at the section of [some](https://github.com/renehorstmann/some)
+Have a look at the section of [some](https://github.com/renehorstmann/some).
 
 
 ## Compiling for Web
@@ -43,7 +45,7 @@ Using Emscripten https://emscripten.org/
 Tested under Ubuntu and WSL Ubuntu.
 You should have already cloned the project and `cd` to that dir:
 
-- Create a sub directory to compile the website
+- Create a sub-directory to compile the website
 ```sh
 mkdir web && cp index.html web && cp icon/* web && cd web
 ```
@@ -75,9 +77,6 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 
-# Todo
-- android .apk for the Play Store
-
 ## Author
 René Horstmann
 
@@ -86,8 +85,9 @@ René Horstmann
 - The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
     - [SDL2](https://www.libsdl.org/) (zlib License)
     - [Emscripten](emscripten.org) (MIT License)
-    - [nuklear](https://github.com/Immediate-Mode-UI/Nuklear) for debug gui windows (MIT License)
-    - [curl](https://curl.se/docs/copyright.html) (MIT like License)
-
-- Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
+    - [nuklear](https://github.com/Immediate-Mode-UI/Nuklear) for debug gui windows (MIT License) 
+      - not used in Pixelc, but is part of some
+    - [curl](https://curl.se/docs/copyright.html) (MIT like License) 
+      - not used in Pixelc, but is part of some
 - the .gif encoder [gifenc](https://github.com/lecram/gifenc) is licenced under public domain
+- Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence

@@ -2,7 +2,10 @@
 #include "s/s_impl.h"
 
 #include <SDL2/SDL_image.h>
+
+#ifdef OPTION_TTF
 #include <SDL2/SDL_ttf.h>
+#endif
 
 #include "e/window.h"
 #include "e/definitions.h"
@@ -111,7 +114,8 @@ static void log_window_event(const SDL_Event *event);
 // protected
 //
 void e_window_handle_window_event_(const SDL_Event *event) {
-    if (event->type == SDL_QUIT) {
+    if (event->type == SDL_QUIT
+            || (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_AC_BACK)) {
         e_window_kill();
         return;
     }

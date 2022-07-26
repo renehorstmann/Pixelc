@@ -1,34 +1,32 @@
-// changed write to fwrite for portability (emscripten)
+// changed to use s_file for portability (emscripten, android)
 
 #include "gifenc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
-/* helper to fwrite a little-endian 16-bit number portably */
-#define fwrite_num(fd, n) fwrite((uint8_t []) {(n) & 0xFF, (n) >> 8}, 2, 1, (fd))
+static void gifwrite(const char *src, ssize s, ssize n, sStream_i stream) {
+    s_stream_write(stream, src, s*n);
+}
+
+/* helper to gifwrite a little-endian 16-bit number portably */
+#define gifwrite_num(fd, n) gifwrite((uint8_t []) {(n) & 0xFF, (n) >> 8}, 2, 1, (fd))
 
 static uint8_t vga[0x30] = {
-    0x00, 0x00, 0x00,
-    0xAA, 0x00, 0x00,
-    0x00, 0xAA, 0x00,
-    0xAA, 0x55, 0x00,
-    0x00, 0x00, 0xAA,
-    0xAA, 0x00, 0xAA,
-    0x00, 0xAA, 0xAA,
-    0xAA, 0xAA, 0xAA,
-    0x55, 0x55, 0x55,
-    0xFF, 0x55, 0x55,
-    0x55, 0xFF, 0x55,
-    0xFF, 0xFF, 0x55,
-    0x55, 0x55, 0xFF,
-    0xFF, 0x55, 0xFF,
-    0x55, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF,
+        0x00, 0x00, 0x00,
+        0xAA, 0x00, 0x00,
+        0x00, 0xAA, 0x00,
+        0xAA, 0x55, 0x00,
+        0x00, 0x00, 0xAA,
+        0xAA, 0x00, 0xAA,
+        0x00, 0xAA, 0xAA,
+        0xAA, 0xAA, 0xAA,
+        0x55, 0x55, 0x55,
+        0xFF, 0x55, 0x55,
+        0x55, 0xFF, 0x55,
+        0xFF, 0xFF, 0x55,
+        0x55, 0x55, 0xFF,
+        0xFF, 0x55, 0xFF,
+        0x55, 0xFF, 0xFF,
+        0xFF, 0xFF, 0xFF,
 };
 
 struct Node {
@@ -67,9 +65,9 @@ del_trie(Node *root, int degree)
     free(root);
 }
 
-#define fwrite_and_store(s, dst, fd, src, n) \
+#define gifwrite_and_store(s, dst, fd, src, n) \
 do { \
-    fwrite(src, 1, n, fd); \
+    gifwrite(src, 1, n, fd); \
     if (s) { \
         memcpy(dst, src, n); \
         dst += n; \
@@ -80,8 +78,8 @@ static void put_loop(ge_GIF *gif, uint16_t loop);
 
 ge_GIF *
 ge_new_gif(
-    const char *fname, uint16_t width, uint16_t height,
-    uint8_t *palette, int depth, int bgindex, int loop
+        const char *fname, uint16_t width, uint16_t height,
+        uint8_t *palette, int depth, int bgindex, int loop
 )
 {
     int i, r, g, b, v;
@@ -94,12 +92,13 @@ ge_new_gif(
     gif->bgindex = bgindex;
     gif->frame = (uint8_t *) &gif[1];
     gif->back = &gif->frame[width*height];
-    gif->fd = fopen(fname, "wb");
-    if (!gif->fd)
+    gif->file = s_file_new_write(fname, false);
+    gif->stream = s_file_stream_out(gif->file);
+    if (!s_stream_valid(gif->stream))
         goto no_fd;
-    fwrite("GIF89a", 1, 6, gif->fd);
-    fwrite_num(gif->fd, width);
-    fwrite_num(gif->fd, height);
+    gifwrite("GIF89a", 1, 6, gif->stream);
+    gifwrite_num(gif->stream, width);
+    gifwrite_num(gif->stream, height);
     store_gct = custom_gct = 0;
     if (palette) {
         if (depth < 0)
@@ -110,19 +109,19 @@ ge_new_gif(
     if (depth < 0)
         depth = -depth;
     gif->depth = depth > 1 ? depth : 2;
-    fwrite((uint8_t []) {0xF0 | (depth-1), (uint8_t) bgindex, 0x00}, 1, 3, gif->fd);
+    gifwrite((uint8_t []) {0xF0 | (depth-1), (uint8_t) bgindex, 0x00}, 1, 3, gif->stream);
     if (custom_gct) {
-        fwrite(palette, 1, 3 << depth, gif->fd);
+        gifwrite(palette, 1, 3 << depth, gif->stream);
     } else if (depth <= 4) {
-        fwrite_and_store(store_gct, palette, gif->fd, vga, 3 << depth);
+        gifwrite_and_store(store_gct, palette, gif->stream, vga, 3 << depth);
     } else {
-        fwrite_and_store(store_gct, palette, gif->fd, vga, sizeof(vga));
+        gifwrite_and_store(store_gct, palette, gif->stream, vga, sizeof(vga));
         i = 0x10;
         for (r = 0; r < 6; r++) {
             for (g = 0; g < 6; g++) {
                 for (b = 0; b < 6; b++) {
-                    fwrite_and_store(store_gct, palette, gif->fd,
-                      ((uint8_t []) {r*51, g*51, b*51}), 3
+                    gifwrite_and_store(store_gct, palette, gif->stream,
+                                       ((uint8_t []) {r*51, g*51, b*51}), 3
                     );
                     if (++i == 1 << depth)
                         goto done_gct;
@@ -131,29 +130,29 @@ ge_new_gif(
         }
         for (i = 1; i <= 24; i++) {
             v = i * 0xFF / 25;
-            fwrite_and_store(store_gct, palette, gif->fd,
-              ((uint8_t []) {v, v, v}), 3
+            gifwrite_and_store(store_gct, palette, gif->stream,
+                               ((uint8_t []) {v, v, v}), 3
             );
         }
     }
-done_gct:
+    done_gct:
     if (loop >= 0 && loop <= 0xFFFF)
         put_loop(gif, (uint16_t) loop);
     return gif;
-no_fd:
+    no_fd:
     free(gif);
-no_gif:
+    no_gif:
     return NULL;
 }
 
 static void
 put_loop(ge_GIF *gif, uint16_t loop)
 {
-    fwrite((uint8_t []) {'!', 0xFF, 0x0B}, 1, 3, gif->fd);
-    fwrite("NETSCAPE2.0", 1, 11, gif->fd);
-    fwrite((uint8_t []) {0x03, 0x01}, 1, 2, gif->fd);
-    fwrite_num(gif->fd, loop);
-    fwrite("\0", 1, 1, gif->fd);
+    gifwrite((uint8_t []) {'!', 0xFF, 0x0B}, 1, 3, gif->stream);
+    gifwrite("NETSCAPE2.0", 1, 11, gif->stream);
+    gifwrite((uint8_t []) {0x03, 0x01}, 1, 2, gif->stream);
+    gifwrite_num(gif->stream, loop);
+    gifwrite("\0", 1, 1, gif->stream);
 }
 
 /* Add packed key to buffer, updating offset and partial.
@@ -162,20 +161,20 @@ put_loop(ge_GIF *gif, uint16_t loop)
 static void
 put_key(ge_GIF *gif, uint16_t key, int key_size)
 {
-    int byte_offset, bit_offset, bits_to_fwrite;
+    int byte_offset, bit_offset, bits_to_gifwrite;
     byte_offset = gif->offset / 8;
     bit_offset = gif->offset % 8;
     gif->partial |= ((uint32_t) key) << bit_offset;
-    bits_to_fwrite = bit_offset + key_size;
-    while (bits_to_fwrite >= 8) {
+    bits_to_gifwrite = bit_offset + key_size;
+    while (bits_to_gifwrite >= 8) {
         gif->buffer[byte_offset++] = gif->partial & 0xFF;
         if (byte_offset == 0xFF) {
-            fwrite("\xFF", 1, 1, gif->fd);
-            fwrite(gif->buffer, 1, 0xFF, gif->fd);
+            gifwrite("\xFF", 1, 1, gif->stream);
+            gifwrite(gif->buffer, 1, 0xFF, gif->stream);
             byte_offset = 0;
         }
         gif->partial >>= 8;
-        bits_to_fwrite -= 8;
+        bits_to_gifwrite -= 8;
     }
     gif->offset = (gif->offset + key_size) % (0xFF * 8);
 }
@@ -188,10 +187,10 @@ end_key(ge_GIF *gif)
     if (gif->offset % 8)
         gif->buffer[byte_offset++] = gif->partial & 0xFF;
     if (byte_offset) {
-        fwrite((uint8_t []) {byte_offset}, 1, 1, gif->fd);
-        fwrite(gif->buffer, 1, byte_offset, gif->fd);
+        gifwrite((uint8_t []) {byte_offset}, 1, 1, gif->stream);
+        gifwrite(gif->buffer, 1, byte_offset, gif->stream);
     }
-    fwrite("\0", 1, 1, gif->fd);
+    gifwrite("\0", 1, 1, gif->stream);
     gif->offset = gif->partial = 0;
 }
 
@@ -202,12 +201,12 @@ put_image(ge_GIF *gif, uint16_t w, uint16_t h, uint16_t x, uint16_t y)
     Node *node, *child, *root;
     int degree = 1 << gif->depth;
 
-    fwrite(",", 1, 1, gif->fd);
-    fwrite_num(gif->fd, x);
-    fwrite_num(gif->fd, y);
-    fwrite_num(gif->fd, w);
-    fwrite_num(gif->fd, h);
-    fwrite((uint8_t []) {0x00, gif->depth}, 1, 2, gif->fd);
+    gifwrite(",", 1, 1, gif->stream);
+    gifwrite_num(gif->stream, x);
+    gifwrite_num(gif->stream, y);
+    gifwrite_num(gif->stream, w);
+    gifwrite_num(gif->stream, h);
+    gifwrite((uint8_t []) {0x00, gif->depth}, 1, 2, gif->stream);
     root = node = new_trie(degree, &nkeys);
     key_size = gif->depth + 1;
     put_key(gif, degree, key_size); /* clear code */
@@ -273,9 +272,9 @@ static void
 add_graphics_control_extension(ge_GIF *gif, uint16_t d)
 {
     uint8_t flags = ((gif->bgindex >= 0 ? 2 : 1) << 2) + 1;
-    fwrite((uint8_t []) {'!', 0xF9, 0x04, flags}, 1, 4, gif->fd);
-    fwrite_num(gif->fd, d);
-    fwrite((uint8_t []) {(uint8_t) gif->bgindex, 0x00}, 1, 2, gif->fd);
+    gifwrite((uint8_t []) {'!', 0xF9, 0x04, flags}, 1, 4, gif->stream);
+    gifwrite_num(gif->stream, d);
+    gifwrite((uint8_t []) {(uint8_t) gif->bgindex, 0x00}, 1, 2, gif->stream);
 }
 
 void
@@ -307,7 +306,7 @@ ge_add_frame(ge_GIF *gif, uint16_t delay)
 void
 ge_close_gif(ge_GIF* gif)
 {
-    fwrite(";", 1, 1, gif->fd);
-    fclose(gif->fd);
+    gifwrite(";", 1, 1, gif->stream);
+    s_file_kill(&gif->file);
     free(gif);
 }

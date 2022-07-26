@@ -1,20 +1,21 @@
-// changed write to fwrite for portability (emscripten)
+// changed to use s_file for portability (emscripten, android)
 
 #ifndef GIFENC_H
 #define GIFENC_H
 
-#include <stdint.h>
-#include <stdio.h>
+#include "s/file.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct ge_GIF {
+    sFile *file;
+    sStream_i stream;
+
     uint16_t w, h;
     int depth;
     int bgindex;
-    FILE *fd;
     int offset;
     int nframes;
     uint8_t *frame, *back;
@@ -23,8 +24,8 @@ typedef struct ge_GIF {
 } ge_GIF;
 
 ge_GIF *ge_new_gif(
-    const char *fname, uint16_t width, uint16_t height,
-    uint8_t *palette, int depth, int bgindex, int loop
+        const char *fname, uint16_t width, uint16_t height,
+        uint8_t *palette, int depth, int bgindex, int loop
 );
 void ge_add_frame(ge_GIF *gif, uint16_t delay);
 void ge_close_gif(ge_GIF* gif);

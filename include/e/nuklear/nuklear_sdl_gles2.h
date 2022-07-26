@@ -20,7 +20,11 @@
 
 
 #include <SDL2/SDL.h>
+#ifdef PLATFORM_ANDROID
+#include <SDL2/SDL_opengles.h>
+#else
 #include <SDL2/SDL_opengles2.h>
+#endif
 
 
 NK_API struct nk_context *nk_sdl_init(SDL_Window *win);

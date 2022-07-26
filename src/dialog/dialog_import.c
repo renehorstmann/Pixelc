@@ -20,12 +20,30 @@ typedef struct {
     RoText info;
     RoSingle upload;
     bool upload_available;
-    
+
     RoText to_canvas_txt;
     RoSingle to_canvas_btn;
     bool image_available;
 
+    char *file_uploaded;
+
 } Impl;
+
+
+static void set_info(const char *file_name) {
+    s_log("file: %s", file_name);
+    Impl *impl = dialog.impl;
+    char text[64];
+    uImage img = u_image_new_file(1, "import.png");
+    impl->image_available = u_image_valid(img);
+    if (!impl->image_available) {
+        snprintf(text, sizeof text, "failed to load\n  image\n%s", file_name);
+    } else {
+        snprintf(text, sizeof text, "%s\n   cols: %i\n   rows: %i", file_name, img.cols, img.rows);
+    }
+    ro_text_set_text(&impl->info, text);
+    u_image_kill(&img);
+}
 
 static void kill_fn() {
     Impl *impl = dialog.impl;
@@ -37,7 +55,12 @@ static void kill_fn() {
 }
 
 static void update(float dtime) {
-    // noop
+    Impl *impl = dialog.impl;
+    if(impl->file_uploaded) {
+        set_info(impl->file_uploaded);
+        s_free(impl->file_uploaded);
+        impl->file_uploaded = NULL;
+    }
 }
 
 static void render(const mat4 *cam_mat) {
@@ -53,22 +76,12 @@ static void render(const mat4 *cam_mat) {
     }
 }
 
-static void set_info(const char *file_name) {
-    Impl *impl = dialog.impl;
-    char text[64];
-    uImage img = u_image_new_file(1, "import.png");
-    impl->image_available = u_image_valid(img);
-    if (!impl->image_available) {
-        snprintf(text, sizeof text, "failed to load\n  image\n%s", file_name);
-    } else {
-        snprintf(text, sizeof text, "%s\n   cols: %i\n   rows: %i", file_name, img.cols, img.rows);
-    }
-    ro_text_set_text(&impl->info, text);
-    u_image_kill(&img);
-}
-
 static void uploaded(const char *file, bool ascii, const char *user_file_name, void *user_data) {
-    set_info(user_file_name);
+    // may run in another thread or something on android...
+    // so applying the change on update
+    Impl *impl = dialog.impl;
+    impl->file_uploaded = s_malloc(strlen(user_file_name)+1);
+    strcpy(impl->file_uploaded, user_file_name);
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -78,7 +91,7 @@ static bool pointer_event(ePointer_s pointer) {
         s_log("import upload...");
         e_io_ask_for_file_upload("import.png", false, uploaded, NULL);
     }
-    
+
     if (impl->image_available && u_button_clicked(&impl->to_canvas_btn.rect, pointer)) {
         s_log("import to canvas");
         uSprite sprite = u_sprite_new_file(1, 1, "import.png");
@@ -106,7 +119,7 @@ void dialog_create_import() {
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
-    
+
     float pos = 22;
 
     impl->info = ro_text_new_font55(64);
@@ -116,27 +129,27 @@ void dialog_create_import() {
 
     impl->info.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
     pos += 40;
-    
+
     impl->to_canvas_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->to_canvas_txt, "Copy into\n"
                                            "       canvas:");
     ro_text_set_color(&impl->to_canvas_txt, DIALOG_TEXT_COLOR);
     impl->to_canvas_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 3, 1, 2);
 
-    
+
     impl->to_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_to.png"));
     impl->to_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     pos += 22;
 
     dialog.impl_height = pos;
 
-#ifdef __EMSCRIPTEN__
+#if defined(PLATFORM_EMSCRIPTEN) || defined(PLATFORM_ANDROID)
     impl->upload = ro_single_new(r_texture_new_file(2, 1, "res/button_dialog_upload.png"));
     impl->upload_available = true;
     impl->upload.rect.pose = u_pose_new_aa(DIALOG_LEFT + 8, DIALOG_TOP-pos-18, 64, 16);
 #endif
 
-   
+
     dialog_set_title("import", TITLE_COLOR);
     dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
     dialog.kill = kill_fn;

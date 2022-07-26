@@ -12,8 +12,9 @@ set(USE_SANITIZER true)
 # PLATFORM_MSVC         Microsoft C++ Compiler
 # PLATFORM_MINGW        Windows Msys2 Mingw-w64
 # PLATFORM_UNIX         Ubuntu, etc.
-# PLATFORM_MOBILE       Android
+# PLATFORM_MOBILE       CxxDroid
 # PLATFORM_EMSCRIPTEN   emscripten web compiler
+# PLATFORM_ANDROID      Android apk
 
 # Optional definitions:
 # OPTION_GLES           for OpenGLES3.0 instead of OpenGL3.3
@@ -256,7 +257,6 @@ if (PLATFORM_MOBILE)
 
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
-
 
     find_library(GLES_LIB GLESv3 REQUIRED)
 

@@ -9,7 +9,7 @@
 #include "s/string.h"
 
 
-#define E_IO_SAVESTATE_MAX_FILENAME_LENGTH 128
+#define E_IO_SAVESTATE_MAX_FILENAME_LENGTH 256
 
 // callback for file uploads, only called on success
 // file and ascii must not be checked and are the same as for e_io_ask_for_file_upload

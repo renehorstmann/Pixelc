@@ -10,6 +10,8 @@ Its also fine to use on desktops, etc.
 
 > Big Screen? Change the internal [Display](#S-display) size
 
+> Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling
+
 ![img](example.png)
 
 ## Table of Contents
@@ -34,24 +36,24 @@ Its also fine to use on desktops, etc.
 - [Layers](#S-layers)
 
 ## <a name="S-draw_modes"></a>Draw Modes
-Pixelc supports different modes to draw on the canvas
+Pixelc supports different modes to draw on the canvas.
 ### Free
 ![img](res/button_free.png)
 Draws freely on the canvas (default mode).
 ### Dot
 ![img](res/button_dot.png)
 Draws on each tip.
-Good to print [stamps](#S-kernel__stamps) on the canvas
+Good to print [stamps](#S-kernel__stamps) on the canvas.
 ### Line
 ![img](res/button_line.png)
-Draws a line on the canvas
+Draws a line on the canvas.
 ### Rect
 ![img](res/button_rect.png)
-Draws a rect on the canvas
+Draws a rect on the canvas.
 ### Circle
 ![img](res/button_circle.png)
 Draws a circle on the canvas.
-Start position is the circle center
+Start position is the circle center.
 ### Grid
 ![img](res/button_dither.png)
 Draws the current [Kernel](#S-kernel) in a grid on the canvas.
@@ -85,19 +87,19 @@ Good to replace thin lines.
 
 ### Replace
 ![img](res/button_replace.png)
-Replaces the touched color
+Replaces the touched color.
 ### None
 ![img](res/button_cross.png)
-Does nothing on the canvas. Use this mode if you just want to view your pixel art, without accidentally drawing on it
+Does nothing on the canvas. Use this mode if you just want to view your pixel art, without accidentally drawing on it.
 ### Pipette
 ![img](res/button_pipette.png)
-Click on a color in the canvas to set it as [secondary](#S-secondary_color). 
+Click on a color in the canvas to set it as [secondary color](#S-secondary_color). 
 The app shows a flash effect of that color to show you that the pipette mode is active.
 (Also if [shading](#S_shading) is active)
 
 ## <a name="S-tooltip"></a>Tooltip
 ![img](res/button_tooltip.png)
-Click on the tooltip tool in the toolbar to open the tooltip dialog
+Click on the tooltip tool in the toolbar to open the tooltip dialog.
 
 ![img](doc/tooltip_dialog.png)
 
@@ -156,7 +158,9 @@ You can also press the buttons in the toolbar and in the dialogs, too!
 
 ## <a name="S-kernel"></a>Kernel
 The Kernel is drawn in the Modes: Free, Dot, Line, Rect, Cricle, Grid and InvertedGrid.
+
 Change the current kernel with the minus and plus button. Hold for the first, last kernel ![img](res/button_minus.png) ![img](res/button_plus.png)
+
 If you hold on the kernel preview between minus and plus, the kernel options dialog starts.
 
 ![img](doc/kernel_dialog.png)
@@ -190,10 +194,12 @@ You can also use kernels as image stamps to quickly draw your stamps in differen
 6. Use the Dot Mode ![img](res/button_dot.png)
 7. Draw your stamp
 
-Lets draw a fish as a stamp in grayscale
+Lets draw a fish as a stamp in grayscale.
+
 ![img](doc/kernel_stamp_image.png)
 
-We can now print the fish in different colors onto our image
+We can now print the fish in different colors onto our image.
+
 ![img](doc/kernel_stamp_usage.png)
 
 
@@ -204,7 +210,7 @@ Choose a palette for the rainbow and copy it into the canvas (or draw your own r
 
 ![img](doc/rainbow_kernel.png)
 
-Create a kernel from that canvas and draw your rainbow
+Create a kernel from that canvas and draw your rainbow.
 
 ![img](doc/rainbow.png)
 
@@ -237,14 +243,16 @@ The app shows a flash effect of the secondary color to show you that the shading
 
 ## <a name="S-display"></a>Display settings
 ![img](res/button_display.png)
-Click on the display tool to open the display dialog
+Click on the display tool to open the display dialog.
 
 ![img](doc/display_dialog.png)
 
 Pixelc is rendered in pixel perfect render mode.
 In that mode, each pixel unit is drawn with an integer number of real pixels.
 The size determines the minimum drawn pixel units in the window.
+
 So a small change may not alter the size of a pixel unit.
+
 Click on the mobile or desktop/tablet button next to the size, to set it to 180 or 270.
 
 The rotate mode is in portrait mode as default.
@@ -255,36 +263,37 @@ The rotate mode is in portrait mode as default.
 
 ## <a name="S-save"></a>Save
 ![img](res/button_save.png)
-Click on the save tool to open the save dialog
+Click on the save tool to open the save dialog.
 
-![img](doc/save_dialog.png)
+![img](doc/saving_dialog.png)
 
-You can save either as .png image file or as animated .gif file
+You can save either as `.png` image file or as animated `.gif` file.
 On the web, the files are offered as download.
-Otherwise the files are saves as as image.png or animation.gif in the working directory of the executable
+Otherwise the files are saved as `image.png` or `animation.gif` in the working directory of the executable.
 
 ![img](res/button_save.png) Save the image with the actual size.
 
-![img](res/button_save_hd.png) Upscale the image to at least HD MIN SIZE.
+![img](res/button_save_hd.png) Upscale the image to at least *HD MIN SIZE*.
 Better for sharing the image, because most image viewer will render pixel art wrong.
 
-If SAVER LAYERS MERGED is activates, all layers are merged into a single image.
+If *SAVER LAYERS MERGED* is activated, all layers are merged into a single image.
 
-PNG will save the frames next to each other, while GIF will animate them.
+*PNG* will save the frames next to each other, while *GIF* will animate them.
 
 > The gif encoder uses a color palette with max. 256 opaque colors. Color 0 is reserved for transparency.
 > The first 255 colors in the canvas are used to create the color palette.
 
 ## <a name="S-import"></a>Import
 ![img](res/button_import.png)
-Click on the import tool to open the import.png image file as [selection](#S-selection).
+Click on the import tool to open the `import.png` image file as [selection](#S-selection).
 
-Hold to open the import dialog
+Hold to open the import dialog.
 
 ![img](doc/import_dialog.png)
 
-In the WebApp you can upload a new file to be loaded as import.png
-Otherwise the file should be located in the working directory of the executable
+In the WebApp you can upload a new file to be loaded as import.png.
+
+Otherwise the file should be located in the working directory of the executable.
 
 The button copy into canvas ![img](res/button_to.png)
 Will copy the image into the canvas directly.
@@ -311,6 +320,7 @@ If keep order is activated, the image will be reset with the frames and layers i
 ![img](res/button_selection.png)
 
 Click on the selection tool, to start a new selection.
+
 Now swipe down on the canvas to create the selection window.
 
 ![img](doc/selection_set.png)
@@ -320,13 +330,13 @@ You can now move the selection borders with the arrow keys on the left in the se
 While a selection is active, all drawing stuff is only applied inside the selection box.
 
 ![img](res/button_copy.png)
-The copy button copies the current selection
+The copy button copies the current selection.
 
 ![img](res/button_cut.png)
 The cut button cuts the current selection and replaces it with transparency.
 
 ![img](res/button_crop.png)
-The crop button crops the canvas onto the current selection (removing everything outside the selection)
+The crop button crops the canvas onto the current selection (removing everything outside the selection).
 
 If copied or cut, the selection box may be moved on the canvas or in a new frame, layer or image tab.
 
@@ -336,16 +346,16 @@ If copied or cut, the selection box may be moved on the canvas or in a new frame
 ![img](res/button_rotate_right.png)
 ![img](res/button_vertical.png)
 ![img](res/button_horizontal.png)
-In the new seleciton toolbar, the selection box may be rotated or flipped.
+In the new selection toolbar, the selection box may be rotated or flipped.
 
 ![img](res/button_copy.png)
-The copy button now copies the selection into the canvas, leaving the selection toolbar open
+The copy button now copies the selection into the canvas, leaving the selection toolbar open.
 
 ![img](res/button_ok.png)
-The ok button copied the selection into the canvas and closes the selection mode
+The ok button copies the selection into the canvas and closes the selection mode.
 
 ![img](res/button_blend.png)
-If the blend button is activated, the selections will be blended onto the canvas (using transparency)
+If the blend button is activated, the selections will be blended onto the canvas (using transparency).
 
 ![img](doc/selection_paste_blend.png)
 
@@ -383,7 +393,7 @@ Switch between the three blend modes:
 3. Full, blend in previous frames with the full alpha value
 
 ![img](res/button_plus.png)
-Add a new frame right next to the current
+Add a new frame right next to the current.
 
 Hold on a frame to open the frame dialog:
 
@@ -392,7 +402,7 @@ Hold on a frame to open the frame dialog:
 Here you can:
 - delete the current frame ![img](res/button_delete.png)
 - move the current frame left or right ![img](res/button_move_prev.png) ![img](res/button_move_next.png)
-- merge the frame with the previous frame ![img](res/button_to.png)
+- merge the frame with the previous frame ![img](res/button_from.png)
 - set the frame time for the animation
 
 Hold on the frames tool to open the animation dialog ![img](res/button_play.png)
@@ -407,8 +417,8 @@ Here you can:
 
 
 ## <a name="S-layers"></a>Layers
-Frames and Layers both are located in a grid of the image.
+Frames and layers both are located in a grid of the image.
 While frames are set right next to each other on the image, layers are placed below each other.
-The Layer options behave exactly the same as the Frame options (without the animation dialog and the frame times)
+The layer options behave exactly the same as the frame options (without the animation dialog and the frame times)
 So have a look at the [Frames](#S-frames) section.
 Layers may be merged down in the save dialog ![img](res/button_save.png)
