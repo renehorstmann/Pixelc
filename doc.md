@@ -276,7 +276,7 @@ Otherwise the files are saved as `image.png` or `animation.gif` in the working d
 ![img](res/button_save_hd.png) Upscale the image to at least *HD MIN SIZE*.
 Better for sharing the image, because most image viewer will render pixel art wrong.
 
-If *SAVER LAYERS MERGED* is activated, all layers are merged into a single image.
+If *SAVE LAYERS MERGED* is activated, all layers are merged into a single image.
 
 *PNG* will save the frames next to each other, while *GIF* will animate them.
 
