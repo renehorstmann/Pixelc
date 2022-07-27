@@ -3,7 +3,7 @@
 #include "gifenc.h"
 
 
-static void gifwrite(const char *src, ssize s, ssize n, sStream_i stream) {
+static void gifwrite(const void *src, ssize s, ssize n, sStream_i stream) {
     s_stream_write(stream, src, s*n);
 }
 

@@ -67,10 +67,6 @@ static void init() {
     
     dialog_create_startup();
 
-#ifdef PLATFORM_ANDROID
-    e_window_set_screen_mode(E_WINDOW_MODE_FULLSCREEN);
-#endif
-
 }
 
 // this functions is called either each frame or at a specific update/s time
