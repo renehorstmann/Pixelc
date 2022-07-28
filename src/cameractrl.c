@@ -59,8 +59,7 @@ static void zoom_camera(float new_distance) {
 static void set_home() {
     memset(&L, 0, sizeof(L));
 
-    int rows = canvas.RO.image.rows;
-    int cols = canvas.RO.image.cols;
+    ivec2 csize = canvas_get_size();
     
     int left = camera.RO.left;
     int right = camera.RO.right;
@@ -77,26 +76,24 @@ static void set_home() {
     
     float w = right - left;
     float h = top - bottom;
-    
-    s_log_debug("cr wh: %i %i  %f %f", cols, rows, w, h);
 
     bool adjust_by_height = false;
-    if(w>h && (w/h >= cols/rows))
+    if(w>h && (w/h >= csize.x/csize.y))
         adjust_by_height = true;
-    if(w<h && (h/w <= rows/cols))
+    if(w<h && (h/w <= csize.y/csize.x))
         adjust_by_height = true;
         
     if(adjust_by_height) {
-        L.zoom = rows / (h*HOME_SIZE);
+        L.zoom = csize.y / (h*HOME_SIZE);
     } else {
-        L.zoom = cols / (w*HOME_SIZE);
+        L.zoom = csize.x / (w*HOME_SIZE);
     }
     
     float cx = (left + right) / 2.0f;
     float cy = (bottom + top) / 2.0f;
     
-    L.pos.x = cols/2.0f;
-    L.pos.y = -rows/2.0f;
+    L.pos.x = csize.x/2.0f;
+    L.pos.y = -csize.y/2.0f;
     
     L.pos.x -= cx * L.zoom;
     L.pos.y -= cy * L.zoom;

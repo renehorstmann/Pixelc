@@ -89,11 +89,12 @@ static void select_update(struct Tool *super, float dtime) {
     float height = 16;
     
     self->bg.rect.pose = u_pose_new(x, y, width+2, height+2);
-    
-    if(sprite.img.cols > sprite.img.rows) {
-        height = height * sprite.img.rows / sprite.img.cols;
-    } else if(sprite.img.cols < sprite.img.rows) {
-        width = width * sprite.img.cols / sprite.img.rows;
+
+    ivec2 size = canvas_get_size();
+    if(size.x > size.y) {
+        height = height * size.y / size.x;
+    } else if(size.x < size.y) {
+        width = width * size.x / size.y;
     }
     
     self->frame.rect.pose = u_pose_new(x, y, width, height);

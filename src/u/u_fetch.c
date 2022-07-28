@@ -135,6 +135,131 @@ sString *u_fetch_check_response(uFetch **self_ptr, bool *opt_error) {
     return ret;
 }
 
+#elif defined(PLATFORM_ANDROID)
+
+#include <jni.h>
+#include "s/file.h"
+#include "e/window.h"
+
+struct uFetch {
+    bool succeeded;
+    bool error;
+    sAllocator_i a;
+};
+
+static struct {
+    bool running;
+} L;
+
+
+static void succeeded_on_looped(void *user_data) {
+    uFetch *self = user_data;
+    self->succeeded = true;
+}
+
+JNIEXPORT void JNICALL SOME_ANDROID_INTERFACE(uFetchSucceeded)(JNIEnv* env, jobject thisObject, jlong fetch_ptr) {
+    s_log("fetch succeeded");
+    e_window_run_once_on_main_looper(succeeded_on_looped, (void*) fetch_ptr);
+}
+
+static void failed_on_looped(void *user_data) {
+    uFetch *self = user_data;
+    self->error = true;
+}
+
+JNIEXPORT void JNICALL SOME_ANDROID_INTERFACE(uFetchFailed)(JNIEnv* env, jobject thisObject, jlong fetch_ptr) {
+    s_log("fetch failed");
+    e_window_run_once_on_main_looper(failed_on_looped, (void*) fetch_ptr);
+}
+
+uFetch *u_fetch_new_get_a(const char *url, sAllocator_i a) {
+    if(L.running) {
+        s_log_warn("multi fetch not yet supported");
+    }
+    L.running = true;
+    
+    uFetch *self = s_a_new0(a, uFetch, 1);
+    self->a = a;
+
+    // retrieve the JNI environment.
+    JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+    // retrieve the Java instance of the SDLActivity
+    jobject activity = (jobject) SDL_AndroidGetActivity();
+    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
+    jclass clazz = (*env)->GetObjectClass(env, activity);
+    // find the identifier of the method to call
+    jmethodID method_id = (*env)->GetMethodID(env, clazz, "u_fetch_request", "(Ljava/lang/String;IJ)V");
+    // effectively call the Java method
+    jstring jurl = (*env)->NewStringUTF(env, url);
+    (*env)->CallVoidMethod(env, activity, method_id, jurl, (jint) 0, (jlong) self);
+    // clean up the local references.
+    (*env)->DeleteLocalRef(env, jurl);
+    (*env)->DeleteLocalRef(env, activity);
+    (*env)->DeleteLocalRef(env, clazz);
+
+    return self;
+}
+
+uFetch *u_fetch_new_post_a(const char *url, sStr_s data, sAllocator_i a) {
+    if(L.running) {
+        s_log_warn("multi fetch not yet supported");
+    }
+    L.running = true;
+    
+    uFetch *self = s_a_new0(a, uFetch, 1);
+    self->a = a;
+
+    s_file_write("u_fetch_post.bin", data, false);
+
+    // retrieve the JNI environment.
+    JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+    // retrieve the Java instance of the SDLActivity
+    jobject activity = (jobject) SDL_AndroidGetActivity();
+    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
+    jclass clazz = (*env)->GetObjectClass(env, activity);
+    // find the identifier of the method to call
+    jmethodID method_id = (*env)->GetMethodID(env, clazz, "u_fetch_request", "(Ljava/lang/String;IJ)V");
+    // effectively call the Java method
+    jstring jurl = (*env)->NewStringUTF(env, url);
+    (*env)->CallVoidMethod(env, activity, method_id, jurl, (jint) 1, (jlong) self);
+    // clean up the local references.
+    (*env)->DeleteLocalRef(env, jurl);
+    (*env)->DeleteLocalRef(env, activity);
+    (*env)->DeleteLocalRef(env, clazz);
+
+    return self;
+}
+
+void u_fetch_kill(uFetch **self_ptr) {
+    uFetch *self = *self_ptr;
+    if(!self)
+        return;
+    s_a_free(self->a, self);
+    *self_ptr = NULL;
+    L.running = false;
+}
+
+sString *u_fetch_check_response(uFetch **self_ptr, bool *opt_error) {
+    sString *ret = s_string_new_invalid();
+    uFetch *self = *self_ptr;
+    if(opt_error)
+        *opt_error = false;
+    if(!self)
+        return ret;
+
+    if(opt_error && self->error) {
+        *opt_error = true;
+    }
+    if(self->succeeded) {
+        ret = s_file_read("u_fetch_result.bin", false);
+    }
+
+    if(self->succeeded || self->error)
+        u_fetch_kill(self_ptr);
+    return ret;
+}
+
+
 #else
 
 #include <SDL2/SDL.h>

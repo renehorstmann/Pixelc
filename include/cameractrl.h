@@ -1,6 +1,10 @@
 #ifndef PIXELC_CAMERACTRL_H
 #define PIXELC_CAMERACTRL_H
 
+//
+// Controls the camera to zoom and move the canvas
+//
+
 #include "s/s.h"
 #include "e/input.h"
 

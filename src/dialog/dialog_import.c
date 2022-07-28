@@ -24,9 +24,6 @@ typedef struct {
     RoText to_canvas_txt;
     RoSingle to_canvas_btn;
     bool image_available;
-
-    char *file_uploaded;
-
 } Impl;
 
 
@@ -55,12 +52,7 @@ static void kill_fn() {
 }
 
 static void update(float dtime) {
-    Impl *impl = dialog.impl;
-    if(impl->file_uploaded) {
-        set_info(impl->file_uploaded);
-        s_free(impl->file_uploaded);
-        impl->file_uploaded = NULL;
-    }
+    // noop
 }
 
 static void render(const mat4 *cam_mat) {
@@ -77,11 +69,7 @@ static void render(const mat4 *cam_mat) {
 }
 
 static void uploaded(const char *file, bool ascii, const char *user_file_name, void *user_data) {
-    // may run in another thread or something on android...
-    // so applying the change on update
-    Impl *impl = dialog.impl;
-    impl->file_uploaded = s_malloc(strlen(user_file_name)+1);
-    strcpy(impl->file_uploaded, user_file_name);
+    set_info(user_file_name);
 }
 
 static bool pointer_event(ePointer_s pointer) {

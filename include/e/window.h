@@ -16,6 +16,7 @@ enum e_window_screen_modes {
 };
 
 #define E_WINDOW_MAX_PAUSE_EVENTS 32
+#define E_WINDOW_MAX_RUN_ONCE_EVENTS 32
 
 // callback, that will be called every frame
 typedef void (*e_window_main_loop_fn)(void *user_data);
@@ -23,6 +24,7 @@ typedef void (*e_window_main_loop_fn)(void *user_data);
 // callback, that will be called on pause and resume of the window
 // e. g. Android home button, browser tab unfocused
 typedef void (*e_window_pause_callback_fn)(bool resume, void *user_data);
+
 
 
 struct eWindow_Globals {
@@ -75,5 +77,9 @@ void e_window_register_pause_callback(e_window_pause_callback_fn event, void *us
 
 // unregisters a pause / resume callback
 void e_window_unregister_pause_callback(e_window_pause_callback_fn event_to_unregister);
+
+// runs a functions on the next main loop (frame)
+// thread safe
+void e_window_run_once_on_main_looper(e_window_main_loop_fn runnable, void *user_data);
 
 #endif //E_WINDOW_H

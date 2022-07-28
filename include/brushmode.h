@@ -1,6 +1,10 @@
 #ifndef PIXELC_BRUSHMODE_H
 #define PIXELC_BRUSHMODE_H
 
+//
+// draw routines that are called by brush.h and call brush.h's actual drawing functions
+//
+
 #include "e/input.h"
 
 enum brushmode_func {

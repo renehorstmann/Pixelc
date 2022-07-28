@@ -1,6 +1,10 @@
 #ifndef PIXELC_SELECTIONCTRL_H
 #define PIXELC_SELECTIONCTRL_H
 
+//
+// handles selections on the canvas
+//
+
 #include "e/input.h"
 #include "selection.h"
 
@@ -36,6 +40,8 @@ bool selectionctrl_pointer_event(ePointer_s pointer);
 
 void selectionctrl_stop();
 
+// in acquiring mode, the selection creation is prepared
+// the next pointer event on the canvas will create the selection box
 void selectionctrl_acquire();
 
 void selectionctrl_paste_image(uImage img);

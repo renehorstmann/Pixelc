@@ -1,6 +1,10 @@
 #ifndef PIXELC_PALETTE_H
 #define PIXELC_PALETTE_H
 
+//
+// handles and renders the palette
+//
+
 #include "e/input.h"
 #include "u/color.h"
 #include "u/image.h"
@@ -9,10 +13,8 @@
 #define PALETTE_NAME_MAX 32
 
 struct Palette_Globals {
-    vec4 ro_color; // render object color (default R_COLOR_WHITE)
-
+    // if true (default) set_colors will always include transparency as first color
     bool include_transparent_at_set_colors;
-    bool auto_save_config;
 
     struct {
         uColor_s palette[PALETTE_MAX];
@@ -36,15 +38,10 @@ bool palette_pointer_event(ePointer_s pointer);
 
 float palette_get_hud_size();
 
-mat4 palette_get_pose();
-
 // returns a new image which has to be killed
 uImage palette_as_image();
 
 bool palette_contains_pos(vec2 pos);
-
-// may return -1, if custom color is selected
-int palette_get_color();
 
 void palette_set_color(int index);
 

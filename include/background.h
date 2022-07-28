@@ -1,6 +1,10 @@
 #ifndef PIXELC_BACKGROUND_H
 #define PIXELC_BACKGROUND_H
 
+//
+// Just the background image/pattern
+//
+
 #include "u/color.h"
 #include "m/types/float.h"
 

@@ -1,6 +1,10 @@
 #ifndef PIXELC_SELECTION_H
 #define PIXELC_SELECTION_H
 
+//
+// selection class
+//
+
 #include "u/image.h"
 #include "m/types/int.h"
 

@@ -187,14 +187,14 @@ void dialog_create_layer() {
         canvas.RO.current_frame,
         canvas.RO.current_layer
     }};
-    
-    uImage img = canvas.RO.image;
+
+    ivec2 size = canvas_get_size();
     float width = 16;
     float height = 16;
-    if(img.cols > img.rows) {
-        height = height * img.rows / img.cols;
-    } else if(img.cols < img.rows) {
-        width = width * img.cols / img.rows;
+    if(size.x > size.y) {
+        height = height * size.y / size.x;
+    } else if(size.x < size.y) {
+        width = width * size.x / size.y;
     }
     
     impl->layer.rect.pose = u_pose_new(DIALOG_LEFT+48, DIALOG_TOP - 4 - pos, width, height);

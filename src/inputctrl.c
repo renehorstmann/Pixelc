@@ -57,6 +57,12 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
         brush_pointer_event(c_pointer);
 }
 
+static void key_event(const SDL_Event *event, void *user_data) {
+    if(event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_AC_BACK) {
+        s_log("key back");
+        canvas_undo();
+    }
+}
 
 //
 // public
@@ -64,4 +70,5 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 
 void inputctrl_init() {
     e_input_register_pointer_event_with_hovering(pointer_event, NULL);
+    e_input_register_key_raw_event(key_event, NULL);
 }

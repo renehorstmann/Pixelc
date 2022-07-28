@@ -1,6 +1,10 @@
 #ifndef PIXELC_FEEDBACK_H
 #define PIXELC_FEEDBACK_H
 
+//
+// feedback effects for longpress and display flashs
+//
+
 #include "s/s.h"
 #include "m/types/float.h"
 

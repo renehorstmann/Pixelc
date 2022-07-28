@@ -1,6 +1,10 @@
 #ifndef PIXELC_CANVAS_H
 #define PIXELC_CANVAS_H
 
+//
+// The actual image canvas, loads saves and renders the image
+//
+
 #include "m/types/int.h"
 #include "m/types/float.h"
 #include "u/sprite.h"
@@ -24,35 +28,48 @@ enum canvas_blend_mode {
 
 
 struct Canvas_Globals {
-    vec4 ro_color;
 
+    // shows frames and layers grid and sets the alpha value of the canvas lower
+    //      to blend in the background
     bool show_grid;
-    float alpha;
+
+    // sets the render mode for the canvas
     enum canvas_blend_mode blend_mode;
-    
+
+    // will be saved and used in the animation
     float frame_times[CANVAS_MAX_FRAMES];
 
     // read only
     struct {
         mat4 pose; // = u_pose_new_aa(0, 0, cols, rows)
-        
+
+        // actual canvas size
         int cols, rows;
         int frames, layers;
-        
+
+        // the sprite to draw in
+        // the internal sizes may differ from the canvas size above
+        // if frames or layers are not enabled, the sprite image contains the full canvas
         uSprite sprite;
+
+        // The texture used to draw the canvsa
+        // will normally be generated from sprite (but can be reset for mods, e. g. Tilec)
         rTexture tex;
-                
+
+        // current sprite position to draw
         int current_frame;
         int current_layer;
-        
+
         bool frames_enabled;
         bool layers_enabled;
-        
-        // just to directly read the image from the sprite
+
+        // just a ref to sprite.img to directly read the image from the sprite
         uImage image;
+        // = current_layer*sprite.cols + current_frame
         int current_image_layer;
-        
-        int tab_id;
+
+        // one of the nine image tabs
+        int current_tab_id;
     } RO;
 };
 extern struct Canvas_Globals canvas;
@@ -63,6 +80,16 @@ void canvas_init();
 void canvas_update(float dtime);
 
 void canvas_render(const mat4 *canvascam_mat);
+
+// returns the size of the canvas
+static ivec2 canvas_get_size() {
+    return canvas.RO.tex.sprite_size;
+}
+
+// returns col and row for the canvas image from a touch on the canvas
+static ivec2 canvas_get_cr(vec2 pointer_pos) {
+    return (ivec2) {{(int) pointer_pos.x, (int) -pointer_pos.y}};
+}
 
 // returns a new image with a single layer
 // calls canvas_reload first

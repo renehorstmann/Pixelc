@@ -110,12 +110,12 @@ bool brushmode_dot(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return false;
 
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    ivec2 cr = canvas_get_cr(pointer.pos.xy);
     return brush_draw(cr.x, cr.y);
 }
 
 bool brushmode_free(ePointer_s pointer) {
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    ivec2 cr = canvas_get_cr(pointer.pos.xy);
 
     if (pointer.action == E_POINTER_DOWN) {
         brushmode.L.is_drawing = true;
@@ -133,7 +133,7 @@ bool brushmode_free(ePointer_s pointer) {
 }
 
 bool brushmode_func(ePointer_s pointer, enum brushmode_func func) {
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    ivec2 cr = canvas_get_cr(pointer.pos.xy);
 
     if (pointer.action == E_POINTER_DOWN) {
         brushmode.L.is_drawing = true;
@@ -169,7 +169,7 @@ void brushmode_pipette(ePointer_s pointer) {
     if (pointer.action != E_POINTER_DOWN)
         return;
 
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    ivec2 cr = canvas_get_cr(pointer.pos.xy);
     uImage img = canvas.RO.image;
     int layer = canvas.RO.current_image_layer;
 

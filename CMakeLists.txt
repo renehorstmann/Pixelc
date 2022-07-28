@@ -12,9 +12,9 @@ set(USE_SANITIZER true)
 # PLATFORM_MSVC         Microsoft C++ Compiler
 # PLATFORM_MINGW        Windows Msys2 Mingw-w64
 # PLATFORM_UNIX         Ubuntu, etc.
-# PLATFORM_MOBILE       CxxDroid
+# PLATFORM_CXXDROID     Android Cxx compiler App
 # PLATFORM_EMSCRIPTEN   emscripten web compiler
-# PLATFORM_ANDROID      Android apk
+# PLATFORM_ANDROID      AndroidStudio
 
 # Optional definitions:
 # OPTION_GLES           for OpenGLES3.0 instead of OpenGL3.3
@@ -80,9 +80,9 @@ else ()
         add_definitions(-DPLATFORM_UNIX)
         set(PLATFORM_UNIX true)
     elseif (GLES_LIB)
-        message("Platform: Mobile")
-        add_definitions(-DPLATFORM_MOBILE)
-        set(PLATFORM_MOBILE true)
+        message("Platform: CxxDroid")
+        add_definitions(-DPLATFORM_CXXDROID)
+        set(PLATFORM_CXXDROID true)
     else ()
         message(FATAL_ERROR "Platform: unknown, neither GL nor GLES found!")
     endif ()
@@ -241,9 +241,9 @@ if (PLATFORM_UNIX)
 endif ()
 
 
-# mobile
-if (PLATFORM_MOBILE)
-    message("Setup Mobile")
+# CxxDroid
+if (PLATFORM_CXXDROID)
+    message("Setup CxxDroid")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long -Wno-unused-function -Wno-unused-variable -Wno-missing-braces -Wno-unused-parameter")

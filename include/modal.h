@@ -1,9 +1,15 @@
 #ifndef PIXELC_MODAL_H
 #define PIXELC_MODAL_H
 
+//
+// modal views are displayed on top of everything else
+// for the shared modules:
+//      textinput
+//      colorpicker
+//
+
 #include "textinput.h"
 #include "colorpicker.h"
-
 
 
 void modal_update(float dtime);

@@ -6,6 +6,7 @@
 //
 
 #include "texture2d.h"
+#include "framebuffer.h"
 
 struct rRender_Globals {
     bool init;
@@ -41,9 +42,18 @@ void r_render_begin_frame(ivec2 window_size);
 // swaps the framebuffer
 void r_render_end_frame();
 
+// clears the bound framebuffer with the given clear color
+void r_render_clear(vec4 clear_color);
+
 // copies the current framebuffer into r_render.framebuffer_tex
 // cols and rows of the current screen, see e_window
 void r_render_blit_framebuffer();
+
+// sets a framebuffer for rendering
+void r_render_set_framebuffer(rFramebuffer fbo);
+
+// restores the framebuffer to the default window buffer
+void r_render_restore_framebuffer();
 
 // checks for opengl errors and displays them, returns true on unexpected error
 bool r_render_error_check_impl_(const char *opt_tag);
@@ -59,7 +69,7 @@ static void r_render_error_check(const char *opt_tag) {
     return;
 #endif
 #ifdef OPTION_GL_ERROR
-    r_render_error_check_impl_(const char *opt_tag);
+    r_render_error_check_impl_(opt_tag);
 #endif
 }
 

@@ -1,6 +1,10 @@
 #ifndef PIXELC_DIALOG_H
 #define PIXELC_DIALOG_H
 
+//
+// dialogs base class and dialog create functions
+//
+
 #include "e/input.h"
 #include "r/ro_single.h"
 #include "r/ro_text.h"

@@ -182,6 +182,7 @@ bool e_io_savestate_append(const char *filename, sStr_s content, bool ascii) {
 #ifdef PLATFORM_ANDROID
 
 #include <jni.h>
+#include "e/window.h"
 
 static struct {
     struct {
@@ -192,10 +193,15 @@ static struct {
     } file_upload;
 } L;
 
-JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_eIoOnFileUploaded(JNIEnv* env, jobject thisObject) {
-    s_log("file uploaded...");
+static void run_on_main_looper(void *user_data) {
+    s_log("calling file uploaded callback...");
     if(L.file_upload.cb)
         L.file_upload.cb(L.file_upload.file, L.file_upload.ascii, L.file_upload.file, L.file_upload.ud);
+}
+
+JNIEXPORT void JNICALL SOME_ANDROID_INTERFACE(eIoOnFileUploaded)(JNIEnv* env, jobject thisObject) {
+    s_log("file uploaded...");
+    e_window_run_once_on_main_looper(run_on_main_looper, NULL);
 }
 
 void e_io_offer_file_as_download(const char *file) {

@@ -1,6 +1,11 @@
 #ifndef PIXELC_BRUSH_H
 #define PIXELC_BRUSH_H
 
+//
+// Handles drawing on the canvas with a kernel
+// catches pointer_events to do the draw calls
+//
+
 #include "r/texture.h"
 #include "e/input.h"
 #include "u/color.h"
@@ -31,7 +36,6 @@ struct Brush_Globals {
     bool secondary_as_current;
     bool shading_active;
     bool render_hover_preview;
-    bool auto_save_config;
 
     const Selection *selection_ref;
 
@@ -49,12 +53,15 @@ void brush_init();
 
 void brush_pointer_event(ePointer_s pointer);
 
+// draws a single pixel
 bool brush_draw_pixel(int c, int r, uColor_s kernel_color);
 
+// draws the kernel
 bool brush_draw(int c, int r);
 
 void brush_abort_current_draw();
 
+// clears the canvas
 void brush_clear();
 
 // moves ownership of kernel_sink to brush

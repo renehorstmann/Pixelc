@@ -18,6 +18,8 @@ typedef struct {
 } StartUp;
 
 static struct {
+    rFramebuffer framebuffer_window;
+
     GLuint framebuffer_tex_fbo;
     // if not null, startup screen was created
     StartUp *start_up;
@@ -57,6 +59,12 @@ void r_render_init(SDL_Window *window) {
     r_render.framebuffer_tex = r_texture2d_new_white_pixel();
     glGenFramebuffers(1, &L.framebuffer_tex_fbo);
 
+    // get the default window framebuffer
+    GLint current_fbo;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo);
+    L.framebuffer_window.fbo = current_fbo;
+
+
     r_render_error_check("r_render_init");
 }
 
@@ -71,15 +79,18 @@ void r_render_kill() {
 void r_render_begin_frame(ivec2 window_size) {
     r_render_error_check("r_render_begin_frameBEGIN");
 
+    // update window framebuffer reference
+    L.framebuffer_window.tex.size = window_size;
+
     r_render.current_window_size = window_size;
 
-    glViewport(0, 0, window_size.x, window_size.y);
+    r_render_restore_framebuffer();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_SCISSOR_TEST);
-    glClearColor(r_render.clear_color.r, r_render.clear_color.g, r_render.clear_color.b, r_render.clear_color.a);
-    glClear(GL_COLOR_BUFFER_BIT);
+
+    r_render_clear(r_render.clear_color);
 
     r_render_error_check("r_render_begin_frame");
 }
@@ -92,11 +103,19 @@ void r_render_end_frame() {
     r_render_error_check("r_render_end_frame");
 }
 
+void r_render_clear(vec4 clear_color) {
+    r_render_error_check("r_render_clearBEGIN");
+    glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
+    glClear(GL_COLOR_BUFFER_BIT);
+    r_render_error_check("r_render_clear");
+}
+
 void r_render_blit_framebuffer() {
     r_render_error_check("r_render_blit_framebufferBEGIN");
 
-    GLint current_fbo;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo);
+    GLint current_draw_fbo, current_read_fbo;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_draw_fbo);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &current_read_fbo);
 
     int cols = r_render.current_window_size.x;
     int rows = r_render.current_window_size.y;
@@ -116,14 +135,26 @@ void r_render_blit_framebuffer() {
 
     // actual blit calls
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, L.framebuffer_tex_fbo);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, current_fbo);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, current_draw_fbo);
     // src x0, y0, x1, y1; dst x0, y0, x1, y1   -> seems to be mirrored, so swapping dst y0 <> y1
     glBlitFramebuffer(0, 0, cols, rows, 0, rows, cols, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     // restore
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_draw_fbo);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, current_read_fbo);
 
     r_render_error_check("r_render_blit_framebuffer");
+}
+
+void r_render_set_framebuffer(rFramebuffer fbo) {
+    r_render_error_check("r_render_set_framebufferBEGIN");
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo.fbo);
+    glViewport(0, 0, fbo.tex.size.x, fbo.tex.size.y);
+    r_render_error_check("r_render_set_framebuffer");
+}
+
+void r_render_restore_framebuffer() {
+    r_render_set_framebuffer(L.framebuffer_window);
 }
 
 bool r_render_error_check_impl_(const char *opt_tag) {

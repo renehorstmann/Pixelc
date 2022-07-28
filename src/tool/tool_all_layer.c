@@ -74,8 +74,7 @@ static void select_update(struct Tool *super, float dtime) {
     } else {
         self->bg.rect.color.a = self->pos==SELECT_CURRENT? 0.5 : 0.25;
         self->layer.rect.color.a = 1;
-        
-        ro_single_set_texture(&self->layer, canvas.RO.tex);
+
         self->layer.rect.sprite.x = canvas.RO.current_frame;
         self->layer.rect.sprite.y = layer;
         
@@ -98,11 +97,12 @@ static void select_update(struct Tool *super, float dtime) {
     float height = 16;
     
     self->bg.rect.pose = u_pose_new(x, y, width+2, height+2);
-    
-    if(sprite.img.cols > sprite.img.rows) {
-        height = height * sprite.img.rows / sprite.img.cols;
-    } else if(sprite.img.cols < sprite.img.rows) {
-        width = width * sprite.img.cols / sprite.img.rows;
+
+    ivec2 size = canvas_get_size();
+    if(size.x > size.y) {
+        height = height * size.y / size.x;
+    } else if(size.x < size.y) {
+        width = width * size.x / size.y;
     }
     
     self->layer.rect.pose = u_pose_new(x, y, width, height);
@@ -126,7 +126,10 @@ static void select_update(struct Tool *super, float dtime) {
 static void select_render(const struct Tool *super, const mat4 *cam_mat) {
     Select *self = (Select *) super;
     ro_single_render(&self->bg, cam_mat);
+
+    ro_single_set_texture(&self->layer, canvas.RO.tex);
     ro_single_render(&self->layer, cam_mat);
+
     ro_text_render(&self->num, cam_mat);
 }
 

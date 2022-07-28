@@ -99,9 +99,7 @@ static float swipe_diff(ePointer_s pointer) {
 //
 
 void palette_init() {
-    palette.ro_color = R_COLOR_WHITE;
     palette.include_transparent_at_set_colors = true;
-    palette.auto_save_config = true;
 
     L.current_pressed = -1;
 
@@ -159,8 +157,7 @@ void palette_update(float dtime) {
         else
             col = R_COLOR_TRANSPARENT;
 
-        L.palette_ro.rects[i].color = vec4_scale_vec(col, palette.ro_color);
-
+        L.palette_ro.rects[i].color = col;
 
         // background sprite
         {
@@ -360,19 +357,6 @@ float palette_get_hud_size() {
     return rows * COLOR_DROP_SIZE;
 }
 
-mat4 palette_get_pose() {
-    int size = palette_get_hud_size();
-    if (camera_is_portrait_mode()) {
-        return u_pose_new(0, camera.RO.bottom + size / 2,
-                          camera_width(),
-                          size);
-
-    }
-    return u_pose_new(camera.RO.right - size / 2, 0,
-                      size,
-                      camera_height());
-}
-
 uImage palette_as_image() {
     uImage ret = u_image_new_empty(palette.RO.palette_size, 1, 1);
     memcpy(ret.data, palette.RO.palette, u_image_data_size(ret));
@@ -385,10 +369,6 @@ bool palette_contains_pos(vec2 pos) {
         return pos.y <= camera.RO.bottom + size;
     }
     return pos.x >= camera.RO.right - size;
-}
-
-int palette_get_color() {
-    return L.last_selected;
 }
 
 void palette_set_color(int index) {
@@ -491,8 +471,7 @@ void palette_load_palette(int id) {
 
     u_image_kill(&colors);
 
-    if (palette.auto_save_config)
-        palette_save_config();
+    palette_save_config();
 }
 
 void palette_append_palette(uImage colors, const char *name) {
@@ -593,8 +572,7 @@ void palette_reset_palette_files() {
 
     palette_defaults_kill(&palettes);
 
-    if (palette.auto_save_config)
-        palette_save_config();
+    palette_save_config();
 }
 
 void palette_save_config() {

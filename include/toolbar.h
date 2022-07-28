@@ -1,11 +1,16 @@
 #ifndef PIXELC_TOOLBAR_H
 #define PIXELC_TOOLBAR_H
 
+//
+// toolbar containing a class for a container and handling the tools
+//
+
 #include "r/ro_single.h"
 #include "u/color.h"
 #include "u/container.h"
 #include "selectionctrl.h"
 #include "tool.h"
+
 
 #define TOOLBAR_MAX_TOOLS 64
 

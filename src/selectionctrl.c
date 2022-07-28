@@ -75,7 +75,7 @@ static void setup_selection(ePointer_s pointer) {
         selectionctrl.mode = SELECTIONCTRL_SET;
         return;
     }
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    ivec2 cr = canvas_get_cr(pointer.pos.xy);
     if (L.pos.x < 0 && !u_image_contains(img, cr.x, cr.y))
         return;
 
@@ -111,7 +111,7 @@ static void move_selection(ePointer_s pointer) {
     uImage img = canvas.RO.image;
     int layer = canvas.RO.current_image_layer;
 
-    ivec2 cr = {{pointer.pos.x, -pointer.pos.y}};
+    ivec2 cr = canvas_get_cr(pointer.pos.xy);
 
     if (pointer.action == E_POINTER_UP)
         L.moving = false;

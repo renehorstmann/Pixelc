@@ -1,7 +1,11 @@
-// changed to use s_file for portability (emscripten, android)
-
 #ifndef GIFENC_H
 #define GIFENC_H
+
+
+//
+// gif encodes, see https://github.com/lecram/gifenc
+// changed to use s_file for portability (emscripten, android)
+//
 
 #include "s/file.h"
 

@@ -4,7 +4,7 @@
 
 //
 // GET and POST http requests
-// uses libcurl or the emscripten fetch api
+// uses libcurl, emscripten fetch api, or the android api
 //
 
 #include "s/s.h"

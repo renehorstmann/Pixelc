@@ -91,7 +91,6 @@ void brush_init() {
     brush.mode = BRUSH_MODE_FREE;
     brush.shading_active = false;
     brush.render_hover_preview = true;
-    brush.auto_save_config = true;
 
     L.hovering = true;
 
@@ -281,8 +280,7 @@ void brush_load_kernel(int id) {
     brush.RO.kernel_id = id;
     brush_set_kernel(kernel);
 
-    if (brush.auto_save_config)
-        brush_save_config();
+    brush_save_config();
 }
 
 void brush_append_kernel(uImage kernel) {
@@ -378,8 +376,7 @@ void brush_reset_kernel_files() {
 
     brush_kernel_defaults_kill(&kernels);
 
-    if (brush.auto_save_config)
-        brush_save_config();
+    brush_save_config();
 }
 
 

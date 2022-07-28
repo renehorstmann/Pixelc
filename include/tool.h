@@ -1,6 +1,10 @@
 #ifndef PIXELC_TOOL_H
 #define PIXELC_TOOL_H
 
+//
+// tool base class and functions
+//
+
 #include "e/input.h"
 #include "r/ro_single.h"
 
@@ -45,6 +49,11 @@ typedef struct Tool {
 
 
 typedef bool (*tool_button_active)(Tool *self, float dtime);
+
+
+//
+// Subclass ToolButton for most simple tools
+//
 
 typedef struct {
     Tool super;

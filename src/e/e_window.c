@@ -36,6 +36,11 @@ typedef struct {
     void *ud;
 } RegPause;
 
+typedef struct {
+    e_window_main_loop_fn cb;
+    void *ud;
+} RegRunOnce;
+
 static struct {
     char title[32];
 
@@ -48,6 +53,10 @@ static struct {
 
     RegPause reg_pause_e[E_WINDOW_MAX_PAUSE_EVENTS];
     int reg_pause_e_size;
+
+    RegRunOnce reg_run_once_e[E_WINDOW_MAX_RUN_ONCE_EVENTS];
+    int reg_run_once_e_size;
+    SDL_mutex *run_once_lock;
 } L;
 
 static void check_resume() {
@@ -80,6 +89,13 @@ static void loop() {
     e_window.deltatime = e_window.frame_deltatime;
     e_window.deltatime_ms = e_window.frame_deltatime_ms;
     e_window.time_ms = e_window.frame_time_ms;
+
+    SDL_LockMutex(L.run_once_lock);
+    for(int i=0; i<L.reg_run_once_e_size; i++) {
+        L.reg_run_once_e[i].cb(L.reg_run_once_e[i].ud);
+    }
+    L.reg_run_once_e_size = 0;
+    SDL_UnlockMutex(L.run_once_lock);
 
     L.main_loop_fn(L.main_loop_user_data);
 }
@@ -114,8 +130,7 @@ static void log_window_event(const SDL_Event *event);
 // protected
 //
 void e_window_handle_window_event_(const SDL_Event *event) {
-    if (event->type == SDL_QUIT
-            || (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_AC_BACK)) {
+    if (event->type == SDL_QUIT) {
         e_window_kill();
         return;
     }
@@ -230,6 +245,8 @@ void e_window_init(const char *title) {
 
     // call protected function to let web load indexDB database
     e_io_savestate_load();
+
+    L.run_once_lock = SDL_CreateMutex();
 }
 
 void e_window_kill() {
@@ -243,6 +260,8 @@ void e_window_kill() {
     emscripten_cancel_main_loop();
     EM_ASM(set_error_img(););
 #endif
+
+    SDL_DestroyMutex(L.run_once_lock);
 }
 
 void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
@@ -362,6 +381,12 @@ void e_window_unregister_pause_callback(e_window_pause_callback_fn event_to_unre
     }
 }
 
+void e_window_run_once_on_main_looper(e_window_main_loop_fn runnable, void *user_data) {
+    SDL_LockMutex(L.run_once_lock);
+    s_assume(L.reg_run_once_e_size < E_WINDOW_MAX_RUN_ONCE_EVENTS, "too many registered run once runables");
+    L.reg_run_once_e[L.reg_run_once_e_size++] = (RegRunOnce) {runnable, user_data};
+    SDL_UnlockMutex(L.run_once_lock);
+}
 
 static void log_window_event(const SDL_Event *event) {
     if (event->type == SDL_WINDOWEVENT) {

@@ -1,6 +1,10 @@
 #ifndef PIXELC_MULTITOUCHCURSOR_H
 #define PIXELC_MULTITOUCHCURSOR_H
 
+//
+// multi touch cursor for touch devices
+//
+
 #include "e/input.h"
 
 

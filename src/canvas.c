@@ -14,6 +14,8 @@
 #define DEFAULT_HEIGHT 32
 #define DEFAULT_FRAME_TIME 0.25
 
+#define GRID_RO_ALPHA 0.8
+
 struct Canvas_Globals canvas;
 
 //
@@ -40,17 +42,15 @@ static struct {
 
 _Static_assert(CANVAS_MAX_SAVES <= 999, "see save / load image");
 
-
-
 static void save_image() {
     char file_png[128];
     char file_json[128];
     snprintf(file_png, sizeof file_png, "image_%02i_%03i.png", 
-            canvas.RO.tab_id, 
-            L.tab_saves[canvas.RO.tab_id].save_idx);
+            canvas.RO.current_tab_id,
+            L.tab_saves[canvas.RO.current_tab_id].save_idx);
     snprintf(file_json, sizeof file_json, "image_%02i_%03i.json", 
-            canvas.RO.tab_id, 
-            L.tab_saves[canvas.RO.tab_id].save_idx);
+            canvas.RO.current_tab_id,
+            L.tab_saves[canvas.RO.current_tab_id].save_idx);
     
     u_sprite_save_file(canvas.RO.sprite,
             e_io_savestate_file_path(file_png));
@@ -130,8 +130,8 @@ static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_fra
 
 static void load_image() {
     uSprite sprite = load_image_file(
-            canvas.RO.tab_id, 
-            L.tab_saves[canvas.RO.tab_id].save_idx,
+            canvas.RO.current_tab_id,
+            L.tab_saves[canvas.RO.current_tab_id].save_idx,
             true);
     canvas.RO.frames = sprite.cols;
     canvas.RO.layers = sprite.rows;
@@ -245,9 +245,6 @@ static void update_sprite() {
 
 
 void canvas_init() {
-    canvas.ro_color = R_COLOR_WHITE;
-
-    canvas.alpha = 1.0;
     canvas.blend_mode = CANVAS_BLEND_LAYER_ONION;
     
     for(int i=0; i<CANVAS_MAX_FRAMES; i++) {
@@ -285,17 +282,18 @@ void canvas_update(float dtime) {
     // set pose
     L.ro.rect.pose = canvas.RO.pose;
 
-    L.ro.rect.color = canvas.ro_color;
-
     L.bg.rect.pose = canvas.RO.pose;
 }
 
 void canvas_render(const mat4 *canvascam_mat) {
+
+    float ro_alpha = canvas.show_grid? GRID_RO_ALPHA : 1;
+
     ro_single_render(&L.bg, canvascam_mat);
     
     switch(canvas.blend_mode) {
     case CANVAS_BLEND_NONE:
-        L.ro.rect.color.a = canvas.alpha;
+        L.ro.rect.color.a = ro_alpha;
         L.ro.rect.sprite.x = canvas.RO.current_frame;
         L.ro.rect.sprite.y = canvas.RO.current_layer;
         ro_single_render(&L.ro, canvascam_mat);
@@ -308,13 +306,13 @@ void canvas_render(const mat4 *canvascam_mat) {
                 alpha = 0.33;
             else if(i==canvas.RO.current_frame)
                 alpha = 1;
-            L.ro.rect.color.a = alpha*canvas.alpha;
+            L.ro.rect.color.a = alpha*ro_alpha;
             L.ro.rect.sprite.x = i;
             ro_single_render(&L.ro, canvascam_mat);
         }
         break;
     case CANVAS_BLEND_FRAMES_FULL:
-        L.ro.rect.color.a = canvas.alpha;
+        L.ro.rect.color.a = ro_alpha;
         L.ro.rect.sprite.y = canvas.RO.current_layer;
         for(int i=0; i<=canvas.RO.current_frame; i++) {
             L.ro.rect.sprite.x = i;
@@ -329,13 +327,13 @@ void canvas_render(const mat4 *canvascam_mat) {
                 alpha = 0.33;
             else if(i==canvas.RO.current_layer)
                 alpha = 1;
-            L.ro.rect.color.a = alpha*canvas.alpha;
+            L.ro.rect.color.a = alpha*ro_alpha;
             L.ro.rect.sprite.y = i;
             ro_single_render(&L.ro, canvascam_mat);
         }
         break;
     case CANVAS_BLEND_LAYER_FULL:
-        L.ro.rect.color.a = canvas.alpha;
+        L.ro.rect.color.a = ro_alpha;
         L.ro.rect.sprite.x = canvas.RO.current_frame;
         for(int i=0; i<=canvas.RO.current_layer; i++) {
             L.ro.rect.sprite.y = i;
@@ -466,7 +464,7 @@ void canvas_save() {
 
     u_image_copy(L.prev_image, canvas.RO.image);
 
-    int t = canvas.RO.tab_id;
+    int t = canvas.RO.current_tab_id;
     L.tab_saves[t].save_idx++;
     L.tab_saves[t].save_idx %= CANVAS_MAX_SAVES;
     L.tab_saves[t].save_idx_max = L.tab_saves[t].save_idx;
@@ -484,7 +482,7 @@ void canvas_reload() {
 
 void canvas_undo() {
     s_log("undo");
-    int t = canvas.RO.tab_id;
+    int t = canvas.RO.current_tab_id;
     if (L.tab_saves[t].save_idx == L.tab_saves[t].save_idx_min) {
         s_log("failed, on min idx");
         return;
@@ -500,7 +498,7 @@ void canvas_undo() {
 
 void canvas_redo() {
     s_log("redo");
-    int t = canvas.RO.tab_id;
+    int t = canvas.RO.current_tab_id;
     if (L.tab_saves[t].save_idx == L.tab_saves[t].save_idx_max) {
         s_log("failed, on max idx");
         return;
@@ -515,22 +513,22 @@ void canvas_redo() {
 }
 
 bool canvas_undo_available() {
-    int t = canvas.RO.tab_id;
+    int t = canvas.RO.current_tab_id;
     return L.tab_saves[t].save_idx != L.tab_saves[t].save_idx_min;
 }
 
 bool canvas_redo_available() {
-    int t = canvas.RO.tab_id;
+    int t = canvas.RO.current_tab_id;
     return L.tab_saves[t].save_idx != L.tab_saves[t].save_idx_max;
 }
 
 
 void canvas_set_tab_id(int id) {
     s_assume(id>=0 && id<CANVAS_MAX_TABS, "invalid tab id");
-    L.tab_saves[canvas.RO.tab_id].current_layer = canvas.RO.current_layer;
-    L.tab_saves[canvas.RO.tab_id].current_frame = canvas.RO.current_frame;
+    L.tab_saves[canvas.RO.current_tab_id].current_layer = canvas.RO.current_layer;
+    L.tab_saves[canvas.RO.current_tab_id].current_frame = canvas.RO.current_frame;
     canvas_save_config();
-    canvas.RO.tab_id = id;
+    canvas.RO.current_tab_id = id;
     load_image();
     u_image_kill(&L.prev_image);
     L.prev_image = u_image_new_clone(canvas.RO.image);
@@ -554,11 +552,11 @@ void canvas_save_config() {
 
     uJson *member = u_json_append_object(config, "canvas");
 
-    u_json_append_int(member, "tab_id", canvas.RO.tab_id);
+    u_json_append_int(member, "current_tab_id", canvas.RO.current_tab_id);
     
     
-    L.tab_saves[canvas.RO.tab_id].current_layer = canvas.RO.current_layer;
-    L.tab_saves[canvas.RO.tab_id].current_frame = canvas.RO.current_frame;
+    L.tab_saves[canvas.RO.current_tab_id].current_layer = canvas.RO.current_layer;
+    L.tab_saves[canvas.RO.current_tab_id].current_frame = canvas.RO.current_frame;
     
     for(int t=0; t<CANVAS_MAX_TABS; t++) {
         char name[16];
@@ -608,8 +606,8 @@ void canvas_load_config() {
 
 
     int tab_id;
-    if ( u_json_get_object_int(member, "tab_id", &tab_id)) {
-        canvas.RO.tab_id = tab_id;
+    if ( u_json_get_object_int(member, "current_tab_id", &tab_id)) {
+        canvas.RO.current_tab_id = tab_id;
         load_image();
         canvas_set_layer(canvas.RO.sprite.rows-1);
     } else {

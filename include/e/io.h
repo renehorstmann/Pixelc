@@ -16,12 +16,14 @@
 typedef void (*eIoFileUploadCallback)(const char *file, bool ascii, const char *user_file_name, void *user_data);
 
 
-// web: offer the given file as download
+// web and android:
+// offer the given file as download
 void e_io_offer_file_as_download(const char *file);
 
-// web: opens a file dialog to upload a file
-//      on success, callback is called
-//      should be called after a pointer event, or the browser may discard the file dialog
+// web and android:
+// opens a file dialog to upload a file
+// on success, callback is called
+// should be called after a pointer event, or the browser may discard the file dialog
 void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallback callback, void *user_data);
 
 

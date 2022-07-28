@@ -236,9 +236,9 @@ static void input_handle_keys(SDL_Event *event) {
         return;
     }
 
-    // copy to be safe to unregister ik an event
+    // copy to be safe to unregister in an event
     RegKeyRawArray array = L.reg_key_raw;
-    for (int i = 0; array.size; i++) {
+    for (int i = 0; i<array.size; i++) {
         array.array[i].cb(event, array.array[i].ud);
     }
     bool down = event->type == SDL_KEYDOWN;

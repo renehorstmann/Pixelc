@@ -1,6 +1,10 @@
 #ifndef PIXELC_IO_H
 #define PIXELC_IO_H
 
+//
+// save the canvas image as png or gif
+//
+
 #include "s/s.h"
 
 struct Io_Globals {

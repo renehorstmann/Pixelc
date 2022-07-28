@@ -48,5 +48,14 @@ static void e_exit_failure() {
     exit(EXIT_FAILURE);
 }
 
+#ifdef PLATFORM_ANDROID
+#ifndef SOME_ANDROID_PACKAGE
+#define SOME_ANDROID_PACKAGE                                 de_horsimann_some
+#endif
+#define SOME_ANDROID_CONCAT1(prefix, class, function)        SOME_ANDROID_CONCAT2(prefix, class, function)
+#define SOME_ANDROID_CONCAT2(prefix, class, function)        Java_ ## prefix ## _ ## class ## _ ## function
+#define SOME_ANDROID_INTERFACE(function)                     SOME_ANDROID_CONCAT1(SOME_ANDROID_PACKAGE, SDLActivity, function)
+#endif
+
 
 #endif //E_CORE_H

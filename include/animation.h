@@ -1,6 +1,10 @@
 #ifndef PIXELC_ANIMATION_H
 #define PIXELC_ANIMATION_H
 
+//
+// Shows the image frames animated behind the canvas
+//
+
 #include "s/s.h"
 #include "m/types/float.h"
 

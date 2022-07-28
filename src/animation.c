@@ -32,12 +32,12 @@ void animation_update(float dtime) {
         return;
     
     float phs = palette_get_hud_size();
-    
+
     rTexture tex = canvas.RO.tex;
-    L.ro.tex = tex;
-    
-    float w = animation.size * tex.sprite_size.x;
-    float h = animation.size * tex.sprite_size.y;
+    ivec2 size = canvas_get_size();
+
+    float w = animation.size * size.x;
+    float h = animation.size * size.y;
     
     float left, top;
     if(camera_is_portrait_mode()) {
@@ -101,7 +101,9 @@ void animation_render(const mat4 *cam_mat) {
     if (!animation.show)
         return;
 
-    r_texture_wrap_repeat(L.ro.tex);
+    rTexture tex = canvas.RO.tex;
+    r_texture_wrap_repeat(tex);
+    ro_single_set_texture(&L.ro, tex);
     for(int i=0; i<=canvas.RO.current_layer; i++) {
         L.ro.rect.sprite.y = i;
         ro_single_render(&L.ro, cam_mat);
