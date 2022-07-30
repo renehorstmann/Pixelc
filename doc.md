@@ -99,12 +99,12 @@ The app shows a flash effect of that color to show you that the pipette mode is 
 
 ## <a name="S-tooltip"></a>Tooltip
 ![img](res/button_tooltip.png)
-Click on the tooltip tool in the toolbar to open the tooltip dialog.
+Click on the tooltip tool in the toolbar to show tooltips for pressed tools
 
-![img](doc/tooltip_dialog.png)
+![img](doc/tooltip.jpg)
 
 You can now click on a tool (or the palette) to get some tipps.
-Click on the tooltip button again to stop the dialog.
+Click on the tooltip button again to stop the tooltips.
 
 ## <a name="S-palette"></a>Palette
 ### Side Swipe to change

@@ -3,6 +3,7 @@
 #include "m/float.h"
 #include "m/uchar.h"
 #include "camera.h"
+#include "tooltip.h"
 #include "toolbar.h"
 
 
@@ -155,7 +156,16 @@ static bool toolbar_container_pointer_event(ToolbarContainer *self, ePointer_s p
     if (pointer.action != E_POINTER_UP && !contains)
         return false;
 
+    float x = pointer.pos.x;
+    float y = pointer.pos.y;
     for (int i = 0; i < self->tools_len; i++) {
+        const uContainerItem_s *item = &self->container.items[i];
+        if(x>=item->out.left 
+                && x<=item->out.left+item->size.x
+                && y<=item->out.top
+                && y>=item->out.top-item->size.y) {
+            tooltip_set(self->tools[i]->name, self->tools[i]->tip);
+        }
         self->tools[i]->pointer_event(self->tools[i], pointer);
     }
 

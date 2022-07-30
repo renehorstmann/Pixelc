@@ -77,9 +77,14 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- apple upload dialog zu klein
-- dialog zoom verhindern?
-- tooltip im bg
+- apple upload dialog render size bhg
+
+- some update
+  - versions?
+  - documentation
+    - platform infos
+  - u_fetch_android.c u_fetch_curl.c u_fetch_emscripten.c
+  - e_io_default.c e_io_emscripten.c e_io_android.c
 
 
 ## Author

@@ -1,5 +1,5 @@
 #include "u/button.h"
-#include "dialog.h"
+#include "tooltip.h"
 #include "tool.h"
 
 //
@@ -13,20 +13,14 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 
     // only passed if button state toggled
     bool pressed = u_button_is_pressed(&self->ro.rect);
-    if (pressed) {
-        s_log("tool tooltip start");
-        dialog_create_tooltip();
-    } else {
-        s_log("tool tooltip stop");
-        dialog_hide();
-    }
-
+    s_log("tool tooltip: %i", pressed);
+    tooltip.show = pressed;
+    tooltip_save_config();
 }
 
 static bool is_active(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    bool tooltip = strcmp(dialog.id, "tooltip") == 0;
-    u_button_set_pressed(&self->ro.rect, tooltip);
+    u_button_set_pressed(&self->ro.rect, tooltip.show);
     // always active
     return true;
 }

@@ -17,6 +17,7 @@
 #include "multitouchcursor.h"
 #include "modal.h"
 #include "feedback.h"
+#include "tooltip.h"
 
 //
 // options
@@ -62,6 +63,9 @@ static void init() {
     inputctrl_init();
     
     feedback_init();
+    
+    tooltip_init();
+    tooltip_load_config();
 
     cameractrl_set_home();
     
@@ -93,6 +97,8 @@ static void update(float dtime) {
     modal_update(dtime);
     
     feedback_update(dtime);
+    
+    tooltip_update(dtime);
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
@@ -102,6 +108,7 @@ static void render(float dtime) {
 
     background_render(hud_cam);
     animation_render(hud_cam);
+    tooltip_render(hud_cam);
     canvas_render(canvas_cam);
     selectionctrl_render(canvas_cam);
     toolbar_render(hud_cam);

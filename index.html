@@ -6,7 +6,7 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-
+    
     <title>Pixelc</title>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -58,7 +58,9 @@
         /* Modal content/box */
         .modal_content {
             background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
+            margin-top: 15%;
+            margin-left: auto;
+            margin-right: auto;
             padding: 20px;
             border: 1px solid #888;
             width: 80%; /* Could be more or less, depending on screen size */
@@ -67,6 +69,11 @@
         /* Set the used font size according to the viewport size */
         .modal_font {
             font-size: 4vmin;
+        }
+        
+        /* Set the used font size according to the viewport size */
+        .modal_font_small {
+            font-size: 3vmin;
         }
 
         /* The modal window close button (also font size according to the viewport size) */
@@ -94,11 +101,13 @@
 <div id="modal_window_file" class="modal">
     <div class="modal_content">
         <span class="modal_content_close">&times;</span>
-        <p class="modal_font">File upload: (please dont zoom in)</p>
+        <p class="modal_font">File Upload</p>
         <input class="modal_font" id="file_uploader" type="file"/>
         <input class="modal_font" id="file_uploader_png" type="file" accept="image/png"/>
         <input class="modal_font" id="file_uploader_txt" type="file" accept="text/plain"/>
         <input class="modal_font" id="file_uploader_json" type="file" accept="application/json"/>
+        
+        <p class="modal_font_small">(Please don't zoom in)</p>
     </div>
 </div>
 

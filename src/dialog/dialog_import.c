@@ -29,6 +29,7 @@ typedef struct {
 
 static void set_info(const char *file_name) {
     s_log("file: %s", file_name);
+    file_name = "import.png";
     Impl *impl = dialog.impl;
     char text[64];
     uImage img = u_image_new_file(1, "import.png");

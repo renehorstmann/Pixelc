@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "dialog.h"
 #include "feedback.h"
+#include "tooltip.h"
 #include "palette.h"
 
 #define COLOR_DROP_SIZE 16.0f
@@ -264,12 +265,20 @@ bool palette_pointer_event(ePointer_s pointer) {
     }
 
     if (pointer.action == E_POINTER_DOWN) {
+        tooltip_set("palette", "Tip to select\n"
+                "a color\n\n"
+                "Swipe left or\n"
+                "right to change\n"
+                "the palette\n\n"
+                "Swipe up for\n"
+                "multitouchmode\n\n"
+                "Hold for options");
+        
         for (int i = 0; i < 2; i++)
             L.action.arrows.rects[i].color.a = 0;
         L.action.start = pointer.pos.xy;
         L.action.swiping = true;
         L.action.longpress_time = LONGPRESS_TIME;
-
         for (int i = 0; i < palette.RO.palette_size; i++) {
             // pose will be rotated in landscape mode (so do not use _aa_)!
             if (u_pose_contains(L.palette_ro.rects[i].pose, pointer.pos)) {

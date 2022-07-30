@@ -93,8 +93,6 @@ void *dialog_prompt_get_user_data(const char *title);
 
 void dialog_create_restart();
 
-void dialog_create_tooltip();
-
 void dialog_create_size();
 
 void dialog_create_display();
