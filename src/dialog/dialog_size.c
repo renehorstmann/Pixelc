@@ -178,7 +178,7 @@ static void on_action(bool ok) {
     uSprite sprite;
     if(keep_order) {
         s_log("reset size with order");
-        uSprite c = canvas.RO.sprite;
+        uSprite c = canvas_get_sprite();
         sprite = u_sprite_new_zeros(cols, rows, frames, layers);
         int fm = s_min(frames, c.cols);
         int lm = s_min(layers, c.rows);
@@ -193,6 +193,7 @@ static void on_action(bool ok) {
                 u_image_copy_top_left(to, from);
             }
         }
+        u_sprite_kill(&c);
     } else {
         s_log("reset size without order");
         uImage img = canvas_get_full_image();

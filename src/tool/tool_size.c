@@ -25,7 +25,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
 
 static bool is_active(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    bool active = strcmp(dialog.id, "set size") == 0;
+    bool active = strcmp(dialog.id, "size") == 0;
     u_button_set_pressed(&self->ro.rect, active);
     // always active
     return true;

@@ -45,6 +45,10 @@ static void e_exit_failure() {
             set_exit_failure_error_msg();
             );
 #endif
+#ifdef PLATFORM_ANDROID
+    SDL_AndroidShowToast("Sorry! Potato devices are not supported", 1, -1, 0, 0);
+    SDL_Delay(4000);
+#endif
     exit(EXIT_FAILURE);
 }
 
