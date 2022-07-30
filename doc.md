@@ -298,6 +298,12 @@ Otherwise the file should be located in the working directory of the executable.
 The button copy into canvas ![img](res/button_to.png)
 Will copy the image into the canvas directly.
 
+> Zoomed in on your Browser while asked for an image upload?
+> try:
+> - use desktop version in your browser to reset tge size
+> - empty the browser cache/data (for the Pixelc App)
+
+If you know someone who speaks html better than me, tell me :)
 
 ## <a name="S-size"></a>Size
 ![img](res/button_size.png)
