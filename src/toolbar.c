@@ -160,7 +160,8 @@ static bool toolbar_container_pointer_event(ToolbarContainer *self, ePointer_s p
     float y = pointer.pos.y;
     for (int i = 0; i < self->tools_len; i++) {
         const uContainerItem_s *item = &self->container.items[i];
-        if(x>=item->out.left 
+        if(pointer.action == E_POINTER_DOWN
+                && x>=item->out.left 
                 && x<=item->out.left+item->size.x
                 && y<=item->out.top
                 && y>=item->out.top-item->size.y) {
