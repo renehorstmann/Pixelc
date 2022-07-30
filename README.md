@@ -35,10 +35,10 @@ Or just use the tooltip tool. ![img](res/button_tooltip.png)
 - **COMPLETELY FREE and open**
 - and many more
 
-## Web Image Uploafmd Zoom Bug
+## Web Image Upload Zoom Bug
 Zoomed in on your Browser while asked for an image upload?
 try:
-- use desktop version in your browser to reset tge size
+- use desktop version in your browser to reset the size
 - empty the browser cache/data (for the Pixelc App)
 
 If you know someone who speaks html better than me, tell me :)

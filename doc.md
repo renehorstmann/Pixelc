@@ -300,7 +300,7 @@ Will copy the image into the canvas directly.
 
 > Zoomed in on your Browser while asked for an image upload?
 > try:
-> - use desktop version in your browser to reset tge size
+> - use desktop version in your browser to reset the size
 > - empty the browser cache/data (for the Pixelc App)
 
 If you know someone who speaks html better than me, tell me :)
