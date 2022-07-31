@@ -30,7 +30,10 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_shading() {
     return tool_button_new("shading",
-                           "Only paint above\nthe secondary color",
+                           "Only paint above\n"
+                           "the secondary color\n\n"
+                           "flashes the screen\n"
+                           "while active",
                            "res/button_shade.png",
                            pointer_event,
                            is_active);

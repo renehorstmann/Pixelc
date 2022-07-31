@@ -7,6 +7,7 @@
 #include "io.h"
 #include "feedback.h"
 #include "canvas.h"
+#include "tooltip.h"
 #include "brushmode.h"
 #include "brush.h"
 
@@ -118,6 +119,7 @@ void brush_pointer_event(ePointer_s pointer) {
         vec4 flash_color = u_color_to_vec4(brush.secondary_color);
         flash_color.a = 1.0;
         feedback_flash(flash_color, 1.0);
+        tooltip_set("Shading", "active");
     }
 
     if (L.hovering && pointer.action == E_POINTER_HOVER) {

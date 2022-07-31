@@ -136,7 +136,9 @@ Tool *tool_new_mode_pipette() {
     return mode_new("pipette",
                     "Select a color\n"
                     "on the canvas\n"
-                    "as secondary color",
+                    "as secondary color\n\n"
+                    "flashes the screen\n"
+                    "while active",
                     "res/button_pipette.png",
                     BRUSH_MODE_PIPETTE);
 }
