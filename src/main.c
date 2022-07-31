@@ -70,6 +70,10 @@ static void init() {
     cameractrl_set_home();
     
     dialog_create_startup();
+    
+#ifdef PIXELC_USE_MOD
+    mod_init();
+#endif
 }
 
 // this functions is called either each frame or at a specific update/s time

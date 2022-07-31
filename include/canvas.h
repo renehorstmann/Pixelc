@@ -9,6 +9,7 @@
 #include "m/types/float.h"
 #include "u/sprite.h"
 #include "r/ro_single.h"
+#include "mod.h"
 
 #define CANVAS_MAX_SIZE 1024
 #define CANVAS_MAX_LAYERS 96
@@ -54,6 +55,7 @@ struct Canvas_Globals {
 
         // The texture used to draw the canvsa
         // will normally be generated from sprite (but can be reset for mods, e. g. Tilec)
+        // is always reset to the default in canvas_update
         rTexture tex;
 
         // current sprite position to draw
@@ -83,11 +85,19 @@ void canvas_render(const mat4 *canvascam_mat);
 
 // returns the size of the canvas
 static ivec2 canvas_get_size() {
+#ifdef PIXELC_USE_MOD
+    if(mod.opt_canvas_get_size)
+        return mod.opt_canvas_get_size();
+#endif
     return canvas.RO.tex.sprite_size;
 }
 
 // returns col and row for the canvas image from a touch on the canvas
 static ivec2 canvas_get_cr(vec2 pointer_pos) {
+#ifdef PIXELC_USE_MOD
+    if(mod.opt_canvas_get_cr)
+        return mod.opt_canvas_get_cr(pointer_pos);
+#endif
     return (ivec2) {{(int) pointer_pos.x, (int) -pointer_pos.y}};
 }
 
@@ -102,6 +112,11 @@ uImage canvas_get_merged_image();
 // returns a new sprite
 // calls canvas_reload first
 uSprite canvas_get_sprite();
+
+// may be called by a mod
+static void canvas_reset_tex(rTexture tex) {
+    canvas.RO.tex = tex;
+}
 
 void canvas_set_frame(int sprite_col);
 

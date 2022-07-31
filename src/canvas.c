@@ -29,6 +29,8 @@ static struct {
     RoSingle bg;
     
     RoBatch sprite_grid;
+    
+    rTexture default_tex;
 
     struct {
         int current_layer;
@@ -144,6 +146,7 @@ static void update_render_objects() {
     rTexture tex = r_texture_new_sprite_buffer(s.img.cols, s.img.rows, s.cols, s.rows, s.img.data);
     
     ro_single_set_texture(&L.ro, tex);
+    L.default_tex = tex;
     canvas.RO.tex = tex;
 
     {
@@ -274,6 +277,12 @@ void canvas_init() {
 }
 
 void canvas_update(float dtime) {
+    canvas.RO.tex = L.default_tex;
+    
+#ifdef PIXELC_USE_MOD
+    if(mod.opt_mod_on_canvas_update)
+        mod.opt_mod_on_canvas_update();
+#endif
 
     canvas.RO.pose = u_pose_new_aa(0, 0, canvas.RO.image.cols, canvas.RO.image.rows);
 
