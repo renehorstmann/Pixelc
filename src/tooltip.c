@@ -41,9 +41,7 @@ void tooltip_update(float dtime) {
         return;
     L.time -= dtime;
     
-    float alpha = sca_min(1, sca_mix(0, 1, L.time));
-    ro_text_set_color(&L.title, (vec4) {{0.9, 0.9, 0.9, alpha}});
-    ro_text_set_color(&L.tip, (vec4) {{0.8, 0.8, 0.8, alpha}});
+    
     
     float phs = palette_get_hud_size();
 
@@ -67,6 +65,21 @@ void tooltip_render(const mat4 *cam_mat) {
     if (!tooltip.show || L.time < 0)
         return;
 
+    float alpha = sca_min(1, sca_mix(0, 1, L.time));
+
+    u_pose_shift_xy(&L.title.pose, 1, -1);
+    u_pose_shift_xy(&L.tip.pose, 1, -1);
+    ro_text_set_color(&L.title, (vec4) {{0.3, 0.3, 0.3, alpha*0.25}});
+    ro_text_set_color(&L.tip, (vec4) {{0.2, 0.2, 0.2, alpha*0.25}});
+    
+    ro_text_render(&L.title, cam_mat);
+    ro_text_render(&L.tip, cam_mat);
+    
+    u_pose_shift_xy(&L.title.pose, -1, 1);
+    u_pose_shift_xy(&L.tip.pose, -1, 1);
+    ro_text_set_color(&L.title, (vec4) {{1, 1, 1, alpha}});
+    ro_text_set_color(&L.tip, (vec4) {{0.9, 0.9, 0.9, alpha}});
+    
     ro_text_render(&L.title, cam_mat);
     ro_text_render(&L.tip, cam_mat);
 }

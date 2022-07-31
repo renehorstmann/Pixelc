@@ -87,7 +87,8 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- assume android should be called nust gor?
+- assume android should be called just once?
+  - main recalled...
 
 - new optics 
   - higher resolution?

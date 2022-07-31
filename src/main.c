@@ -53,22 +53,16 @@ static void init() {
     palette_load_config();
 
     cameractrl_init();
-    
     dialog_init();
-
     toolbar_init();
-
     multitouchcursor_init();
-
-    inputctrl_init();
-    
+    inputctrl_init();   
     feedback_init();
     
     tooltip_init();
     tooltip_load_config();
 
     cameractrl_set_home();
-    
     dialog_create_startup();
     
 #ifdef PIXELC_USE_MOD
@@ -81,10 +75,7 @@ static void update(float dtime) {
     // simulate
     camera_update();
     cameractrl_update(dtime);
-
     background_update(dtime);
-
-
     canvas_update(dtime);
     palette_update(dtime);
     animation_update(dtime);
@@ -99,9 +90,7 @@ static void update(float dtime) {
     }
     multitouchcursor_update(dtime);
     modal_update(dtime);
-    
     feedback_update(dtime);
-    
     tooltip_update(dtime);
 }
 
@@ -112,10 +101,10 @@ static void render(float dtime) {
 
     background_render(hud_cam);
     animation_render(hud_cam);
-    tooltip_render(hud_cam);
     canvas_render(canvas_cam);
     selectionctrl_render(canvas_cam);
     toolbar_render(hud_cam);
+    tooltip_render(hud_cam);
     palette_render(hud_cam);
     dialog_render(hud_cam);
     if (!modal_active()) {
