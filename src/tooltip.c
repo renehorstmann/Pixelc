@@ -78,7 +78,7 @@ void tooltip_render(const mat4 *cam_mat) {
     u_pose_shift_xy(&L.title.pose, -1, 1);
     u_pose_shift_xy(&L.tip.pose, -1, 1);
     ro_text_set_color(&L.title, (vec4) {{1, 1, 1, alpha}});
-    ro_text_set_color(&L.tip, (vec4) {{0.9, 0.9, 0.9, alpha}});
+    ro_text_set_color(&L.tip, (vec4) {{0.95, 0.95, 0.95, alpha}});
     
     ro_text_render(&L.title, cam_mat);
     ro_text_render(&L.tip, cam_mat);

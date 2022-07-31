@@ -16,6 +16,8 @@
 #define TB_LAYER_BG_A "#bb9999"
 #define TB_LAYER_BG_B "#aa8888"
 
+#define HOVER_TIME 1.0
+
 struct Toolbar_Globals toolbar;
 
 //
@@ -92,6 +94,13 @@ static void toolbar_container_update(ToolbarContainer *self, float start_pos, fl
 
     for (int i = 0; i < self->tools_len; i++) {
         self->tools[i]->update(self->tools[i], dtime);
+        
+        if(self->tool_hover_times[i]>0) {
+            self->tool_hover_times[i]-=dtime;
+            if(self->tool_hover_times[i]<=0) {
+                tooltip_set(self->tools[i]->name, self->tools[i]->tip);
+            }
+        }
     }
 
     // bg
@@ -160,12 +169,21 @@ static bool toolbar_container_pointer_event(ToolbarContainer *self, ePointer_s p
     float y = pointer.pos.y;
     for (int i = 0; i < self->tools_len; i++) {
         const uContainerItem_s *item = &self->container.items[i];
-        if(pointer.action == E_POINTER_DOWN
-                && x>=item->out.left 
+        bool in_tool = x>=item->out.left 
                 && x<=item->out.left+item->size.x
                 && y<=item->out.top
-                && y>=item->out.top-item->size.y) {
+                && y>=item->out.top-item->size.y;
+                
+        if(in_tool && pointer.action == E_POINTER_DOWN) {
             tooltip_set(self->tools[i]->name, self->tools[i]->tip);
+        }
+        
+        if(in_tool && pointer.action == E_POINTER_HOVER) {
+            if(self->tool_hover_times[i]<=0) {
+                self->tool_hover_times[i] = HOVER_TIME;
+            } 
+        } else {
+            self->tool_hover_times[i] = 0;
         }
         self->tools[i]->pointer_event(self->tools[i], pointer);
     }

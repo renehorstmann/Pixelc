@@ -17,6 +17,7 @@
 
 typedef struct {
     Tool **tools;
+    float tool_hover_times[TOOLBAR_MAX_TOOLS];
     int tools_len;
 
     uContainer container;

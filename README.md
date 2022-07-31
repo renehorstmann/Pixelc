@@ -90,14 +90,6 @@ python3 -m http.server --bind localhost  # [port]
 - assume android should be called just once?
   - main recalled...
 
-- new optics 
-  - higher resolution?
-  - buttons
-  - kernel tool bg
-  - dialog?
-  
-- hover tooltip
-
 - mod system
   - Tilec mod
 
