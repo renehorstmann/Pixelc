@@ -273,7 +273,6 @@ void toolbar_init() {
     add_tool(tool_new_undo());
     add_tool(tool_new_redo());
     add_tool(tool_new_selection());
-    add_tool(tool_new_kernel());
     add_tool(tool_new_rgb());
     add_tool(tool_new_shading());
     add_tool(tool_new_secondary_color());
@@ -290,6 +289,8 @@ void toolbar_init() {
     add_tool(tool_new_mode_fill());
     add_tool(tool_new_mode_fill8());
     add_tool(tool_new_mode_replace());
+    
+    add_tool(tool_new_kernel());
 
     for(int i=0; i<TOOL_FRAMES_SELECT_NUM; i++) {
         add_frames_tool(tool_new_frames_select(i));
