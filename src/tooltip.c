@@ -14,6 +14,7 @@
 struct Tooltip_Globals tooltip;
 
 static struct {
+    
     RoText title;
     RoText tip;
     vec2 title_size;
@@ -69,8 +70,8 @@ void tooltip_render(const mat4 *cam_mat) {
 
     u_pose_shift_xy(&L.title.pose, 1, -1);
     u_pose_shift_xy(&L.tip.pose, 1, -1);
-    ro_text_set_color(&L.title, (vec4) {{0.3, 0.3, 0.3, alpha*0.25}});
-    ro_text_set_color(&L.tip, (vec4) {{0.2, 0.2, 0.2, alpha*0.25}});
+    ro_text_set_color(&L.title, (vec4) {{0.3, 0.3, 0.3, alpha*0.5}});
+    ro_text_set_color(&L.tip, (vec4) {{0.2, 0.2, 0.2, alpha*0.5}});
     
     ro_text_render(&L.title, cam_mat);
     ro_text_render(&L.tip, cam_mat);
