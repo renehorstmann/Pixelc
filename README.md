@@ -87,12 +87,20 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- apple upload dialog render size bhg
+- assume android should be called nust gor?
+
+- new optics 
+  - higher resolution?
+  - buttons
+  - dialog?
+  
+- hover tooltip
 
 - mod system
   - Tilec mod
 
 - some update
+  - gtk file chooser for desktop
   - versions?
   - documentation
     - platform infos
