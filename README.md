@@ -89,6 +89,9 @@ python3 -m http.server --bind localhost  # [port]
 ## Todo
 - apple upload dialog render size bhg
 
+- mod system
+  - Tilec mod
+
 - some update
   - versions?
   - documentation
