@@ -92,6 +92,7 @@ python3 -m http.server --bind localhost  # [port]
 - new optics 
   - higher resolution?
   - buttons
+  - kernel tool bg
   - dialog?
   
 - hover tooltip
