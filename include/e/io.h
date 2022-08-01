@@ -16,20 +16,27 @@
 typedef void (*eIoFileUploadCallback)(const char *file, bool ascii, const char *user_file_name, void *user_data);
 
 
-// web and android:
 // offer the given file as download
+// noop for PLATFORM_CXXDROID
 void e_io_offer_file_as_download(const char *file);
 
-// web and android:
 // opens a file dialog to upload a file
 // on success, callback is called
 // should be called after a pointer event, or the browser may discard the file dialog
+// noop for PLATFORM_CXXDROID
 void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallback callback, void *user_data);
 
 
-// web: save files saved with e_io_savestate_file_path to IndexedDB
+// save files saved with e_io_savestate_file_path to IndexedDB
+// only needed for PLATFORM_EMSCRIPTEN
 void e_io_savestate_save();
 
+// returns true if the file name is valid
+// must not contain a '/' and < E_IO_SAVESTATE_MAX_FILENAME_LENGTH
+bool e_io_savestate_filename_valid(const char *filename);
+
+// returned by e_io_savestate_file_path
+extern _Thread_local char e_io_savestate_file[64 + E_IO_SAVESTATE_MAX_FILENAME_LENGTH];
 
 // creates a savestate file path to load and save with default FILE's
 // filename must not include directories (/)

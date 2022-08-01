@@ -216,8 +216,6 @@ static void update_sprite() {
     // check frames, morph into frames cols
     if(canvas.RO.frames_enabled && c.cols==1) {
         s_log("frames to sprite: %i", canvas.RO.frames);
-        uImage img = c.img;
-        
         uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, c.img);
         u_sprite_kill(&c);
         c = sprite;

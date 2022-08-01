@@ -1,6 +1,6 @@
 // changed to use s_file for portability (emscripten, android)
 
-#include "gifenc.h"
+#include "ext_gifenc.h"
 
 
 static void gifwrite(const void *src, ssize s, ssize n, sStream_i stream) {

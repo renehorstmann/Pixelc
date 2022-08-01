@@ -9,7 +9,7 @@
 #define CSCA_MAX SCHAR_MAX
 
 /** minimum possible value */
-#define CSCA_MIN (-SCHAR_MIN)
+#define CSCA_MIN SCHAR_MIN
 
 /** for printing in IO */
 #define CSCA_PRINT_FORMAT_SPECIFIER "hhi"

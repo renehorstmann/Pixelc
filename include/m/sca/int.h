@@ -9,7 +9,7 @@
 #define ISCA_MAX INT_MAX
 
 /** minimum possible value */
-#define ISCA_MIN (-INT_MIN)
+#define ISCA_MIN INT_MIN
 
 /** for printing in IO */
 #define ISCA_PRINT_FORMAT_SPECIFIER "i"

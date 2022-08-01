@@ -31,7 +31,9 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_tooltip() {
     return tool_button_new("tooltip",
-                           "Click on a tool\nto get its tip",
+                           "Click or hover\n"
+                           "on a tool\n"
+                           "to get its tip",
                            "res/button_tooltip.png",
                            pointer_event,
                            is_active);

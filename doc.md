@@ -101,7 +101,7 @@ The app shows a flash effect of that color to show you that the pipette mode is 
 ![img](res/button_tooltip.png)
 Click on the tooltip tool in the toolbar to show tooltips for pressed tools
 
-![img](doc/tooltip.jpg)
+![img](doc/tooltip.png)
 
 You can now click on a tool (or the palette) to get some tipps.
 Click on the tooltip button again to stop the tooltips.
@@ -159,7 +159,8 @@ You can also press the buttons in the toolbar and in the dialogs, too!
 ## <a name="S-kernel"></a>Kernel
 The Kernel is drawn in the Modes: Free, Dot, Line, Rect, Cricle, Grid and InvertedGrid.
 
-Change the current kernel with the minus and plus button. Hold for the first, last kernel ![img](res/button_minus.png) ![img](res/button_plus.png)
+Change the current kernel with the minus and plus button. Hold for the first, last kernel 
+![img](res/button_kernel_minus.png) ![img](res/button_kernel_plus.png)
 
 If you hold on the kernel preview between minus and plus, the kernel options dialog starts.
 
@@ -268,8 +269,7 @@ Click on the save tool to open the save dialog.
 ![img](doc/saving_dialog.png)
 
 You can save either as `.png` image file or as animated `.gif` file.
-On the web, the files are offered as download.
-Otherwise the files are saved as `image.png` or `animation.gif` in the working directory of the executable.
+> The CxxDroid Version saves the files as `image.png` or `animation.gif` in the working directory.
 
 ![img](res/button_save.png) Save the image with the actual size.
 
@@ -285,18 +285,18 @@ If *SAVE LAYERS MERGED* is activated, all layers are merged into a single image.
 
 ## <a name="S-import"></a>Import
 ![img](res/button_import.png)
-Click on the import tool to open the `import.png` image file as [selection](#S-selection).
-
-Hold to open the import dialog.
+Click on the import tool to open the import dialog.
 
 ![img](doc/import_dialog.png)
 
-In the WebApp you can upload a new file to be loaded as import.png.
+Click on the *UPLOAD* button to open a file chooser and upload a png image.
+> The CxxDroid Version has no file dialog and just trys to load import.png from the working directory.
 
-Otherwise the file should be located in the working directory of the executable.
-
-The button copy into canvas ![img](res/button_to.png)
+The button *COPY INTO CANVAS* ![img](res/button_to.png)
 Will copy the image into the canvas directly.
+
+The button *AS SELECTION* ![img](res/button_selection.png)
+will open the image as a [selection](#S-selection).
 
 > Zoomed in on your Browser while asked for an image upload?
 > try:

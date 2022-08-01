@@ -66,8 +66,8 @@ static void update(float dtime) {
     
     int k_w = brush.RO.kernel.cols;
     int k_h = brush.RO.kernel.rows;
-    k_w = isca_min(k_w, 8);
-    k_h = isca_min(k_h, 8);
+    k_w = s_min(k_w, 8);
+    k_h = s_min(k_h, 8);
     u_pose_set_size(&impl->kernel.rect.pose, k_w*4, k_h*4);
 }
 
@@ -138,23 +138,27 @@ void dialog_create_kernel() {
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
-    int pos = 24;
+    float pos = 16;
     impl->info = ro_text_new_font55(32);
     ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
 
-    char info_txt[32];
-    snprintf(info_txt, sizeof info_txt, "%ix%i",
-            brush.RO.kernel.cols, 
-            brush.RO.kernel.rows);
-    ro_text_set_text(&impl->info, info_txt);
-    s_log("size is: %s", info_txt);
-    impl->info.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
-    
-    impl->kernel = ro_single_new(r_texture_new_invalid());
+    char text[64];
+    uImage img = brush.RO.kernel;
+    snprintf(text, sizeof text, "cols: %i\n"
+                                "rows: %i", img.cols, img.rows);
+    ro_text_set_text(&impl->info, text);
+    impl->info.pose = u_pose_new(DIALOG_LEFT + 50, DIALOG_TOP - pos - 4, 1, 2);
+
+    impl->kernel = ro_single_new(brush.RO.kernel_tex);
     impl->kernel.owns_tex = false;
-    u_pose_set_xy(&impl->kernel.rect.pose, DIALOG_LEFT + 48, DIALOG_TOP - 4 - pos);
-    pos += 18;
-    
+
+    int width = brush.RO.kernel.cols;
+    int height = brush.RO.kernel.rows;
+    width = s_min(width, 8) * 4;
+    height = s_min(height, 8) * 4;
+    impl->kernel.rect.pose = u_pose_new(DIALOG_LEFT + 8 + 16, DIALOG_TOP - pos -16, width, height);
+
+    pos += 34;
 
     impl->delete_txt = ro_text_new_font55(7);
     ro_text_set_text(&impl->delete_txt, "Delete:");

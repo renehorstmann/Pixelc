@@ -4,7 +4,7 @@
 #include "m/int.h"
 #include "m/uchar.h"
 #include "canvas.h"
-#include "gifenc.h"
+#include "ext_gifenc.h"
 #include "io.h"
 
 

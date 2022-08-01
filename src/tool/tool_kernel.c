@@ -180,8 +180,8 @@ Tool *tool_new_kernel() {
 
     self->kernel = ro_single_new(r_texture_new_invalid());
     self->kernel.owns_tex = false;
-    self->minus = ro_single_new(r_texture_new_file(2, 1, "res/button_minus.png"));
-    self->plus = ro_single_new(r_texture_new_file(2, 1, "res/button_plus.png"));
+    self->minus = ro_single_new(r_texture_new_file(2, 1, "res/button_kernel_minus.png"));
+    self->plus = ro_single_new(r_texture_new_file(2, 1, "res/button_kernel_plus.png"));
     self->minus.rect.pose = u_pose_new(0, 0, 16, 16);
     self->plus.rect.pose = u_pose_new(0, 0, 16, 16);
     

@@ -9,7 +9,7 @@
 #define LLSCA_MAX LLONG_MAX
 
 /** minimum possible value */
-#define LLSCA_MIN (-LLONG_MIN)
+#define LLSCA_MIN LLONG_MIN
 
 /** for printing in IO */
 #define LLSCA_PRINT_FORMAT_SPECIFIER "lli"

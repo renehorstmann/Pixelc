@@ -9,7 +9,7 @@
 #define SSCA_MAX SHRT_MAX
 
 /** minimum possible value */
-#define SSCA_MIN (-SHRT_MIN)
+#define SSCA_MIN SHRT_MIN
 
 /** for printing in IO */
 #define SSCA_PRINT_FORMAT_SPECIFIER "hi"

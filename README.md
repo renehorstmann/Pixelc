@@ -93,14 +93,6 @@ python3 -m http.server --bind localhost  # [port]
 - mod system
   - Tilec mod
 
-- some update
-  - gtk file chooser for desktop
-  - versions?
-  - documentation
-    - platform infos
-  - u_fetch_android.c u_fetch_curl.c u_fetch_emscripten.c
-  - e_io_default.c e_io_emscripten.c e_io_android.c
-
 
 ## Author
 René Horstmann
@@ -114,5 +106,6 @@ René Horstmann
       - not used in Pixelc, but is part of some
     - [curl](https://curl.se/docs/copyright.html) (MIT like License) 
       - not used in Pixelc, but is part of some
+    - [sfd](https://github.com/rxi/sfd) for simple file dialogs (MIT License)
 - the .gif encoder [gifenc](https://github.com/lecram/gifenc) is licenced under public domain
 - Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
