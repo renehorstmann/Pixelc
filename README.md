@@ -9,7 +9,7 @@ Based on [some](https://github.com/renehorstmann/some) framework.
 ## WebApp
 [Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten.
 
-> Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling
+> Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling.
 
 ![example_image](example.png)
 
