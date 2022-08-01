@@ -87,8 +87,7 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- assume android should be called just once?
-  - main recalled...
+- longpress colors
 
 - mod system
   - Tilec mod
