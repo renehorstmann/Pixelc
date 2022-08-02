@@ -24,7 +24,8 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_undo() {
     return tool_button_new("undo",
-                           "Undos the last\ncanvas changes",
+                           "Undos the last\n"
+                           "canvas changes",
                            "res/button_undo.png",
                            pointer_event,
                            is_active);

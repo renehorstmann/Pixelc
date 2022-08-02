@@ -233,7 +233,7 @@ void palette_update(float dtime) {
         if(L.action.longpress_time<0) {
             // stop actions
             L.action.swiping = false;
-            feedback_longpress(L.action.start, (vec4) {{0.8, 0.1, 0.1, 1.0}});
+            feedback_longpress(L.action.start, (vec4) {{0.6, 0.6, 0.1, 1.0}});
             dialog_create_palette();
         }
     }
@@ -271,7 +271,7 @@ bool palette_pointer_event(ePointer_s pointer) {
                 "right to change\n"
                 "the palette\n\n"
                 "Swipe up for\n"
-                "multitouchmode\n\n"
+                "Multitouch Mode\n\n"
                 "Hold for options");
         
         for (int i = 0; i < 2; i++)

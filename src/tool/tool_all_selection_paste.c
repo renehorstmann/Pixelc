@@ -71,7 +71,7 @@ static void mirror_v_pe(struct Tool *super, ePointer_s pointer) {
 }
 
 Tool *tool_new_selection_paste_mirror_v() {
-    return tool_button_new("mirror vertical",
+    return tool_button_new("flip vertical",
                            "Mirrors the\nselection\nvertically",
                            "res/button_vertical.png",
                            mirror_v_pe,
@@ -91,7 +91,7 @@ static void mirror_h_pe(struct Tool *super, ePointer_s pointer) {
 }
 
 Tool *tool_new_selection_paste_mirror_h() {
-    return tool_button_new("mirror horizontal",
+    return tool_button_new("flip horizontal",
                            "Mirrors the\nselection\nhorizontally",
                            "res/button_horizontal.png",
                            mirror_h_pe,
@@ -122,7 +122,10 @@ static bool blend_is_a(struct Tool *super, float dtime) {
 
 Tool *tool_new_selection_paste_blend() {
     return tool_button_new("blend",
-                           "Blends alpha\nof selection",
+                           "Blends in the\n"
+                           "previous color\n"
+                           "with the selection\n"
+                           "alpha / transparency",
                            "res/button_blend.png",
                            blend_pe,
                            blend_is_a);
@@ -155,7 +158,7 @@ static void ok_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_ok() {
     return tool_button_new("ok",
-                           "Copies thecurrent\nselection paste\nand stops the\nselection mode",
+                           "Copies the current\nselection paste\nand stops the\nselection mode",
                            "res/button_ok.png",
                            ok_pe,
                            NULL);

@@ -141,6 +141,9 @@ void dialog_create_startup() {
 
     impl->disp_txt = ro_text_new_font55(64);
     ro_text_set_color(&impl->disp_txt, DIALOG_TEXT_COLOR);
+    for(int i=0; i< (int)strlen("using a\nbig screen?"); i++) {
+        impl->disp_txt.ro.rects[i].color.rgb = (vec3) {{0.2, 0.2, 1.0}};
+    }
     ro_text_set_text(&impl->disp_txt, "using a\n"
             "big screen?\n"
             "change the\n"

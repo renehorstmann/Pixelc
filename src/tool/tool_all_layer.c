@@ -115,7 +115,7 @@ static void select_update(struct Tool *super, float dtime) {
         if(self->long_press_time<=0) {
             self->pressed = false;
             s_log("layer longpress: %i", layer);
-            feedback_longpress(u_pose_get_xy(self->bg.rect.pose), R_COLOR_BLACK);
+            feedback_longpress(u_pose_get_xy(self->bg.rect.pose), (vec4) {{0.8, 0.2, 0.2, 1.0}});
             canvas_reload();
             canvas_set_layer(layer);
             dialog_create_layer();

@@ -6,7 +6,9 @@ Pixelc is a free pixelart editor for multiple platforms, including a [WebApp](ht
 The main target are touch devices such as smartphones and tablets (also via the [WebApp](https://renehorstmann.github.io/pixelc)).
 Its also fine to use on desktops, etc.
 
-> Touch-Users: Use the [Multitouchmode](#S-multitouchmode) for a great user experience!
+[Pixelc](https://play.google.com/store/apps/details?id=de.horsimann.pixelc) in the Google PlayStore.
+
+> Touch-Users: Use the [Multitouch Mode](#S-multitouchmode) for a great user experience!
 
 > Big Screen? Change the internal [Display](#S-display) size
 
@@ -20,7 +22,7 @@ Its also fine to use on desktops, etc.
 - [Palette](#S-palette)
   - [How to edit a palette](#S-palette__edit)
   - [How load a palette from a file](#S-palette__load)
-- [Multitouchmode](#S-multitouchmode)
+- [Multitouch Mode](#S-multitouchmode)
 - [Kernel](#S-kernel)
   - [New Brush Size](#S-kernel__brush)
   - [Stamps](#S-kernel__stamps)
@@ -112,8 +114,8 @@ Swipe to the left or right on the palette, to change to the previous or next pal
 
 ![img](doc/palette_swipe.png)
 
-### Up Swipe for Multitouchmode
-See [Multitouchmode](#S-multitouchmode).
+### Up Swipe for Multitouch Mode
+See [Multitouch Mode](#S-multitouchmode).
 ### Hold for Options
 Press on the palette for some time to start the palette dialog.
 
@@ -146,7 +148,7 @@ In this dialog you can:
 6. (optional) rename the palette name to a new one
 7. set palette from canvas (duplicate colors are ignored, up to 128 colors) ![img](res/button_to.png)
 
-## <a name="S-multitouchmode"></a>Multitouchmode
+## <a name="S-multitouchmode"></a>Multitouch Mode
 > Makes editing pixelart on touch devices a great experience!
 
 To start, swipe with your thumb (or a finger) up from the palette.

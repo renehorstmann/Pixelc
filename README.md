@@ -6,6 +6,9 @@ An opensource tile/sprite editor in C, using SDL2 and OpenGL.
 
 Based on [some](https://github.com/renehorstmann/some) framework.
 
+## Android App
+[Pixelc](https://play.google.com/store/apps/details?id=de.horsimann.pixelc) in the Google PlayStore.
+
 ## WebApp
 [Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten.
 
@@ -19,7 +22,7 @@ A documentation / tutorial can be found [here / doc.md](doc.md)
 Or just use the tooltip tool. ![img](res/button_tooltip.png)
 
 ## Highlights:
-- Multitouchmode for a great touch experience
+- Multitouch Mode for a great touch experience
 - Full mobile friendly [WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten
 - Frames and a .gif export
 - Layers
@@ -87,7 +90,6 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- longpress colors
 
 - mod system
   - Tilec mod

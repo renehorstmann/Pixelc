@@ -25,7 +25,8 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_redo() {
     return tool_button_new("redo",
-                           "Redos the undone\ncanvas changes",
+                           "Redos the undone\n"
+                           "canvas changes",
                            "res/button_redo.png",
                            pointer_event,
                            is_active);

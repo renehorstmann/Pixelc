@@ -3,6 +3,7 @@
 #include "m/float.h"
 #include "camera.h"
 #include "palette.h"
+#include "tooltip.h"
 #include "multitouchcursor.h"
 
 
@@ -45,6 +46,8 @@ static void set_out_pointer(ePointer_s *out_pointer, enum ePointerAction action)
 static void activate() {
     multitouchcursor.active = true;
     palette_set_info("Multitouch Mode");
+    tooltip_set("Multitouch Mode","Tip with a second\n"
+                                  "finger to draw");
 }
 
 //

@@ -156,7 +156,7 @@ static void update(struct Tool *super, float dtime) {
             } else if (self->pressed == BTN_KERNEL) {
                 s_log("tool kernel long press");
                 feedback_longpress(u_pose_get_xy(self->kernel_press_pose),
-                                    R_COLOR_CYAN);
+                                    R_COLOR_MAGENTA);
                 dialog_create_kernel();
             }
             self->pressed = BTN_NONE;

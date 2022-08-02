@@ -36,7 +36,7 @@ Tool *tool_new_import() {
                            "Opens the\n"
                            "import dialog\n\n"
                            "To load a\n"
-                           "png image",
+                           "PNG image",
                            "res/button_import.png",
                            pointer_event,
                            is_active);

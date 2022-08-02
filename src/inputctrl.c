@@ -9,6 +9,7 @@
 #include "brush.h"
 #include "canvas.h"
 #include "toolbar.h"
+#include "tooltip.h"
 #include "inputctrl.h"
 
 
@@ -58,9 +59,12 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 }
 
 static void key_event(const SDL_Event *event, void *user_data) {
-    if(event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_AC_BACK) {
+    if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_AC_BACK) {
         s_log("key back");
         canvas_undo();
+        tooltip_set("undo",
+                    "Undos the last\n"
+                    "canvas changes");
     }
 }
 
