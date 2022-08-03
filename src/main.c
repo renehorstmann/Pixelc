@@ -102,7 +102,7 @@ static void render(float dtime) {
     background_render(hud_cam);
     animation_render(hud_cam);
     canvas_render(canvas_cam);
-    selectionctrl_render(canvas_cam);
+    selectionctrl_render(hud_cam, canvas_cam);
     toolbar_render(hud_cam);
     tooltip_render(hud_cam);
     palette_render(hud_cam);

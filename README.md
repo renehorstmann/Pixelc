@@ -1,6 +1,8 @@
 # Pixelc
 An opensource tile/sprite editor in C, using SDL2 and OpenGL.
 
+![logo](icon/icon196.png)
+
 > Main target are touch devices such as smartphones and tablets.
 > Runs also fine on desktops.
 

@@ -1,8 +1,14 @@
 #include "r/ro_batch.h"
+#include "r/ro_text.h"
 #include "u/pose.h"
 #include "m/int.h"
 #include "canvas.h"
+#include "palette.h"
+#include "camera.h"
 #include "selectionctrl.h"
+
+
+#define TIP_TEXT_LENGTH 128
 
 
 struct SelectionCtrl_Globals selectionctrl;
@@ -12,6 +18,11 @@ struct SelectionCtrl_Globals selectionctrl;
 //
 
 static struct {
+    RoText title;
+    RoText tip;
+    vec2 title_size;
+    vec2 tip_size;
+
     RoBatch border;
 
     bool moving;
@@ -145,6 +156,12 @@ static void move_selection(ePointer_s pointer) {
 //
 
 void selectionctrl_init() {
+    L.title = ro_text_new_font55(9);
+    L.title_size = ro_text_set_text(&L.title, "Selection");
+    u_pose_set_size(&L.title.pose, 1, 2);
+
+    L.tip = ro_text_new_font85(TIP_TEXT_LENGTH);
+
     L.border = ro_batch_new(1024,
                             r_texture_new_file(2, 2, "res/selection_border.png"));
     for (int i = 0; i < L.border.num; i++) {
@@ -170,11 +187,61 @@ void selectionctrl_update(float dtime) {
         selectionctrl.show_ok = true;
     }
     setup_border();
+
+    int x, y, cols, rows;
+    if(selectionctrl.selection) {
+        x = selectionctrl.selection->left;
+        y = selectionctrl.selection->top;
+        cols = selectionctrl.selection->cols;
+        rows = selectionctrl.selection->rows;
+    } else {
+        x = y = cols = rows = 0;
+    }
+
+    char buf[TIP_TEXT_LENGTH];
+    snprintf(buf, sizeof buf, "x: %i\ny: %i\ncols: %i\nrows: %i", x, y, cols, rows);
+    L.tip_size = ro_text_set_text(&L.tip, buf);
+
+
+    float phs = palette_get_hud_size();
+
+    float w = s_max(L.title_size.x, L.tip_size.x);
+    float h = L.title_size.y*2 + L.tip_size.y + 2;
+
+    float left, top;
+    if(camera_is_portrait_mode()) {
+        left = camera.RO.left + 6;
+        top = camera.RO.bottom + phs + h + 2;
+    } else {
+        left = camera.RO.right - phs - w - 2;
+        top = camera.RO.bottom + h + 2;
+    }
+
+    u_pose_set_xy(&L.title.pose, left, top);
+    u_pose_set_xy(&L.tip.pose, left, top-L.title_size.y*2-2);
 }
 
-void selectionctrl_render(const mat4 *cam_mat) {
-    if (selectionctrl.selection)
-        ro_batch_render(&L.border, cam_mat, false);
+void selectionctrl_render(const mat4 *hud_cam_mat, const mat4 *canvas_cam_mat) {
+    if (!selectionctrl.selection)
+        return;
+
+    u_pose_shift_xy(&L.title.pose, 1, -1);
+    u_pose_shift_xy(&L.tip.pose, 1, -1);
+    ro_text_set_color(&L.title, (vec4) {{0.3, 0.3, 0.3, 0.5}});
+    ro_text_set_color(&L.tip, (vec4) {{0.2, 0.2, 0.2, 0.5}});
+
+    ro_text_render(&L.title, hud_cam_mat);
+    ro_text_render(&L.tip, hud_cam_mat);
+
+    u_pose_shift_xy(&L.title.pose, -1, 1);
+    u_pose_shift_xy(&L.tip.pose, -1, 1);
+    ro_text_set_color(&L.title, (vec4) {{1, 1, 1, 1}});
+    ro_text_set_color(&L.tip, (vec4) {{0.95, 0.95, 0.95, 1}});
+
+    ro_text_render(&L.title, hud_cam_mat);
+    ro_text_render(&L.tip, hud_cam_mat);
+
+    ro_batch_render(&L.border, canvas_cam_mat, false);
 }
 
 bool selectionctrl_pointer_event(ePointer_s pointer) {

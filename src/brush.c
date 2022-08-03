@@ -108,8 +108,12 @@ void brush_pointer_event(ePointer_s pointer) {
     if (pointer.id != 0)
         return;
 
-    if (pointer.action == E_POINTER_DOWN)
+    if (pointer.action == E_POINTER_DOWN) {
         L.hovering = false;
+
+        // restore canvas after hovering is done, so a single pixel change will be saved
+        canvas_reload();
+    }
 
 
     if (L.hovering && L.hovering_change)

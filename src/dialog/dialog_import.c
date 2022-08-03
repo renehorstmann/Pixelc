@@ -78,6 +78,8 @@ static bool pointer_event(ePointer_s pointer) {
     if (impl->upload_available && u_button_clicked(&impl->upload.rect, pointer)) {
         s_log("import upload...");
         e_io_ask_for_file_upload("import.png", false, uploaded, NULL);
+        // return after hide, hide kills this dialog
+        return true;
     }
 
     if (impl->import_available && u_button_clicked(&impl->to_canvas_btn.rect, pointer)) {
@@ -85,11 +87,13 @@ static bool pointer_event(ePointer_s pointer) {
         uSprite sprite = u_sprite_new_file(1, 1, "import.png");
         if (!u_sprite_valid(sprite)) {
             dialog_create_import();
+            // return after hide, hide kills this dialog
             return true;
         }
         canvas_set_sprite(sprite, true);
         cameractrl_set_home();
         dialog_hide();
+        // return after hide, hide kills this dialog
         return true;
     }
 
@@ -104,6 +108,7 @@ static bool pointer_event(ePointer_s pointer) {
         selectionctrl_paste_image(img);
         u_image_kill(&img);
         dialog_hide();
+        // return after hide, hide kills this dialog
         return true;
     }
 

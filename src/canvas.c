@@ -16,6 +16,9 @@
 
 #define GRID_RO_ALPHA 0.8
 
+#define ONION_SKINNING_PREV_ALPHA 0.33
+#define ONION_SKINNING_REM_ALPHA 0.1
+
 struct Canvas_Globals canvas;
 
 //
@@ -308,9 +311,9 @@ void canvas_render(const mat4 *canvascam_mat) {
     case CANVAS_BLEND_FRAMES_ONION:
         L.ro.rect.sprite.y = canvas.RO.current_layer;
         for(int i=0; i<=canvas.RO.current_frame; i++) {
-            float alpha = 0.05;
+            float alpha = ONION_SKINNING_REM_ALPHA;
             if(i==canvas.RO.current_frame-1)
-                alpha = 0.33;
+                alpha = ONION_SKINNING_PREV_ALPHA;
             else if(i==canvas.RO.current_frame)
                 alpha = 1;
             L.ro.rect.color.a = alpha*ro_alpha;
@@ -329,9 +332,9 @@ void canvas_render(const mat4 *canvascam_mat) {
     case CANVAS_BLEND_LAYER_ONION:
         L.ro.rect.sprite.x = canvas.RO.current_frame;
         for(int i=0; i<=canvas.RO.current_layer; i++) {
-            float alpha = 0.05;
+            float alpha = ONION_SKINNING_REM_ALPHA;
             if(i==canvas.RO.current_layer-1)
-                alpha = 0.33;
+                alpha = ONION_SKINNING_PREV_ALPHA;
             else if(i==canvas.RO.current_layer)
                 alpha = 1;
             L.ro.rect.color.a = alpha*ro_alpha;

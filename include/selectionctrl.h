@@ -34,7 +34,7 @@ void selectionctrl_init();
 
 void selectionctrl_update(float dtime);
 
-void selectionctrl_render(const mat4 *cam_mat);
+void selectionctrl_render(const mat4 *hud_cam_mat, const mat4 *canvas_cam_mat);
 
 bool selectionctrl_pointer_event(ePointer_s pointer);
 

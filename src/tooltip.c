@@ -14,7 +14,6 @@
 struct Tooltip_Globals tooltip;
 
 static struct {
-    
     RoText title;
     RoText tip;
     vec2 title_size;
