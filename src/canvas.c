@@ -19,6 +19,14 @@
 #define ONION_SKINNING_PREV_ALPHA 0.33
 #define ONION_SKINNING_REM_ALPHA 0.1
 
+
+
+// bright and dark
+static const su8 PATTERN_COLORS[2][4] = {
+        {204, 200, 192, 187},
+        {179, 175, 166, 161}
+};
+
 struct Canvas_Globals canvas;
 
 //
@@ -155,7 +163,9 @@ static void update_render_objects() {
     {
         float w = 2.0 * canvas.RO.image.cols / L.bg.tex.sprite_size.x;
         float h = 2.0 * canvas.RO.image.rows / L.bg.tex.sprite_size.y;
-        u_pose_set_size(&L.bg.rect.uv, w, h);
+
+        // u_pose_set_size may fail if the previous size is inf (which may happen at start with an invalid bg tex)
+        L.bg.rect.uv = u_pose_new(0, 0, w, h);
     }
     
     int idx = 0;
@@ -269,12 +279,11 @@ void canvas_init() {
         L.sprite_grid.rects[i].color = (vec4) {{0.33, 0.66, 0.33, 0.33}};
     }
 
-    rTexture bg_tex = r_texture_new_file(1, 1, "res/canvas_pattern.png");
-    r_texture_wrap_repeat(bg_tex);
-    L.bg = ro_single_new(bg_tex);
-
+    L.bg = ro_single_new(r_texture_new_invalid());
     uSprite sprite = u_sprite_new_zeros(DEFAULT_WIDTH, DEFAULT_HEIGHT, 1, 1);
+
     canvas_set_sprite(sprite, false);
+    canvas_set_pattern_size(8, 8);
 }
 
 void canvas_update(float dtime) {
@@ -465,6 +474,39 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
     }     
 }
 
+void canvas_set_pattern_size(int cols, int rows) {
+    s_log("size: %i, %i", cols, rows);
+    canvas.RO.pattern_size = (ivec2) {{cols, rows}};
+    // each pixel has 4 colors, and we need a bright and a dark pattern
+    uImage img = u_image_new_empty(cols*4, rows*4, 1);
+    for(int r=0; r<img.rows; r++) {
+        for(int c=0; c<img.cols; c++) {
+            bool dark = r<img.rows/2? (c<img.cols/2? false : true) : (c<img.cols/2? true : false);
+            bool even_row = (r/2)%2 == 0;
+            int dark_idx = dark? 1 : 0;
+            int idx;
+
+            // swap each pixel row
+            if(even_row)
+                idx = c % 4;
+            else
+                idx = (c+2) % 4;
+
+            // bottom order of a pixel
+            if(r%2 == 1)
+                idx = (int[]) {1, 0, 3, 2}[idx];
+            su8 col = PATTERN_COLORS[dark_idx][idx];
+            *u_image_pixel(img, c, r, 0) = (uColor_s) {{col, col, col, 255}};
+        }
+    }
+    rTexture tex = r_texture_new(img.cols, img.rows, 1, 1, img.data);
+    r_texture_wrap_repeat(tex);
+    ro_single_set_texture(&L.bg, tex);
+    update_render_objects();
+
+    u_image_kill(&img);
+}
+
 void canvas_save() {
     s_log("save");
     if (u_image_equals(canvas.RO.image, L.prev_image)) {
@@ -581,6 +623,9 @@ void canvas_save_config() {
         u_json_append_int(tab, "save_idx_min", L.tab_saves[t].save_idx_min);
     }
 
+    u_json_append_int(member, "pattern_cols", canvas.RO.pattern_size.x);
+    u_json_append_int(member, "pattern_rows", canvas.RO.pattern_size.y);
+
     u_json_save_file(config,io_config_file(), NULL);
     e_io_savestate_save();
 
@@ -614,7 +659,6 @@ void canvas_load_config() {
         }
     }
 
-
     int tab_id;
     if ( u_json_get_object_int(member, "current_tab_id", &tab_id)) {
         canvas.RO.current_tab_id = tab_id;
@@ -623,6 +667,12 @@ void canvas_load_config() {
     } else {
         s_log("failed, saving the empty image as index 0");
         save_image();
+    }
+
+    int pattern_cols, pattern_rows;
+    if(u_json_get_object_int(member, "pattern_cols", &pattern_cols)
+            && u_json_get_object_int(member, "pattern_rows", &pattern_rows)) {
+        canvas_set_pattern_size(pattern_cols, pattern_rows);
     }
 
     update_render_objects();

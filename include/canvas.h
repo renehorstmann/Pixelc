@@ -11,7 +11,7 @@
 #include "r/ro_single.h"
 #include "mod.h"
 
-#define CANVAS_MAX_SIZE 1024
+#define CANVAS_MAX_SIZE 8192
 #define CANVAS_MAX_LAYERS 96
 #define CANVAS_MAX_FRAMES 96
 #define CANVAS_MAX_SAVES 128
@@ -72,6 +72,8 @@ struct Canvas_Globals {
 
         // one of the nine image tabs
         int current_tab_id;
+
+        ivec2 pattern_size;
     } RO;
 };
 extern struct Canvas_Globals canvas;
@@ -131,6 +133,9 @@ void canvas_enable_layers(bool enable);
 // sets a new image for the canvas
 // canvas will take the ownership of image_sink
 void canvas_set_sprite(uSprite image_sink, bool save);
+
+// resets the chessboard pattern background size (size of a bright or dark set of pixels)
+void canvas_set_pattern_size(int cols, int rows);
 
 // saves an image (for reload, undo and redo)
 // only saves if the image changed

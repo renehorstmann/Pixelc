@@ -3,8 +3,8 @@
 #ifdef S_IMPL
 
 #include <stdio.h>
-#include <stdarg.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <signal.h>
 #include "../assume.h"
 
@@ -13,9 +13,7 @@
 #endif
 
 #ifdef PLATFORM_ANDROID
-
 #include <SDL2/SDL.h>
-
 #endif
 
 //

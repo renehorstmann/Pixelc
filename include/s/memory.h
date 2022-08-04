@@ -6,6 +6,7 @@
 //
 
 #include "common.h"
+#include "export.h"
 #include "assume.h"
 
 //
@@ -13,6 +14,7 @@
 //
 
 // realloc (see impl/memory_impl.h)
+S_EXPORT
 void *s_realloc_try(void *memory, ssize n);
 
 

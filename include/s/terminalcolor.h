@@ -5,6 +5,8 @@
 // colors for a terminal
 //
 
+#include "export.h"
+
 #define S_TERMINALCOLOR_RESET   "\x1B[0m"
 #define S_TERMINALCOLOR_BLACK   "\x1B[0;30m"
 #define S_TERMINALCOLOR_RED     "\x1B[0;31m"
@@ -65,11 +67,13 @@
 
 
 // setup the terminal to handle color codes
-// just for windows...
+// just needed for windows...
+S_EXPORT
 void s_terminalcolor_start();
 
 // stop the terminal from using color codes
-// just for windows...
+// just needed for windows...
+S_EXPORT
 void s_terminalcolor_stop();
 
 #endif //S_TERMINALCOLOR_H

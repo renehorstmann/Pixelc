@@ -8,6 +8,7 @@
 //
 
 #include "common.h"
+#include "export.h"
 #include "error.h"
 #include "assume.h"
 #include "memory.h"

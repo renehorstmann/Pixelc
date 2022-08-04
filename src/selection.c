@@ -1,4 +1,3 @@
-#include "s/error.h"
 #include "s/log.h"
 #include "selection.h"
 

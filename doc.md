@@ -1,6 +1,8 @@
 # Pixelc Tutorial
 Welcome to the [Pixelc](https://github.com/renehorstmann/pixelc) tutorial.
 
+![logo](icon/icon196.png)
+
 Pixelc is a free pixelart editor for multiple platforms, including a [WebApp](https://renehorstmann.github.io/pixelc).
 
 The main target are touch devices such as smartphones and tablets (also via the [WebApp](https://renehorstmann.github.io/pixelc)).
@@ -30,6 +32,7 @@ Its also fine to use on desktops, etc.
 - [Secondary Color](#S-secondary_color)
 - [Shading](#S-shading)
 - [Display Settings](#S-display)
+- [Grid](#S-grid)
 - [Save](#S-save)
 - [Import](#S-import)
 - [Selection](#S-selection)
@@ -263,6 +266,25 @@ The rotate mode is in portrait mode as default.
 - In Landscape Mode, the toolbar is aligned left and the palette right.
 - Auto Mode uses the window size to select the mode.
 
+## <a name="S-grid"></a>Grid
+![img](res/button_grid.png)
+Click on the grid tool to add a little transparency to the canvas, so you can see the background grid.
+
+Grid option off (default):
+
+![img](doc/grid_off.png)
+
+Grid option on:
+
+![img](doc/grid_on.png)
+
+Hold on the grid tool, to open a dialog in which you can change the pattern size:
+
+![img](doc/grid_dialog.png)
+
+Now with a background chess pattern of a 16x16 size, instead of the default 8x8:
+
+![img](doc/grid_16.png)
 
 ## <a name="S-save"></a>Save
 ![img](res/button_save.png)
@@ -384,7 +406,7 @@ If not activated, the frames are side by side on the canvas.
 
 ![img](doc/frames_off.png)
 
-Click on the grid tool, to show the frame grid in the full image ![img](res/button_grid.png)
+Click on the [grid](#S-grid) tool, to show the frame grid in the full image ![img](res/button_grid.png)
 
 ![img](doc/frames_grid.png)
 

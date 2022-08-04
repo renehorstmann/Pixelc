@@ -160,15 +160,15 @@ static void S_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
 static TYPE *S_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
     // key hash
     su32 hash = KEY_HASH_FN(key) % self->size;
-
+    
     // first item in hash map array
     ITEM **item = &self->map[hash];
-
+    
     // if item is available, get the right item in the linked list
     while(*item && !KEY_EQUALS_FN(key, (*item)->key)) {
         item = &((*item)->next);
     }
-
+    
     // if item not found, create a new one
     if(!(*item)) {
         *item = (ITEM *) s_a_new(self->allocator, ITEM, 1);
@@ -177,7 +177,7 @@ static TYPE *S_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
         (*item)->key = KEY_CLONE_FN(key, self->allocator);
         (*item)->next = NULL;
     }
-
+    
     // return a pointer to the item value
     return &((*item)->value);
 }
@@ -194,13 +194,13 @@ void S_NAME_CONCAT2(FN_NAME, _remove)(CLASS *self, KEY key) {
     while(*item && !KEY_EQUALS_FN(key, (*item)->key)) {
         item = &((*item)->next);
     }
-
+    
     // item for key not found?
     if(!(*item)) {
         s_log_warn(S_TO_STRING2(FN_NAME), "_remove: failed, key not found");
         return;
     }
-
+    
     ITEM *kill = *item;
     *item = (*item)->next;
     KEY_KILL_FN(kill->key, self->allocator);
@@ -216,9 +216,9 @@ ITER S_NAME_CONCAT2(FN_NAME, _iter_new)(CLASS *self) {
 ITEM *S_NAME_CONCAT2(FN_NAME, _iter_next)(ITER *self) {
     // test iter valid
     if(!self->hashmap || !S_NAME_CONCAT2(FN_NAME, _valid)(*self->hashmap)
-       || self->map_index <= -2 || self->map_index >= self->hashmap->size)
+            || self->map_index <= -2 || self->map_index >= self->hashmap->size)
         return NULL;
-
+        
     ITEM *item;
     // next item is available, so just use it
     if(self->next) {
@@ -226,7 +226,7 @@ ITEM *S_NAME_CONCAT2(FN_NAME, _iter_next)(ITER *self) {
         self->next = self->next->next;
         return item;
     }
-
+    
     // find next item in the map array
     do {
         self->map_index++;
@@ -235,7 +235,7 @@ ITEM *S_NAME_CONCAT2(FN_NAME, _iter_next)(ITER *self) {
         }
         item = self->hashmap->map[self->map_index];
     } while(item == NULL);
-
+    
     self->next = item->next;
     return item;
 }

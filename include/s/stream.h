@@ -6,6 +6,7 @@
 //    Implementations are in string.h, file.h and socket.h
 //
 
+#include "export.h"
 #include "common.h"
 
 struct sString;
@@ -69,23 +70,29 @@ static bool s_stream_valid(sStream_i self) {
 
 // reads exactly n bytes from the stream into memory
 // returns bytes read or <=0 on error
+S_EXPORT
 ssize s_stream_read(sStream_i self, void *memory, ssize n);
 
 // reads exactly n bytes, if the stream stays valid
 // returns bytes read or <=0 on error
+S_EXPORT
 ssize s_stream_read_as_long_as_valid(sStream_i self, void *memory, ssize n);
 
 // writes exactly n bytes into the stream into memory
 // returns bytes written or <=0 on error
+S_EXPORT
 ssize s_stream_write(sStream_i self, const void *memory, ssize n);
 
 // print formatted on the stream
+S_EXPORT
 ssize s_stream_printf_v(sStream_i self, const char *format, va_list args);
 
 // print formatted on the stream
+S_EXPORT
 ssize s_stream_printf(sStream_i self, const char *format, ...);
 
 // print a line of text on the stream
+S_EXPORT
 ssize s_stream_puts(sStream_i self, const char *text);
 
 // reads a single byte from the stream
@@ -108,10 +115,12 @@ static bool s_stream_putchar(sStream_i self, char c) {
 //      if(returned_line_len==max && memory[returned_line_len-1]!=until)
 //          // more characters in the line
 // returns 0 on error
+S_EXPORT
 ssize s_stream_read_until_into(sStream_i self, void *memory, ssize max, char until);
 
 // reads into the returned String, until the given char "until" (which will be included)
 // returns an invalid string on error
+S_EXPORT
 struct sString *s_stream_read_until(sStream_i self, char until);
 
 

@@ -97,9 +97,12 @@ void dialog_create_size();
 
 void dialog_create_display();
 
+void dialog_create_grid();
+
 void dialog_create_save();
 
 void dialog_create_import();
+
 
 void dialog_create_palette();
 

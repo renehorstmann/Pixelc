@@ -20,6 +20,9 @@
 // Definitions
 //
 
+#define s_min(a, b) ((a)<(b)?(a):(b))
+#define s_max(a, b) ((a)>(b)?(a):(b))
+
 typedef uint8_t su8;
 typedef int8_t si8;
 typedef uint16_t su16;
@@ -32,9 +35,24 @@ typedef float sf32;
 typedef double sf64;
 typedef si64 ssize;
 
-#define s_min(a, b) ((a)<(b)?(a):(b))
-#define s_max(a, b) ((a)>(b)?(a):(b))
-
+#define S_U8_MIN 0
+#define S_U8_MAX 255
+#define S_I8_MIN (-128)
+#define S_I8_MAX 127
+#define S_U16_MIN 0
+#define S_U16_MAX 65535
+#define S_I16_MIN (-32768)
+#define S_I16_MAX 32767
+#define S_U32_MIN 0
+#define S_U32_MAX 4294967295
+#define S_I32_MIN (-2147483648)
+#define S_I32_MAX 2147483647
+#define S_U64_MIN 0
+#define S_U64_MAX 18446744073709551615UL
+#define S_I64_MIN (-9223372036854775808LL)
+#define S_I64_MAX 9223372036854775807LL
+#define S_SIZE_MIN (-9223372036854775808LL)
+#define S_SIZE_MAX 9223372036854775807LL
 
 //
 // windows stuff

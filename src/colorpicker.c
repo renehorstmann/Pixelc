@@ -1,4 +1,3 @@
-#include "s/error.h"
 #include "m/float.h"
 #include "m/utils/camera.h"
 #include "m/utils/color.h"

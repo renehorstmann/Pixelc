@@ -6,6 +6,7 @@
 //
 
 #include "common.h"
+#include "export.h"
 
 //
 // Options:
@@ -43,8 +44,10 @@ enum s_log_level {
 #define s_log_wtf(...)   s_log_base(S_LOG_WTF, __FILE__, __LINE__, __func__, __VA_ARGS__)
 
 
+S_EXPORT
 void s_log_set_min_level(enum s_log_level level);
 
+S_EXPORT
 void s_log_set_quiet(bool set);
 
 /**
@@ -52,6 +55,7 @@ void s_log_set_quiet(bool set);
  * If opt_file is NULL, file and line will be omitted. (Useful for helper functions (like s_assume))
  * If opt_func is not NULL, the function name will be printed before format
  */
+S_EXPORT
 void s_log_base(enum s_log_level level, const char *opt_file, int line,
                   const char *opt_func, const char *format, ...);
 

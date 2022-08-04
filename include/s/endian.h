@@ -25,48 +25,62 @@ static void s_endian_swap(void *buf, int n) {
     memcpy(buf_data, tmp, n);
 }
 
-static su16 s_endian_host_to_be16(su16 x) {
+//
+// Contents;
+// uX host to le|be
+// uX le|be to host
+// iX host to le|be
+// iX le|be to host
+//
+
+
+
+//
+// unsigned
+//
+
+static su16 s_endian_u16_host_to_be(su16 x) {
     su16 result;
-    unsigned char *c;
-    c = (unsigned char *) &result;
+    su8 *c;
+    c = (su8 *) &result;
     c[0] = (x >> 8) & 0xFF;
     c[1] = x & 0xFF;
     return result;
 }
 
-static su16 s_endian_host_to_le16(su16 x) {
+static su16 s_endian_u16_host_to_le(su16 x) {
     su16 result;
-    unsigned char *c;
-    c = (unsigned char *) &result;
+    su8 *c;
+    c = (su8 *) &result;
     c[1] = (x >> 8) & 0xFF;
     c[0] = x & 0xFF;
     return result;
 }
 
-static su16 s_endian_le_to_host16(su16 x) {
+static su16 s_endian_u16_le_to_host(su16 x) {
     su16 result;
-    unsigned char *c;
+    su8 *c;
 
-    c = (unsigned char *) &x;
+    c = (su8 *) &x;
     result = (su16) c[0];
     result |= (su16) c[1] << 8;
     return result;
 }
 
-static su16 s_endian_be_to_host16(su16 x) {
+static su16 s_endian_u16_be_to_host(su16 x) {
     su16 result;
-    unsigned char *c;
+    su8 *c;
 
-    c = (unsigned char *) &x;
+    c = (su8 *) &x;
     result = (su16) c[1];
     result |= (su16) c[0] << 8;
     return result;
 }
 
-static su32 s_endian_host_to_be32(su32 x) {
+static su32 s_endian_u32_host_to_be(su32 x) {
     su32 result;
-    unsigned char *c;
-    c = (unsigned char *) &result;
+    su8 *c;
+    c = (su8 *) &result;
     c[0] = (x >> 24) & 0xFF;
     c[1] = (x >> 16) & 0xFF;
     c[2] = (x >> 8) & 0xFF;
@@ -74,10 +88,10 @@ static su32 s_endian_host_to_be32(su32 x) {
     return result;
 }
 
-static su32 s_endian_host_to_le32(su32 x) {
+static su32 s_endian_u32_host_to_le(su32 x) {
     su32 result;
-    unsigned char *c;
-    c = (unsigned char *) &result;
+    su8 *c;
+    c = (su8 *) &result;
     c[3] = (x >> 24) & 0xFF;
     c[2] = (x >> 16) & 0xFF;
     c[1] = (x >> 8) & 0xFF;
@@ -85,11 +99,11 @@ static su32 s_endian_host_to_le32(su32 x) {
     return result;
 }
 
-static su32 s_endian_le_to_host32(su32 x) {
+static su32 s_endian_u32_le_to_host(su32 x) {
     su32 result;
-    unsigned char *c;
+    su8 *c;
 
-    c = (unsigned char *) &x;
+    c = (su8 *) &x;
     result = (su32) c[0];
     result |= (su32) c[1] << 8;
     result |= (su32) c[2] << 16;
@@ -97,11 +111,11 @@ static su32 s_endian_le_to_host32(su32 x) {
     return result;
 }
 
-static su32 s_endian_be_to_host32(su32 x) {
+static su32 s_endian_u32_be_to_host(su32 x) {
     su32 result;
-    unsigned char *c;
+    su8 *c;
 
-    c = (unsigned char *) &x;
+    c = (su8 *) &x;
     result = (su32) c[3];
     result |= (su32) c[2] << 8;
     result |= (su32) c[1] << 16;
@@ -109,10 +123,10 @@ static su32 s_endian_be_to_host32(su32 x) {
     return result;
 }
 
-static su64 s_endian_host_to_be64(su64 x) {
+static su64 s_endian_u64_host_to_be(su64 x) {
     su64 result;
-    unsigned char *c;
-    c = (unsigned char *) &result;
+    su8 *c;
+    c = (su8 *) &result;
     c[0] = x >> 56;
     c[1] = (x >> 48) & 0xFF;
     c[2] = (x >> 40) & 0xFF;
@@ -124,10 +138,10 @@ static su64 s_endian_host_to_be64(su64 x) {
     return result;
 }
 
-static su64 s_endian_host_to_le64(su64 x) {
+static su64 s_endian_u64_host_to_le(su64 x) {
     su64 result;
-    unsigned char *c;
-    c = (unsigned char *) &result;
+    su8 *c;
+    c = (su8 *) &result;
     c[7] = x >> 56;
     c[6] = (x >> 48) & 0xFF;
     c[5] = (x >> 40) & 0xFF;
@@ -139,11 +153,11 @@ static su64 s_endian_host_to_le64(su64 x) {
     return result;
 }
 
-static su64 s_endian_le_to_host64(su64 x) {
+static su64 s_endian_u64_le_to_host(su64 x) {
     su64 result;
-    unsigned char *c;
+    su8 *c;
 
-    c = (unsigned char *) &x;
+    c = (su8 *) &x;
     result = (su64) c[0];
     result |= (su64) c[1] << 8;
     result |= (su64) c[2] << 16;
@@ -155,11 +169,11 @@ static su64 s_endian_le_to_host64(su64 x) {
     return result;
 }
 
-static su64 s_endian_be_to_host64(su64 x) {
+static su64 s_endian_u64_be_to_host(su64 x) {
     su64 result;
-    unsigned char *c;
+    su8 *c;
 
-    c = (unsigned char *) &x;
+    c = (su8 *) &x;
     result = (su64) c[7];
     result |= (su64) c[6] << 8;
     result |= (su64) c[5] << 16;
@@ -169,6 +183,73 @@ static su64 s_endian_be_to_host64(su64 x) {
     result |= (su64) c[1] << 48;
     result |= (su64) c[0] << 56;
     return result;
+}
+
+
+//
+// signed wrapper
+//
+
+static si16 s_endian_i16_host_to_be(si16 x) {
+    su16 ret = s_endian_u16_host_to_be(*((su16*)&x));
+    return *((si16*)&ret);
+}
+
+static si16 s_endian_i16_host_to_le(si16 x) {
+    su16 ret = s_endian_u16_host_to_le(*((su16*)&x));
+    return *((si16*)&ret);
+}
+
+static si16 s_endian_i16_le_to_host(si16 x) {
+    su16 ret = s_endian_u16_le_to_host(*((su16*)&x));
+    return *((si16*)&ret);
+}
+
+static si16 s_endian_i16_be_to_host(si16 x) {
+    su16 ret = s_endian_u16_be_to_host(*((su16*)&x));
+    return *((si16*)&ret);
+}
+
+
+static si32 s_endian_i32_host_to_be(si32 x) {
+    su32 ret = s_endian_u32_host_to_be(*((su32*)&x));
+    return *((si32*)&ret);
+}
+
+static si32 s_endian_i32_host_to_le(si32 x) {
+    su32 ret = s_endian_u32_host_to_le(*((su32*)&x));
+    return *((si32*)&ret);
+}
+
+static si32 s_endian_i32_le_to_host(si32 x) {
+    su32 ret = s_endian_u32_le_to_host(*((su32*)&x));
+    return *((si32*)&ret);
+}
+
+static si32 s_endian_i32_be_to_host(si32 x) {
+    su32 ret = s_endian_u32_be_to_host(*((su32*)&x));
+    return *((si32*)&ret);
+}
+
+
+static si64 s_endian_i64_host_to_be(si64 x) {
+    su64 ret = s_endian_u64_host_to_be(*((su64*)&x));
+    return *((si64*)&ret);
+}
+
+static si64 s_endian_i64_host_to_le(si64 x) {
+    su64 ret = s_endian_u64_host_to_le(*((su64*)&x));
+    return *((si64*)&ret);
+}
+
+static si64 s_endian_i64_le_to_host(si64 x) {
+    su64 ret = s_endian_u64_le_to_host(*((su64*)&x));
+    return *((si64*)&ret);
+}
+
+static si64 s_endian_i64_be_to_host(si64 x) {
+    su64 ret = s_endian_u64_be_to_host(*((su64*)&x));
+    return *((si64*)&ret);
 }
 
 #endif //S_ENDIAN_H

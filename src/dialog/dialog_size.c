@@ -169,11 +169,11 @@ static void on_action(bool ok) {
 
     dialog_hide();
     if (!ok) {
-        s_log("dialog canvas_size aborted");
+        s_log("dialog size aborted");
         return;
     }
     
-    s_log("dialog canvas_size: new size %i %i, %i %i", cols, rows, frames, layers);
+    s_log("dialog size: new size %i %i, %i %i", cols, rows, frames, layers);
 
     uSprite sprite;
     if(keep_order) {

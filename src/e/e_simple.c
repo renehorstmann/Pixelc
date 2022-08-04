@@ -106,7 +106,7 @@ static void main_loop(void *user_data) {
         }
     }
 
-    double load_time = s_timer_reset(timer);
+    double load_time = s_timer_reset(&timer);
 
     // render
     r_render_begin_frame(e_window.size);

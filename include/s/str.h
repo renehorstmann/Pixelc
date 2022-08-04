@@ -5,6 +5,7 @@
 // functions working on a data view
 //
 
+#include "export.h"
 #include "error.h"
 #include "log.h"
 #include "str_type.h"
@@ -29,11 +30,13 @@ static bool s_str_empty(sStr_s s) {
 // prints the str to a stream
 // as f.e.: "(sStr_s) {"hello world", 11}\n"
 // returns the amount of printed characters
+S_EXPORT
 ssize s_str_stream_print(sStr_s str, struct sStream_i stream);
 
 // prints the str to stdoud
 // as f.e.: "(sStr_s) {"hello world", 11}\n"
 // returns the amount of printed characters
+S_EXPORT
 ssize s_str_print(sStr_s s);
 
 // copies from into cpy. cpy and from must have the same size

@@ -14,7 +14,7 @@
 #include <emscripten.h>
 #endif
 #include <limits.h>
-#include "SDL_net.h"
+#include "SDL2/SDL_net.h"
 
 struct sSocket {
     TCPsocket so;

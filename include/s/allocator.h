@@ -8,6 +8,7 @@
 //      The postfix *_a is also just for functions taking an allocator...
 //
 
+#include "export.h"
 #include "memory.h"
 
 //
@@ -167,6 +168,7 @@ do { \
 // the arena can be cleared with s_allocator_arena_clear to free all allocations
 // the arena must also be killed with s_allocator_arena_kill (which will also free all allocations)
 // Stack a version
+S_EXPORT
 sAllocator_i s_allocator_arena_new_a(ssize arena_size, sAllocator_i arena_stack_allocator);
 
 // An arena allocates everything on a fixed stack
@@ -178,15 +180,19 @@ static sAllocator_i s_allocator_arena_new(ssize arena_size) {
     return s_allocator_arena_new_a(arena_size, S_ALLOCATOR_DEFAULT);
 }
 
+S_EXPORT
 void s_allocator_arena_kill(sAllocator_i *self_arena);
 
 // clears / frees all allocations
+S_EXPORT
 void s_allocator_arena_clear(sAllocator_i self_arena);
 
 // returns the ssize the arena was created with
+S_EXPORT
 ssize s_allocator_arena_full_size(sAllocator_i self_arena);
 
 // returns the current remaining ssize of the arena
+S_EXPORT
 ssize s_allocator_arena_remaining_size(sAllocator_i self_arena);
 
 

@@ -7,6 +7,7 @@
 // When a function returns a string, you have to kill it
 //
 
+#include "export.h"
 #include "str_type.h"
 #include "stream.h"
 
@@ -61,6 +62,7 @@ static sStream_i s_string_get_stream(sString *self) {
 
 // allocated start_capacity + 1 (null)
 // start_capacity will be set to a minimum of 7
+S_EXPORT
 sString *s_string_new_a(ssize start_capacity, sAllocator_i a);
 
 // allocated start_capacity + 1 (null)
@@ -69,6 +71,7 @@ static sString *s_string_new(ssize start_capacity) {
 }
 
 // clones sStr_s and appends null
+S_EXPORT
 sString *s_string_new_clone_a(sStr_s to_clone, sAllocator_i a);
 
 
@@ -78,6 +81,7 @@ static sString *s_string_new_clone(sStr_s to_clone) {
 }
 
 // copies str s into a new string, with old -> replacement.
+S_EXPORT
 sString *s_string_new_replace_a(sStr_s to_replace, sStr_s old, sStr_s replacement, sAllocator_i a);
 
 
@@ -87,6 +91,7 @@ static sString *s_string_new_replace(sStr_s to_replace, sStr_s old, sStr_s repla
 }
 
 // concatenates all strs
+S_EXPORT
 sString *s_string_new_cat_a(sStr_s *strs, int n, sAllocator_i a);
 
 // concatenates all strs
@@ -94,18 +99,23 @@ static sString *s_string_new_cat(sStr_s *strs, int n) {
     return s_string_new_cat_a(strs, n, S_ALLOCATOR_DEFAULT);
 }
 
+S_EXPORT
 void s_string_kill(sString **self_ptr);
 
 // size is the sum of characters, not including termination null (as strlen)
+S_EXPORT
 void s_string_set_capacity(sString *self, ssize capacity);
 
 // size is the sum of characters, not including termination null (as strlen)
+S_EXPORT
 void s_string_resize(sString *self, ssize size);
 
 // appends a char
+S_EXPORT
 void s_string_push(sString *self, char push);
 
 // appends a string
+S_EXPORT
 void s_string_append(sString *self, sStr_s append);
 
 #endif //S_STRING_H
