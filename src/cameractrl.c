@@ -25,14 +25,14 @@ static struct {
 
     vec2 pos0;
     vec2 move0;
-    
+
     float zoom0;
     vec2 touch[2];
     bvec2 touching;
     float distance0;
     float distance;
     bool touched;
-    
+
     int set_home_cnt;
 
     struct {
@@ -60,12 +60,12 @@ static void set_home() {
     memset(&L, 0, sizeof(L));
 
     ivec2 csize = canvas_get_size();
-    
+
     int left = camera.RO.left;
     int right = camera.RO.right;
     int top = camera.RO.top;
     int bottom = camera.RO.bottom;
-    
+
     if (camera_is_portrait_mode()) {
         top -= toolbar_size();
         bottom += palette_get_hud_size();
@@ -73,37 +73,42 @@ static void set_home() {
         left += toolbar_size();
         right -= palette_get_hud_size();
     }
-    
+
     float w = right - left;
     float h = top - bottom;
 
     bool adjust_by_height = false;
-    if(w>h && (w/h >= csize.x/csize.y))
+    if (w > h && (w / h >= csize.x / csize.y))
         adjust_by_height = true;
-    if(w<h && (h/w <= csize.y/csize.x))
+    if (w < h && (h / w <= csize.y / csize.x))
         adjust_by_height = true;
-        
-    if(adjust_by_height) {
-        L.zoom = csize.y / (h*HOME_SIZE);
+
+    if (adjust_by_height) {
+        L.zoom = csize.y / (h * HOME_SIZE);
     } else {
-        L.zoom = csize.x / (w*HOME_SIZE);
+        L.zoom = csize.x / (w * HOME_SIZE);
     }
-    
+
     float cx = (left + right) / 2.0f;
     float cy = (bottom + top) / 2.0f;
-    
-    L.pos.x = csize.x/2.0f;
-    L.pos.y = -csize.y/2.0f;
-    
+
+    L.pos.x = csize.x / 2.0f;
+    L.pos.y = -csize.y / 2.0f;
+
     L.pos.x -= cx * L.zoom;
     L.pos.y -= cy * L.zoom;
-   
+
     camera_set_pos(L.pos.x, L.pos.y);
     camera_set_zoom(L.zoom);
 }
 
 
 static void wheel_event(bool up, void *user_data) {
+    ivec2 csize = canvas_get_size();
+    if (L.cursor.pointer_pos.x < 0 || L.cursor.pointer_pos.x > csize.x
+            || L.cursor.pointer_pos.y < -csize.y || L.cursor.pointer_pos.y > 0)
+        return;
+
     if (up)
         L.zoom /= WHEEL_ZOOM_FACTOR;
     else
@@ -188,9 +193,9 @@ void cameractrl_init() {
 }
 
 void cameractrl_update(float dtime) {
-    if(L.set_home_cnt>0) {
+    if (L.set_home_cnt > 0) {
         L.set_home_cnt--;
-        if(L.set_home_cnt<=0)
+        if (L.set_home_cnt <= 0)
             set_home();
     }
 }

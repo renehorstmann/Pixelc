@@ -10,7 +10,7 @@
 
 // comment out or use the option to hide the animation preview and dialog
 // for mods like Tilec
-#ifndef OPTION_HIDE_ANIMATION
+#ifndef PIXELC_HIDE_ANIMATION
 #define SHOW_ANIMATION
 #endif
 

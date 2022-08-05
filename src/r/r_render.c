@@ -25,6 +25,7 @@ static struct {
     StartUp *start_up;
 } L;
 
+
 //
 // public
 //
@@ -85,10 +86,6 @@ void r_render_begin_frame(ivec2 window_size) {
     r_render.current_window_size = window_size;
 
     r_render_restore_framebuffer();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_SCISSOR_TEST);
 
     r_render_clear(r_render.clear_color);
 
@@ -150,6 +147,10 @@ void r_render_set_framebuffer(rFramebuffer fbo) {
     r_render_error_check("r_render_set_framebufferBEGIN");
     glBindFramebuffer(GL_FRAMEBUFFER, fbo.fbo);
     glViewport(0, 0, fbo.tex.size.x, fbo.tex.size.y);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_SCISSOR_TEST);
     r_render_error_check("r_render_set_framebuffer");
 }
 

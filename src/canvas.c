@@ -155,7 +155,8 @@ static void load_image() {
 static void update_render_objects() {
     uSprite s = canvas.RO.sprite;
     rTexture tex = r_texture_new_sprite_buffer(s.img.cols, s.img.rows, s.cols, s.rows, s.img.data);
-    
+
+    L.ro.tex = L.default_tex;
     ro_single_set_texture(&L.ro, tex);
     L.default_tex = tex;
     canvas.RO.tex = tex;
@@ -288,23 +289,24 @@ void canvas_init() {
 
 void canvas_update(float dtime) {
     canvas.RO.tex = L.default_tex;
-    
-#ifdef PIXELC_USE_MOD
-    if(mod.opt_mod_on_canvas_update)
-        mod.opt_mod_on_canvas_update();
-#endif
 
     canvas.RO.pose = u_pose_new_aa(0, 0, canvas.RO.image.cols, canvas.RO.image.rows);
 
-    r_texture_set_sprite_buffer(L.ro.tex, canvas.RO.sprite.img.data);
+    r_texture_set_sprite_buffer(L.default_tex, canvas.RO.sprite.img.data);
 
     // set pose
     L.ro.rect.pose = canvas.RO.pose;
 
     L.bg.rect.pose = canvas.RO.pose;
+
+#ifdef PIXELC_USE_MOD
+    if(mod.opt_mod_on_canvas_update)
+        mod.opt_mod_on_canvas_update();
+#endif
 }
 
 void canvas_render(const mat4 *canvascam_mat) {
+    L.ro.tex = canvas.RO.tex;
 
     float ro_alpha = canvas.show_grid? GRID_RO_ALPHA : 1;
 

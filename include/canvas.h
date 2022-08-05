@@ -91,7 +91,7 @@ static ivec2 canvas_get_size() {
     if(mod.opt_canvas_get_size)
         return mod.opt_canvas_get_size();
 #endif
-    return canvas.RO.tex.sprite_size;
+    return (ivec2) {{canvas.RO.image.cols, canvas.RO.image.rows}};
 }
 
 // returns col and row for the canvas image from a touch on the canvas

@@ -9,7 +9,6 @@
 #include "u/color.h"
 #include "u/image.h"
 
-#define PALETTE_MAX 128
 #define PALETTE_NAME_MAX 32
 
 struct Palette_Globals {
@@ -17,7 +16,7 @@ struct Palette_Globals {
     bool include_transparent_at_set_colors;
 
     struct {
-        uColor_s palette[PALETTE_MAX];
+        uColor_s *palette;
         int palette_size;
         int palette_id;
         char palette_name[PALETTE_NAME_MAX];

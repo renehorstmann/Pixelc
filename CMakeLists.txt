@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(pixelc C)
 
+# mods
+set(MOD_TILEC false)
+
 # link options
 set(USE_SDL_MIXER false)
 set(USE_SDL_NET false)
@@ -32,6 +35,18 @@ set(USE_SANITIZER true)
 # S_LOG_DO_NOT_USE_COLOR          dont use colored logs
 # S_LOG_DO_NOT_PRINT_TIME_FILE    disable time and file in logs
 
+# mods
+if(MOD_TILEC)
+    message("Pixelc Mod: Tilec")
+    add_definitions(-DPIXELC_USE_MOD)
+    add_definitions(-DPIXELC_MOD_PALETTE)
+    add_definitions(-DPIXELC_HIDE_ANIMATION)
+    add_definitions(-DPIXELC_JUST_SAVE)
+    file(GLOB MOD_SRCS
+            "${PROJECT_SOURCE_DIR}/src/mod/tilec/*"
+            )
+endif()
+
 set(CMAKE_C_STANDARD 11)
 
 include_directories(
@@ -49,7 +64,7 @@ file(GLOB SRCS
         "${PROJECT_SOURCE_DIR}/src/tool/*"
         )
 
-add_executable(pixelc ${SRCS})
+add_executable(pixelc ${SRCS} ${MOD_SRCS})
 
 
 # set default configuration
@@ -105,6 +120,7 @@ if (USE_FETCH)
     message("USE_FETCH")
     add_definitions(-DOPTION_FETCH)
 endif ()
+
 
 # windows mingw
 if (PLATFORM_MINGW)

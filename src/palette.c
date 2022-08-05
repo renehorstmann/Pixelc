@@ -1,3 +1,5 @@
+#ifndef PIXELC_MOD_PALETTE
+
 #include "r/r.h"
 #include "e/io.h"
 #include "u/pose.h"
@@ -12,6 +14,9 @@
 #include "feedback.h"
 #include "tooltip.h"
 #include "palette.h"
+
+
+#define PALETTE_MAX 128
 
 #define COLOR_DROP_SIZE 16.0f
 #define ADDITIONAL_PALETTE_SPACE 512
@@ -104,6 +109,8 @@ void palette_init() {
 
     L.current_pressed = -1;
 
+    palette.RO.palette = s_new0(uColor_s, PALETTE_MAX);
+
     L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
     L.background_ro = ro_batch_new(PALETTE_MAX + ADDITIONAL_PALETTE_SPACE,
@@ -129,8 +136,6 @@ void palette_init() {
         };
         palette_set_colors(palette, 4, NULL);
     }
-
-    return;
 }
 
 
@@ -661,3 +666,8 @@ void palette_load_config() {
     }
     u_json_kill(&config);
 }
+
+
+#else // !PIXELC_MOD_PALETTE
+typedef int avoid_empty_translation_unit;
+#endif

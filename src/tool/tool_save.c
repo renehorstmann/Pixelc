@@ -6,7 +6,7 @@
 
 // comment out or use the option to just save the png instead of opening the save dialog
 // for mods like Tilec
-#ifndef OPTION_JUST_SAVE
+#ifndef PIXELC_JUST_SAVE
 #define OPEN_DIALOG
 #endif
 
