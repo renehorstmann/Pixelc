@@ -481,7 +481,7 @@ Here you can:
 
 
 ## <a name="S-layers"></a>Layers
-Frames and layers both are located in a grid of the image.
+Frames and layers both are located in a grid on the image.
 While frames are set right next to each other on the image, layers are placed below each other.
 The layer options behave exactly the same as the frame options (without the animation dialog and the frame times)
 So have a look at the [Frames](#S-frames) section.
