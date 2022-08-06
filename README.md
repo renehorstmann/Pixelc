@@ -98,6 +98,10 @@ python3 -m http.server --bind localhost  # [port]
 
 ## Todo
 
+- some_android
+  - remove some uneccessary sdl comments in the manifest
+  - locked orientation
+    https://stackoverflow.com/questions/45983438/app-auto-rotates-even-with-device-orientation-locked
 - mod system
   - Tilec mod
 
