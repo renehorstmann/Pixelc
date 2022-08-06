@@ -99,6 +99,7 @@ python3 -m http.server --bind localhost  # [port]
 ## Todo
 
 - some
+  - ro_fontxx_shadow with opt. custom shadow color
   - r_texture (2d) global
     - init_as_nearest
     - add call to nearest for ro_font55, ...
