@@ -329,7 +329,7 @@ If **SAVE LAYERS MERGED** is activated, all layers are merged into a single imag
 **PNG** will save the frames next to each other, while **GIF** will animate them.
 
 > The gif encoder uses a color palette with max. 256 opaque colors. Color 0 is reserved for transparency.
-> The first 255 colors in the canvas are used to create the color palette.
+> The first 255 different colors in the canvas are used to create the color palette.
 
 ## <a name="S-import"></a>Import
 ![img](doc/res4/button_import.png)
