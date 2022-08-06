@@ -476,7 +476,7 @@ Hold on the frames tool to open the animation dialog
 Here you can:
 - reset the animation size
 - ![img](doc/res2/button_repeat.png)  repeat the animated preview horizontally or vertically or both 
-  - good to show repeated mod_tiles
+  - good to show repeated tiles
 - ![img](doc/res2/button_sec_fps.png)  reset all frame times via seconds or fps 
 
 
