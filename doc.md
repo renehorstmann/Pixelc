@@ -413,6 +413,9 @@ The copy button now copies the selection into the canvas, leaving the selection 
 ![img](doc/res2/button_ok.png)
 The ok button copies the selection into the canvas and closes the selection mode.
 
+![img](doc/res2/button_selection.png)
+Stop the selection mode to cancel the copying.
+
 ![img](doc/res2/button_blend.png)
 If the blend button is activated, the selections will be blended onto the canvas (using transparency).
 
