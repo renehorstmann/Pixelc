@@ -29,9 +29,17 @@ RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink);
 // inits text with the r/font55.png sprite sheet
 RoText ro_text_new_font55(int max);
 
+// inits text with the r/font55_shadow.png sprite sheet
+// adds a dark transparent shadow
+RoText ro_text_new_font55_shadow(int max);
 
 // inits text with the r/font88.png sprite sheet
 RoText ro_text_new_font85(int max);
+
+// inits text with the r/font88_shadow.png sprite sheet
+// adds a dark transparent shadow
+RoText ro_text_new_font85_shadow(int max);
+
 
 void ro_text_kill(RoText *self);
 

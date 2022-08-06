@@ -193,10 +193,25 @@ RoText ro_text_new_font55(int max) {
     return ro_text_new(max, font55_sprite_cb, r_texture_new_file(columns, rows, "res/r/font55.png"));
 }
 
+RoText ro_text_new_font55_shadow(int max) {
+    const int columns = 12;
+    const int rows = 5;
+    return ro_text_new(max, font55_sprite_cb, r_texture_new_file(columns, rows, "res/r/font55_shadow.png"));
+}
+
 RoText ro_text_new_font85(int max) {
     const int columns = 12;
     const int rows = 8;
     RoText self = ro_text_new(max, font85_sprite_cb, r_texture_new_file(columns, rows, "res/r/font85.png"));
+    self.size = (vec2) {{5, 8}};
+    self.offset = (vec2) {{6, 9}};
+    return self;
+}
+
+RoText ro_text_new_font85_shadow(int max) {
+    const int columns = 12;
+    const int rows = 8;
+    RoText self = ro_text_new(max, font85_sprite_cb, r_texture_new_file(columns, rows, "res/r/font85_shadow.png"));
     self.size = (vec2) {{5, 8}};
     self.offset = (vec2) {{6, 9}};
     return self;
