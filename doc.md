@@ -213,7 +213,7 @@ In this dialog you can:
 ### <a name="S-kernel__stamps"></a>Stamps
 You can also use kernels as image stamps to quickly draw your stamps in different colors:
 1. ![img](doc/res2/button_tab.png)  use a new image tab 
-2. Draw your stamp in white, gray and black (other colors work to, the resulting color is `kernel color * palette color`)
+2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel color * palette color`)
 3. Hold on the Kernel preview to start the kernel dialog
 4. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
 5. Select a color from the palette
