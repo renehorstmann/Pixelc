@@ -19,7 +19,7 @@
 #include "palette.h"
 
 
-#define PALETTE_SIZE 80
+#define PALETTE_SIZE 100
 
 #define COLOR_DROP_SIZE 16.0f
 #define ADDITIONAL_PALETTE_SPACE 512
@@ -42,6 +42,7 @@ static struct {
     RoSingle select_ro;
     RoSingle background_ro;
     RoSingle tiles_ro;
+    mat4 tiles_pose_inv;
 
     rFramebuffer fb;
     uImage fb_img;
@@ -50,6 +51,8 @@ static struct {
 
     int current_tile_cols;
     int current_tile_rows;
+    int tile_size_x;
+    int tile_size_y;
 
     struct {
         RoSingle bg;
@@ -100,14 +103,13 @@ void palette_init() {
     L.current_pressed = -1;
 
     uColor_s buf[4];
-    buf[0] = buf[3] = (uColor_s) {{150, 100, 60, 255}};
-    buf[1] = buf[2] = (uColor_s) {{160, 100, 60, 255}};
+    buf[0] = buf[3] = (uColor_s) {{153, 125, 118, 255}};
+    buf[1] = buf[2] = (uColor_s) {{170, 140, 130, 255}};
     rTexture tex = r_texture_new(2, 2, 1, 1, buf);
     r_texture_wrap_repeat(tex);
     L.background_ro = ro_single_new(tex);
 
     L.select_ro = ro_single_new(r_texture_new_file(1, 1, "res/palette_select.png"));
-    L.select_ro.rect.color.r = 0;
 
     L.tiles_ro = ro_single_new(r_texture_new_invalid());
     L.tiles_ro.owns_tex = false;
@@ -140,10 +142,16 @@ void palette_update(float dtime) {
     }
     L.ro.rect.pose = L.background_ro.rect.pose;
 
-//    if (L.custom_select_active)
-//        L.select_ro.rect.pose = L.custom_select_pose;
-//    else
-//        L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
+    if (L.custom_select_active) {
+        L.select_ro.rect.pose = L.custom_select_pose;
+    } else {
+        int x = L.last_selected % L.current_tile_cols;
+        int y = L.last_selected / L.current_tile_cols;
+        L.select_ro.rect.pose = u_pose_new_aa(
+                x*L.tile_size_x,
+                -y*L.tile_size_y,
+                L.tile_size_x, L.tile_size_y);
+    }
 
     // info
     if (L.info.time > 0) {
@@ -220,6 +228,8 @@ void palette_render(const mat4 *cam_mat) {
     r_render_set_framebuffer(L.fb);
     r_render_clear(R_COLOR_TRANSPARENT);
     ro_single_render(&L.tiles_ro, &mod_palette_camera.matrices.vp);
+    if(!L.custom_select_active)
+        ro_single_render(&L.select_ro, &mod_palette_camera.matrices.vp);
     r_render_restore_framebuffer();
 
     r_framebuffer_get(L.fb, L.fb_img.data);
@@ -233,7 +243,8 @@ void palette_render(const mat4 *cam_mat) {
 
     ro_single_render(&L.background_ro, cam_mat);
     ro_single_render(&L.ro, cam_mat);
-    ro_single_render(&L.select_ro, cam_mat);
+    if(L.custom_select_active)
+        ro_single_render(&L.select_ro, cam_mat);
 
     if (L.action.swiping)
         ro_batch_render(&L.action.arrows, cam_mat, true);
@@ -249,22 +260,48 @@ bool palette_pointer_event(ePointer_s pointer) {
         return false;
     }
 
-    // back to all and into the
-    ePointer_s t_pointer = pointer;
-    if(camera_is_portrait_mode()) {
-        t_pointer.pos.y -= (camera.RO.bottom + PALETTE_SIZE/2);
-    } else {
-        t_pointer.pos.x -= (camera.RO.right - PALETTE_SIZE/2);
-    }
-    t_pointer.pos = mat4_mul_vec(camera.matrices.p, t_pointer.pos);
-    t_pointer.pos = mat4_mul_vec(mod_palette_camera.matrices.v_p_inv, t_pointer.pos);
-    vec2_println(t_pointer.pos.xy);
+    // transform into the render object coordinates
+    ePointer_s ro_pointer = pointer;
+    mat4 pose_inv = mat4_inv(L.ro.rect.pose);
+    ro_pointer.pos = mat4_mul_vec(pose_inv, ro_pointer.pos);
+    
+    // from [-0.5 : 0.5] to [-1.0 : 1.0]
+    // and y top is -, bottom +, for the fbo
+    ro_pointer.pos.x *= 2;
+    ro_pointer.pos.y *= -2;
+    
+    ro_pointer.pos = mat4_mul_vec(mod_palette_camera.matrices.p_inv, ro_pointer.pos);
+    
+    // in tiles view
+    ePointer_s t_pointer = ro_pointer;
+    t_pointer.pos = mat4_mul_vec(mod_palette_camera.matrices.v, t_pointer.pos);
+    
 
     mod_palette_cameractrl_pointer_event(t_pointer);
+
+    if (pointer.id != 0 || pointer.action == E_POINTER_UP) {
+        for (int i = 0; i < 2; i++)
+            L.action.arrows.rects[i].color.a = 0;
+        L.action.swiping = false;
+        L.action.longpress_time = -1;
+    }
 
     if(pointer.id != 0) {
         return false;
     }
+    
+    // in tiles ro as [-0.5 : 0.5]
+    vec4 in_tiles = mat4_mul_vec(L.tiles_pose_inv, t_pointer.pos);
+    
+    int tile_pos_x = (int) sca_floor((in_tiles.x+0.5) * L.current_tile_cols);
+    int tile_pos_y = (int) sca_floor((0.5-in_tiles.y) * L.current_tile_rows);
+    
+    int tile_id = -1;
+    if(tile_pos_x>=0 
+            && tile_pos_x<=L.current_tile_cols
+            && tile_pos_y>=0
+            && tile_pos_y<=L.current_tile_rows)
+        tile_id = tile_pos_y * L.current_tile_cols + tile_pos_x;
 
     if (pointer.action == E_POINTER_DOWN) {
         tooltip_set("palette", "Tip to select\n"
@@ -281,31 +318,21 @@ bool palette_pointer_event(ePointer_s pointer) {
         L.action.start = pointer.pos.xy;
         L.action.swiping = true;
         L.action.longpress_time = LONGPRESS_TIME;
-//        for (int i = 0; i < palette.RO.palette_size; i++) {
-//            // pose will be rotated in landscape mode (so do not use _aa_)!
-//            if (u_pose_contains(L.palette_ro.rects[i].pose, pointer.pos)) {
-//                L.current_pressed = i;
-//                return true;
-//            }
-//        }
+        if(tile_id>=0) {
+            L.current_pressed = tile_id;
+            return true;
+        }
 
         L.current_pressed = -1;
         return true;
     }
 
-    if (pointer.action == E_POINTER_UP) {
-        for (int i = 0; i < 2; i++)
-            L.action.arrows.rects[i].color.a = 0;
-        L.action.swiping = false;
-        L.action.longpress_time = -1;
-    }
+    
 
-//    if (L.current_pressed != -1
-//        // pose will be rotated in landscape mode (so do not use _aa_)!
-//        && !u_pose_contains(L.palette_ro.rects[L.current_pressed].pose,
-//                            pointer.pos)) {
-//        L.current_pressed = -1;
-//    }
+    if (L.current_pressed != -1
+            && L.current_pressed != tile_id) {
+        L.current_pressed = -1;
+    }
 
     if (L.current_pressed != -1 && pointer.action == E_POINTER_UP) {
         palette_set_color(L.current_pressed);
@@ -421,15 +448,8 @@ void palette_set_palette(uImage colors, const char *name) {
 
 // protected for mod_palette_cameractrl scrool event
 vec2 mod_palette_tiles_size() {
-    float w, h;
-    if(L.current_tile_cols < L.current_tile_rows) {
-        w = 100.0*L.current_tile_cols/L.current_tile_rows;
-        h = 100;
-    } else {
-        w = 100;
-        h = 100.0*L.current_tile_rows/L.current_tile_cols;
-    }
-    return (vec2) {{w, h}};
+    return (vec2) {{L.current_tile_cols*L.tile_size_x, 
+            L.current_tile_rows*L.tile_size_y}};
 }
 
 void palette_load_palette(int id) {
@@ -444,9 +464,13 @@ void palette_load_palette(int id) {
 
     L.current_tile_cols = tile_img.cols / MOD_TILES_TILE_COLS;
     L.current_tile_rows = tile_img.rows / MOD_TILES_TILE_ROWS;
+    
+    L.tile_size_x = MOD_TILES_TILE_COLS;
+    L.tile_size_y = MOD_TILES_TILE_ROWS;
 
     vec2 tile_size = mod_palette_tiles_size();
-    L.tiles_ro.rect.pose = u_pose_new(0, 0, tile_size.x, tile_size.y);
+    L.tiles_ro.rect.pose = u_pose_new_aa(0, 0, tile_size.x, tile_size.y);
+    L.tiles_pose_inv = mat4_inv(L.tiles_ro.rect.pose);
 
     palette.RO.palette = s_renew(uColor_s, palette.RO.palette, L.current_tile_cols * L.current_tile_rows);
     palette.RO.palette_size = 0;

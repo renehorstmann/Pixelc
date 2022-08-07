@@ -24,7 +24,7 @@ void mod_palette_camera_init() {
     mod_palette_camera.matrices.p_inv = mat4_eye();
     mod_palette_camera.matrices.vp = mat4_eye();
 //    mod_palette_camera.matrices.v_p_inv = mat4_eye();
-    mod_palette_camera.size = 100;
+    mod_palette_camera.size = 200;
 }
 
 void mod_palette_camera_update(ivec2 window_size) {
