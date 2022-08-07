@@ -1,5 +1,6 @@
 #include "r/r.h"
 #include "u/pose.h"
+#include "m/int.h"
 #include "mod_tiles.h"
 #include "canvas.h"
 #include "mod_canvas.h"
@@ -9,6 +10,7 @@ static struct {
     uSprite sprite;
     rTexture tex;
     RoBatch tiles[MOD_TILES_MAX_FILES];
+    ivec2 origin;
 } L;
 
 
@@ -17,12 +19,27 @@ static struct {
 static void reset_framebuffer(int sprite_size_x, int sprite_size_y, int sprites_cols, int sprites_rows) {
     s_log("sprite_size_x, sprite_size_y; sprites_cols, sprites_rows: %i, %i; %i, %i",
           sprite_size_x, sprite_size_y, sprites_cols, sprites_rows);
+          
+    int cols = sprite_size_x;
+    int rows = sprite_size_y;
+    L.origin = ivec2_set(0);
+#ifdef PIXELC_MOD_ISOTILEC
+    cols = MOD_TILES_TILE_COLS 
+            + (sprite_size_x + sprite_size_y) * MOD_TILES_TILE_COLS/2;
+    rows = MOD_TILES_TILE_ROWS 
+            + s_max(sprite_size_x, sprite_size_y) * MOD_TILES_TILE_ROWS/4 
+            + sprites_rows*MOD_TILES_TILE_ROWS/2;
+    
+    L.origin.x = (sprite_size_x-sprite_size_y) * MOD_TILES_TILE_COLS/2;
+    L.origin.y = -sprites_rows*MOD_TILES_TILE_ROWS/2;
+#endif
+    
     r_framebuffer_kill(&L.fb);
-    L.fb = r_framebuffer_new(sprite_size_x, sprite_size_y*sprites_cols*sprites_rows);
+    L.fb = r_framebuffer_new(cols, rows*sprites_cols*sprites_rows);
     u_sprite_kill(&L.sprite);
-    L.sprite = u_sprite_new_empty(sprite_size_x, sprite_size_y, sprites_cols, sprites_rows);
+    L.sprite = u_sprite_new_empty(cols, rows, sprites_cols, sprites_rows);
     r_texture_kill(&L.tex);
-    L.tex = r_texture_new_sprite_buffer(sprite_size_x, sprite_size_y, sprites_cols, sprites_rows, NULL);
+    L.tex = r_texture_new_sprite_buffer(cols, rows, sprites_cols, sprites_rows, NULL);
 }
 
 static void reset_renderobject(int ccols, int crows, int clayers) {
@@ -34,7 +51,17 @@ static void reset_renderobject(int ccols, int crows, int clayers) {
         int t = 0;
         for(int r=0; r<crows*clayers; r++) {
             for(int c=0; c<ccols; c++) {
-                L.tiles[i].rects[t++].pose = u_pose_new_aa(c * MOD_TILES_TILE_COLS, -r * MOD_TILES_TILE_ROWS,
+                float x, y;
+#ifdef PIXELC_MOD_ISOTILEC
+                x = L.origin.x + (c-r) * MOD_TILES_TILE_COLS/2;
+                y = L.origin.y - (c+r) * MOD_TILES_TILE_ROWS/4 
+                        + (r/crows) * MOD_TILES_TILE_ROWS/2;
+#else
+                x = c * MOD_TILES_TILE_COLS;
+                y = -r * MOD_TILES_TILE_ROWS;
+#endif
+                
+                L.tiles[i].rects[t++].pose = u_pose_new_aa(x, y,
                                                            MOD_TILES_TILE_COLS, MOD_TILES_TILE_ROWS);
             }
         }
