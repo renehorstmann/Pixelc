@@ -17,5 +17,5 @@ struct Mod_Globals mod;
 void mod_init() {
     mod.opt_mod_on_canvas_update = mod_canvas_on_canvas_update_fn;
     mod_tiles_init();
-    palette_load_palette(1);
+    palette_load_palette(0);
 }

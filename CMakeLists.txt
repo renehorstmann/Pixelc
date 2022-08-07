@@ -65,8 +65,9 @@ if(MOD_ISOTILEC)
     add_definitions(-DPIXELC_MOD_PALETTE)
     add_definitions(-DPIXELC_HIDE_ANIMATION)
     add_definitions(-DPIXELC_JUST_SAVE)
+    add_definitions(-DPIXELC_MOD_ISOTILEC)
     file(GLOB MOD_SRCS
-            "${PROJECT_SOURCE_DIR}/src/mod/isotilec/*"
+            "${PROJECT_SOURCE_DIR}/src/mod/tilec/*"
             )
 endif()
 
