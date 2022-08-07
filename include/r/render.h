@@ -16,6 +16,9 @@ struct rRender_Globals {
 
     // 3D (2D_ARRAY) not working in WebGL2
     rTexture2D framebuffer_tex;         // copy of the framebuffer, after blit_framebuffer
+    
+    // defaults to false
+    bool init_textures_as_filtered_linear;
 };
 extern struct rRender_Globals r_render;
 

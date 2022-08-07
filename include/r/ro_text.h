@@ -7,6 +7,11 @@
 //
 
 #include "ro_batch.h"
+#include "m/types/uchar.h"
+
+
+static const ucvec4 RO_TEXT_SHADOW_COLOR = {{0, 0, 0, 127}};
+
 
 // text sprite from char callback
 // return true for a newline
@@ -31,14 +36,16 @@ RoText ro_text_new_font55(int max);
 
 // inits text with the r/font55_shadow.png sprite sheet
 // adds a dark transparent shadow
-RoText ro_text_new_font55_shadow(int max);
+// uColer_s := ucvec4
+RoText ro_text_new_font55_shadow(int max, ucvec4 *opt_shadow_color);
 
 // inits text with the r/font88.png sprite sheet
 RoText ro_text_new_font85(int max);
 
 // inits text with the r/font88_shadow.png sprite sheet
 // adds a dark transparent shadow
-RoText ro_text_new_font85_shadow(int max);
+// uColor_s := ucvec4
+RoText ro_text_new_font85_shadow(int max, ucvec4 *opt_shadow_color);
 
 
 void ro_text_kill(RoText *self);

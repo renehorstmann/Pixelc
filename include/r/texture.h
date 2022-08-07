@@ -8,6 +8,7 @@
 #include "core.h"
 #include "m/types/int.h"
 
+
 // Texture, with sprite grid -> 2D array texture
 typedef struct {
     GLuint tex;    // GL_TEXTURE_2D_ARRAY

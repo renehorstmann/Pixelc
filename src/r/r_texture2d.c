@@ -18,7 +18,11 @@ rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffe
                  self.size.x, self.size.y,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, opt_buffer);
 
-    r_texture2d_filter_nearest(self);
+    if(r_render.init_textures_as_filtered_linear) 
+        r_texture2d_filter_linear(self);
+    else
+        r_texture2d_filter_nearest(self);
+    
     r_texture2d_wrap_clamp(self);
 
     r_render_error_check("r_texture2d_new");

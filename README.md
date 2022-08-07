@@ -98,15 +98,10 @@ python3 -m http.server --bind localhost  # [port]
 
 ## Todo
 
-- some
-  - ro_fontxx_shadow with opt. custom shadow color
-  - r_texture (2d) global
-    - init_as_nearest
-    - add call to nearest for ro_font55, ...
-
 - some_android
   - locked orientation
     https://stackoverflow.com/questions/45983438/app-auto-rotates-even-with-device-orientation-locked
+
 - mod system
   - Tilec mod
 

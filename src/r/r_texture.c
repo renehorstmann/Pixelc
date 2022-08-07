@@ -93,7 +93,11 @@ rTexture r_texture_new_sprite_buffer(int sprite_size_x, int sprite_size_y, int s
                  0, GL_RGBA, GL_UNSIGNED_BYTE,opt_buffer);
 
 
-    r_texture_filter_nearest(self);
+    if(r_render.init_textures_as_filtered_linear) 
+        r_texture_filter_linear(self);
+    else
+        r_texture_filter_nearest(self);
+    
     r_texture_wrap_clamp(self);
     
     r_render_error_check("r_texture_new_sprite_buffer");
