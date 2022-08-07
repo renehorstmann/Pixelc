@@ -53,8 +53,13 @@ static void zoom_camera(float new_distance) {
 }
 
 static void set_home() {
-    mod_palette_camera_set_pos(0, 0);
-    mod_palette_camera_set_zoom(1);
+    // protected 
+    vec2 mod_palette_tiles_size();
+    
+    vec2 size = mod_palette_tiles_size();
+    
+    mod_palette_camera_set_pos(size.x/2, -size.y/2);
+    mod_palette_camera_set_zoom(size.y/mod_palette_camera.size);
 }
 
 

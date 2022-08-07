@@ -1,6 +1,7 @@
 #include "r/r.h"
 #include "e/io.h"
 #include "u/pose.h"
+#include "u/button.h"
 #include "u/json.h"
 #include "s/s_full.h"
 #include "m/float.h"
@@ -48,6 +49,9 @@ static struct {
     uImage fb_img;
 
     RoSingle ro;
+    
+    RoSingle clear_tool;
+    RoSingle cam_btn;
 
     int current_tile_cols;
     int current_tile_rows;
@@ -121,6 +125,9 @@ void palette_init() {
     L.action.arrows = ro_batch_new(2, r_texture_new_file(1, 1, "res/palette_arrow.png"));
 
     L.action.longpress_time = -1;
+    
+    L.clear_tool = ro_single_new(r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));
+    L.cam_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_camera.png"));
 }
 
 
@@ -198,6 +205,15 @@ void palette_update(float dtime) {
             dialog_create_palette();
         }
     }
+    
+    // tools
+    if(camera_is_portrait_mode()) {
+        L.clear_tool.rect.pose = u_pose_new(camera.RO.right-10, camera.RO.bottom+PALETTE_SIZE-10, 16, 16);
+        L.cam_btn.rect.pose = u_pose_new(camera.RO.right-10, camera.RO.bottom+PALETTE_SIZE-30, 16, 16);
+    } else {
+        L.clear_tool.rect.pose = u_pose_new(camera.RO.right-PALETTE_SIZE+10, camera.RO.top-10, 16, 16);
+        L.cam_btn.rect.pose = u_pose_new(camera.RO.right-PALETTE_SIZE+30, camera.RO.top-10, 16, 16);
+    }
 
 }
 
@@ -243,6 +259,8 @@ void palette_render(const mat4 *cam_mat) {
 
     ro_single_render(&L.background_ro, cam_mat);
     ro_single_render(&L.ro, cam_mat);
+    ro_single_render(&L.clear_tool, cam_mat);
+    ro_single_render(&L.cam_btn, cam_mat);
     if(L.custom_select_active)
         ro_single_render(&L.select_ro, cam_mat);
 
@@ -288,6 +306,21 @@ bool palette_pointer_event(ePointer_s pointer) {
 
     if(pointer.id != 0) {
         return false;
+    }
+    
+    if(pointer.action == E_POINTER_DOWN 
+            && u_pose_aa_contains(L.clear_tool.rect.pose, pointer.pos.xy)) {
+        s_log("clear_tool");
+        brush.current_color = U_COLOR_TRANSPARENT;
+        brush.secondary_as_current = false;
+        palette_set_custom_select(L.clear_tool.rect.pose);
+        return true;
+    }
+    
+    if(u_button_clicked(&L.cam_btn.rect, pointer)) {
+        s_log("cam_btn");
+        mod_palette_cameractrl_set_home();
+        return true;
     }
     
     // in tiles ro as [-0.5 : 0.5]
@@ -476,14 +509,17 @@ void palette_load_palette(int id) {
     palette.RO.palette_size = 0;
     for(int r=0; r<L.current_tile_rows; r++) {
         for(int c=0; c<L.current_tile_cols; c++) {
-            palette.RO.palette[palette.RO.palette_size++] = (uColor_s) {{id+1, c, r, 1}};
+            palette.RO.palette[palette.RO.palette_size++] = (uColor_s) {{id+1, c, r, 255}};
         }
     }
 
     snprintf(palette.RO.palette_name, sizeof palette.RO.palette_name, "Tileset: %i", id+1);
     palette_set_info(palette.RO.palette_name);
     palette.RO.palette_id = id;
+    
+    palette_set_color(0);
 
+    mod_palette_cameractrl_set_home();
     palette_save_config();
 }
 

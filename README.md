@@ -103,7 +103,8 @@ python3 -m http.server --bind localhost  # [port]
     https://stackoverflow.com/questions/45983438/app-auto-rotates-even-with-device-orientation-locked
 
 - mod system
-  - Tilec mod
+  - mod.md
+  - IsoTilec mod
 
 
 ## Author
