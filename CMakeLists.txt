@@ -3,6 +3,7 @@ project(pixelc C)
 
 # mods
 set(MOD_TILEC false)
+set(MOD_ISOTILEC false)
 
 # link options
 set(USE_SDL_MIXER false)
@@ -35,9 +36,16 @@ set(USE_SANITIZER true)
 # S_LOG_DO_NOT_USE_COLOR          dont use colored logs
 # S_LOG_DO_NOT_PRINT_TIME_FILE    disable time and file in logs
 
+#
 # mods
+#
+
 if(MOD_TILEC)
     message("Pixelc Mod: Tilec")
+    if(MOD_USED)
+        message(FATAL_ERROR "Select max. 1 mod!")
+    endif()
+    set(MOD_USED true)
     add_definitions(-DPIXELC_USE_MOD)
     add_definitions(-DPIXELC_MOD_PALETTE)
     add_definitions(-DPIXELC_HIDE_ANIMATION)
@@ -46,6 +54,24 @@ if(MOD_TILEC)
             "${PROJECT_SOURCE_DIR}/src/mod/tilec/*"
             )
 endif()
+
+if(MOD_ISOTILEC)
+    message("Pixelc Mod: IsoTilec")
+    if(MOD_USED)
+        message(FATAL_ERROR "Select max. 1 mod!")
+    endif()
+    set(MOD_USED true)
+    add_definitions(-DPIXELC_USE_MOD)
+    add_definitions(-DPIXELC_MOD_PALETTE)
+    add_definitions(-DPIXELC_HIDE_ANIMATION)
+    add_definitions(-DPIXELC_JUST_SAVE)
+    file(GLOB MOD_SRCS
+            "${PROJECT_SOURCE_DIR}/src/mod/isotilec/*"
+            )
+endif()
+
+
+
 
 set(CMAKE_C_STANDARD 11)
 
