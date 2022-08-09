@@ -43,6 +43,7 @@ Or just use the tooltip tool.
 - Custom Brush / Kernel / Stamps
 - Custom Palettes
 - **COMPLETELY FREE and open**
+- Mod Tilec for a tileset editor (+ isometric view)
 - and many more
 
 ## Web Image Upload Zoom Bug
@@ -96,16 +97,32 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 python3 -m http.server --bind localhost  # [port]
 ```
 
-## Todo
+## Mod
+Pixelc has a little and stupid modding system.
+Have a look at [mod.h](include/mod.h).
 
-- some_android
-  - locked orientation
-    https://stackoverflow.com/questions/45983438/app-auto-rotates-even-with-device-orientation-locked
+### Mod Tilec
 
-- mod system
-  - mod.md
-  - IsoTilec mod
+![img](mod_tilec.png)
 
+> Create tilesets for 2d games in a 2d or 3d isometric grid!
+
+To use the **Tilec** Mod, set `MOD_TILEC true` in the [CMakeLists.txt](CMakeLists.txt) configuration file.
+
+Tilec loads up to 128 tilesheets from `tiles/tile_XX.png` in the working directory of Pixelc
+
+To change the dir or the tile size, see [mod_tiles.h](src/mod/tilec/mod_tiles.h).
+
+The 3d isometric renderer assumes that each layer is a z-layer.
+So layer 1 is the bottom floor. 
+
+Result of Tilec is an image .png file, in which each color is a code to the tile.
+- Color code for transparency: `0, 0, 0, 0`
+- Color code for a tile: `tile_file_id, x, y, 255`
+
+> Currently not supported as App.
+> If you want to use it directly on Android, 
+> have a look at the install section of [some](https://github.com/renehorstmann/some) /CxxDroid
 
 ## Author
 René Horstmann

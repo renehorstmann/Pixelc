@@ -290,7 +290,8 @@ void canvas_init() {
 void canvas_update(float dtime) {
     canvas.RO.tex = L.default_tex;
 
-    canvas.RO.pose = u_pose_new_aa(0, 0, canvas.RO.image.cols, canvas.RO.image.rows);
+    ivec2 size = canvas_get_size();
+    canvas.RO.pose = u_pose_new_aa(0, 0, size.x, size.y);
 
     r_texture_set_sprite_buffer(L.default_tex, canvas.RO.sprite.img.data);
 

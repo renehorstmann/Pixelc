@@ -29,6 +29,8 @@ static struct {
     ivec2 pos;
     ivec2 move_start_selection_lt;
     ivec2 move_start_position;
+
+    bool was_allowed;
 } L;
 
 static mat4 pixel_pose(int x, int y) {
@@ -167,9 +169,19 @@ void selectionctrl_init() {
     for (int i = 0; i < L.border.num; i++) {
         L.border.rects[i].color = u_color_to_vec4(u_color_from_hex("#357985"));
     }
+
+    // may be reset by a mod
+    selectionctrl.allowed = true;
 }
 
 void selectionctrl_update(float dtime) {
+    if(L.was_allowed != selectionctrl.allowed) {
+        selectionctrl_stop();
+    }
+    L.was_allowed = selectionctrl.allowed;
+    if(!selectionctrl.allowed)
+        return;
+
     if (selectionctrl.mode == SELECTIONCTRL_COPY
         || selectionctrl.mode == SELECTIONCTRL_CUT) {
         uImage img = canvas.RO.image;
@@ -222,7 +234,7 @@ void selectionctrl_update(float dtime) {
 }
 
 void selectionctrl_render(const mat4 *hud_cam_mat, const mat4 *canvas_cam_mat) {
-    if (!selectionctrl.selection)
+    if (!selectionctrl.selection || !selectionctrl.allowed)
         return;
 
     u_pose_shift_xy(&L.title.pose, 1, -1);
@@ -246,6 +258,7 @@ void selectionctrl_render(const mat4 *hud_cam_mat, const mat4 *canvas_cam_mat) {
 
 bool selectionctrl_pointer_event(ePointer_s pointer) {
     if (pointer.id != 0
+        || !selectionctrl.allowed
         || selectionctrl.mode == SELECTIONCTRL_NONE
         || selectionctrl.mode == SELECTIONCTRL_SET)
         return false;
@@ -266,6 +279,10 @@ void selectionctrl_stop() {
 
 void selectionctrl_acquire() {
     s_log("acquire");
+    if(!selectionctrl.allowed) {
+        s_log("not allowed");
+        return;
+    }
     L.pos = (ivec2) {{-1, -1}};
     selection_kill(&selectionctrl.selection);
     selectionctrl.mode = SELECTIONCTRL_ACQUIRE;
@@ -273,6 +290,10 @@ void selectionctrl_acquire() {
 
 void selectionctrl_paste_image(uImage img) {
     s_log("paste_image");
+    if(!selectionctrl.allowed) {
+        s_log("not allowed");
+        return;
+    }
     L.pos = (ivec2) {{-1, -1}};
     selection_kill(&selectionctrl.selection);
     selectionctrl.selection = selection_new(0, 0, img.cols, img.rows);

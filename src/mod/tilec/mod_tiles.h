@@ -7,13 +7,10 @@
 
 #define MOD_TILES_MAX_FILES 128
 
-#ifdef PIXELC_MOD_ISOTILEC
-#define MOD_TILES_TILE_COLS 32
-#define MOD_TILES_TILE_ROWS 32
-#else
 #define MOD_TILES_TILE_COLS 16
 #define MOD_TILES_TILE_ROWS 16
-#endif
+
+#define MOD_TILES_DIR "tiles"
 
 struct ModTilesGlobals_s {
     uImage imgs[MOD_TILES_MAX_FILES];

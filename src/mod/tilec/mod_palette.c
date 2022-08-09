@@ -12,6 +12,8 @@
 #include "dialog.h"
 #include "feedback.h"
 #include "tooltip.h"
+#include "cameractrl.h"
+#include "mod_canvas.h"
 #include "mod_tiles.h"
 
 #include "mod_palette_camera.h"
@@ -52,6 +54,7 @@ static struct {
     
     RoSingle clear_tool;
     RoSingle cam_btn;
+    RoSingle iso_toggle;
 
     int current_tile_cols;
     int current_tile_rows;
@@ -128,6 +131,7 @@ void palette_init() {
     
     L.clear_tool = ro_single_new(r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));
     L.cam_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_camera.png"));
+    L.iso_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_iso.png"));
 }
 
 
@@ -210,11 +214,13 @@ void palette_update(float dtime) {
     if(camera_is_portrait_mode()) {
         L.clear_tool.rect.pose = u_pose_new(camera.RO.right-10, camera.RO.bottom+PALETTE_SIZE-10, 16, 16);
         L.cam_btn.rect.pose = u_pose_new(camera.RO.right-10, camera.RO.bottom+PALETTE_SIZE-30, 16, 16);
+        L.iso_toggle.rect.pose = u_pose_new(camera.RO.right-10, camera.RO.bottom+PALETTE_SIZE-50, 16, 16);
     } else {
         L.clear_tool.rect.pose = u_pose_new(camera.RO.right-PALETTE_SIZE+10, camera.RO.top-10, 16, 16);
         L.cam_btn.rect.pose = u_pose_new(camera.RO.right-PALETTE_SIZE+30, camera.RO.top-10, 16, 16);
+        L.iso_toggle.rect.pose = u_pose_new(camera.RO.right-PALETTE_SIZE+50, camera.RO.top-10, 16, 16);
     }
-
+    L.iso_toggle.rect.sprite.x = mod_canvas.iso? 1 : 0;
 }
 
 void palette_render(const mat4 *cam_mat) {
@@ -259,8 +265,11 @@ void palette_render(const mat4 *cam_mat) {
 
     ro_single_render(&L.background_ro, cam_mat);
     ro_single_render(&L.ro, cam_mat);
+
     ro_single_render(&L.clear_tool, cam_mat);
     ro_single_render(&L.cam_btn, cam_mat);
+    ro_single_render(&L.iso_toggle, cam_mat);
+
     if(L.custom_select_active)
         ro_single_render(&L.select_ro, cam_mat);
 
@@ -268,6 +277,23 @@ void palette_render(const mat4 *cam_mat) {
         ro_batch_render(&L.action.arrows, cam_mat, true);
 }
 
+
+// protected
+vec4 mod_palette_pointer_pos(vec4 hud_pointer_pos) {
+    // transform into the render object coordinates
+    mat4 pose_inv = mat4_inv(L.ro.rect.pose);
+    vec4 ro_pos = mat4_mul_vec(pose_inv, hud_pointer_pos);
+
+    // from [-0.5 : 0.5] to [-1.0 : 1.0]
+    // and y top is -, bottom +, for the fbo
+    ro_pos.x *= 2;
+    ro_pos.y *= -2;
+
+    ro_pos = mat4_mul_vec(mod_palette_camera.matrices.p_inv, ro_pos);
+
+    // in tiles view
+    return mat4_mul_vec(mod_palette_camera.matrices.v, ro_pos);
+}
 
 bool palette_pointer_event(ePointer_s pointer) {
     if (!palette_contains_pos(pointer.pos.xy)) {
@@ -278,22 +304,9 @@ bool palette_pointer_event(ePointer_s pointer) {
         return false;
     }
 
-    // transform into the render object coordinates
-    ePointer_s ro_pointer = pointer;
-    mat4 pose_inv = mat4_inv(L.ro.rect.pose);
-    ro_pointer.pos = mat4_mul_vec(pose_inv, ro_pointer.pos);
-    
-    // from [-0.5 : 0.5] to [-1.0 : 1.0]
-    // and y top is -, bottom +, for the fbo
-    ro_pointer.pos.x *= 2;
-    ro_pointer.pos.y *= -2;
-    
-    ro_pointer.pos = mat4_mul_vec(mod_palette_camera.matrices.p_inv, ro_pointer.pos);
-    
     // in tiles view
-    ePointer_s t_pointer = ro_pointer;
-    t_pointer.pos = mat4_mul_vec(mod_palette_camera.matrices.v, t_pointer.pos);
-    
+    ePointer_s t_pointer = pointer;
+    t_pointer.pos = mod_palette_pointer_pos(pointer.pos);
 
     mod_palette_cameractrl_pointer_event(t_pointer);
 
@@ -321,6 +334,12 @@ bool palette_pointer_event(ePointer_s pointer) {
         s_log("cam_btn");
         mod_palette_cameractrl_set_home();
         return true;
+    }
+
+    if(u_button_toggled(&L.iso_toggle.rect, pointer)) {
+        s_log("iso_toggle");
+        mod_canvas.iso = u_button_is_pressed(&L.iso_toggle.rect);
+        cameractrl_set_home();
     }
     
     // in tiles ro as [-0.5 : 0.5]

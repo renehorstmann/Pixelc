@@ -45,7 +45,8 @@ typedef struct {
 typedef void (*ePointerEventFn)(ePointer_s, void *user_data);
 
 // mouse wheel callback
-typedef void (*eWheelEventFn)(bool up, void *user_data);
+// pos = position of the cursor (id==0) as x, y, 0, 1
+typedef void (*eWheelEventFn)(vec4 pos, bool up, void *user_data);
 
 // keyboard key event
 typedef void (*eKeyRawEventFn)(const SDL_Event *event, void *user_data);

@@ -3,7 +3,6 @@ project(pixelc C)
 
 # mods
 set(MOD_TILEC false)
-set(MOD_ISOTILEC false)
 
 # link options
 set(USE_SDL_MIXER false)
@@ -54,23 +53,6 @@ if(MOD_TILEC)
             "${PROJECT_SOURCE_DIR}/src/mod/tilec/*"
             )
 endif()
-
-if(MOD_ISOTILEC)
-    message("Pixelc Mod: IsoTilec")
-    if(MOD_USED)
-        message(FATAL_ERROR "Select max. 1 mod!")
-    endif()
-    set(MOD_USED true)
-    add_definitions(-DPIXELC_USE_MOD)
-    add_definitions(-DPIXELC_MOD_PALETTE)
-    add_definitions(-DPIXELC_HIDE_ANIMATION)
-    add_definitions(-DPIXELC_JUST_SAVE)
-    add_definitions(-DPIXELC_MOD_ISOTILEC)
-    file(GLOB MOD_SRCS
-            "${PROJECT_SOURCE_DIR}/src/mod/tilec/*"
-            )
-endif()
-
 
 
 

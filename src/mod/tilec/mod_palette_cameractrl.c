@@ -1,5 +1,7 @@
 #include "m/bool.h"
 #include "m/float.h"
+#include "camera.h"
+#include "palette.h"
 #include "mod_palette_camera.h"
 #include "mod_palette_cameractrl.h"
 
@@ -62,16 +64,19 @@ static void set_home() {
     mod_palette_camera_set_zoom(size.y/mod_palette_camera.size);
 }
 
-
-static void wheel_event(bool up, void *user_data) {
-
+static void wheel_event(vec4 pos, bool up, void *user_data) {
+    // protected
+    vec4 mod_palette_pointer_pos(vec4 hud_pointer_pos);
     // protected
     vec2 mod_palette_tiles_size();
 
-    vec2 tile_size = mod_palette_tiles_size();
+    vec4 hud_pos = mat4_mul_vec(camera.matrices.p_inv, pos);
+    if(!palette_contains_pos(hud_pos.xy))
+        return;
+    vec4 t_pos = mod_palette_pointer_pos(hud_pos);
 
-    if (L.cursor.pointer_pos.x < -tile_size.x/2 || L.cursor.pointer_pos.x > tile_size.x/2
-        || L.cursor.pointer_pos.y < -tile_size.y/2 || L.cursor.pointer_pos.y > tile_size.y/2)
+    vec2 tile_size = mod_palette_tiles_size();
+    if (t_pos.x < 0 || t_pos.x > tile_size.x || t_pos.y < -tile_size.y || t_pos.y > 0)
         return;
 
     if (up)

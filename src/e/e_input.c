@@ -59,12 +59,12 @@ typedef struct {
 
 
 static struct {
-    eInputKeys keys;
-
     TouchID touch_ids[E_MAX_TOUCH_IDS];
     int touch_ids_size;
     
     bool mouse_pressed[E_POINTER_BUTTON_NUM];
+
+    ePointer_s current_pointer_0;
 
     RegPointerArray reg_pointer;
     RegPointer reg_pointer_e_vip;  // .cb==NULL if none
@@ -148,6 +148,9 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, S
 }
 
 static void emit_pointer_events(ePointer_s action) {
+    if(action.id == 0)
+        L.current_pointer_0 = action;
+
     if (L.reg_pointer_e_vip.cb) {
         if(action.action == E_POINTER_HOVER && !L.reg_pointer_e_vip.hover)
             return;
@@ -166,14 +169,14 @@ static void emit_pointer_events(ePointer_s action) {
 
 static void emit_wheel_events(bool up) {
     if (L.reg_wheel_e_vip.cb) {
-        L.reg_wheel_e_vip.cb(up, L.reg_wheel_e_vip.ud);
+        L.reg_wheel_e_vip.cb(L.current_pointer_0.pos, up, L.reg_wheel_e_vip.ud);
         return;
     }
 
     // copy to be safe to unregister in an event
     RegWheelArray array = L.reg_wheel;
     for (int i = 0; i < array.size; i++)
-        array.array[i].cb(up, array.array[i].ud);
+        array.array[i].cb(L.current_pointer_0.pos, up, array.array[i].ud);
 }
 
 static void input_handle_pointer_touch(SDL_Event *event) {
@@ -244,22 +247,22 @@ static void input_handle_keys(SDL_Event *event) {
     bool down = event->type == SDL_KEYDOWN;
     switch (event->key.keysym.sym) {
         case SDLK_UP:
-            L.keys.up = down;
+            e_input.keys.up = down;
             break;
         case SDLK_LEFT:
-            L.keys.left = down;
+            e_input.keys.left = down;
             break;
         case SDLK_RIGHT:
-            L.keys.right = down;
+            e_input.keys.right = down;
             break;
         case SDLK_DOWN:
-            L.keys.down = down;
+            e_input.keys.down = down;
             break;
         case SDLK_RETURN:
-            L.keys.enter = down;
+            e_input.keys.enter = down;
             break;
         case SDLK_SPACE:
-            L.keys.space = down;
+            e_input.keys.space = down;
             break;
     }
 }

@@ -24,6 +24,10 @@ struct SelectionCtrl_Globals {
 
     enum selectionctrl_mode mode;
 
+    // may be set by a mod to false, will not enable a selection and sets the tool button pressed
+    // default is true
+    bool allowed;
+
     bool show_copy_cut;
     bool show_ok;
 };

@@ -103,10 +103,13 @@ static void set_home() {
 }
 
 
-static void wheel_event(bool up, void *user_data) {
+static void wheel_event(vec4 pos, bool up, void *user_data) {
+    pos = mat4_mul_vec(camera.matrices.p_inv, pos);
+    if(palette_contains_pos(pos.xy))
+        return;
+    pos = mat4_mul_vec(camera.matrices.v, pos);
     ivec2 csize = canvas_get_size();
-    if (L.cursor.pointer_pos.x < 0 || L.cursor.pointer_pos.x > csize.x
-            || L.cursor.pointer_pos.y < -csize.y || L.cursor.pointer_pos.y > 0)
+    if (pos.x < 0 || pos.x > csize.x || pos.y < -csize.y || pos.y > 0)
         return;
 
     if (up)

@@ -1,6 +1,7 @@
 #ifndef PIXELC_MOD_H
 #define PIXELC_MOD_H
 #ifdef PIXELC_USE_MOD
+
 //
 // For mods like Tilec
 // To create a mod,
