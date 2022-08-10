@@ -451,6 +451,11 @@ void canvas_set_sprite(uSprite image_sink, bool save) {
         s_log_warn("to much frames!");
         return;
     }
+    if(image_sink.img.cols > CANVAS_MAX_SIZE
+             || image_sink.img.rows > CANVAS_MAX_SIZE) {
+        s_log_warn("to large");
+        return;
+    }
     s_log("set_sprite: size %i:%i sprite: %i:%i",
             image_sink.img.cols, image_sink.img.rows, 
             image_sink.cols, image_sink.rows);

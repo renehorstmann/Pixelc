@@ -132,6 +132,7 @@ Result of Tilec is an image .png file, in which each color is a code to the tile
   - hd multiplyer
   - save tilemap
   - save preview (normal + hd)
+- size scale option
 - update doc and readme for tile mode
 
 ## Author
