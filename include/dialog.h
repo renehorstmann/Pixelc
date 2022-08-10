@@ -106,6 +106,8 @@ void dialog_create_import();
 
 void dialog_create_palette();
 
+void dialog_create_tile();
+
 void dialog_create_kernel();
 
 void dialog_create_tab();

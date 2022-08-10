@@ -124,6 +124,16 @@ Result of Tilec is an image .png file, in which each color is a code to the tile
 > If you want to use it directly on Android, 
 > have a look at the install section of [some](https://github.com/renehorstmann/some) /CxxDroid
 
+
+## Todo
+- JS IDB sync timeout (like 5 seconds)
+- save hd with multiplyer instead of min size
+- save tile dialog
+  - hd multiplyer
+  - save tilemap
+  - save preview (normal + hd)
+- update doc and readme for tile mode
+
 ## Author
 René Horstmann
 

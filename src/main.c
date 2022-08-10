@@ -17,6 +17,7 @@
 #include "multitouchcursor.h"
 #include "modal.h"
 #include "feedback.h"
+#include "tile.h"
 #include "tooltip.h"
 
 //
@@ -58,6 +59,9 @@ static void init() {
     multitouchcursor_init();
     inputctrl_init();   
     feedback_init();
+
+    tile_init();
+    tile_load_config();
     
     tooltip_init();
     tooltip_load_config();
@@ -91,7 +95,15 @@ static void update(float dtime) {
     multitouchcursor_update(dtime);
     modal_update(dtime);
     feedback_update(dtime);
+
+    tile_update(dtime);
+
     tooltip_update(dtime);
+
+    int max_tex, max_layers, max_3d;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex);
+    glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_layers);
+    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE , &max_3d);
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames

@@ -212,8 +212,7 @@ void e_window_init(const char *title) {
     e_window.sdl_window = SDL_CreateWindow(title,
                                            SDL_WINDOWPOS_UNDEFINED,
                                            SDL_WINDOWPOS_UNDEFINED,
-//                                           640, 480,
-                                           360, 480,
+                                           640, 480,
                                            SDL_WINDOW_OPENGL
                                            | SDL_WINDOW_RESIZABLE
     );

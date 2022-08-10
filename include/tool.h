@@ -94,6 +94,8 @@ Tool *tool_new_layer();
 
 Tool *tool_new_frames();
 
+Tool *tool_new_tile();
+
 Tool *tool_new_tab();
 
 Tool *tool_new_kernel();

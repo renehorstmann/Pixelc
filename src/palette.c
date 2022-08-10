@@ -13,6 +13,7 @@
 #include "dialog.h"
 #include "feedback.h"
 #include "tooltip.h"
+#include "tile.h"
 #include "palette.h"
 
 
@@ -141,6 +142,65 @@ void palette_init() {
 
 void palette_update(float dtime) {
 
+    // info
+    if (L.info.time > 0) {
+        L.info.time -= dtime;
+
+        float pos = 4;
+        if (L.info.time < INFO_STATIC_TIME) {
+            pos = sca_mix(-4, 4, L.info.time / INFO_STATIC_TIME);
+        }
+
+        pos += palette_get_hud_size();
+
+        if (camera_is_portrait_mode()) {
+            pos += camera.RO.bottom;
+
+            L.info.bg.rect.pose = u_pose_new(
+                    0, pos, 128, 8);
+
+            pos += 2;
+            L.info.text.pose = u_pose_new(
+                    L.info.x_offset, pos,
+                    1, 1);
+
+        } else {
+            pos = camera.RO.right - pos;
+
+            L.info.bg.rect.pose = u_pose_new_angle(
+                    pos, 0, 128, 8, SCA_PI_2);
+
+            pos -= 2;
+            L.info.text.pose = u_pose_new_angle(
+                    pos, L.info.x_offset,
+                    1, 1, SCA_PI_2);
+        }
+    }
+
+    // action
+    if(L.action.longpress_time>=0) {
+        L.action.longpress_time -= dtime;
+        if(L.action.longpress_time<0) {
+            // stop actions
+            L.action.swiping = false;
+            feedback_longpress(L.action.start, (vec4) {{0.6, 0.6, 0.1, 1.0}});
+            if(tile.active)
+                dialog_create_tile();
+            else
+                dialog_create_palette();
+        }
+    }
+
+    if(tile.active) {
+        tile_palette_update(dtime);
+        return;
+    }
+
+    if (L.custom_select_active)
+        L.select_ro.rect.pose = L.custom_select_pose;
+    else
+        L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
+
     int cols = palette_cols();
     int last_row = (palette.RO.palette_size - 1) / cols;
     for (int i = 0; i < PALETTE_MAX; i++) {
@@ -191,58 +251,6 @@ void palette_update(float dtime) {
             L.background_ro.rects[idx].sprite = (vec2) {{u, v}};
         }
     }
-
-    if (L.custom_select_active)
-        L.select_ro.rect.pose = L.custom_select_pose;
-    else
-        L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
-
-    // info
-    if (L.info.time > 0) {
-        L.info.time -= dtime;
-
-        float pos = 4;
-        if (L.info.time < INFO_STATIC_TIME) {
-            pos = sca_mix(-4, 4, L.info.time / INFO_STATIC_TIME);
-        }
-
-        pos += palette_get_hud_size();
-
-        if (camera_is_portrait_mode()) {
-            pos += camera.RO.bottom;
-
-            L.info.bg.rect.pose = u_pose_new(
-                    0, pos, 128, 8);
-
-            pos += 2;
-            L.info.text.pose = u_pose_new(
-                    L.info.x_offset, pos,
-                    1, 1);
-
-        } else {
-            pos = camera.RO.right - pos;
-
-            L.info.bg.rect.pose = u_pose_new_angle(
-                    pos, 0, 128, 8, SCA_PI_2);
-
-            pos -= 2;
-            L.info.text.pose = u_pose_new_angle(
-                    pos, L.info.x_offset,
-                    1, 1, SCA_PI_2);
-        }
-    }
-    
-    // action
-    if(L.action.longpress_time>=0) {
-        L.action.longpress_time -= dtime;
-        if(L.action.longpress_time<0) {
-            // stop actions
-            L.action.swiping = false;
-            feedback_longpress(L.action.start, (vec4) {{0.6, 0.6, 0.1, 1.0}});
-            dialog_create_palette();
-        }
-    }
-
 }
 
 void palette_render(const mat4 *cam_mat) {
@@ -251,9 +259,13 @@ void palette_render(const mat4 *cam_mat) {
         ro_text_render(&L.info.text, cam_mat);
     }
 
-    ro_batch_render(&L.background_ro, cam_mat, true);
-    ro_batch_render(&L.palette_ro, cam_mat, true);
-    ro_single_render(&L.select_ro, cam_mat);
+    if(tile.active) {
+        tile_palette_render(cam_mat);
+    } else {
+        ro_batch_render(&L.background_ro, cam_mat, true);
+        ro_batch_render(&L.palette_ro, cam_mat, true);
+        ro_single_render(&L.select_ro, cam_mat);
+    }
 
     if (L.action.swiping)
         ro_batch_render(&L.action.arrows, cam_mat, true);
@@ -261,6 +273,11 @@ void palette_render(const mat4 *cam_mat) {
 
 
 bool palette_pointer_event(ePointer_s pointer) {
+
+    if(tile.active) {
+        tile_palette_pointer_event_always(pointer);
+    }
+
     if (!palette_contains_pos(pointer.pos.xy)) {
         for (int i = 0; i < 2; i++)
             L.action.arrows.rects[i].color.a = 0;
@@ -284,16 +301,6 @@ bool palette_pointer_event(ePointer_s pointer) {
         L.action.start = pointer.pos.xy;
         L.action.swiping = true;
         L.action.longpress_time = LONGPRESS_TIME;
-        for (int i = 0; i < palette.RO.palette_size; i++) {
-            // pose will be rotated in landscape mode (so do not use _aa_)!
-            if (u_pose_contains(L.palette_ro.rects[i].pose, pointer.pos)) {
-                L.current_pressed = i;
-                return true;
-            }
-        }
-
-        L.current_pressed = -1;
-        return true;
     }
 
     if (pointer.action == E_POINTER_UP) {
@@ -303,33 +310,16 @@ bool palette_pointer_event(ePointer_s pointer) {
         L.action.longpress_time = -1;
     }
 
-    if (L.current_pressed != -1
-        // pose will be rotated in landscape mode (so do not use _aa_)!
-        && !u_pose_contains(L.palette_ro.rects[L.current_pressed].pose,
-                            pointer.pos)) {
-        L.current_pressed = -1;
-    }
-
-    if (L.current_pressed != -1 && pointer.action == E_POINTER_UP) {
-        palette_set_color(L.current_pressed);
-        L.current_pressed = -1;
-    }
-
+    // swiping
     if (L.action.swiping && pointer.action == E_POINTER_MOVE) {
         float diff = swipe_diff(pointer);
         if (diff > 1) {
-            int id = palette.RO.palette_id - 1;
-            if (id < 0)
-                id = palette.RO.max_palettes - 1;
-            palette_load_palette(id);
+            palette_next_palette(true);
             L.action.swiping = false;
 
         } else if (diff <= -1) {
-            int id = palette.RO.palette_id + 1;
-            id %= palette.RO.max_palettes;
-            palette_load_palette(id);
+            palette_next_palette(false);
             L.action.swiping = false;
-
         }
 
         float alpha = sca_smoothstep(sca_abs(diff), 0.25, 1);
@@ -355,17 +345,55 @@ bool palette_pointer_event(ePointer_s pointer) {
             }
         }
     }
-    
+
+    // longpress
     if(L.action.longpress_time>=0 && pointer.action == E_POINTER_MOVE) {
         if(vec2_distance(L.action.start, pointer.pos.xy) > LONGPRESS_RADIUS) {
             L.action.longpress_time = -1;
         }
     }
 
+    if(tile.active) {
+        tile_palette_pointer_event(pointer);
+        if (pointer.id != 0) {
+            for (int i = 0; i < 2; i++)
+                L.action.arrows.rects[i].color.a = 0;
+            L.action.swiping = false;
+            L.action.longpress_time = -1;
+        }
+        return true;
+    }
+
+    if(pointer.action == E_POINTER_DOWN) {
+        for (int i = 0; i < palette.RO.palette_size; i++) {
+            // pose will be rotated in landscape mode (so do not use _aa_)!
+            if (u_pose_contains(L.palette_ro.rects[i].pose, pointer.pos)) {
+                L.current_pressed = i;
+                return true;
+            }
+        }
+        L.current_pressed = -1;
+        return true;
+    }
+
+    if (L.current_pressed != -1
+        // pose will be rotated in landscape mode (so do not use _aa_)!
+        && !u_pose_contains(L.palette_ro.rects[L.current_pressed].pose,
+                            pointer.pos)) {
+        L.current_pressed = -1;
+    }
+
+    if (L.current_pressed != -1 && pointer.action == E_POINTER_UP) {
+        palette_set_color(L.current_pressed);
+        L.current_pressed = -1;
+    }
     return true;
 }
 
 float palette_get_hud_size() {
+    if(tile.active) {
+        return tile_palette_get_hud_size();
+    }
     int cols = palette_cols();
     int rows = 1 + (palette.RO.palette_size - 1) / cols;
     return rows * COLOR_DROP_SIZE;
@@ -399,6 +427,10 @@ void palette_set_color(int index) {
 }
 
 void palette_set_custom_select(mat4 select_pose) {
+    if(tile.active) {
+        tile_palette_set_custom_select(select_pose);
+        return;
+    }
     L.custom_select_pose = select_pose;
     L.custom_select_active = true;
     L.last_selected = -1;
@@ -486,6 +518,24 @@ void palette_load_palette(int id) {
     u_image_kill(&colors);
 
     palette_save_config();
+}
+
+void palette_next_palette(bool prev) {
+    if(tile.active) {
+        tile_palette_next_palette(prev);
+        return;
+    }
+
+    int id;
+    if(prev) {
+        id = palette.RO.palette_id - 1;
+        if (id < 0)
+            id = palette.RO.max_palettes - 1;
+    } else {
+        id = palette.RO.palette_id + 1;
+        id %= palette.RO.max_palettes;
+    }
+    palette_load_palette(id);
 }
 
 void palette_append_palette(uImage colors, const char *name) {

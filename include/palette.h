@@ -60,6 +60,9 @@ void palette_set_palette(uImage colors, const char *name);
 // loads a palette by its id
 void palette_load_palette(int id);
 
+// prev=false -> next palette, else previous
+void palette_next_palette(bool prev);
+
 // saves the given palette into the config and calls palette_set_palette
 //   (which will take the ownership of palette_sink)
 // calls palette_save_config

@@ -300,10 +300,8 @@ void canvas_update(float dtime) {
 
     L.bg.rect.pose = canvas.RO.pose;
 
-#ifdef PIXELC_USE_MOD
-    if(mod.opt_mod_on_canvas_update)
-        mod.opt_mod_on_canvas_update();
-#endif
+    if(tile.canvas_active)
+        tile_on_canvas_update();
 }
 
 void canvas_render(const mat4 *canvascam_mat) {

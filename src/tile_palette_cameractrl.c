@@ -1,9 +1,10 @@
 #include "m/bool.h"
 #include "m/float.h"
 #include "camera.h"
+#include "tile.h"
 #include "palette.h"
-#include "mod_palette_camera.h"
-#include "mod_palette_cameractrl.h"
+#include "tile_palette_camera.h"
+#include "tile_palette_cameractrl.h"
 
 #define HOME_SIZE 0.9
 #define WHEEL_ZOOM_FACTOR 1.1
@@ -11,7 +12,7 @@
 
 #define DISTANCE_ALPHA 0.25
 
-struct ModPaletteCameraCtrl_Globals mod_palette_cameractrl;
+struct TilePaletteCameraCtrl_Globals tile_palette_cameractrl;
 
 //
 // private
@@ -44,38 +45,35 @@ static void move_camera(vec2 current_pos) {
     vec2 diff = vec2_sub_vec(current_pos, L.move0);
     diff = vec2_scale(diff, 2);
     L.pos = vec2_sub_vec(L.pos0, diff);
-    mod_palette_camera_set_pos(L.pos.x, L.pos.y);
+    tile_palette_camera_set_pos(L.pos.x, L.pos.y);
 }
 
 static void zoom_camera(float new_distance) {
     float factor = new_distance / L.distance0;
     factor = sca_clamp(factor, 0.3, 3);
     L.zoom = L.zoom0 / factor;
-    mod_palette_camera_set_zoom(L.zoom);
+    tile_palette_camera_set_zoom(L.zoom);
 }
 
 static void set_home() {
-    // protected 
-    vec2 mod_palette_tiles_size();
-    
-    vec2 size = mod_palette_tiles_size();
-    
-    mod_palette_camera_set_pos(size.x/2, -size.y/2);
-    mod_palette_camera_set_zoom(size.y/mod_palette_camera.size);
+    memset(&L, 0, sizeof(L));
+
+    vec2 size = tile_tilesheet_size();
+
+    L.pos.x = size.x/2;
+    L.pos.y = -size.y/2;
+    L.zoom = s_max(size.x*0.66, size.y)/tile_palette_camera.size;
+    tile_palette_camera_set_pos(L.pos.x, L.pos.y);
+    tile_palette_camera_set_zoom(L.zoom);
 }
 
 static void wheel_event(vec4 pos, bool up, void *user_data) {
-    // protected
-    vec4 mod_palette_pointer_pos(vec4 hud_pointer_pos);
-    // protected
-    vec2 mod_palette_tiles_size();
-
     vec4 hud_pos = mat4_mul_vec(camera.matrices.p_inv, pos);
     if(!palette_contains_pos(hud_pos.xy))
         return;
-    vec4 t_pos = mod_palette_pointer_pos(hud_pos);
+    vec4 t_pos = tile_palette_pointer_pos(hud_pos);
 
-    vec2 tile_size = mod_palette_tiles_size();
+    vec2 tile_size = tile_tilesheet_size();
     if (t_pos.x < 0 || t_pos.x > tile_size.x || t_pos.y < -tile_size.y || t_pos.y > 0)
         return;
 
@@ -83,12 +81,12 @@ static void wheel_event(vec4 pos, bool up, void *user_data) {
         L.zoom /= WHEEL_ZOOM_FACTOR;
     else
         L.zoom *= WHEEL_ZOOM_FACTOR;
-    mod_palette_camera_set_zoom(L.zoom);
+    tile_palette_camera_set_zoom(L.zoom);
 }
 
 static bool event_cursor(ePointer_s pointer) {
-    // if move_mode is true, the normal pointer (0) can move the camera
-    int max_id = mod_palette_cameractrl.move_mode ? 0 : -1;
+    // if move_tilee is true, the normal pointer (0) can move the camera
+    int max_id = tile_palette_cameractrl.move_mode ? 0 : -1;
 
     L.cursor.pointer_pos = vec2_mix(L.cursor.pointer_pos, pointer.pos.xy,
                                     SMOOTH_ALPHA);
@@ -154,12 +152,12 @@ static bool event_touch(ePointer_s pointer) {
 //
 
 
-void mod_palette_cameractrl_init() {
+void tile_palette_cameractrl_init() {
     L.zoom = 1;
     e_input_register_wheel_event(wheel_event, NULL);
 }
 
-void mod_palette_cameractrl_update(float dtime) {
+void tile_palette_cameractrl_update(float dtime) {
     if(L.set_home_cnt>0) {
         L.set_home_cnt--;
         if(L.set_home_cnt<=0)
@@ -167,11 +165,11 @@ void mod_palette_cameractrl_update(float dtime) {
     }
 }
 
-void mod_palette_cameractrl_set_home() {
+void tile_palette_cameractrl_set_home() {
     L.set_home_cnt = 3;
 }
 
-bool mod_palette_cameractrl_pointer_event(ePointer_s pointer) {
+bool tile_palette_cameractrl_pointer_event(ePointer_s pointer) {
     return event_cursor(pointer) || event_touch(pointer);
 }
 

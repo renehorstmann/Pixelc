@@ -9,7 +9,7 @@
 #include "m/types/float.h"
 #include "u/sprite.h"
 #include "r/ro_single.h"
-#include "mod.h"
+#include "tile.h"
 
 #define CANVAS_MAX_SIZE 8192
 #define CANVAS_MAX_LAYERS 96
@@ -87,19 +87,16 @@ void canvas_render(const mat4 *canvascam_mat);
 
 // returns the size of the canvas
 static ivec2 canvas_get_size() {
-#ifdef PIXELC_USE_MOD
-    if(mod.opt_canvas_get_size)
-        return mod.opt_canvas_get_size();
-#endif
+    if(tile.canvas_active)
+        return tile_canvas_get_size();
     return (ivec2) {{canvas.RO.image.cols, canvas.RO.image.rows}};
 }
 
 // returns col and row for the canvas image from a touch on the canvas
 static ivec2 canvas_get_cr(vec2 pointer_pos) {
-#ifdef PIXELC_USE_MOD
-    if(mod.opt_canvas_get_cr)
-        return mod.opt_canvas_get_cr(pointer_pos);
-#endif
+    if(tile.canvas_active)
+        return tile_canvas_get_cr(pointer_pos);
+
     return (ivec2) {{(int) pointer_pos.x, (int) -pointer_pos.y}};
 }
 

@@ -51,12 +51,12 @@ static uColor_s blend_color(uColor_s prev, uColor_s kernel, uColor_s color) {
 
 static bool draw_kernel(int c, int r, enum draw_kernel_mode mode) {
 
-    int kernel_offset_col = -(brush.RO.kernel.cols - 0.5) / 2;
-    int kernel_offset_row = -(brush.RO.kernel.rows - 0.5) / 2;
+    int kernel_offset_col = (int) (-(brush.RO.kernel.cols - 0.5) / 2);
+    int kernel_offset_row = (int) (-(brush.RO.kernel.rows - 0.5) / 2);
 
     if (mode == DRAW_DITHER || mode == DRAW_DITHER_INV) {
-        c = (c - kernel_offset_col) / brush.RO.kernel.cols * brush.RO.kernel.cols;
-        r = (r - kernel_offset_row) / brush.RO.kernel.rows * brush.RO.kernel.rows;
+        c = -kernel_offset_col + c / brush.RO.kernel.cols * brush.RO.kernel.cols;
+        r = -kernel_offset_row + r  / brush.RO.kernel.rows * brush.RO.kernel.rows;
     }
 
     bool changed = false;

@@ -264,6 +264,7 @@ void toolbar_init() {
     add_tool(tool_new_import());
     add_tool(tool_new_display());
     add_tool(tool_new_size());
+    add_tool(tool_new_tile());
     add_tool(tool_new_tab());
     add_tool(tool_new_frames());
     add_tool(tool_new_layer());
@@ -279,8 +280,8 @@ void toolbar_init() {
 
     add_tool(tool_new_mode_pipette());
     add_tool(tool_new_mode_none());
-    add_tool(tool_new_mode_free());
     add_tool(tool_new_mode_dot());
+    add_tool(tool_new_mode_free());
     add_tool(tool_new_mode_line());
     add_tool(tool_new_mode_rect());
     add_tool(tool_new_mode_circle());

@@ -6,13 +6,8 @@
 #include "animation.h"
 #include "feedback.h"
 #include "dialog.h"
+#include "tile.h"
 #include "tool.h"
-
-// comment out or use the option to hide the animation preview and dialog
-// for mods like Tilec
-#ifndef PIXELC_HIDE_ANIMATION
-#define SHOW_ANIMATION
-#endif
 
 //
 // private
@@ -54,26 +49,26 @@ static bool is_active(struct Tool *super, float dtime) {
     bool active = toolbar_container_valid(&toolbar.frames);
     if (!canvas.RO.frames_enabled && active) {
         toolbar_hide_frames();
-#ifdef SHOW_ANIMATION
-        animation.show = false;
-#endif
+        if(!tile.canvas_active) {
+            animation.show = false;
+        }
     }
     if (canvas.RO.frames_enabled && !active) {
         toolbar_show_frames();
-#ifdef SHOW_ANIMATION
-        animation.show = true;
-#endif
+        if(!tile.canvas_active) {
+            animation.show = true;
+        }
     }
 
     float *longpress_time = (float *) self->additional_data;
     if (*longpress_time > 0) {
         *longpress_time -= dtime;
         if (*longpress_time <= 0) {
-#ifdef SHOW_ANIMATION
-            feedback_longpress(u_pose_get_xy(self->ro.rect.pose),
-                               R_COLOR_GREEN);
-            dialog_create_animation();
-#endif
+            if(!tile.canvas_active) {
+                feedback_longpress(u_pose_get_xy(self->ro.rect.pose),
+                                   R_COLOR_GREEN);
+                dialog_create_animation();
+            }
         }
     }
 
@@ -87,16 +82,11 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_frames() {
     return tool_button_new("frames",
-#ifdef SHOW_ANIMATION
                            "Enable / disable\n"
                            "frames and show\n"
                            "the animation\n\n"
                            "Hold for\n"
                            "animation options",
-#else
-                            "Enable / disable\n"
-                           "frames",
-#endif
                            "res/button_play.png",
                            pointer_event,
                            is_active);
