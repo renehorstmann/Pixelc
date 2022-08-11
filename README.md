@@ -16,8 +16,7 @@ Pixelc in the [Google Play](https://play.google.com/store/apps/details?id=de.hor
 
 > Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling.
 
-App:
-
+## App:
 
 ![example_image](example.png)
 
@@ -34,6 +33,7 @@ Or just use the tooltip tool.
 - Frames and a .gif export
 - Layers
 - Onion Skinning for frames and layers
+- Tile Mode
 - Multiple drawing modes
 - Shading
 - Selections
@@ -96,46 +96,6 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 ```sh
 python3 -m http.server --bind localhost  # [port]
 ```
-
-## Mod
-Pixelc has a little and stupid modding system.
-Have a look at [mod.h](include/mod.h).
-
-### Mod Tilec
-
-![img](mod_tilec.png)
-
-> Create tilesets for 2d games in a 2d or 3d isometric grid!
-
-To use the **Tilec** Mod, set `MOD_TILEC true` in the [CMakeLists.txt](CMakeLists.txt) configuration file.
-
-Tilec loads up to 128 tilesheets from `tiles/tile_XX.png` in the working directory of Pixelc
-
-To change the dir or the tile size, see [mod_tiles.h](src/mod/tilec/mod_tiles.h).
-
-The 3d isometric renderer assumes that each layer is a z-layer.
-So layer 1 is the bottom floor. 
-
-Result of Tilec is an image .png file, in which each color is a code to the tile.
-- Color code for transparency: `0, 0, 0, 0`
-- Color code for a tile: `tile_file_id, x, y, 255`
-
-> Currently not supported as App.
-> If you want to use it directly on Android, 
-> have a look at the install section of [some](https://github.com/renehorstmann/some) /CxxDroid
-
-
-## Todo
-- JS IDB sync timeout (like 5 seconds)
-- tiles.active && tiles.canvas_asctive...
-- save hd with multiplyer instead of min size
-- save tile dialog
-  - hd multiplyer
-  - save tilemap
-  - save preview (normal + hd)
-- size scale option
-- animation preview uses selection
-- update doc and readme for tile mode
 
 ## Author
 René Horstmann

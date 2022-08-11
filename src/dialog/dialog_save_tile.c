@@ -23,16 +23,12 @@ typedef struct {
     RoText hd_multiplyer_num;
     mat4 hd_multiplyer_hitbox;
     
-    RoText merge_txt;
-    RoSingle merge_toggle;
+    RoText tilemap_txt;
+    RoSingle tilemap_btn;
     
-    RoText png_txt;
-    RoSingle png_btn;
-    RoSingle png_hd_btn;
-    
-    RoText gif_txt;
-    RoSingle gif_btn;
-    RoSingle gif_hd_btn;
+    RoText preview_txt;
+    RoSingle preview_btn;
+    RoSingle preview_hd_btn;
     
     TextInput *textinput;
 } Impl;
@@ -42,17 +38,13 @@ static void kill_fn() {
     
     ro_text_kill(&impl->hd_multiplyer_txt);
     ro_text_kill(&impl->hd_multiplyer_num);
+
+    ro_text_kill(&impl->tilemap_txt);
+    ro_single_kill(&impl->tilemap_btn);
     
-    ro_text_kill(&impl->merge_txt);
-    ro_single_kill(&impl->merge_toggle);
-    
-    ro_text_kill(&impl->png_txt);
-    ro_single_kill(&impl->png_btn);
-    ro_single_kill(&impl->png_hd_btn);
-    
-    ro_text_kill(&impl->gif_txt);
-    ro_single_kill(&impl->gif_btn);
-    ro_single_kill(&impl->gif_hd_btn);
+    ro_text_kill(&impl->preview_txt);
+    ro_single_kill(&impl->preview_btn);
+    ro_single_kill(&impl->preview_hd_btn);
     
     textinput_kill(&impl->textinput);
     
@@ -80,8 +72,6 @@ static void update(float dtime) {
     char buf[16];
     snprintf(buf, sizeof buf, "%i", io.hd_multiplyer);
     ro_text_set_text(&impl->hd_multiplyer_num, buf);
-    
-    impl->merge_toggle.rect.sprite.x = io.image_save_merged? 1 : 0;
 }
 
 static void render(const mat4 *cam_mat) {
@@ -90,16 +80,12 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->hd_multiplyer_txt, cam_mat);
     ro_text_render(&impl->hd_multiplyer_num, cam_mat);
     
-    ro_text_render(&impl->merge_txt, cam_mat);
-    ro_single_render(&impl->merge_toggle, cam_mat);
+    ro_text_render(&impl->tilemap_txt, cam_mat);
+    ro_single_render(&impl->tilemap_btn, cam_mat);
     
-    ro_text_render(&impl->png_txt, cam_mat);
-    ro_single_render(&impl->png_btn, cam_mat);
-    ro_single_render(&impl->png_hd_btn, cam_mat);
-    
-    ro_text_render(&impl->gif_txt, cam_mat);
-    ro_single_render(&impl->gif_btn, cam_mat);
-    ro_single_render(&impl->gif_hd_btn, cam_mat);
+    ro_text_render(&impl->preview_txt, cam_mat);
+    ro_single_render(&impl->preview_btn, cam_mat);
+    ro_single_render(&impl->preview_hd_btn, cam_mat);
 }
 
 
@@ -116,37 +102,27 @@ static bool pointer_event(ePointer_s pointer) {
         impl->textinput->shiftstate = TEXTINPUT_SHIFT_ALT;
     }
     
-    if(u_button_toggled(&impl->merge_toggle.rect, pointer)) {
-        bool merge = u_button_is_pressed(&impl->merge_toggle.rect);
-        s_log("save merged toggled: %i", merge);
-        io.image_save_merged = merge;
-    }
-    
-    if(u_button_clicked(&impl->png_btn.rect, pointer)) {
+    if(u_button_clicked(&impl->tilemap_btn.rect, pointer)) {
         s_log("save png");
+        bool was_merged = io.image_save_merged;
+        io.image_save_merged = false;
         io_image_save();
-        dialog_hide();
-        // return after hide, hide kills this dialog
-        return true;
-    }
-    if(u_button_clicked(&impl->png_hd_btn.rect, pointer)) {
-        s_log("save png hd");
-        io_image_hd_save();
+        io.image_save_merged = was_merged;
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
     }
     
-    if(u_button_clicked(&impl->gif_btn.rect, pointer)) {
+    if(u_button_clicked(&impl->preview_btn.rect, pointer)) {
         s_log("save gif");
-        io_gif_save();
+        io_tilemap_save();
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
     }
-    if(u_button_clicked(&impl->gif_hd_btn.rect, pointer)) {
+    if(u_button_clicked(&impl->preview_hd_btn.rect, pointer)) {
         s_log("save gif hd");
-        io_gif_hd_save();
+        io_tilemap_hd_save();
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
@@ -164,7 +140,7 @@ static void on_action(bool ok) {
 //
 
 
-void dialog_create_save() {
+void dialog_create_save_tile() {
     dialog_hide();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
@@ -182,48 +158,33 @@ void dialog_create_save() {
     impl->hd_multiplyer_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
     
     pos += 20;
+    
+    impl->tilemap_txt = ro_text_new_font55(32);
+    ro_text_set_text(&impl->tilemap_txt, "tilemap\n"
+                                         " save .png:");
+    
+    ro_text_set_color(&impl->tilemap_txt, DIALOG_TEXT_COLOR);
+    impl->tilemap_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
 
-    impl->merge_txt = ro_text_new_font55(32);
-    ro_text_set_color(&impl->merge_txt, DIALOG_TEXT_COLOR);
-    ro_text_set_text(&impl->merge_txt, "save layers\n"
-            "      merged?");
-    impl->merge_txt.pose = u_pose_new(DIALOG_LEFT+6, DIALOG_TOP - pos, 1, 2);
-    
-    impl->merge_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
-    impl->merge_toggle.rect.pose = u_pose_new_aa(
-            DIALOG_LEFT + DIALOG_WIDTH - 20, 
-            DIALOG_TOP - pos - 4, 
-            16, 16);
-            
-    pos += 40;
-    
-    impl->png_txt = ro_text_new_font55(16);
-    ro_text_set_text(&impl->png_txt, "save .png:");
-    
-    ro_text_set_color(&impl->png_txt, DIALOG_TEXT_COLOR);
-    impl->png_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
+    impl->tilemap_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
+    impl->tilemap_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos - 10, 16, 16);
 
-    impl->png_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
-    impl->png_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos, 16, 16);
+    pos += 32;
     
-    impl->png_hd_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save_hd.png"));
-    impl->png_hd_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
+    impl->preview_txt = ro_text_new_font55(32);
+    ro_text_set_text(&impl->preview_txt, "preview\n"
+                                         " save .png:");
+    
+    ro_text_set_color(&impl->preview_txt, DIALOG_TEXT_COLOR);
+    impl->preview_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
+
+    impl->preview_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
+    impl->preview_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos - 10, 16, 16);
+    
+    impl->preview_hd_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save_hd.png"));
+    impl->preview_hd_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
     
     pos += 18;
-    
-    impl->gif_txt = ro_text_new_font55(16);
-    ro_text_set_text(&impl->gif_txt, "save .gif:");
-    
-    ro_text_set_color(&impl->gif_txt, DIALOG_TEXT_COLOR);
-    impl->gif_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
-
-    impl->gif_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save.png"));
-    impl->gif_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 40, DIALOG_TOP - pos, 16, 16);
-    
-    impl->gif_hd_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save_hd.png"));
-    impl->gif_hd_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
-    
-    pos += 10;
     
     dialog.impl_height = pos;
 

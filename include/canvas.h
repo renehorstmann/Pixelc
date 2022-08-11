@@ -87,14 +87,21 @@ void canvas_render(const mat4 *canvascam_mat);
 
 // returns the size of the canvas
 static ivec2 canvas_get_size() {
-    if(tile.canvas_active)
+    if(tile.active && tile.canvas_active)
         return tile_canvas_get_size();
     return (ivec2) {{canvas.RO.image.cols, canvas.RO.image.rows}};
 }
 
+// returns the size of a pixel unit
+// normally 1, but tiles renders multiple pixels in a tile unit (8, 16, 32)
+static vec2 canvas_get_unit_scale() {
+    ivec2 cs = canvas_get_size();
+    return (vec2) {{(float) cs.x / canvas.RO.image.cols, (float) cs.y / canvas.RO.image.rows}};
+}
+
 // returns col and row for the canvas image from a touch on the canvas
 static ivec2 canvas_get_cr(vec2 pointer_pos) {
-    if(tile.canvas_active)
+    if(tile.active && tile.canvas_active)
         return tile_canvas_get_cr(pointer_pos);
 
     return (ivec2) {{(int) pointer_pos.x, (int) -pointer_pos.y}};
@@ -122,9 +129,11 @@ void canvas_set_frame(int sprite_col);
 void canvas_set_layer(int sprite_row);
 
 // turns on or off sprite.cols
+// will call canvas_save_config
 void canvas_enable_frames(bool enable);
 
 // turns on or off sprite.rows
+// will call canvas_save_config
 void canvas_enable_layers(bool enable);
 
 // sets a new image for the canvas

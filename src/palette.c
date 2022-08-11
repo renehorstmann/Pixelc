@@ -261,11 +261,12 @@ void palette_render(const mat4 *cam_mat) {
 
     if(tile.active) {
         tile_palette_render(cam_mat);
-    } else {
-        ro_batch_render(&L.background_ro, cam_mat, true);
-        ro_batch_render(&L.palette_ro, cam_mat, true);
-        ro_single_render(&L.select_ro, cam_mat);
+        return;
     }
+
+    ro_batch_render(&L.background_ro, cam_mat, true);
+    ro_batch_render(&L.palette_ro, cam_mat, true);
+    ro_single_render(&L.select_ro, cam_mat);
 
     if (L.action.swiping)
         ro_batch_render(&L.action.arrows, cam_mat, true);
@@ -287,15 +288,6 @@ bool palette_pointer_event(ePointer_s pointer) {
     }
 
     if (pointer.action == E_POINTER_DOWN) {
-        tooltip_set("palette", "Tip to select\n"
-                "a color\n\n"
-                "Swipe left or\n"
-                "right to change\n"
-                "the palette\n\n"
-                "Swipe up for\n"
-                "Multitouch Mode\n\n"
-                "Hold for options");
-        
         for (int i = 0; i < 2; i++)
             L.action.arrows.rects[i].color.a = 0;
         L.action.start = pointer.pos.xy;
@@ -310,15 +302,46 @@ bool palette_pointer_event(ePointer_s pointer) {
         L.action.longpress_time = -1;
     }
 
-    // swiping
+    // longpress
+    if(L.action.longpress_time>=0 && pointer.action == E_POINTER_MOVE) {
+        if(vec2_distance(L.action.start, pointer.pos.xy) > LONGPRESS_RADIUS) {
+            L.action.longpress_time = -1;
+        }
+    }
+
+    if(tile.active) {
+        tile_palette_pointer_event(pointer);
+        if (pointer.id != 0) {
+            for (int i = 0; i < 2; i++)
+                L.action.arrows.rects[i].color.a = 0;
+            L.action.swiping = false;
+            L.action.longpress_time = -1;
+        }
+        return true;
+    }
+
+    // tooltip
+    if (pointer.action == E_POINTER_DOWN) {
+        tooltip_set("palette", "Tip to select\n"
+                               "a color\n\n"
+                               "Swipe left or\n"
+                               "right to change\n"
+                               "the palette\n\n"
+                               "Swipe up for\n"
+                               "Multitouch Mode\n\n"
+                               "Hold for options");
+    }
+
+
+        // swiping
     if (L.action.swiping && pointer.action == E_POINTER_MOVE) {
         float diff = swipe_diff(pointer);
         if (diff > 1) {
-            palette_next_palette(true);
+            palette_next_palette(false);
             L.action.swiping = false;
 
         } else if (diff <= -1) {
-            palette_next_palette(false);
+            palette_next_palette(true);
             L.action.swiping = false;
         }
 
@@ -344,24 +367,6 @@ bool palette_pointer_event(ePointer_s pointer) {
                 );
             }
         }
-    }
-
-    // longpress
-    if(L.action.longpress_time>=0 && pointer.action == E_POINTER_MOVE) {
-        if(vec2_distance(L.action.start, pointer.pos.xy) > LONGPRESS_RADIUS) {
-            L.action.longpress_time = -1;
-        }
-    }
-
-    if(tile.active) {
-        tile_palette_pointer_event(pointer);
-        if (pointer.id != 0) {
-            for (int i = 0; i < 2; i++)
-                L.action.arrows.rects[i].color.a = 0;
-            L.action.swiping = false;
-            L.action.longpress_time = -1;
-        }
-        return true;
     }
 
     if(pointer.action == E_POINTER_DOWN) {
@@ -520,14 +525,14 @@ void palette_load_palette(int id) {
     palette_save_config();
 }
 
-void palette_next_palette(bool prev) {
+void palette_next_palette(bool next) {
     if(tile.active) {
-        tile_palette_next_palette(prev);
+        tile_palette_next_palette(next);
         return;
     }
 
     int id;
-    if(prev) {
+    if(!next) {
         id = palette.RO.palette_id - 1;
         if (id < 0)
             id = palette.RO.max_palettes - 1;

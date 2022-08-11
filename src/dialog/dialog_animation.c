@@ -16,6 +16,9 @@ static const vec4 TITLE_COLOR = {{0.6, 0.6, 0.2, 1}};
 //
 
 typedef struct {
+    RoText show_txt;
+    RoSingle show;
+
     RoText size_txt;
     RoText size_num;
     mat4 size_hitbox;
@@ -38,6 +41,9 @@ typedef struct {
 static void kill_fn() {
     Impl *impl = dialog.impl;
     
+    ro_text_kill(&impl->show_txt);
+    ro_single_kill(&impl->show);
+
     ro_text_kill(&impl->size_txt);
     ro_text_kill(&impl->size_num);
     
@@ -85,17 +91,22 @@ static void update(float dtime) {
     
     snprintf(buf, sizeof buf, "%.2f", impl->time);
     ro_text_set_text(&impl->time_num, buf);
-    
-    
-    impl->repeat_h.rect.sprite.x = (animation.mode == ANIMATION_MODE_REPEAT_H 
-            || animation.mode == ANIMATION_MODE_REPEAT_HV) ? 1: 0;
-            
-    impl->repeat_v.rect.sprite.x = (animation.mode == ANIMATION_MODE_REPEAT_V 
-            || animation.mode == ANIMATION_MODE_REPEAT_HV) ? 1: 0;
+
+    u_button_set_pressed(&impl->show.rect, animation.auto_show);
+
+    u_button_set_pressed(&impl->repeat_h.rect, (animation.mode == ANIMATION_MODE_REPEAT_H
+            || animation.mode == ANIMATION_MODE_REPEAT_HV) ? 1: 0);
+
+    u_button_set_pressed(&impl->repeat_v.rect, (animation.mode == ANIMATION_MODE_REPEAT_V
+            || animation.mode == ANIMATION_MODE_REPEAT_HV) ? 1: 0);
+
+    animation.show = animation.auto_show;
 }
 
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
+    ro_text_render(&impl->show_txt, cam_mat);
+    ro_single_render(&impl->show, cam_mat);
     ro_text_render(&impl->size_txt, cam_mat);
     ro_text_render(&impl->size_num, cam_mat);
     ro_text_render(&impl->repeat_txt, cam_mat);
@@ -109,7 +120,11 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
-    
+
+    if(u_button_toggled(&impl->show.rect, pointer)) {
+        s_log("animation auto_show");
+        animation.auto_show = u_button_is_pressed(&impl->show.rect);
+    }
     
     if(pointer.id == 0 
             && pointer.action == E_POINTER_DOWN 
@@ -195,6 +210,16 @@ void dialog_create_animation() {
     dialog.impl = impl;
     
     int pos = 24;
+
+    impl->show_txt = ro_text_new_font55(16);
+    ro_text_set_text(&impl->show_txt, "show animation:");
+    ro_text_set_color(&impl->show_txt, DIALOG_TEXT_COLOR);
+    impl->show_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 2, 1, 2);
+
+    impl->show = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    impl->show.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
+
+    pos += 24;
 
     impl->size_txt = ro_text_new_font55(5);
     ro_text_set_text(&impl->size_txt, "size:");

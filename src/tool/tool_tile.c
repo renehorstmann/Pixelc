@@ -16,6 +16,7 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
     bool pressed = u_button_is_pressed(&self->ro.rect);
     s_log("tool tile");
     tile.active = pressed;
+    tile_save_config();
     cameractrl_set_home();
 }
 

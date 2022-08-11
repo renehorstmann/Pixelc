@@ -160,6 +160,8 @@ image_hd.png
 import.png
 animation.gif
 animation_hd.gif
+tilemap.png
+tilemap_hd.png
 save_*
 savestate_*
 tiles/*

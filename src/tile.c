@@ -49,6 +49,8 @@ static struct {
         RoSingle select_ro;
 
         RoSingle clear_tool;
+        RoSingle prev_btn;
+        RoSingle next_btn;
         RoSingle cam_btn;
         RoSingle tile_toggle;
         RoSingle iso_toggle;
@@ -60,7 +62,6 @@ static struct {
         bool custom_select_active;
     } palette;
 
-    bool was_active;
     bool was_iso;
 } L;
 
@@ -262,6 +263,9 @@ void tile_init() {
 
     tile.RO.tile_size_x = 16;
     tile.RO.tile_size_y = 16;
+    tile.active = false;
+    tile.canvas_active = true;
+    tile.iso = false;
 
     tile_palette_camera_init();
     tile_palette_cameractrl_init();
@@ -280,6 +284,8 @@ void tile_init() {
     L.palette.select_ro = ro_single_new(r_texture_new_file(1, 1, "res/palette_select.png"));
 
     L.palette.clear_tool = ro_single_new(r_texture_new_file(1, 1, "res/toolbar_color_bg.png"));
+    L.palette.prev_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_prev.png"));
+    L.palette.next_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_next.png"));
     L.palette.cam_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_camera.png"));
     L.palette.tile_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_tile.png"));
     L.palette.iso_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_iso.png"));
@@ -287,13 +293,17 @@ void tile_init() {
 }
 
 void tile_update(float dtime) {
-    if (tile.active && !L.was_active) {
-        tile.canvas_active = true;
+    selectionctrl.allowed = !(tile.active && tile.iso);
+}
+
+uImage tile_get_tilemap_preview() {
+    if(!(tile.active && tile.canvas_active)) {
+        return u_image_new_invalid();
     }
-    L.was_active = tile.active;
-    if (!tile.active) {
-        tile.canvas_active = false;
-    }
+    uSprite sprite = u_sprite_new_clone_merge_row_down_full(L.canvas.sprite);
+    uImage img = u_sprite_reorder_to_new_image(sprite);
+    u_sprite_kill(&sprite);
+    return img;
 }
 
 vec2 tile_tilesheet_size() {
@@ -302,7 +312,8 @@ vec2 tile_tilesheet_size() {
 }
 
 ivec2 tile_canvas_get_size() {
-    if (!tile.iso || L.canvas.sprite.img.layers <= 0) {
+    // layers may be ==0 on the first frame
+    if (!tile.iso || L.canvas.sprite.img.layers<=0) {
         return (ivec2) {{canvas.RO.image.cols * tile.RO.tile_size_x, canvas.RO.image.rows * tile.RO.tile_size_y}};
     }
     return (ivec2) {{L.canvas.fb.tex.size.x, L.canvas.fb.tex.size.y / L.canvas.sprite.img.layers}};
@@ -339,8 +350,6 @@ ivec2 tile_canvas_get_cr(vec2 pointer_pos) {
 }
 
 void tile_on_canvas_update() {
-    selectionctrl.allowed = !tile.iso;
-
     uSprite c = canvas.RO.sprite;
 
     ivec2 fbo_size = get_framebuffer_size();
@@ -403,16 +412,22 @@ void tile_palette_update(float dtime) {
 
     // tools
     if (camera_is_portrait_mode()) {
-        L.palette.clear_tool.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 10, 16, 16);
-        L.palette.cam_btn.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 30, 16, 16);
-        L.palette.tile_toggle.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 50, 16,
+        L.palette.clear_tool.rect.pose = u_pose_new(camera.RO.left + 10, camera.RO.bottom + PALETTE_SIZE - 10, 16, 16);
+
+        L.palette.prev_btn.rect.pose = u_pose_new(camera.RO.right - 30, camera.RO.bottom + PALETTE_SIZE - 10, 16, 16);
+        L.palette.next_btn.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 10, 16, 16);
+        L.palette.cam_btn.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 40, 16, 16);
+        L.palette.tile_toggle.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 60, 16,
                                                      16);
-        L.palette.iso_toggle.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 70, 16, 16);
+        L.palette.iso_toggle.rect.pose = u_pose_new(camera.RO.right - 10, camera.RO.bottom + PALETTE_SIZE - 80, 16, 16);
     } else {
-        L.palette.clear_tool.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 10, camera.RO.top - 10, 16, 16);
-        L.palette.cam_btn.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 30, camera.RO.top - 10, 16, 16);
-        L.palette.tile_toggle.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 50, camera.RO.top - 10, 16, 16);
-        L.palette.iso_toggle.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 70, camera.RO.top - 10, 16, 16);
+        L.palette.clear_tool.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 10, camera.RO.bottom + 10, 16, 16);
+
+        L.palette.prev_btn.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 10, camera.RO.top - 30, 16, 16);
+        L.palette.next_btn.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 10, camera.RO.top - 10, 16, 16);
+        L.palette.cam_btn.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 40, camera.RO.top - 10, 16, 16);
+        L.palette.tile_toggle.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 60, camera.RO.top - 10, 16, 16);
+        L.palette.iso_toggle.rect.pose = u_pose_new(camera.RO.right - PALETTE_SIZE + 80, camera.RO.top - 10, 16, 16);
     }
     L.palette.tile_toggle.rect.sprite.x = tile.canvas_active ? 1 : 0;
     L.palette.iso_toggle.rect.sprite.x = tile.iso ? 1 : 0;
@@ -456,6 +471,8 @@ void tile_palette_render(const mat4 *cam_mat) {
     ro_single_render(&L.palette.ro, cam_mat);
 
     ro_single_render(&L.palette.clear_tool, cam_mat);
+    ro_single_render(&L.palette.prev_btn, cam_mat);
+    ro_single_render(&L.palette.next_btn, cam_mat);
     ro_single_render(&L.palette.cam_btn, cam_mat);
     ro_single_render(&L.palette.tile_toggle, cam_mat);
     ro_single_render(&L.palette.iso_toggle, cam_mat);
@@ -498,6 +515,24 @@ void tile_palette_pointer_event(ePointer_s pointer) {
         return;
     }
 
+    if (u_button_clicked(&L.palette.prev_btn.rect, pointer)) {
+        s_log("prev_btn");
+        tooltip_set("previous", "Load the\n"
+                                "previous\n"
+                                "tilesheet");
+        tile_palette_next_palette(false);
+        return;
+    }
+
+    if (u_button_clicked(&L.palette.next_btn.rect, pointer)) {
+        s_log("next_btn");
+        tooltip_set("next", "Load the\n"
+                                "next\n"
+                                "tilesheet");
+        tile_palette_next_palette(true);
+        return;
+    }
+
     if (u_button_clicked(&L.palette.cam_btn.rect, pointer)) {
         s_log("cam_btn");
         tooltip_set("tile camera", "Reset the\n"
@@ -512,7 +547,9 @@ void tile_palette_pointer_event(ePointer_s pointer) {
                             "tile mode or\n"
                             "color mode");
         tile.canvas_active = u_button_is_pressed(&L.palette.tile_toggle.rect);
+        tile_save_config();
         cameractrl_set_home();
+        return;
     }
 
     if (u_button_toggled(&L.palette.iso_toggle.rect, pointer)) {
@@ -523,7 +560,19 @@ void tile_palette_pointer_event(ePointer_s pointer) {
         if (tile.iso) {
             tile.canvas_active = true;
         }
+        tile_save_config();
         cameractrl_set_home();
+        return;
+    }
+
+
+    // tooltip
+    if (pointer.action == E_POINTER_DOWN) {
+        tooltip_set("tile palette", "Tip to select\n"
+                               "a tile\n\n"
+                               "Swipe up for\n"
+                               "Multitouch Mode\n\n"
+                               "Hold for options");
     }
 
     // in tiles ro as [-0.5 : 0.5]
@@ -585,9 +634,9 @@ void tile_palette_set_custom_select(mat4 select_pose) {
     L.palette.last_selected = -1;
 }
 
-void tile_palette_next_palette(bool prev) {
+void tile_palette_next_palette(bool next) {
     int id;
-    if (prev) {
+    if (!next) {
         id = tile.RO.tilesheet_id - 1;
         if (id < 0)
             id = TILE_MAX_TILESHEETS - 1;
@@ -644,7 +693,6 @@ void tile_load_tilesheet(int id) {
     set_color(0);
 
     tile_palette_cameractrl_set_home();
-    palette_save_config();
 
     tile_save_config();
 }
@@ -654,15 +702,33 @@ void tile_update_tilesheet(uImage tilesheet, int id) {
         s_log_error("not in range");
         return;
     }
-    if (tilesheet.cols % 32 != 0 || tilesheet.rows % 32 != 0) {
-        s_log_warn("ignoring tilesheet, sizes must be %32==0");
+    if(!u_image_valid(tilesheet)) {
+        s_log_error("not valid");
         return;
     }
     s_log("update: %i", id);
 
     tilesheet.layers = 1;
+    
+    if(tilesheet.cols>=32 && tilesheet.cols%32==0 && tilesheet.rows>=32 && tilesheet.rows%32==0) {
+        u_image_save_file(tilesheet, tilesheet_file(id));
+    } else {
+        int cols = tilesheet.cols;
+        if(cols<32)
+            cols = 32;
+        if(cols%32!=0)
+            cols = (1+(cols/32))*32;
+        int rows = tilesheet.rows;
+        if(rows<32)
+            rows = 32;
+        if(rows%32!=0)
+            rows = (1+(rows/32))*32;
+        uImage img = u_image_new_zeros(cols, rows, 1);
+        u_image_copy_top_left(img, tilesheet);
+        u_image_save_file(img, tilesheet_file(id));
+        u_image_kill(&img);
+    }
 
-    u_image_save_file(tilesheet, tilesheet_file(id));
 
     // save the savestate files (needed for web)
     e_io_savestate_save();
@@ -714,6 +780,9 @@ void tile_save_config() {
     uJson *config = u_json_new_file(io_config_file());
 
     uJson *member = u_json_append_object(config, "tile");
+    u_json_append_bool(member, "active", tile.active);
+    u_json_append_bool(member, "canvas_active", tile.canvas_active);
+    u_json_append_bool(member, "iso", tile.iso);
     u_json_append_int(member, "id", tile.RO.tilesheet_id);
     u_json_append_int(member, "tile_size_x", tile.RO.tile_size_x);
     u_json_append_int(member, "tile_size_y", tile.RO.tile_size_y);
@@ -731,6 +800,15 @@ void tile_load_config() {
 
     uJson *config = u_json_new_file(io_config_file());
     uJson *member = u_json_get_object(config, "tile");
+
+    const bool *active = u_json_get_object_bool(member, "active");
+    const bool *canvas_active = u_json_get_object_bool(member, "canvas_active");
+    const bool *iso = u_json_get_object_bool(member, "iso");
+    if(active && canvas_active && iso) {
+        tile.active = *active;
+        tile.canvas_active = *canvas_active;
+        tile.iso = *iso;
+    }
 
     int id;
     if (!u_json_get_object_int(member, "id", &id)) {

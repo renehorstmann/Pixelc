@@ -34,6 +34,9 @@ void tile_init();
 
 void tile_update(float dtime);
 
+// returns an invalid image, if !tile.active || !tile.canvas_active
+uImage tile_get_tilemap_preview();
+
 vec2 tile_tilesheet_size();
 
 ivec2 tile_canvas_get_size();
@@ -57,7 +60,7 @@ float tile_palette_get_hud_size();
 
 void tile_palette_set_custom_select(mat4 select_pose);
 
-void tile_palette_next_palette(bool prev);
+void tile_palette_next_palette(bool next);
 
 
 void tile_set_size(int tile_size_x, int tile_size_y);

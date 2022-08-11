@@ -149,7 +149,7 @@ bool brushmode_func(ePointer_s pointer, enum brushmode_func func) {
     canvas_reload();
 
     // just 1 pixel length
-    if (ivec2_norm_inf(ivec2_sub_vec(cr, brushmode.L.start)) <= 1)
+    if (ivec2_norm_inf(ivec2_sub_vec(cr, brushmode.L.start)) < 1)
         return brush_draw(cr.x, cr.y);
 
     switch (func) {

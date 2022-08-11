@@ -49,26 +49,20 @@ static bool is_active(struct Tool *super, float dtime) {
     bool active = toolbar_container_valid(&toolbar.frames);
     if (!canvas.RO.frames_enabled && active) {
         toolbar_hide_frames();
-        if(!tile.canvas_active) {
-            animation.show = false;
-        }
+        animation.show = false;
     }
     if (canvas.RO.frames_enabled && !active) {
         toolbar_show_frames();
-        if(!tile.canvas_active) {
-            animation.show = true;
-        }
+        animation.show = animation.auto_show;
     }
 
     float *longpress_time = (float *) self->additional_data;
     if (*longpress_time > 0) {
         *longpress_time -= dtime;
         if (*longpress_time <= 0) {
-            if(!tile.canvas_active) {
                 feedback_longpress(u_pose_get_xy(self->ro.rect.pose),
                                    R_COLOR_GREEN);
                 dialog_create_animation();
-            }
         }
     }
 

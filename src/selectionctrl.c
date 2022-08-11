@@ -33,8 +33,8 @@ static struct {
     bool was_allowed;
 } L;
 
-static mat4 pixel_pose(int x, int y) {
-    return u_pose_new_aa(x, -y, 1, 1);
+static mat4 pixel_pose(int x, int y, vec2 scale) {
+    return u_pose_new_aa(x*scale.x, -y*scale.y, scale.x, scale.y);
 }
 
 
@@ -49,25 +49,27 @@ static void setup_border() {
 
     int max = L.border.num;
 
+    vec2 scale = canvas_get_unit_scale();
+
     int idx = 0;
     for (int i = 0; i < h; i++) {
-        L.border.rects[idx].pose = pixel_pose(x - 1, y + i);
+        L.border.rects[idx].pose = pixel_pose(x - 1, y + i, scale);
         L.border.rects[idx].sprite = (vec2) {0, 0};
         idx++;
         if (idx >= max) goto UPDATE;
 
-        L.border.rects[idx].pose = pixel_pose(x + w, y + i);
+        L.border.rects[idx].pose = pixel_pose(x + w, y + i, scale);
         L.border.rects[idx].sprite = (vec2) {0, 1};
         idx++;
         if (idx >= max) goto UPDATE;
     }
     for (int i = 0; i < w; i++) {
-        L.border.rects[idx].pose = pixel_pose(x + i, y - 1);
+        L.border.rects[idx].pose = pixel_pose(x + i, y - 1, scale);
         L.border.rects[idx].sprite = (vec2) {1, 0};
         idx++;
         if (idx >= max) goto UPDATE;
 
-        L.border.rects[idx].pose = pixel_pose(x + i, y + h);
+        L.border.rects[idx].pose = pixel_pose(x + i, y + h, scale);
         L.border.rects[idx].sprite = (vec2) {1, 1};
         idx++;
         if (idx >= max) goto UPDATE;

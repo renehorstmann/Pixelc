@@ -18,9 +18,17 @@ enum animation_mode {
 };
 
 struct Animation_Globals {
+    // shows the preview
     bool show;
+
+    // preview size (default: 1.0)
     float size;
+
+    // default: ANIMATION_MODE_SINGLE
     enum animation_mode mode;
+
+    // if true, shows if frames are active (default: true)
+    bool auto_show;
 };
 extern struct Animation_Globals animation;
 

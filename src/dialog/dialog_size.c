@@ -39,6 +39,9 @@ typedef struct {
     RoText keep_order_txt;
     RoSingle keep_order_toggle;
 
+    RoText scale_txt;
+    RoSingle scale_toggle;
+
     int textinput_usage;
     TextInput *textinput;
 } Impl;
@@ -55,6 +58,8 @@ static void kill_fn() {
     ro_text_kill(&impl->layers_num);
     ro_text_kill(&impl->keep_order_txt);
     ro_single_kill(&impl->keep_order_toggle);
+    ro_text_kill(&impl->scale_txt);
+    ro_single_kill(&impl->scale_toggle);
     textinput_kill(&impl->textinput);
     s_free(impl);
 }
@@ -119,6 +124,8 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->layers_num, cam_mat);
     ro_text_render(&impl->keep_order_txt, cam_mat);
     ro_single_render(&impl->keep_order_toggle, cam_mat);
+    ro_text_render(&impl->scale_txt, cam_mat);
+    ro_single_render(&impl->scale_toggle, cam_mat);
 }
 
 static bool pointer_event(ePointer_s pointer) {
@@ -126,6 +133,10 @@ static bool pointer_event(ePointer_s pointer) {
 
     if(u_button_toggled(&impl->keep_order_toggle.rect, pointer)) {
         s_log("keep_order toggled");
+    }
+
+    if(u_button_toggled(&impl->scale_toggle.rect, pointer)) {
+        s_log("scale toggled");
     }
 
     if (pointer.id != 0 || pointer.action != E_POINTER_DOWN)
@@ -166,6 +177,7 @@ static void on_action(bool ok) {
     int frames = impl->frames;
     int layers = impl->layers;
     bool keep_order = u_button_is_pressed(&impl->keep_order_toggle.rect);
+    bool scale = u_button_is_pressed(&impl->scale_toggle.rect);
 
     dialog_hide();
     if (!ok) {
@@ -179,28 +191,38 @@ static void on_action(bool ok) {
     if(keep_order) {
         s_log("reset size with order");
         uSprite c = canvas_get_sprite();
-        sprite = u_sprite_new_zeros(cols, rows, frames, layers);
-        int fm = s_min(frames, c.cols);
-        int lm = s_min(layers, c.rows);
-        for(int l=0; l<lm; l++) {
-            for(int f=0; f<fm; f++) {
-                uImage from = c.img;
-                from.data = u_sprite_sprite(c, f, l);
-                from.layers = 1;
-                uImage to = sprite.img;
-                to.data = u_sprite_sprite(sprite, f, l);
-                to.layers = 1;
-                u_image_copy_top_left(to, from);
+        if(scale) {
+            sprite = u_sprite_new_clone_scaled(cols, rows, false, c);
+        } else {
+            sprite = u_sprite_new_zeros(cols, rows, frames, layers);
+            int fm = s_min(frames, c.cols);
+            int lm = s_min(layers, c.rows);
+            for(int l=0; l<lm; l++) {
+                for(int f=0; f<fm; f++) {
+                    uImage from = c.img;
+                    from.data = u_sprite_sprite(c, f, l);
+                    from.layers = 1;
+                    uImage to = sprite.img;
+                    to.data = u_sprite_sprite(sprite, f, l);
+                    to.layers = 1;
+                    u_image_copy_top_left(to, from);
+                }
             }
         }
+
         u_sprite_kill(&c);
     } else {
         s_log("reset size without order");
         uImage img = canvas_get_full_image();
-        uImage new_img = u_image_new_zeros(cols*frames, rows*layers, 1);
+        uImage new_img;
 
+        if(scale) {
+            new_img = u_image_new_clone_scaled(cols*frames, rows*layers, false, img);
+        } else {
+            new_img = u_image_new_zeros(cols*frames, rows*layers, 1);
+            u_image_copy_top_left(new_img, img);
+        }
 
-        u_image_copy_top_left(new_img, img);
         new_img.rows = rows;
         new_img.layers = layers;
 
@@ -276,6 +298,18 @@ void dialog_create_size() {
 
     impl->keep_order_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
     impl->keep_order_toggle.rect.pose = u_pose_new_aa(
+            DIALOG_LEFT + DIALOG_WIDTH - 30,
+            DIALOG_TOP - pos + 2,
+            16, 16);
+    pos += 18;
+
+    impl->scale_txt = ro_text_new_font55(16);
+    ro_text_set_color(&impl->scale_txt, DIALOG_TEXT_COLOR);
+    ro_text_set_text(&impl->scale_txt, "scale?");
+    impl->scale_txt.pose = u_pose_new(DIALOG_LEFT+6, DIALOG_TOP - pos, 1, 2);
+
+    impl->scale_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    impl->scale_toggle.rect.pose = u_pose_new_aa(
             DIALOG_LEFT + DIALOG_WIDTH - 30,
             DIALOG_TOP - pos + 2,
             16, 16);

@@ -17,8 +17,7 @@ Its also fine to use on desktops, etc.
 > Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling
 
 
-App:
-
+## App
 
 ![img](example.png)
 
@@ -35,6 +34,10 @@ App:
 - [Funny Rainbow Trick](#S-rainbow)
 - [Secondary Color](#S-secondary_color)
 - [Shading](#S-shading)
+- [Tiles](#S-tiles)
+  - [Isometric Mode](#S-tiles__isometric)
+  - [How to edit a tilesheet](#S-tiles__edit)
+  - [How to load a tilesheet from a file](#S-tiles__load)
 - [Display Settings](#S-display)
 - [Grid](#S-grid)
 - [Save](#S-save)
@@ -165,7 +168,7 @@ In this dialog you can:
 2. ![img](doc/res2/button_tab.png)  use a new image tab
 3. ![img](doc/res2/button_import.png)  hold down on the import button 
 4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas" 
-5. hold down on the palette again to open the palette dialog
+5. hold down on the palette to open the palette dialog
 6. (optional) rename the palette name to a new one
 7. ![img](doc/res2/button_to.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
 
@@ -268,6 +271,103 @@ Shading is useful to only paint above a selected color, to shade or highlight ed
 The app shows a flash effect of the secondary color to show you that the shading mode is active.
 (Also if the pipette [draw mode](#S_draw_modes) is used)
 
+## <a name="S-tiles"></a>Tiles
+![img](doc/res4/button_tile.png)
+
+Click on the tile tool to start the tiling mode.
+
+![img](doc/tiling_mode.png)
+
+The canvas now renders a tile for each pixel.
+
+### Tile Palette
+
+The palette now shows tilesheets and some additional tools.
+
+You can zoom and move the tilesheet like the canvas.
+
+Tools:
+- ![img](doc/res2/toolbar_color_bg.png) Select to clear tiles
+- ![img](doc/res2/button_prev.png) Previous tilesheet
+- ![img](doc/res2/button_next.png) Next tilesheet
+- ![img](doc/res2/button_camera.png) Reset the tilesheet camera
+- ![img](doc/res2/button_tile.png) Render the tiles in the canvas
+- ![img](doc/res2/button_iso.png) Render in [isometric mode](#S-tiles__isometric)
+
+> Pixelc supports up to 16 different tilesheets!
+
+Hold down on the palette to open the tile dialog:
+
+![img](doc/tile_dialog.png)
+
+Here you can:
+- Reset the size of a single tile for x and y (`8, 16, 32 pixel`)
+  - For all tilesheets.
+- ![img](doc/res2/button_to.png) Copy the tilesheet into the canvas
+- ![img](doc/res2/button_from.png) Update the current tilesheet with the canvas image
+  - The image size must be a multiple of 32
+
+### <a name="S-tiles__isometric"></a>Isometric Mode
+![img](doc/res4/button_iso.png)
+
+If the isometric mode is active, the canvas renders the tiles with isometric overlapping:
+
+![img](doc/tiles_isometric.png)
+
+In this example, the tilesize is set as 32x32 pixel
+> Use layers to define the z-height of your tilemap.
+> Layer 1 is the bottom floor.
+
+In the isometric mode, selections are disabled. Turn it off to use them.
+
+### <a name="S-tiles__edit"></a>How to edit a tilesheet
+1. ![img](doc/res2/button_tab.png)  use a new image tab
+2. ![img](doc/res2/button_tile.png) start the tiling mode
+3. hold down on the tile palette to open the tile dialog
+4. ![img](doc/res2/button_from.png)  copy the current tilesheet into the canvas
+5. redraw tiles, change the size, draw new tiles, ....
+6. ![img](doc/res2/button_tile.png) start the tiling mode again
+7. (optional) select a different tilesheet to update
+8. hold down on the tile palette again to open the tile dialog
+9. ![img](doc/res2/button_to.png) update tilesheet from canvas
+
+### <a name="S-tiles__load"></a>How to load a tilesheet from a file
+1. Download a tilesheet file as png (for example from [itch](https://itch.io/game-assets/tag-tileset))
+2. ![img](doc/res2/button_tab.png)  use a new image tab
+3. ![img](doc/res2/button_import.png)  hold down on the import button
+4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas"
+5. (optional) crop the image out to the tiles you want with a [selection](#S-selection)
+6. ![img](doc/res2/button_tile.png) start the tiling mode
+7. (optional) select a different tilesheet to update
+8. hold down on the tile palette to open the tile dialog
+9. ![img](doc/res2/button_to.png) update tilesheet from canvas
+
+
+### Tile saving
+The tilemap is drawn with color codes for each tile.
+
+The color code is built up as:
+```
+.r = tile_id;
+.g = tile_x;
+.b = tile_y;
+.a = alpha;
+```
+
+`tile_id` is one of the 16 tilesheets.
+
+`tile_x & tile_y` are the position in the tilesheet.
+
+![img](doc/res2/button_save.png) A click on the save tool, opens a new save dialog:
+
+![img](doc/saving_tile_dialog.png)
+
+Here you can:
+- Save the tilemap with its color codes as .png image
+- Save the rendered preview of the tilemap
+- Save the rendered preview of the tilemap in HD, using the **HD MULTIPLYER**
+
+
 ## <a name="S-display"></a>Display settings
 ![img](doc/res4/button_display.png)
 
@@ -321,7 +421,7 @@ You can save either as `.png` image file or as animated `.gif` file.
 
 ![img](doc/res2/button_save.png) Save the image with the actual size.
 
-![img](doc/res2/button_save_hd.png) Upscale the image to at least **HD MIN SIZE**.
+![img](doc/res2/button_save_hd.png) Upscale the image with the **HD MULTIPLYER**.
 Better for sharing the image, because most image viewer will render pixel art wrong.
 
 If **SAVE LAYERS MERGED** is activated, all layers are merged into a single image.
@@ -363,15 +463,22 @@ Click on the size tool to open the size dialog.
 
 ![img](doc/size_dialog.png)
 
-If keep order is NOT activated (default), the image will be reset as there where no frames or layers.
+If **KEEP ORDER** is NOT activated (default), the image will be reset as there where no frames or layers.
 Frames are placed side by side to the right in the image. Layers are placed below.
 > Good to load an image with frames and set the size and frames to match the image.
 > For example the image has 128 cols and 4 frames, so 32 cols per frame.
 > Reset COLS to 32 and FRAMES to 4 to morph the image into the frames system.
 
-If keep order is activated, the image will be reset with the frames and layers individually copied.
+If **KEEP ORDER** is activated, the image will be reset with the frames and layers individually copied.
 > Good to resize the actual frame size.
 
+If **SCALE** is NOT activated (default), the image size will just be changed
+and non-existent areas are filled transparently.
+
+If **SCALE** is activated, the image will be scaled from the old to the new size 
+with the *"nearest"* filter setting.
+
+> Good to downscale an (.png) image into pixel art
 
 
 ## <a name="S-selection"></a>Selection
@@ -474,6 +581,7 @@ Hold on the frames tool to open the animation dialog
 ![img](doc/animation_dialog.png)
 
 Here you can:
+- show and hide the animation
 - reset the animation size
 - ![img](doc/res2/button_repeat.png)  repeat the animated preview horizontally or vertically or both 
   - good to show repeated tiles

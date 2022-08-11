@@ -3,6 +3,7 @@
 #include "canvas.h"
 #include "camera.h"
 #include "palette.h"
+#include "selectionctrl.h"
 #include "animation.h"
 
 
@@ -22,7 +23,8 @@ static struct {
 
 void animation_init() {
     animation.size = 1.0;
-    
+    animation.auto_show = true;
+
     L.ro = ro_single_new(r_texture_new_invalid());
     L.ro.owns_tex = false;
 }

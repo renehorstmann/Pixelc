@@ -62,7 +62,10 @@ static void set_home() {
 
     L.pos.x = size.x/2;
     L.pos.y = -size.y/2;
-    L.zoom = s_max(size.x*0.66, size.y)/tile_palette_camera.size;
+    if(camera_is_portrait_mode())
+        L.zoom = s_max(size.x*0.66, size.y)/tile_palette_camera.size;
+    else
+        L.zoom = s_max(size.x, size.y*0.66)/tile_palette_camera.size;
     tile_palette_camera_set_pos(L.pos.x, L.pos.y);
     tile_palette_camera_set_zoom(L.zoom);
 }

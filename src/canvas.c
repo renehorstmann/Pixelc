@@ -55,7 +55,7 @@ static struct {
 
 _Static_assert(CANVAS_MAX_SAVES <= 999, "see save / load image");
 
-static void save_image() {
+static void save_image(bool savestate_save) {
     char file_png[128];
     char file_json[128];
     snprintf(file_png, sizeof file_png, "image_%02i_%03i.png", 
@@ -84,7 +84,9 @@ static void save_image() {
     u_json_save_file(state,
             e_io_savestate_file_path(file_json),
             &options);
-    e_io_savestate_save();
+
+    if(savestate_save)
+        e_io_savestate_save();
 
     u_json_kill(&state);
 }
@@ -300,7 +302,7 @@ void canvas_update(float dtime) {
 
     L.bg.rect.pose = canvas.RO.pose;
 
-    if(tile.canvas_active)
+    if(tile.active && tile.canvas_active)
         tile_on_canvas_update();
 }
 
@@ -422,7 +424,9 @@ void canvas_enable_frames(bool enable) {
         return;
     }
     canvas.RO.frames_enabled = enable;
+    canvas.RO.current_frame = enable? canvas.RO.frames-1 : 0;
     update_sprite();
+    canvas_save_config();
 }
 
 
@@ -434,7 +438,9 @@ void canvas_enable_layers(bool enable) {
         return;
     }
     canvas.RO.layers_enabled = enable;
+    canvas.RO.current_layer = enable? canvas.RO.layers-1 : 0;
     update_sprite();
+    canvas_save_config();
 }
 
 
@@ -604,14 +610,16 @@ uSprite canvas_get_tab(int id) {
 void canvas_save_config() {
     s_log("save");
     
-    save_image();
+    save_image(false);
 
     uJson *config = u_json_new_file(io_config_file());
 
     uJson *member = u_json_append_object(config, "canvas");
 
     u_json_append_int(member, "current_tab_id", canvas.RO.current_tab_id);
-    
+
+    u_json_append_bool(member, "frames_enabled", canvas.RO.frames_enabled);
+    u_json_append_bool(member, "layers_enabled", canvas.RO.layers_enabled);
     
     L.tab_saves[canvas.RO.current_tab_id].current_layer = canvas.RO.current_layer;
     L.tab_saves[canvas.RO.current_tab_id].current_frame = canvas.RO.current_frame;
@@ -621,7 +629,7 @@ void canvas_save_config() {
         snprintf(name, sizeof name, "tab_%02i", t);
         
         uJson *tab = u_json_append_object(member, name);
-        
+
         u_json_append_int(tab, "current_layer", L.tab_saves[t].current_layer);
         u_json_append_int(tab, "current_frame", L.tab_saves[t].current_frame);
         u_json_append_int(tab, "save_idx", L.tab_saves[t].save_idx);
@@ -633,6 +641,7 @@ void canvas_save_config() {
     u_json_append_int(member, "pattern_rows", canvas.RO.pattern_size.y);
 
     u_json_save_file(config,io_config_file(), NULL);
+
     e_io_savestate_save();
 
     u_json_kill(&config);
@@ -672,7 +681,7 @@ void canvas_load_config() {
         canvas_set_layer(canvas.RO.sprite.rows-1);
     } else {
         s_log("failed, saving the empty image as index 0");
-        save_image();
+        save_image(true);
     }
 
     int pattern_cols, pattern_rows;
@@ -681,7 +690,16 @@ void canvas_load_config() {
         canvas_set_pattern_size(pattern_cols, pattern_rows);
     }
 
-    update_render_objects();
+    const bool *frames_enabled = u_json_get_object_bool(member, "frames_enabled");
+    const bool *layers_enabled = u_json_get_object_bool(member, "layers_enabled");
+
+    if(frames_enabled && layers_enabled) {
+        // will call update_render_objects
+        canvas_enable_frames(*frames_enabled);
+        canvas_enable_layers(*layers_enabled);
+    } else {
+        update_render_objects();
+    }
 
     u_json_kill(&config);
 }

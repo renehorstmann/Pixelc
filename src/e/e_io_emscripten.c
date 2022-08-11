@@ -1,9 +1,12 @@
 #ifdef PLATFORM_EMSCRIPTEN
 
 #include "s/s_full.h"
+#include "e/window.h"
 #include "e/io.h"
 #include "emscripten.h"
 
+
+#define SYNC_TIMEOUT_MS 200
 
 // protected function
 const char *e_window_get_title();
@@ -16,6 +19,7 @@ const char *e_window_get_title();
 static struct {
     bool mounted;
     bool synced;
+    su32 synced_timeout;
 
     struct {
         char file[128];
@@ -26,6 +30,8 @@ static struct {
 } L;
 
 static void idbfs_mount() {
+    s_log_info("idbfs_mount");
+
     if(L.mounted)
         return;
     EM_ASM( 
@@ -54,6 +60,8 @@ static void idbfs_mount() {
         emscripten_sleep(1);
     }
     s_log("e_io_idbfs: synced");
+
+    L.synced_timeout = e_window.time_ms + SYNC_TIMEOUT_MS;
 }
 
 // protected, JS need its name as global
@@ -63,6 +71,13 @@ void e_io_idbfs_synced() {
 }
 
 static void idbfs_save() {
+    if(L.synced_timeout > e_window.time_ms) {
+        s_log_info("ignoring e_io save sync (timeout: %i ms)", L.synced_timeout - e_window.time_ms);
+        return;
+    }
+    L.synced_timeout = e_window.time_ms + SYNC_TIMEOUT_MS;
+
+    s_log_info("idbfs_save");
     // false = save file system from idbfs
     EM_ASM(
         e_io_idbfs_synced = false;

@@ -32,6 +32,8 @@ static void on_delete_action(bool ok) {
 
 
 typedef struct {
+    bool was_canvas_active;
+
     RoText info;
 
     int size_x;
@@ -122,9 +124,10 @@ static bool pointer_event(ePointer_s pointer) {
     }
 
     if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
-        s_log("set tilesheet from canvas");
+        s_log("update tilesheet from canvas");
         uImage tilesheet = canvas.RO.sprite.img;
         tile_update_tilesheet(tilesheet, tile.RO.tilesheet_id);
+        tile.canvas_active = impl->was_canvas_active;
         dialog_hide();
         // return after hide, hide kills this dialog
         return true;
@@ -140,7 +143,7 @@ static void on_action(bool ok) {
         tile_set_size(impl->size_x, impl->size_y);
     }
     // show tiles
-    tile.canvas_active = true;
+    tile.canvas_active = impl->was_canvas_active;
     cameractrl_set_home();
     dialog_hide();
 }
@@ -155,11 +158,13 @@ void dialog_create_tile() {
     s_log("create");
 
     // show image in the background
-    tile.canvas_active = false;
     cameractrl_set_home();
 
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
+
+    impl->was_canvas_active = tile.canvas_active;
+    tile.canvas_active = false;
 
     impl->size_x = tile.RO.tile_size_x;
     impl->size_y = tile.RO.tile_size_y;

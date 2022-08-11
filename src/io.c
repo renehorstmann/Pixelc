@@ -4,6 +4,7 @@
 #include "m/int.h"
 #include "m/uchar.h"
 #include "canvas.h"
+#include "tile.h"
 #include "ext_gifenc.h"
 #include "io.h"
 
@@ -105,7 +106,7 @@ static void save_gif(uSprite sprite, const char *file) {
 
 void io_init() {
     io.image_save_merged = true;
-    io.hd_min_size = 1024;
+    io.hd_multiplyer = 8;
 }
 
 const char *io_config_file() {
@@ -144,11 +145,7 @@ void io_image_hd_save() {
           io.image_save_merged,
           img.cols, img.rows);
 
-
-    int scale_w = sca_ceil((float) io.hd_min_size / img.cols);
-    int scale_h = sca_ceil((float) io.hd_min_size / img.rows);
-    int scale = isca_max(scale_w, scale_h);
-    uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
+    uImage hd = u_image_new_clone_scaled(img.cols * io.hd_multiplyer, img.rows * io.hd_multiplyer, false, img);
 
     u_image_save_file(hd, "image_hd.png");
     u_image_kill(&hd);
@@ -190,11 +187,7 @@ void io_gif_hd_save() {
           io.image_save_merged,
           img.cols, img.rows);
 
-
-    int scale_w = sca_ceil((float) io.hd_min_size / img.cols);
-    int scale_h = sca_ceil((float) io.hd_min_size / img.rows);
-    int scale = isca_max(scale_w, scale_h);
-    uImage hd = u_image_new_clone_scaled(img.cols * scale, img.rows * scale, false, img);
+    uImage hd = u_image_new_clone_scaled(img.cols * io.hd_multiplyer, img.rows * io.hd_multiplyer, false, img);
 
     uSprite sprite = u_sprite_new_reorder_from_image(canvas.RO.frames, hd);
 
@@ -203,4 +196,35 @@ void io_gif_hd_save() {
     u_image_kill(&img);
     u_image_kill(&hd);
     e_io_offer_file_as_download("animation_hd.gif");
+}
+
+void io_tilemap_save() {
+    uImage img = tile_get_tilemap_preview();
+    if(!u_image_valid(img)) {
+        s_log_error("failed, invalid");
+        return;
+    }
+    s_log("save tilemap: size: %i %i",
+          img.cols, img.rows);
+
+    u_image_save_file(img, "tilemap.png");
+    u_image_kill(&img);
+    e_io_offer_file_as_download("tilemap.png");
+}
+
+void io_tilemap_hd_save() {
+    uImage img = tile_get_tilemap_preview();
+    if(!u_image_valid(img)) {
+        s_log_error("failed, invalid");
+        return;
+    }
+    s_log("save tilemap hd: size: %i %i",
+          img.cols, img.rows);
+
+    uImage hd = u_image_new_clone_scaled(img.cols * io.hd_multiplyer, img.rows * io.hd_multiplyer, false, img);
+
+    u_image_save_file(hd, "tilemap_hd.png");
+    u_image_kill(&img);
+    u_image_kill(&hd);
+    e_io_offer_file_as_download("tilemap_hd.png");
 }
