@@ -127,6 +127,7 @@ Result of Tilec is an image .png file, in which each color is a code to the tile
 
 ## Todo
 - JS IDB sync timeout (like 5 seconds)
+- tiles.active && tiles.canvas_asctive...
 - save hd with multiplyer instead of min size
 - save tile dialog
   - hd multiplyer
