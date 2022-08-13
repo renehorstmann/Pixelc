@@ -101,6 +101,10 @@ python3 -m http.server --bind localhost  # [port]
   - frames behind cols
   - layers behind rows
   - add rotate und flip toggles
+- iso tilesheet fix tree
+- doc
+  - size
+  - iso how to rotate
 
 ## Author
 René Horstmann
