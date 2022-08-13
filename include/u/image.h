@@ -1,6 +1,12 @@
 #ifndef U_IMAGE_H
 #define U_IMAGE_H
 
+//
+// Image class
+// each pixel is an uColor_s (4* uint8)
+// besides cols ans rows, the image can have multiple layers
+//
+
 #include "s/s.h"
 #include "s/allocator.h"
 #include "m/sca/float.h"

@@ -195,6 +195,11 @@ static void on_action(bool ok) {
     int rows = impl->rows;
     int frames = impl->frames;
     int layers = impl->layers;
+    bool rotate_left = u_button_is_pressed(&impl->rotate_flip_toggle[0].rect);
+    bool rotate_right = u_button_is_pressed(&impl->rotate_flip_toggle[1].rect);
+    bool mirror_vertical = u_button_is_pressed(&impl->rotate_flip_toggle[2].rect);
+    bool mirror_horizontal = u_button_is_pressed(&impl->rotate_flip_toggle[3].rect);
+    
     bool keep_order = u_button_is_pressed(&impl->keep_order_toggle.rect);
     bool scale = u_button_is_pressed(&impl->scale_toggle.rect);
 
@@ -248,6 +253,15 @@ static void on_action(bool ok) {
         sprite = u_sprite_new_reorder_from_image(frames, new_img);
         u_image_kill(&img);
         u_image_kill(&new_img);
+    }
+    
+    if(rotate_left || rotate_right) {
+        s_log("rotate");
+        u_image_rotate(&sprite.img, rotate_right);
+    }
+    if(mirror_horizontal || mirror_vertical) {
+        s_log("mirror");
+        u_image_mirror(sprite.img, mirror_vertical);
     }
     
     canvas_set_sprite(sprite, true);
@@ -306,26 +320,10 @@ void dialog_create_size() {
     impl->layers_text.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
     impl->layers_num.pose = u_pose_new(DIALOG_LEFT + 106, DIALOG_TOP - pos, 1, 2);
     impl->layers_hitbox = u_pose_new_aa(DIALOG_LEFT+64, DIALOG_TOP - pos + 4, DIALOG_WIDTH-64, 15);
-    pos += 16;
-    
-    
-    for(int i=0; i<4; i++) {
-        impl->rotate_flip_toggle[i] = ro_single_new(r_texture_new_file(2, 1,
-                (const char *[]) {
-                    "res/button_rotate_left.png",
-                    "res/button_rotate_right.png",
-                    "res/button_vertical.png",
-                    "res/button_horizontal.png"
-                }[i]
-                ));
-        impl->rotate_flip_toggle[i].rect.pose = u_pose_new_aa(
-                DIALOG_LEFT + DIALOG_WIDTH/2 - 36 + 18*i, 
-                DIALOG_TOP - pos, 
-                16, 16);
-        
-    }
     pos += 20;
-
+    
+    
+    
     impl->keep_order_txt = ro_text_new_font55(16);
     ro_text_set_color(&impl->keep_order_txt, DIALOG_TEXT_COLOR);
     ro_text_set_text(&impl->keep_order_txt, "keep order?");
@@ -349,7 +347,25 @@ void dialog_create_size() {
             DIALOG_TOP - pos + 2,
             16, 16);
 
+    pos += 16;
+    
+    for(int i=0; i<4; i++) {
+        impl->rotate_flip_toggle[i] = ro_single_new(r_texture_new_file(2, 1,
+                (const char *[]) {
+                    "res/button_rotate_left.png",
+                    "res/button_rotate_right.png",
+                    "res/button_vertical.png",
+                    "res/button_horizontal.png"
+                }[i]
+                ));
+        impl->rotate_flip_toggle[i].rect.pose = u_pose_new_aa(
+                DIALOG_LEFT + DIALOG_WIDTH/2 - 36 + 18*i, 
+                DIALOG_TOP - pos, 
+                16, 16);
+        
+    }
     pos += 5;
+
 
 
     dialog_set_title("size", TITLE_COLOR);

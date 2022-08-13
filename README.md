@@ -97,11 +97,6 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- size dialog
-  - frames behind cols
-  - layers behind rows
-  - add rotate und flip toggles
-- iso tilesheet fix tree
 - doc
   - size
   - iso how to rotate

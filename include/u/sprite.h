@@ -1,6 +1,12 @@
 #ifndef U_SPRITE_H
 #define U_SPRITE_H
 
+//
+// Holds an uImage 
+// and expands layers into sprite cols, rows
+// like an rTexture...
+//
+
 #include "m/types/int.h"
 #include "image.h"
 

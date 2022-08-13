@@ -62,6 +62,7 @@ static struct {
         bool custom_select_active;
     } palette;
 
+    bool was_active;
     bool was_iso;
 } L;
 
@@ -294,6 +295,10 @@ void tile_init() {
 
 void tile_update(float dtime) {
     selectionctrl.allowed = !(tile.active && tile.iso);
+    if(tile.active && !L.was_active) {
+        set_color(0);
+    }
+    L.was_active = tile.active;
 }
 
 uImage tile_get_tilemap_preview() {
