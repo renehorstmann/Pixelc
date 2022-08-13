@@ -87,6 +87,10 @@ void tooltip_render(const mat4 *cam_mat) {
 void tooltip_set(const char *title, const char *tip) {
     if(!tooltip.show)
         return;
+    if(!title || !tip) {
+        L.time = -1;
+        return;
+    }
     s_log("set: %s", title);
     
     L.title_size = ro_text_set_text(&L.title, title);

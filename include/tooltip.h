@@ -24,6 +24,7 @@ void tooltip_update(float dtime);
 
 void tooltip_render(const mat4 *camera_mat);
 
+// pass NULL, NULL to clear
 void tooltip_set(const char *title, const char *tip);
 
 // saves the config to the savestate config.json 

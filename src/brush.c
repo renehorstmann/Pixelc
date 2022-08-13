@@ -183,8 +183,10 @@ void brush_pointer_event(ePointer_s pointer) {
     if (L.hovering)
         return;
 
-    if (change)
+    if (change) {
         L.change = true;
+        tooltip_set(NULL, NULL);
+    }
 
     if (L.change && pointer.action == E_POINTER_UP) {
         L.change = false;
