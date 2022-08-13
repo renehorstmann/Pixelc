@@ -36,8 +36,8 @@ static bool is_active(struct Tool *super, float dtime) {
 Tool *tool_new_save() {
     return tool_button_new("save",
                            "Opens the save\n"
-                           "dialog to save as\n"
-                           "PNG or GIF",
+                           "dialog to save\n"
+                           "as PNG or GIF",
                            "res/button_save.png",
                            pointer_event,
                            is_active);

@@ -43,7 +43,6 @@ Or just use the tooltip tool.
 - Custom Brush / Kernel / Stamps
 - Custom Palettes
 - **COMPLETELY FREE and open**
-- Mod Tilec for a tileset editor (+ isometric view)
 - and many more
 
 ## Web Image Upload Zoom Bug

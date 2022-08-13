@@ -119,7 +119,7 @@ Does nothing on the canvas. Use this mode if you just want to view your pixel ar
 
 Click on a color in the canvas to set it as [secondary color](#S-secondary_color). 
 The app shows a flash effect of that color to show you that the pipette mode is active.
-(Also if [shading](#S_shading) is active)
+(Also if [shading](#S-shading) is active)
 
 ## <a name="S-tooltip"></a>Tooltip
 ![img](doc/res4/button_tooltip.png)
@@ -166,7 +166,7 @@ In this dialog you can:
 ### <a name="S-palette__load"></a>How to load a palette from a file
 1. Download a palette file as png (for example from [LOSCPEC](https://lospec.com/palette-list) PNG Image 1x)
 2. ![img](doc/res2/button_tab.png)  use a new image tab
-3. ![img](doc/res2/button_import.png)  hold down on the import button 
+3. ![img](doc/res2/button_import.png) click on the import button 
 4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas" 
 5. hold down on the palette to open the palette dialog
 6. (optional) rename the palette name to a new one
@@ -198,7 +198,7 @@ In this dialog you can:
 - ![img](doc/res2/button_delete.png)   delete the current kernel
 - ![img](doc/res2/button_from.png)   copy the current kernel as image into the canvas
   - will overwrite the full image (use undo to reset to the old)
-  - Good to edit the palatte in the canvas
+  - Good to edit the kernel in the canvas
 - ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image
 
 ### <a name="S-kernel__brush"></a>New Brush Size
@@ -216,7 +216,7 @@ In this dialog you can:
 ### <a name="S-kernel__stamps"></a>Stamps
 You can also use kernels as image stamps to quickly draw your stamps in different colors:
 1. ![img](doc/res2/button_tab.png)  use a new image tab 
-2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel color * palette color`)
+2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel color * palette color // [0:1]`)
 3. Hold on the Kernel preview to start the kernel dialog
 4. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
 5. Select a color from the palette
@@ -262,14 +262,15 @@ To set the secondary color:
 
 Shading is useful to only paint above a selected color, to shade or highlight edges.
 
-1. set the secondary color 
-2. activate the shading mode
-3. draw the shades
+1. set the secondary color to the color you wish to overdraw
+2. select the new color from the palette
+3. activate the shading mode
+4. draw the shades
 
 ![img](doc/shading.png)
 
 The app shows a flash effect of the secondary color to show you that the shading mode is active.
-(Also if the pipette [draw mode](#S_draw_modes) is used)
+(Also if the pipette [draw mode](#S-draw_modes) is used)
 
 ## <a name="S-tiles"></a>Tiles
 ![img](doc/res4/button_tile.png)
@@ -278,7 +279,12 @@ Click on the tile tool to start the tiling mode.
 
 ![img](doc/tiling_mode.png)
 
-The canvas now renders a tile for each pixel.
+The canvas now renders a tile for each pixel unit.
+
+> (WebApp) limitation:
+> The tile mode creates large textures on the GPU.
+> If the maximal size is reached on your device, the canvas may get completely black or is rendered wrong!
+> Use a smaller canvas size.
 
 ### Tile Palette
 
@@ -304,8 +310,10 @@ Here you can:
 - Reset the size of a single tile for x and y (`8, 16, 32 pixel`)
   - For all tilesheets.
 - ![img](doc/res2/button_to.png) Copy the tilesheet into the canvas
+  - Good for editing the tilesheet
 - ![img](doc/res2/button_from.png) Update the current tilesheet with the canvas image
   - The image size must be a multiple of 32
+    - will be filled with transparency to match `%32==0`
 
 ### <a name="S-tiles__isometric"></a>Isometric Mode
 ![img](doc/res4/button_iso.png)
@@ -333,8 +341,8 @@ In the isometric mode, selections are disabled. Turn it off to use them.
 
 ### <a name="S-tiles__load"></a>How to load a tilesheet from a file
 1. Download a tilesheet file as png (for example from [itch](https://itch.io/game-assets/tag-tileset))
-2. ![img](doc/res2/button_tab.png)  use a new image tab
-3. ![img](doc/res2/button_import.png)  hold down on the import button
+2. ![img](doc/res2/button_tab.png) use a new image tab
+3. ![img](doc/res2/button_import.png) click on the import button
 4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas"
 5. (optional) crop the image out to the tiles you want with a [selection](#S-selection)
 6. ![img](doc/res2/button_tile.png) start the tiling mode
@@ -539,15 +547,16 @@ You can select up to nine different image tabs via the tab tool.
 
 ## <a name="S-frames"></a>Frames
 ![img](doc/res4/button_play.png)
+
 Open the frames toolbar and show the animated preview.
 
 
-If not activated, the frames are side by side on the canvas.
+If not activated, the frames are side by side on the canvas:
 
 ![img](doc/frames_off.png)
 
 ![img](doc/res2/button_grid.png)
-Click on the [grid](#S-grid) tool, to show the frame grid in the full image 
+Click on the [grid](#S-grid) tool, to show the frame grid in the full image:
 
 ![img](doc/frames_grid.png)
 

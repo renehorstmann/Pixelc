@@ -38,9 +38,10 @@ static bool is_active(struct Tool *super, float dtime) {
 
 Tool *tool_new_display() {
     return tool_button_new("display",
-                           "Change the internal\n"
+                           "Change the\n"
+                           "internal\n"
                            "display size\n"
-                           "(min. pixel size)\n\n"
+                           "(min. pixel)\n\n"
                            "and the\n"
                            "rotation mode",
                            "res/button_display.png",

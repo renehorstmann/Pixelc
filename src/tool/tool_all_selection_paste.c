@@ -32,7 +32,8 @@ static void rotate_l_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_rotate_l() {
     return tool_button_new("rotate left",
-                           "Rotates the\nselection left",
+                           "Rotates the\n"
+                           "selection left",
                            "res/button_rotate_left.png",
                            rotate_l_pe,
                            NULL);
@@ -52,7 +53,8 @@ static void rotate_r_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_rotate_r() {
     return tool_button_new("rotate right",
-                           "Rotates the\nselection right",
+                           "Rotates the\n"
+                           "selection right",
                            "res/button_rotate_right.png",
                            rotate_r_pe,
                            NULL);
@@ -72,7 +74,9 @@ static void mirror_v_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_mirror_v() {
     return tool_button_new("flip vertical",
-                           "Mirrors the\nselection\nvertically",
+                           "Mirrors the\n"
+                           "selection\n"
+                           "vertically",
                            "res/button_vertical.png",
                            mirror_v_pe,
                            NULL);
@@ -92,7 +96,9 @@ static void mirror_h_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_mirror_h() {
     return tool_button_new("flip horizontal",
-                           "Mirrors the\nselection\nhorizontally",
+                           "Mirrors the\n"
+                           "selection\n"
+                           "horizontally",
                            "res/button_horizontal.png",
                            mirror_h_pe,
                            NULL);
@@ -124,8 +130,10 @@ Tool *tool_new_selection_paste_blend() {
     return tool_button_new("blend",
                            "Blends in the\n"
                            "previous color\n"
-                           "with the selection\n"
-                           "alpha / transparency",
+                           "with the\n"
+                           "selection\n"
+                           "alpha /\n"
+                           "transparency",
                            "res/button_blend.png",
                            blend_pe,
                            blend_is_a);
@@ -141,7 +149,10 @@ static void copy_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_copy() {
     return tool_button_new("copy",
-                           "Copies the current\nselection paste",
+                           "Copies the\n"
+                           "current\n"
+                           "selection\n"
+                           "paste",
                            "res/button_copy.png",
                            copy_pe,
                            NULL);
@@ -158,7 +169,12 @@ static void ok_pe(struct Tool *super, ePointer_s pointer) {
 
 Tool *tool_new_selection_paste_ok() {
     return tool_button_new("ok",
-                           "Copies the current\nselection paste\nand stops the\nselection mode",
+                           "Copies the\n"
+                           "current\n"
+                           "selection\n"
+                           "paste\n"
+                           "and stops the\n"
+                           "selection mode",
                            "res/button_ok.png",
                            ok_pe,
                            NULL);

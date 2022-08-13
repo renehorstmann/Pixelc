@@ -59,7 +59,8 @@ Tool *tool_new_rgb() {
     return tool_button_new("rgb",
                            "Set the\n"
                            "secondary color\n"
-                           "with a color picker",
+                           "with a\n"
+                           "color picker",
                            "res/button_rgb.png",
                            pointer_event,
                            is_active);

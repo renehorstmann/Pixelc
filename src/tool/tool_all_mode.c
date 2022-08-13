@@ -135,9 +135,10 @@ Tool *tool_new_mode_replace() {
 Tool *tool_new_mode_pipette() {
     return mode_new("pipette",
                     "Select a color\n"
-                    "on the canvas\n"
-                    "as secondary color\n\n"
-                    "flashes the screen\n"
+                    "on the canvas as\n"
+                    "secondary color\n\n"
+                    "flashes the\n"
+                    "screen\n"
                     "while active",
                     "res/button_pipette.png",
                     BRUSH_MODE_PIPETTE);

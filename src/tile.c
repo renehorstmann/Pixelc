@@ -517,18 +517,20 @@ void tile_palette_pointer_event(ePointer_s pointer) {
 
     if (u_button_clicked(&L.palette.prev_btn.rect, pointer)) {
         s_log("prev_btn");
+        // extra spaces and newline to get above the palette info
         tooltip_set("previous", "Load the\n"
                                 "previous\n"
-                                "tilesheet");
+                                "tilesheet  \n");
         tile_palette_next_palette(false);
         return;
     }
 
     if (u_button_clicked(&L.palette.next_btn.rect, pointer)) {
         s_log("next_btn");
+        // extra spaces and newline to get above the palette info
         tooltip_set("next", "Load the\n"
-                                "next\n"
-                                "tilesheet");
+                            "next\n"
+                            "tilesheet  \n");
         tile_palette_next_palette(true);
         return;
     }
@@ -545,7 +547,7 @@ void tile_palette_pointer_event(ePointer_s pointer) {
         s_log("tile_toggle");
         tooltip_set("tile", "Render in\n"
                             "tile mode or\n"
-                            "color mode");
+                            "color code mode");
         tile.canvas_active = u_button_is_pressed(&L.palette.tile_toggle.rect);
         tile_save_config();
         cameractrl_set_home();

@@ -14,6 +14,7 @@
 #include "feedback.h"
 #include "tooltip.h"
 #include "tile.h"
+#include "multitouchcursor.h"
 #include "palette.h"
 
 
@@ -180,7 +181,7 @@ void palette_update(float dtime) {
     // action
     if(L.action.longpress_time>=0) {
         L.action.longpress_time -= dtime;
-        if(L.action.longpress_time<0) {
+        if(L.action.longpress_time<0 && !multitouchcursor.active) {
             // stop actions
             L.action.swiping = false;
             feedback_longpress(L.action.start, (vec4) {{0.6, 0.6, 0.1, 1.0}});
