@@ -35,6 +35,8 @@ typedef struct {
     RoText layers_text;
     RoText layers_num;
     mat4 layers_hitbox;
+    
+    RoSingle rotate_flip_toggle[4];
 
     RoText keep_order_txt;
     RoSingle keep_order_toggle;
@@ -56,6 +58,8 @@ static void kill_fn() {
     ro_text_kill(&impl->frames_num);
     ro_text_kill(&impl->layers_text);
     ro_text_kill(&impl->layers_num);
+    for(int i=0; i<4; i++)
+        ro_single_kill(&impl->rotate_flip_toggle[i]);
     ro_text_kill(&impl->keep_order_txt);
     ro_single_kill(&impl->keep_order_toggle);
     ro_text_kill(&impl->scale_txt);
@@ -122,6 +126,8 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->frames_num, cam_mat);
     ro_text_render(&impl->layers_text, cam_mat);
     ro_text_render(&impl->layers_num, cam_mat);
+    for(int i=0; i<4; i++)
+        ro_single_render(&impl->rotate_flip_toggle[i], cam_mat);
     ro_text_render(&impl->keep_order_txt, cam_mat);
     ro_single_render(&impl->keep_order_toggle, cam_mat);
     ro_text_render(&impl->scale_txt, cam_mat);
@@ -130,6 +136,19 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
+    
+    for(int i=0; i<4; i++) {
+        if(u_button_toggled(&impl->rotate_flip_toggle[i].rect, pointer)) {
+            s_log("rotate_flip[%i] toggled", i);
+            if(u_button_is_pressed(&impl->rotate_flip_toggle[i].rect)) {
+                for(int j=0; j<4; j++) {
+                    if(i==j)
+                        continue;
+                    u_button_set_pressed(&impl->rotate_flip_toggle[j].rect, false);
+                }
+            }
+        }
+    }
 
     if(u_button_toggled(&impl->keep_order_toggle.rect, pointer)) {
         s_log("keep_order toggled");
@@ -287,6 +306,24 @@ void dialog_create_size() {
     impl->layers_text.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
     impl->layers_num.pose = u_pose_new(DIALOG_LEFT + 106, DIALOG_TOP - pos, 1, 2);
     impl->layers_hitbox = u_pose_new_aa(DIALOG_LEFT+64, DIALOG_TOP - pos + 4, DIALOG_WIDTH-64, 15);
+    pos += 16;
+    
+    
+    for(int i=0; i<4; i++) {
+        impl->rotate_flip_toggle[i] = ro_single_new(r_texture_new_file(2, 1,
+                (const char *[]) {
+                    "res/button_rotate_left.png",
+                    "res/button_rotate_right.png",
+                    "res/button_vertical.png",
+                    "res/button_horizontal.png"
+                }[i]
+                ));
+        impl->rotate_flip_toggle[i].rect.pose = u_pose_new_aa(
+                DIALOG_LEFT + DIALOG_WIDTH/2 - 36 + 18*i, 
+                DIALOG_TOP - pos, 
+                16, 16);
+        
+    }
     pos += 20;
 
     impl->keep_order_txt = ro_text_new_font55(16);
