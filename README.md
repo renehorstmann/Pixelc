@@ -96,6 +96,12 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 python3 -m http.server --bind localhost  # [port]
 ```
 
+## Todo
+- size dialog
+  - frames behind cols
+  - layers behind rows
+  - add rotate und flip toggles
+
 ## Author
 René Horstmann
 

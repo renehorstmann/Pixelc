@@ -253,9 +253,19 @@ void dialog_create_size() {
     ro_text_set_color(&impl->cols_text, DIALOG_TEXT_COLOR);
     impl->cols_num = ro_text_new_font55(8);
     ro_text_set_color(&impl->cols_num, DIALOG_TEXT_EDIT_COLOR);
-    impl->cols_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
-    impl->cols_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
-    impl->cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
+    impl->cols_text.pose = u_pose_new(DIALOG_LEFT + 4, DIALOG_TOP - pos, 1, 2);
+    impl->cols_num.pose = u_pose_new(DIALOG_LEFT + 34, DIALOG_TOP - pos, 1, 2);
+    impl->cols_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, 64, 15);
+
+    impl->frames = canvas.RO.frames;
+    impl->frames_text = ro_text_new_font55(7);
+    ro_text_set_text(&impl->frames_text, "frames:");
+    ro_text_set_color(&impl->frames_text, DIALOG_TEXT_COLOR);
+    impl->frames_num = ro_text_new_font55(8);
+    ro_text_set_color(&impl->frames_num, DIALOG_TEXT_EDIT_COLOR);
+    impl->frames_text.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
+    impl->frames_num.pose = u_pose_new(DIALOG_LEFT + 106, DIALOG_TOP - pos, 1, 2);
+    impl->frames_hitbox = u_pose_new_aa(DIALOG_LEFT + 64, DIALOG_TOP - pos + 4, DIALOG_WIDTH-64, 15);
     pos += 15;
 
     impl->rows = canvas.RO.rows;
@@ -264,21 +274,9 @@ void dialog_create_size() {
     ro_text_set_color(&impl->rows_text, DIALOG_TEXT_COLOR);
     impl->rows_num = ro_text_new_font55(8);
     ro_text_set_color(&impl->rows_num, DIALOG_TEXT_EDIT_COLOR);
-    impl->rows_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
-    impl->rows_num.pose = u_pose_new(DIALOG_LEFT + 40, DIALOG_TOP - pos, 1, 2);
-    impl->rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
-    pos += 20;
-
-    impl->frames = canvas.RO.frames;
-    impl->frames_text = ro_text_new_font55(7);
-    ro_text_set_text(&impl->frames_text, "frames:");
-    ro_text_set_color(&impl->frames_text, DIALOG_TEXT_COLOR);
-    impl->frames_num = ro_text_new_font55(8);
-    ro_text_set_color(&impl->frames_num, DIALOG_TEXT_EDIT_COLOR);
-    impl->frames_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
-    impl->frames_num.pose = u_pose_new(DIALOG_LEFT + 52, DIALOG_TOP - pos, 1, 2);
-    impl->frames_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
-    pos += 15;
+    impl->rows_text.pose = u_pose_new(DIALOG_LEFT + 4, DIALOG_TOP - pos, 1, 2);
+    impl->rows_num.pose = u_pose_new(DIALOG_LEFT + 34, DIALOG_TOP - pos, 1, 2);
+    impl->rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, 64, 15);    
 
     impl->layers = canvas.RO.layers;
     impl->layers_text = ro_text_new_font55(7);
@@ -286,9 +284,9 @@ void dialog_create_size() {
     ro_text_set_color(&impl->layers_text, DIALOG_TEXT_COLOR);
     impl->layers_num = ro_text_new_font55(8);
     ro_text_set_color(&impl->layers_num, DIALOG_TEXT_EDIT_COLOR);
-    impl->layers_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
-    impl->layers_num.pose = u_pose_new(DIALOG_LEFT + 52, DIALOG_TOP - pos, 1, 2);
-    impl->layers_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
+    impl->layers_text.pose = u_pose_new(DIALOG_LEFT + 64, DIALOG_TOP - pos, 1, 2);
+    impl->layers_num.pose = u_pose_new(DIALOG_LEFT + 106, DIALOG_TOP - pos, 1, 2);
+    impl->layers_hitbox = u_pose_new_aa(DIALOG_LEFT+64, DIALOG_TOP - pos + 4, DIALOG_WIDTH-64, 15);
     pos += 20;
 
     impl->keep_order_txt = ro_text_new_font55(16);
