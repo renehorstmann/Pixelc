@@ -9,7 +9,7 @@ An opensource tile/sprite editor in C, using SDL2 and OpenGL.
 Based on [some](https://github.com/renehorstmann/some) framework.
 
 ## Android App
-Pixelc in the [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelc).
+Pixelc on [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelc).
 
 ## WebApp
 [Pixelc WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten.

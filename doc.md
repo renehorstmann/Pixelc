@@ -6,7 +6,7 @@ Welcome to the [Pixelc](https://github.com/renehorstmann/pixelc) tutorial.
 Pixelc is a free pixelart editor for multiple platforms, including a [WebApp](https://renehorstmann.github.io/pixelc).
 
 The main target are touch devices such as smartphones and tablets 
-(via the [WebApp](https://renehorstmann.github.io/pixelc) or as Android App from [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelc)).
+(via the [WebApp](https://renehorstmann.github.io/pixelc) or as Android App on [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelc)).
 
 Its also fine to use on desktops, etc.
 
