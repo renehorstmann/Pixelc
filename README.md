@@ -97,6 +97,9 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
+- some e window
+  - flag ALLOW HIGH DPI (ios manual)
+    - get renderer size instead if window size
 - doc
   - size
   - iso how to rotate
