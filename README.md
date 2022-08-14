@@ -100,6 +100,8 @@ python3 -m http.server --bind localhost  # [port]
 - some e window
   - flag ALLOW HIGH DPI (ios manual)
     - get renderer size instead if window size
+  - some_examples breaks in beginning gl check?
+    - seems to have full screen size?!?
 - doc
   - size
   - grid dialog
