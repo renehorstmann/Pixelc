@@ -262,6 +262,8 @@ static void update_sprite() {
 
 
 void canvas_init() {
+    canvas.show_bg = true;
+    
     canvas.blend_mode = CANVAS_BLEND_LAYER_ONION;
     
     for(int i=0; i<CANVAS_MAX_FRAMES; i++) {
@@ -311,7 +313,10 @@ void canvas_render(const mat4 *canvascam_mat) {
 
     float ro_alpha = canvas.show_grid? GRID_RO_ALPHA : 1;
 
-    ro_single_render(&L.bg, canvascam_mat);
+    bool tile_iso = tile.active && tile.canvas_active && tile.iso;
+    if(canvas.show_bg && !tile_iso) {
+        ro_single_render(&L.bg, canvascam_mat);
+    }
     
     switch(canvas.blend_mode) {
     case CANVAS_BLEND_NONE:

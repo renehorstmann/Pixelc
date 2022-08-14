@@ -100,8 +100,10 @@ python3 -m http.server --bind localhost  # [port]
 - some e window
   - flag ALLOW HIGH DPI (ios manual)
     - get renderer size instead if window size
+- grid dialog canvas.show_bg
 - doc
   - size
+  - grid dialog
   - iso how to rotate
 
 ## Author

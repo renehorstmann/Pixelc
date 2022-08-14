@@ -29,6 +29,9 @@ enum canvas_blend_mode {
 
 
 struct Canvas_Globals {
+    
+    // show or hide the background grid (defaults to true)
+    bool show_bg;
 
     // shows frames and layers grid and sets the alpha value of the canvas lower
     //      to blend in the background
