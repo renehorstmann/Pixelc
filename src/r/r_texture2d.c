@@ -13,11 +13,10 @@ rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffe
 
     glGenTextures(1, &self.tex);
     glBindTexture(GL_TEXTURE_2D, self.tex);
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                  self.size.x, self.size.y,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, opt_buffer);
-
+    
     if(r_render.init_textures_as_filtered_linear) 
         r_texture2d_filter_linear(self);
     else

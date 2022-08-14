@@ -101,6 +101,10 @@ static void reset_framebuffer(ivec2 fbo_size, ivec2 sprites) {
 
     r_framebuffer_kill(&L.canvas.fb);
     L.canvas.fb = r_framebuffer_new(fbo_size.x, fbo_size.y * sprites.x * sprites.y);
+    if(!r_framebuffer_valid(L.canvas.fb)) {
+        s_log_error("invalid framebuffer, too large?");
+        palette_set_info("Tilemap to large to render");
+    }
     u_sprite_kill(&L.canvas.sprite);
     L.canvas.sprite = u_sprite_new_empty(fbo_size.x, fbo_size.y, sprites.x, sprites.y);
     r_texture_kill(&L.canvas.tex);

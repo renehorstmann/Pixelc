@@ -102,6 +102,10 @@ python3 -m http.server --bind localhost  # [port]
     - get renderer size instead if window size
   - some_examples breaks in beginning gl check?
     - seems to have full screen size?!?
+- to big framebuffer texture to render info?
+  - glTexImage size error
+  - either call glGetError (slow on web)
+  - or check sizes before (init max sizes in r_render)
 - doc
   - size
   - grid dialog

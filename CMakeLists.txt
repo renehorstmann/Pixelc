@@ -8,6 +8,8 @@ set(USE_SDL_TTF false)
 set(USE_FETCH false)
 set(USE_SANITIZER true)
 
+add_definitions(-DOPTION_GL_ERROR)
+
 # Platforms definitions:
 # PLATFORM_MSVC         Microsoft C++ Compiler
 # PLATFORM_MINGW        Windows Msys2 Mingw-w64
