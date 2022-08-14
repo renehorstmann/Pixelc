@@ -16,6 +16,9 @@ static const vec4 TITLE_COLOR = {{0.6, 0.8, 0.6, 1}};
 //
 
 typedef struct {
+    RoText show_txt;
+    RoSingle show;
+    
     int pattern_cols;
     RoText pattern_cols_text;
     RoText pattern_cols_num;
@@ -32,6 +35,8 @@ typedef struct {
 
 static void kill_fn() {
     Impl *impl = dialog.impl;
+    ro_text_kill(&impl->show_txt);
+    ro_single_kill(&impl->show);
     ro_text_kill(&impl->pattern_cols_text);
     ro_text_kill(&impl->pattern_cols_num);
     ro_text_kill(&impl->pattern_rows_text);
@@ -76,10 +81,14 @@ static void update(float dtime) {
     ro_text_set_text(&impl->pattern_cols_num, buf);
     snprintf(buf, sizeof buf, "%i", impl->pattern_rows);
     ro_text_set_text(&impl->pattern_rows_num, buf);
+    
+    u_button_set_pressed(&impl->show.rect, canvas.show_bg);
 }
 
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
+    ro_text_render(&impl->show_txt, cam_mat);
+    ro_single_render(&impl->show, cam_mat);
     ro_text_render(&impl->pattern_cols_text, cam_mat);
     ro_text_render(&impl->pattern_cols_num, cam_mat);
     ro_text_render(&impl->pattern_rows_text, cam_mat);
@@ -88,6 +97,12 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
+    
+    if(u_button_toggled(&impl->show.rect, pointer)) {
+        s_log("canvas show_bg");
+        canvas.show_bg = u_button_is_pressed(&impl->show.rect);
+    }
+    
 
     if (pointer.id != 0 || pointer.action != E_POINTER_DOWN)
         return true;
@@ -138,6 +153,17 @@ void dialog_create_grid() {
     dialog.impl = impl;
 
     int pos = 20;
+    
+    impl->show_txt = ro_text_new_font55(32);
+    ro_text_set_text(&impl->show_txt, "show\n"
+            "  background:");
+    ro_text_set_color(&impl->show_txt, DIALOG_TEXT_COLOR);
+    impl->show_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 2, 1, 2);
+
+    impl->show = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    impl->show.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 30, DIALOG_TOP - pos - 10, 16, 16);
+
+    pos += 40;
 
     impl->pattern_cols = canvas.RO.pattern_size.x;
     impl->pattern_cols_text = ro_text_new_font55(16);
