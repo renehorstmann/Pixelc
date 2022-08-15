@@ -9,7 +9,7 @@
 //
 
 uImage u_image_new_empty_a(int cols, int rows, int layers, sAllocator_i a) {
-    ssize data_size = cols * rows * layers * sizeof(uColor_s);
+    ssize data_size = (ssize) cols * (ssize) rows * (ssize) layers * (ssize) sizeof(uColor_s);
 
     if (data_size <= 0) {
         s_error_set("image new failed");

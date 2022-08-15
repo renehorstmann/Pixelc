@@ -27,6 +27,10 @@ static rTexture r_texture_new_invalid() {
     return (rTexture) {0};
 }
 
+// returns true if the texture sizes are valid (see r_render.limits.)
+// assumes all values are >0 and image_cols % sprite_cols == 0 (same for rows)
+bool r_texture_size_in_limits(int image_cols, int image_rows, int sprite_cols, int sprites_rows);
+
 // returns a new texture from an optional buffer
 // the buffer image data will be reordered to fit in the 3d array
 rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer);

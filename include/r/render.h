@@ -19,6 +19,11 @@ struct rRender_Globals {
     
     // defaults to false
     bool init_textures_as_filtered_linear;
+
+    struct {
+        int max_texture_size;
+        int max_texture_layers;
+    } limits; // read only, set by r_render_init
 };
 extern struct rRender_Globals r_render;
 

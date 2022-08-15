@@ -75,11 +75,27 @@ static void update(float dtime) {
 
         char *end;
         int size = strtol(impl->textinput->text, &end, 10);
-        bool ok = end && end != impl->textinput->text && size > 0 && size <= CANVAS_MAX_SIZE;
-        if (ok && impl->textinput_usage == 2
-            && size > CANVAS_MAX_LAYERS)
-            ok = false;
+        bool ok = end && end != impl->textinput->text;
+
+        // check canvas size:
+        switch (impl->textinput_usage) {
+            case 0:
+                ok &= canvas_size_valid(size, impl->rows, impl->frames, impl->layers);
+                break;
+            case 1:
+                ok &= canvas_size_valid(impl->cols, size, impl->frames, impl->layers);
+                break;
+            case 2:
+                ok &= canvas_size_valid(impl->cols, impl->rows, size, impl->layers);
+                break;
+            case 3:
+                ok &= canvas_size_valid(impl->cols, impl->rows, impl->frames, size);
+                break;
+            default:
+                s_assume(0, "wtf");
+        }
         impl->textinput->ok_active = ok;
+
 
         if (impl->textinput->state == TEXTINPUT_DONE) {
             switch (impl->textinput_usage) {

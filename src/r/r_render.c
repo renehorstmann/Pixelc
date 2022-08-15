@@ -56,6 +56,11 @@ void r_render_init(SDL_Window *window) {
         r_exit_failure();
     }
 
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &r_render.limits.max_texture_size);
+    glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &r_render.limits.max_texture_layers);
+    s_log("OpenGL texture limits: size=%i; layers=%i",
+          r_render.limits.max_texture_size, r_render.limits.max_texture_layers);
+
     // startup "empty" texture
     r_render.framebuffer_tex = r_texture2d_new_white_pixel();
     glGenFramebuffers(1, &L.framebuffer_tex_fbo);
@@ -145,7 +150,7 @@ void r_render_blit_framebuffer() {
 
 void r_render_set_framebuffer(rFramebuffer fbo) {
     r_render_error_check("r_render_set_framebufferBEGIN");
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo.fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.fbo);
     glViewport(0, 0, fbo.tex.size.x, fbo.tex.size.y);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

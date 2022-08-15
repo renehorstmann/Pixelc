@@ -133,7 +133,8 @@ void dialog_create_import() {
     uImage img = u_image_new_file(1, "import.png");
     impl->import_available = u_image_valid(img)
                              && img.cols <= CANVAS_MAX_SIZE
-                             && img.rows <= CANVAS_MAX_SIZE;
+                             && img.rows <= CANVAS_MAX_SIZE
+                             && canvas_size_valid(img.cols, img.rows, 1, 1);
 
     float pos = 16;
 

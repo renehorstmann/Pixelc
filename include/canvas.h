@@ -11,6 +11,9 @@
 #include "r/ro_single.h"
 #include "tile.h"
 
+// 64 "MiB" = 16 "MiPixel"
+#define CANVAS_MAX_MEMORY 67108864
+
 #define CANVAS_MAX_SIZE 8192
 #define CANVAS_MAX_LAYERS 96
 #define CANVAS_MAX_FRAMES 96
@@ -81,6 +84,11 @@ struct Canvas_Globals {
 };
 extern struct Canvas_Globals canvas;
 
+// returns true if the given size is valid
+// may be invalid if image size would exceed CANVAS_MAX_MEMORY
+//      or r_render.limits.
+//      or all sizes to be<=0
+bool canvas_size_valid(int cols, int rows, int frames, int layers);
 
 void canvas_init();
 

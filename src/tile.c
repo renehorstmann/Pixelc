@@ -4,6 +4,7 @@
 #include "u/pose.h"
 #include "u/json.h"
 #include "m/int.h"
+#include "m/utils/camera.h"
 #include "io.h"
 #include "canvas.h"
 #include "brush.h"
@@ -31,6 +32,7 @@ static struct {
     RoBatch tiles;
 
     struct {
+        ivec2 fb_wanted_size;
         rFramebuffer fb;
         uSprite sprite;
         rTexture tex;
@@ -98,13 +100,24 @@ static ivec2 get_framebuffer_size() {
 static void reset_framebuffer(ivec2 fbo_size, ivec2 sprites) {
     s_log("fbo_size.x, fbo_size.y; sprites.x, sprites.y: %i, %i; %i, %i",
           fbo_size.x, fbo_size.y, sprites.x, sprites.y);
-
+    L.canvas.fb_wanted_size = fbo_size;
     r_framebuffer_kill(&L.canvas.fb);
-    L.canvas.fb = r_framebuffer_new(fbo_size.x, fbo_size.y * sprites.x * sprites.y);
-    if(!r_framebuffer_valid(L.canvas.fb)) {
-        s_log_error("invalid framebuffer, too large?");
-        palette_set_info("Tilemap to large to render");
+    if (!r_texture2d_size_in_limits(fbo_size.x, fbo_size.y * sprites.x * sprites.y)) {
+        s_log_warn("tilemap to large for the frambuffer");
+        tooltip_set("Warning", "Tilemap\n"
+                               "to large\n"
+                               "to render");
+        if (fbo_size.x > fbo_size.y * sprites.x * sprites.y) {
+            float scale = (float) fbo_size.y / fbo_size.x;
+            fbo_size.x = r_render.limits.max_texture_size;
+            fbo_size.y = fbo_size.x * scale;
+        } else {
+            float scale = (float) fbo_size.x / fbo_size.y;
+            fbo_size.y = r_render.limits.max_texture_size / (sprites.x * sprites.y);
+            fbo_size.x = fbo_size.y * scale;
+        }
     }
+    L.canvas.fb = r_framebuffer_new(fbo_size.x, fbo_size.y * sprites.x * sprites.y);
     u_sprite_kill(&L.canvas.sprite);
     L.canvas.sprite = u_sprite_new_empty(fbo_size.x, fbo_size.y, sprites.x, sprites.y);
     r_texture_kill(&L.canvas.tex);
@@ -116,7 +129,7 @@ static void set_tile_pose(int batch_id, int c, int r, int sc, int sr, int layer)
     x = c * tile.RO.tile_size_x;
     y = -r * tile.RO.tile_size_y;
 
-    y -= L.canvas.sprite.img.rows * layer;
+    y -= L.canvas.fb_wanted_size.y * layer;
     L.tiles.rects[batch_id].pose = u_pose_new_aa(x, y, tile.RO.tile_size_x, tile.RO.tile_size_y);
 }
 
@@ -126,7 +139,7 @@ static void set_tile_pose_iso(int batch_id, int c, int r, int sc, int sr, int la
     y = L.canvas.origin.y - (c + r) * tile.RO.tile_size_y / 4
         + sr * tile.RO.tile_size_y / 2;
 
-    y -= L.canvas.sprite.img.rows * layer;
+    y -= L.canvas.fb_wanted_size.y * layer;
     L.tiles.rects[batch_id].pose = u_pose_new_aa(x, y, tile.RO.tile_size_x, tile.RO.tile_size_y);
 }
 
@@ -137,8 +150,8 @@ static void reset_renderobject(int ccols, int crows, int scols, int srows) {
     L.tiles.owns_tex = false;
 
     // uv
-    for(int i=0; i<L.tiles.num; i++) {
-        L.tiles.rects[i].uv = u_pose_new(0, 0, 1.0/L.max_tile_cols, 1.0/L.max_tile_rows);
+    for (int i = 0; i < L.tiles.num; i++) {
+        L.tiles.rects[i].uv = u_pose_new(0, 0, 1.0 / L.max_tile_cols, 1.0 / L.max_tile_rows);
     }
 
     int t = 0;
@@ -205,7 +218,8 @@ static void update_tiles() {
     int max_rows = 0;
     for (int i = 0; i < TILE_MAX_TILESHEETS; i++) {
         imgs[i] = u_image_new_file(1, tilesheet_file(i));
-        if (!u_image_valid(imgs[i]) || imgs[i].cols % tile.RO.tile_size_x != 0 || imgs[i].rows % tile.RO.tile_size_y != 0) {
+        if (!u_image_valid(imgs[i]) || imgs[i].cols % tile.RO.tile_size_x != 0 ||
+            imgs[i].rows % tile.RO.tile_size_y != 0) {
             s_log_error("img size invalid");
             continue;
         }
@@ -299,14 +313,14 @@ void tile_init() {
 
 void tile_update(float dtime) {
     selectionctrl.allowed = !(tile.active && tile.iso);
-    if(tile.active && !L.was_active) {
+    if (tile.active && !L.was_active) {
         set_color(0);
     }
     L.was_active = tile.active;
 }
 
 uImage tile_get_tilemap_preview() {
-    if(!(tile.active && tile.canvas_active)) {
+    if (!(tile.active && tile.canvas_active)) {
         return u_image_new_invalid();
     }
     uSprite sprite = u_sprite_new_clone_merge_row_down_full(L.canvas.sprite);
@@ -322,10 +336,10 @@ vec2 tile_tilesheet_size() {
 
 ivec2 tile_canvas_get_size() {
     // layers may be ==0 on the first frame
-    if (!tile.iso || L.canvas.sprite.img.layers<=0) {
+    if (!tile.iso || L.canvas.sprite.img.layers <= 0) {
         return (ivec2) {{canvas.RO.image.cols * tile.RO.tile_size_x, canvas.RO.image.rows * tile.RO.tile_size_y}};
     }
-    return (ivec2) {{L.canvas.fb.tex.size.x, L.canvas.fb.tex.size.y / L.canvas.sprite.img.layers}};
+    return (ivec2) {{L.canvas.fb_wanted_size.x, L.canvas.fb_wanted_size.y}};
 }
 
 ivec2 tile_canvas_get_cr(vec2 pointer_pos) {
@@ -364,9 +378,9 @@ void tile_on_canvas_update() {
     ivec2 fbo_size = get_framebuffer_size();
     ivec2 sprites = (ivec2) {{c.cols, c.rows}};
 
-    // k sizes (also for startup)chec
+    // check sizes (also for startup)
     if (tile.iso != L.was_iso
-        || fbo_size.x != L.canvas.sprite.img.cols || fbo_size.y != L.canvas.sprite.img.rows
+        || fbo_size.x != L.canvas.fb_wanted_size.x || fbo_size.y != L.canvas.fb_wanted_size.y
         || sprites.x != L.canvas.sprite.cols || sprites.y != L.canvas.sprite.rows) {
         reset_framebuffer(fbo_size, sprites);
         reset_renderobject(c.img.cols, c.img.rows, sprites.x, sprites.y);
@@ -377,7 +391,12 @@ void tile_on_canvas_update() {
     update_ros();
 
     // draw in the framebuffer
-    mat4 cam = r_framebuffer_camera_ortho(L.canvas.fb);
+//    mat4 cam = r_framebuffer_camera_ortho(L.canvas.fb);
+    mat4 cam = mat4_camera_ortho(0,
+                                 L.canvas.fb_wanted_size.x,
+                                 0,
+                                 -L.canvas.fb_wanted_size.y * L.canvas.sprite.cols * L.canvas.sprite.rows,
+                                 -1, 1);
     r_render_set_framebuffer(L.canvas.fb);
     r_render_clear(R_COLOR_TRANSPARENT);
     ro_batch_render(&L.tiles, &cam, true);
@@ -495,7 +514,7 @@ void tile_palette_pointer_event_always(ePointer_s pointer) {
         && !palette_contains_pos(pointer.pos.xy)) {
         return;
     }
-    
+
     // in tiles view
     ePointer_s t_pointer = pointer;
     t_pointer.pos = tile_palette_pointer_pos(pointer.pos);
@@ -580,10 +599,10 @@ void tile_palette_pointer_event(ePointer_s pointer) {
     // tooltip
     if (pointer.action == E_POINTER_DOWN) {
         tooltip_set("tile palette", "Tip to select\n"
-                               "a tile\n\n"
-                               "Swipe up for\n"
-                               "Multitouch Mode\n\n"
-                               "Hold for options");
+                                    "a tile\n\n"
+                                    "Swipe up for\n"
+                                    "Multitouch Mode\n\n"
+                                    "Hold for options");
     }
 
     // in tiles ro as [-0.5 : 0.5]
@@ -682,7 +701,7 @@ void tile_load_tilesheet(int id) {
     tile.RO.tilesheet_id = id;
 
     uImage tile_img = u_image_new_file(1, tilesheet_file(id));
-    if(!u_image_valid(tile_img)) {
+    if (!u_image_valid(tile_img)) {
         s_log_error("invalid image?");
         return;
     }
@@ -713,27 +732,27 @@ void tile_update_tilesheet(uImage tilesheet, int id) {
         s_log_error("not in range");
         return;
     }
-    if(!u_image_valid(tilesheet)) {
+    if (!u_image_valid(tilesheet)) {
         s_log_error("not valid");
         return;
     }
     s_log("update: %i", id);
 
     tilesheet.layers = 1;
-    
-    if(tilesheet.cols>=32 && tilesheet.cols%32==0 && tilesheet.rows>=32 && tilesheet.rows%32==0) {
+
+    if (tilesheet.cols >= 32 && tilesheet.cols % 32 == 0 && tilesheet.rows >= 32 && tilesheet.rows % 32 == 0) {
         u_image_save_file(tilesheet, tilesheet_file(id));
     } else {
         int cols = tilesheet.cols;
-        if(cols<32)
+        if (cols < 32)
             cols = 32;
-        if(cols%32!=0)
-            cols = (1+(cols/32))*32;
+        if (cols % 32 != 0)
+            cols = (1 + (cols / 32)) * 32;
         int rows = tilesheet.rows;
-        if(rows<32)
+        if (rows < 32)
             rows = 32;
-        if(rows%32!=0)
-            rows = (1+(rows/32))*32;
+        if (rows % 32 != 0)
+            rows = (1 + (rows / 32)) * 32;
         uImage img = u_image_new_zeros(cols, rows, 1);
         u_image_copy_top_left(img, tilesheet);
         u_image_save_file(img, tilesheet_file(id));
@@ -815,7 +834,7 @@ void tile_load_config() {
     const bool *active = u_json_get_object_bool(member, "active");
     const bool *canvas_active = u_json_get_object_bool(member, "canvas_active");
     const bool *iso = u_json_get_object_bool(member, "iso");
-    if(active && canvas_active && iso) {
+    if (active && canvas_active && iso) {
         tile.active = *active;
         tile.canvas_active = *canvas_active;
         tile.iso = *iso;

@@ -328,6 +328,15 @@ In this example, the tilesize is set as 32x32 pixel
 
 In the isometric mode, selections are disabled. Turn it off to use them.
 
+#### Rotating the Isometric Tilemap
+Want to view your 3D-Tilemap from a different orientation?
+1. ![img](doc/res2/button_size.png) Click on the size tool to open the [size](#S-size) dialog
+2. ![img](doc/res2/button_rotate_left.png) Rotate the image
+3. Enjoy your new view:
+
+![img](doc/tiles_isometric_rotate.png)
+
+
 ### <a name="S-tiles__edit"></a>How to edit a tilesheet
 1. ![img](doc/res2/button_tab.png)  use a new image tab
 2. ![img](doc/res2/button_tile.png) start the tiling mode
@@ -409,7 +418,8 @@ Grid option on:
 
 ![img](doc/grid_on.png)
 
-Hold on the grid tool, to open a dialog in which you can change the pattern size:
+Hold on the grid tool, to open a dialog in which you can change the pattern size 
+and show or hide the entire background grid:
 
 ![img](doc/grid_dialog.png)
 
@@ -448,6 +458,12 @@ Click on the import tool to open the import dialog.
 
 Click on the **UPLOAD** button to open a file chooser and upload a png image.
 > The CxxDroid Version has no file dialog and just trys to load import.png from the working directory.
+
+> Maximal image sizes:
+> - 8192*8192
+> - 96 Frames
+> - 96 Layers
+> - 64 MiB image size (~16 million pixel)
 
 ![img](doc/res2/button_to.png)
 The button **COPY INTO CANVAS** 
@@ -488,6 +504,18 @@ with the *"nearest"* filter setting.
 
 > Good to downscale an (.png) image into pixel art
 
+![img](doc/res2/button_rotate_left.png)
+![img](doc/res2/button_rotate_right.png)
+![img](doc/res2/button_vertical.png)
+![img](doc/res2/button_horizontal.png)
+
+Toggle the rotate and flip buttons, to manipulate the image after resizing
+
+> Maximal image sizes:
+> - 8192*8192
+> - 96 Frames
+> - 96 Layers
+> - 64 MiB image size (~16 million pixel)
 
 ## <a name="S-selection"></a>Selection
 ![img](doc/res4/button_selection.png)

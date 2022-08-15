@@ -210,17 +210,17 @@ void e_window_init(const char *title) {
 
     // create window
     e_window.sdl_window = SDL_CreateWindow(title,
-                                           SDL_WINDOWPOS_UNDEFINED,
-                                           SDL_WINDOWPOS_UNDEFINED,
-                                           640, 480,
-                                           SDL_WINDOW_OPENGL
-                                           | SDL_WINDOW_RESIZABLE
+           SDL_WINDOWPOS_UNDEFINED,
+           SDL_WINDOWPOS_UNDEFINED,
+           640, 480,
+           SDL_WINDOW_OPENGL
+           | SDL_WINDOW_RESIZABLE
+//           | SDL_WINDOW_ALLOW_HIGHDPI
     );
     if (!e_window.sdl_window) {
         s_log_error("SDL_CreateWindow failed: %s", SDL_GetError());
         e_exit_failure();
     }
-//    SDL_SetWindowMinimumSize(e_window.sdl_window, 480, 320);
     SDL_SetWindowMinimumSize(e_window.sdl_window, 1, 1);
 
 

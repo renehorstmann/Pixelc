@@ -35,15 +35,28 @@ static void reorder(ucvec4 *dst, const ucvec4 *src, ivec2 sprite_size, ivec2 spr
 // public
 //
 
-rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer) {
+bool r_texture_size_in_limits(int image_cols, int image_rows, int sprites_cols, int sprites_rows) {
     s_assume(image_cols > 0 && image_rows > 0
-           && sprites_cols > 0 && sprites_rows > 0
-           && image_cols % sprites_cols == 0
-           && image_rows % sprites_rows == 0
-           && image_cols / sprites_cols >= 1
-           && image_rows / sprites_rows >= 1, "texture size invalid: %i, %i ; %i %i", image_cols, image_rows,
-           sprites_cols, sprites_rows
+             && sprites_cols > 0 && sprites_rows > 0
+             && image_cols % sprites_cols == 0
+             && image_rows % sprites_rows == 0
+             && image_cols / sprites_cols >= 1
+             && image_rows / sprites_rows >= 1,
+             "texture size invalid: %i, %i ; %i %i",
+             image_cols, image_rows,
+             sprites_cols, sprites_rows
     );
+    int size_x = image_cols / sprites_cols;
+    int size_y = image_rows / sprites_rows;
+    int layers = sprites_cols * sprites_rows;
+    return size_x <= r_render.limits.max_texture_size
+            && size_y <= r_render.limits.max_texture_size
+            && layers <= r_render.limits.max_texture_layers;
+}
+
+rTexture r_texture_new(int image_cols, int image_rows, int sprites_cols, int sprites_rows, const void *opt_buffer) {
+    if(!r_texture_size_in_limits(image_cols, image_rows, sprites_cols, sprites_rows))
+        return r_texture_new_invalid();
 
     // reorder vertical
     void *tmp_buffer = NULL;

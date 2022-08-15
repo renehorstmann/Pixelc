@@ -31,7 +31,6 @@ static bool is_active(struct Tool *super, float dtime) {
 // public
 //
 
-
 Tool *tool_new_tile() {
     return tool_button_new("tile",
                            "Switch to the\n"

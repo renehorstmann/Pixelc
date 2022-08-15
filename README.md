@@ -45,7 +45,10 @@ Or just use the tooltip tool.
 - **COMPLETELY FREE and open**
 - and many more
 
-## Web Image Upload Zoom Bug
+## Known Bugs
+A few bugs that I haven't been able to solve yet:
+
+### 1. Web Image Upload Zoom Bug
 Zoomed in on your Browser while asked for an image upload?
 try:
 - use desktop version in your browser to reset the size
@@ -55,6 +58,13 @@ If you know someone who speaks html better than me, tell me :)
 
 Using the html option `user-scalable=no` will create a smaller canvas size on phones, which looks washed due to linear scaling. 
 Also not all browsers disable zoom (like the Samsung Internet Browser)
+
+### 2. Samsung Internet Browser App Corruption Bug
+Using the tiling mode may create wrong rendering in the tilemap first (some tiles are just wrong or missing).
+The more that happens, other parts of the App will break, too.
+Often files cant be loaded anymore, so a lot of black rects will appear here and there...
+Looks like a C memory overflow to me, but all other browsers and platform do not have that problem.
+Also the Google Sanitizer on Ubuntu does not detect any leaks or overflows...
 
 ## Install and run on Desktop
 Have a look at the section of [some](https://github.com/renehorstmann/some).
@@ -95,22 +105,6 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 ```sh
 python3 -m http.server --bind localhost  # [port]
 ```
-
-## Todo
-- some e window
-  - flag ALLOW HIGH DPI (ios manual)
-    - get renderer size instead if window size
-  - some_examples breaks in beginning gl check?
-    - seems to have full screen size?!?
-- to big framebuffer texture to render info?
-  - glTexImage size error
-  - check sizes before (init max sizes in r_render)
-  - create max size for tiles framebuffer with a warning?
-  - dont allow image sizes that are bigger (disabled + button for layers and frames...)
-- doc
-  - size
-  - grid dialog
-  - iso how to rotate
 
 ## Author
 René Horstmann

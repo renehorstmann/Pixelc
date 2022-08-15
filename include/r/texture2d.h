@@ -23,6 +23,10 @@ static rTexture2D r_texture2d_new_invalid() {
     return (rTexture2D) {0};
 }
 
+// returns true if the texture sizes are valid (see r_render.limits.)
+// assumes all values are >0
+bool r_texture2d_size_in_limits(int image_cols, int image_rows);
+
 // returns a new texture from an optional buffer
 rTexture2D r_texture2d_new(int image_cols, int image_rows, const void *opt_buffer);
 

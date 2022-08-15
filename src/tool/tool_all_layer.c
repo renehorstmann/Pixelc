@@ -10,6 +10,7 @@
 #include "canvas.h"
 #include "cameractrl.h"
 #include "dialog.h"
+#include "tooltip.h"
 #include "tool.h"
 
 #define SELECT_CURRENT 3
@@ -234,6 +235,12 @@ static void add_pe(struct Tool *super, ePointer_s pointer) {
         s_log("tool layer add");
         int layer = canvas.RO.current_layer;
         uSprite old = canvas_get_sprite();
+        if (!canvas_size_valid(old.img.cols, old.img.rows, old.cols, old.rows + 1)) {
+            s_log_warn("failed to add a frame");
+            tooltip_set("Warning", "Image limit\n"""
+                                   "reached!");
+            return;
+        }
         uSprite sprite = u_sprite_new_clone_insert_row(old, layer);
         u_sprite_kill(&old);
         canvas_set_sprite(sprite, true);
