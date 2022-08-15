@@ -104,8 +104,9 @@ python3 -m http.server --bind localhost  # [port]
     - seems to have full screen size?!?
 - to big framebuffer texture to render info?
   - glTexImage size error
-  - either call glGetError (slow on web)
-  - or check sizes before (init max sizes in r_render)
+  - check sizes before (init max sizes in r_render)
+  - create max size for tiles framebuffer with a warning?
+  - dont allow image sizes that are bigger (disabled + button for layers and frames...)
 - doc
   - size
   - grid dialog
