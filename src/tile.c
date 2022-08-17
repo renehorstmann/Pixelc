@@ -316,6 +316,9 @@ void tile_update(float dtime) {
     if (tile.active && !L.was_active) {
         set_color(0);
     }
+    if (!tile.active && L.was_active) {
+        palette_set_color(s_min(1, palette.RO.palette_size-1));
+    }
     L.was_active = tile.active;
 }
 

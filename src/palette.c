@@ -1,5 +1,3 @@
-#ifndef PIXELC_MOD_PALETTE
-
 #include "r/r.h"
 #include "e/io.h"
 #include "u/pose.h"
@@ -19,9 +17,9 @@
 
 
 #define PALETTE_MAX 128
+#define PALETTE_SPACE 512
 
 #define COLOR_DROP_SIZE 16.0f
-#define ADDITIONAL_PALETTE_SPACE 512
 
 #define SWIPE_DISTANCE 50
 
@@ -102,6 +100,7 @@ static float swipe_diff(ePointer_s pointer) {
 }
 
 
+
 //
 // public
 //
@@ -115,7 +114,7 @@ void palette_init() {
 
     L.palette_ro = ro_batch_new(PALETTE_MAX, r_texture_new_file(1, 1, "res/color_drop.png"));
 
-    L.background_ro = ro_batch_new(PALETTE_MAX + ADDITIONAL_PALETTE_SPACE,
+    L.background_ro = ro_batch_new(PALETTE_SPACE,
                                    r_texture_new_file(2, 2, "res/palette_background.png"));
 
     L.select_ro = ro_single_new(r_texture_new_file(1, 1, "res/palette_select.png"));
@@ -203,8 +202,9 @@ void palette_update(float dtime) {
         L.select_ro.rect.pose = L.palette_ro.rects[L.last_selected].pose;
 
     int cols = palette_cols();
-    int last_row = (palette.RO.palette_size - 1) / cols;
-    for (int i = 0; i < PALETTE_MAX; i++) {
+    int last_row = (palette.RO.palette_size - 1) /cols;
+    
+    for (int i = 0; i < PALETTE_SPACE; i++) {
         int r = i / cols;
         int c = i % cols;
 
@@ -214,8 +214,20 @@ void palette_update(float dtime) {
             pose = setup_palette_color_pose(r, c);
         else
             u_pose_set(&pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-        L.palette_ro.rects[i].pose = pose;
+        
         L.background_ro.rects[i].pose = pose;
+
+        // background sprite
+        {
+            float u = i < palette.RO.palette_size ? 0 : 1;
+            float v = r < last_row ? 1 : 0;
+            L.background_ro.rects[i].sprite = (vec2) {{u, v}};
+        }
+        
+        if(i >= PALETTE_MAX)
+            continue;
+        
+        L.palette_ro.rects[i].pose = pose;
 
         // color
         vec4 col;
@@ -225,24 +237,13 @@ void palette_update(float dtime) {
             col = R_COLOR_TRANSPARENT;
 
         L.palette_ro.rects[i].color = col;
-
-        // background sprite
-        {
-            float u = i < palette.RO.palette_size ? 0 : 1;
-            float v = r < last_row ? 1 : 0;
-            L.background_ro.rects[i].sprite = (vec2) {{u, v}};
-        }
     }
 
     // background continuation
-    for (int r = 0; r < ADDITIONAL_PALETTE_SPACE; r++) {
+    for (int r = 0; r <= last_row; r++) {
         int idx = L.background_ro.num - r - 1;
         // pose
-        mat4 pose = mat4_eye();
-        if (r <= last_row)
-            pose = setup_palette_color_pose(r, cols);
-        else
-            u_pose_set(&pose, FLT_MAX, FLT_MAX, 0, 0, 0);
+        mat4 pose = setup_palette_color_pose(r, cols);
         L.background_ro.rects[idx].pose = pose;
 
         // background uv
@@ -552,6 +553,9 @@ void palette_append_palette(uImage colors, const char *name) {
     memcpy(clone, name, len);
 
     s_str_tolower(s_strc(clone));
+    
+    palette_set_palette(colors, name);
+    colors = palette_as_image();
 
     char file[256];
     snprintf(file, sizeof file, "palette_%s.png", clone);
@@ -578,6 +582,7 @@ void palette_append_palette(uImage colors, const char *name) {
     e_io_savestate_save();
 
     palette_load_palette(idx);
+    u_image_kill(&colors);
 }
 
 bool palette_name_exists(const char *name) {
@@ -722,8 +727,3 @@ void palette_load_config() {
     }
     u_json_kill(&config);
 }
-
-
-#else // !PIXELC_MOD_PALETTE
-typedef int avoid_empty_translation_unit;
-#endif

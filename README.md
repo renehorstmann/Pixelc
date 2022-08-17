@@ -106,6 +106,10 @@ EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
 python3 -m http.server --bind localhost  # [port]
 ```
 
+## Todo
+- palette info show "tileset 0" on startup
+  - just disable it own startup...
+
 ## Author
 René Horstmann
 

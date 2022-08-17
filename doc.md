@@ -157,7 +157,7 @@ In this dialog you can:
 1. ![img](doc/res2/button_tab.png)  use a new image tab
 2. hold down on the palette to open the palette dialog
 3. ![img](doc/res2/button_from.png)  copy the current palette into the canvas
-4. change the size to add new colors, or replace the colors in the canvas. 
+4. change the [size](#S-size) to add new colors, or replace the colors in the canvas. 
    - ![img](doc/res2/button_rgb.png)  Use the RGB tool to draw with a custom color
 5. hold down on the palette again to open the palette dialog
 6. (optional) rename the palette name to a new one
@@ -283,8 +283,9 @@ The canvas now renders a tile for each pixel unit.
 
 > (WebApp) limitation:
 > The tile mode creates large textures on the GPU.
-> If the maximal size is reached on your device, the canvas may get completely black or is rendered wrong!
-> Use a smaller canvas size.
+> If the maximal size is reached on your device, the canvas will be rendered with the maximal GPU texture size and your tilemap will get pixelated.
+> If thats the case, a warning will be print as tooltip
+> Use a smaller canvas size or reduce the layers to avoid this.
 
 ### Tile Palette
 
