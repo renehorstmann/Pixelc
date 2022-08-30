@@ -69,9 +69,6 @@ static void init() {
     cameractrl_set_home();
     dialog_create_startup();
     
-#ifdef PIXELC_USE_MOD
-    mod_init();
-#endif
 }
 
 // this functions is called either each frame or at a specific update/s time
@@ -99,11 +96,7 @@ static void update(float dtime) {
     tile_update(dtime);
 
     tooltip_update(dtime);
-
-    int max_tex, max_layers, max_3d;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex);
-    glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_layers);
-    glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE , &max_3d);
+    
 }
 
 // this function is calles each frame to render stuff, dtime is the time between frames
