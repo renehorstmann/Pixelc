@@ -109,6 +109,10 @@ python3 -m http.server --bind localhost  # [port]
 ## Todo
 - palette info show "tileset 0" on startup
   - just disable it own startup...
+- palette start color is wrong (tileset code?)
+- change requirements of android to GLES3.1?
+- android class call NULL checks
+- premium/sponsor version
 
 ## Author
 René Horstmann
