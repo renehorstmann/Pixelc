@@ -110,11 +110,12 @@ python3 -m http.server --bind localhost  # [port]
 - palette info show "tileset 0" on startup
   - just disable it own startup...
 - palette start color is wrong (tileset code?)
-- change requirements of android6.0
+- change requirements to android6.0
 - android class call NULL checks
 - premium/sponsor version
-- gid decoder?
+- gif decoder?
 - selection paste color
+- some problems in some (empty module warning + sanitizer leak?)
 
 ## Author
 René Horstmann
