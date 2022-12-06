@@ -25,6 +25,7 @@ enum brush_modes {
     BRUSH_MODE_FILL,
     BRUSH_MODE_FILL8,
     BRUSH_MODE_REPLACE,
+    BRUSH_MODE_PIPETTE_SINGLE,
     BRUSH_MODE_PIPETTE,
     BRUSH_NUM_MODES
 };
@@ -33,6 +34,7 @@ struct Brush_Globals {
     uColor_s current_color;
     uColor_s secondary_color;
     enum brush_modes mode;
+    enum brush_modes pipette_last_mode;
     bool secondary_as_current;
     bool shading_active;
     bool render_hover_preview;

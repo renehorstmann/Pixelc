@@ -316,7 +316,8 @@ void toolbar_init() {
     add_selection_paste_tool(tool_new_selection_paste_rotate_r());
     add_selection_paste_tool(tool_new_selection_paste_mirror_v());
     add_selection_paste_tool(tool_new_selection_paste_mirror_h());
-    add_selection_paste_tool(tool_new_selection_paste_blend());
+    add_selection_paste_tool(tool_new_selection_paste_color());
+     add_selection_paste_tool(tool_new_selection_paste_blend());
     add_selection_paste_tool(tool_new_selection_paste_copy());
     add_selection_paste_tool(tool_new_selection_paste_ok());
     

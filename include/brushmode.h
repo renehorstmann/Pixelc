@@ -6,6 +6,7 @@
 //
 
 #include "e/input.h"
+#include "m/types/int.h"
 
 enum brushmode_func {
     BRUSHMODE_FUNC_LINE,
@@ -32,7 +33,7 @@ bool brushmode_free(ePointer_s pointer);
 
 bool brushmode_func(ePointer_s pointer, enum brushmode_func func);
 
-void brushmode_pipette(ePointer_s pointer);
+void brushmode_pipette(ePointer_s pointer, bool single);
 
 bool brushmode_fill(ePointer_s pointer, bool mode8);
 

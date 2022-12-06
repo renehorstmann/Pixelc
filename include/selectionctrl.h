@@ -30,6 +30,8 @@ struct SelectionCtrl_Globals {
 
     bool show_copy_cut;
     bool show_ok;
+    
+    bool use_brush_color;
 };
 extern struct SelectionCtrl_Globals selectionctrl;
 

@@ -166,7 +166,7 @@ bool brushmode_func(ePointer_s pointer, enum brushmode_func func) {
 }
 
 
-void brushmode_pipette(ePointer_s pointer) {
+void brushmode_pipette(ePointer_s pointer, bool single) {
     if (pointer.action != E_POINTER_DOWN)
         return;
 
@@ -178,9 +178,15 @@ void brushmode_pipette(ePointer_s pointer) {
         return;
 
     brush.secondary_color = *u_image_pixel(img, cr.x, cr.y, layer);
+    brush.secondary_as_current = true;
     
     vec4 flash_color = u_color_to_vec4(brush.secondary_color);
     flash_color.a = 1;
     feedback_flash(flash_color, 0.5);
     tooltip_set("Pipette", "active");
+    
+    if(single) {
+        brush.mode = brush.pipette_last_mode;
+        brush.pipette_last_mode = BRUSH_MODE_NONE;
+    }
 }

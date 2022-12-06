@@ -104,6 +104,34 @@ Tool *tool_new_selection_paste_mirror_h() {
                            NULL);
 }
 
+static void color_pe(struct Tool *super, ePointer_s pointer) {
+    ToolButton *self = (ToolButton *) super;
+    if (u_button_toggled(&self->ro.rect, pointer)) {
+        bool pressed = u_button_is_pressed(&self->ro.rect);
+        s_log("tool selection paste color: %i", pressed);
+        selectionctrl.use_brush_color = pressed;
+        //update_canvas();
+    }
+}
+
+static bool color_is_a(struct Tool *super, float dtime) {
+    ToolButton *self = (ToolButton *) super;
+    bool active = selectionctrl.use_brush_color;
+    u_button_set_pressed(&self->ro.rect, active);
+    // always active
+    return true;
+}
+
+Tool *tool_new_selection_paste_color() {
+    return tool_button_new("color",
+                           "Applies the\n"
+                           "current color\n"
+                           "on the selection",
+                           "res/button_colordrop.png",
+                           color_pe,
+                           color_is_a);
+}
+
 static void blend_pe(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
     Selection *s = selectionctrl.selection;

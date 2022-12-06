@@ -171,8 +171,11 @@ void brush_pointer_event(ePointer_s pointer) {
         case BRUSH_MODE_REPLACE:
             change = brushmode_replace(pointer);
             break;
+        case BRUSH_MODE_PIPETTE_SINGLE:
+            brushmode_pipette(pointer, true);
+            break;
         case BRUSH_MODE_PIPETTE:
-            brushmode_pipette(pointer);
+            brushmode_pipette(pointer, false);
             break;
         default:
             s_log_wtf("unknown mode");

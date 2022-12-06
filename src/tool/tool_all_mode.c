@@ -8,6 +8,8 @@
 #include "brush.h"
 #include "tool.h"
 
+
+
 _Static_assert(sizeof(enum brush_modes) <= TOOL_BUTTON_ADDITIONAL_DATA_SIZE, "wtf");
 
 static void mode_pe(struct Tool *super, ePointer_s pointer) {
@@ -132,14 +134,56 @@ Tool *tool_new_mode_replace() {
                     BRUSH_MODE_REPLACE);
 }
 
+//
+// pipette
+//
+
+static void pipette_pe(struct Tool *super, ePointer_s pointer) {
+    ToolButton *self = (ToolButton *) super;
+    enum brush_modes mode = *((enum brush_modes *) self->additional_data);
+    if (u_button_pressed(&self->ro.rect, pointer)) {
+        if(brush.mode == BRUSH_MODE_PIPETTE_SINGLE) {
+            brush.pipette_last_mode = BRUSH_MODE_NONE;
+            brush.mode = BRUSH_MODE_PIPETTE;
+        } else if(brush.mode != BRUSH_MODE_PIPETTE) {
+            brush.pipette_last_mode = brush.mode;
+            brush.mode = BRUSH_MODE_PIPETTE_SINGLE;
+        }
+        s_log("tool mode: %i", brush.mode);
+    }
+}
+
+static bool pipette_is_a(struct Tool *super, float dtime) {
+    ToolButton *self = (ToolButton *) super;
+    int x = 0;
+    if(brush.mode == BRUSH_MODE_PIPETTE_SINGLE) {
+        x = 1; 
+    } else if(brush.mode == BRUSH_MODE_PIPETTE) {
+        x = 2;
+    }
+    self->ro.rect.sprite.x = x;
+    // always active
+    return true;
+}
+
+
 Tool *tool_new_mode_pipette() {
-    return mode_new("pipette",
-                    "Select a color\n"
-                    "on the canvas as\n"
-                    "secondary color\n\n"
-                    "flashes the\n"
-                    "screen\n"
-                    "while active",
-                    "res/button_pipette.png",
-                    BRUSH_MODE_PIPETTE);
+    
+    // load the wrong texture with the right texture size
+    Tool *super = tool_button_new("pipette", 
+            "Select a color\n"
+            "on the canvas as\n"
+            "secondary color\n\n"
+            "flashes the\n"
+            "screen\n"
+            "while active",
+            "res/button_cross.png",
+            pipette_pe, pipette_is_a);
+    ToolButton *self = (ToolButton *) super;
+    *((enum brush_modes *) self->additional_data) = BRUSH_MODE_NONE;
+    
+    // reload tex with 3 sprite cols
+    ro_single_set_texture(&self->ro, r_texture_new_file(3, 1, "res/button_pipette.png"));
+    
+    return super;
 }

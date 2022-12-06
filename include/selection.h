@@ -12,6 +12,8 @@ typedef struct {
     int left, top;
     int cols, rows;
     bool blend;
+    bool apply_color;
+    vec4 color;
     uImage opt_img;
 } Selection;
 

@@ -166,6 +166,8 @@ Tool *tool_new_selection_paste_mirror_v();
 
 Tool *tool_new_selection_paste_mirror_h();
 
+Tool *tool_new_selection_paste_color();
+
 Tool *tool_new_selection_paste_blend();
 
 Tool *tool_new_selection_paste_copy();

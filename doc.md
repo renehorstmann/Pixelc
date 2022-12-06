@@ -117,9 +117,12 @@ Does nothing on the canvas. Use this mode if you just want to view your pixel ar
 ### Pipette
 ![img](doc/res4/button_pipette.png)
 
-Click on a color in the canvas to set it as [secondary color](#S-secondary_color). 
+Click on a color in the canvas to set (and select) it as [secondary color](#S-secondary_color). 
 The app shows a flash effect of that color to show you that the pipette mode is active.
 (Also if [shading](#S-shading) is active)
+
+- If the button is half pressed, the last active draw mode will be reset, if a color was picked.
+- If full pressed, the pipette mode stays active
 
 ## <a name="S-tooltip"></a>Tooltip
 ![img](doc/res4/button_tooltip.png)

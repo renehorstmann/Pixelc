@@ -99,12 +99,18 @@ void selection_paste(Selection *self, uImage to, int layer) {
                 continue;
 
             uColor_s *pixel_to = u_image_pixel(to, to_c, to_r, layer);
-            const uColor_s *pixel_from = u_image_pixel(self->opt_img, c, r, 0);
+            uColor_s pixel_from = *u_image_pixel(self->opt_img, c, r, 0);
+            
+            if(self->apply_color) {
+                vec4 col = u_color_to_vec4(pixel_from);
+                col = vec4_scale_vec(col, self->color);
+                pixel_from = u_color_from_vec4(col);
+            }
 
             if (self->blend) {
-                *pixel_to = ucvec4_mix(*pixel_to, *pixel_from, (float) pixel_from->a / 255);
+                *pixel_to = ucvec4_mix(*pixel_to, pixel_from, (float) pixel_from.a / 255);
             } else {
-                *pixel_to = *pixel_from;
+                *pixel_to = pixel_from;
             }
         }
     }

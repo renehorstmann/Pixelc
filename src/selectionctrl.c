@@ -5,6 +5,7 @@
 #include "canvas.h"
 #include "palette.h"
 #include "camera.h"
+#include "brush.h"
 #include "selectionctrl.h"
 
 
@@ -31,12 +32,18 @@ static struct {
     ivec2 move_start_position;
 
     bool was_allowed;
+    
+    bool prev_use_brush_color;
+    uColor_s prev_brush_color;
 } L;
 
-static mat4 pixel_pose(int x, int y, vec2 scale) {
-    return u_pose_new_aa(x*scale.x, -y*scale.y, scale.x, scale.y);
+static void update_canvas() {
+    Selection *s = selectionctrl.selection;
+    if (!s)
+        return;
+    canvas_reload();
+    selection_paste(s, canvas.RO.image, canvas.RO.current_image_layer);
 }
-
 
 static void setup_border() {
     int x = 0, y = 0, w = 0, h = 0;
@@ -47,39 +54,39 @@ static void setup_border() {
         h = selectionctrl.selection->rows;
     }
 
-    int max = L.border.num;
-
     vec2 scale = canvas_get_unit_scale();
+    float stretch = sca_max(1, sca_max(w, h) / 10);
+    
+    // left
+    L.border.rects[0].pose = u_pose_new_aa(
+            (x-stretch) * scale.x,
+            -y * scale.y,
+            scale.x * stretch,
+            scale.y * h);
+            
+    // top
+    L.border.rects[1].pose = u_pose_new_aa(
+            x * scale.x,
+            -(y-stretch) * scale.y,
+            scale.x * w,
+            scale.y * stretch);
+    
+    // right
+    L.border.rects[2].pose = u_pose_new_aa(
+            (x+w) * scale.x,
+            -y * scale.y,
+            scale.x * stretch,
+            scale.y * h);
+            
 
-    int idx = 0;
-    for (int i = 0; i < h; i++) {
-        L.border.rects[idx].pose = pixel_pose(x - 1, y + i, scale);
-        L.border.rects[idx].sprite = (vec2) {0, 0};
-        idx++;
-        if (idx >= max) goto UPDATE;
+    // bottom
+    L.border.rects[3].pose = u_pose_new_aa(
+            x * scale.x,
+            -(y+h) * scale.y,
+            scale.x * w,
+            scale.y * stretch);
 
-        L.border.rects[idx].pose = pixel_pose(x + w, y + i, scale);
-        L.border.rects[idx].sprite = (vec2) {0, 1};
-        idx++;
-        if (idx >= max) goto UPDATE;
-    }
-    for (int i = 0; i < w; i++) {
-        L.border.rects[idx].pose = pixel_pose(x + i, y - 1, scale);
-        L.border.rects[idx].sprite = (vec2) {1, 0};
-        idx++;
-        if (idx >= max) goto UPDATE;
 
-        L.border.rects[idx].pose = pixel_pose(x + i, y + h, scale);
-        L.border.rects[idx].sprite = (vec2) {1, 1};
-        idx++;
-        if (idx >= max) goto UPDATE;
-    }
-
-    for (; idx < L.border.num; idx++) {
-        u_pose_set(&L.border.rects[idx].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-    }
-
-    UPDATE:
     ro_batch_update(&L.border);
 }
 
@@ -166,10 +173,12 @@ void selectionctrl_init() {
 
     L.tip = ro_text_new_font85(TIP_TEXT_LENGTH);
 
-    L.border = ro_batch_new(1024,
+    L.border = ro_batch_new(4,
                             r_texture_new_file(2, 2, "res/selection_border.png"));
     for (int i = 0; i < L.border.num; i++) {
         L.border.rects[i].color = u_color_to_vec4(u_color_from_hex("#357985"));
+        L.border.rects[i].sprite.x = i%2;
+        L.border.rects[i].sprite.y = i/2;
     }
 
     // may be reset by a mod
@@ -177,6 +186,16 @@ void selectionctrl_init() {
 }
 
 void selectionctrl_update(float dtime) {
+    if(selectionctrl.selection) {
+        selectionctrl.selection->apply_color = selectionctrl.use_brush_color;
+        selectionctrl.selection->color = u_color_to_vec4(brush.current_color);
+        if(L.prev_use_brush_color != selectionctrl.use_brush_color || !u_color_equals(L.prev_brush_color, brush.current_color)) {
+            update_canvas();
+        }
+        L.prev_use_brush_color = selectionctrl.use_brush_color;
+        L.prev_brush_color = brush.current_color;
+    }
+    
     if(L.was_allowed != selectionctrl.allowed) {
         selectionctrl_stop();
     }
