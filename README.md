@@ -112,6 +112,9 @@ python3 -m http.server --bind localhost  # [port]
 - palette start color is wrong (tileset code?)
 - premium/sponsor version
 - gif decoder?
+- doc
+  - selection color (link from and to kernel stamps)
+  - res template images
 - some problems in some (empty module warning + sanitizer leak?)
 
 ## Author
