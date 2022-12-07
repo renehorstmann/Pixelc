@@ -2,9 +2,9 @@
 #define S_STRING_IMPL_H
 #ifdef S_IMPL
 
-static ssize s__string_stream_read(struct sStream_i stream, void *data, ssize len);
-static ssize s__string_stream_write(struct sStream_i stream, const void *data, ssize len);
-static bool s__string_stream_valid(struct sStream_i stream);
+static ssize s__string_stream_read(struct sStream_i *stream, void *data, ssize len);
+static ssize s__string_stream_write(struct sStream_i *stream, const void *data, ssize len);
+static bool s__string_stream_valid(struct sStream_i *stream);
 
 
 
@@ -123,8 +123,8 @@ void s_string_append(sString *self, sStr_s append) {
 
 
 
-static ssize s__string_stream_read(struct sStream_i stream, void *data, ssize len) {
-    sString *self = stream.impl;
+static ssize s__string_stream_read(struct sStream_i *stream, void *data, ssize len) {
+    sString *self = stream->impl;
     if(!s_string_valid(self) || len <=0)
         return 0;
     ssize s = s_min(self->size - self->stream_pos, len);
@@ -132,15 +132,15 @@ static ssize s__string_stream_read(struct sStream_i stream, void *data, ssize le
     self->stream_pos+=s;
     return s;
 }
-static ssize s__string_stream_write(struct sStream_i stream, const void *data, ssize len) {
-    sString *self = stream.impl;
+static ssize s__string_stream_write(struct sStream_i *stream, const void *data, ssize len) {
+    sString *self = stream->impl;
     if(!s_string_valid(self) || len <=0)
         return 0;
     s_string_append(self, (sStr_s) {(char *) data, len});
     return len;
 }
-static bool s__string_stream_valid(struct sStream_i stream) {
-    sString *self = stream.impl;
+static bool s__string_stream_valid(struct sStream_i *stream) {
+    sString *self = stream->impl;
     return s_string_valid(self);
 }
 

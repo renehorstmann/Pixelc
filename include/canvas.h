@@ -178,6 +178,9 @@ void canvas_set_tab_id(int id);
 // returns a new image of the tab id
 uSprite canvas_get_tab(int id);
 
+// clears the '0'er save idx of all tabs
+void canvas_clear_all_base_tabs();
+
 // saves the config to the savestate config.json 
 // uses object "canvas"
 // also saves the current image as savestate

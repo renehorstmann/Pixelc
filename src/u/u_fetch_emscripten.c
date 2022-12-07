@@ -132,7 +132,9 @@ sString *u_fetch_check_response(uFetch **self_ptr, bool *opt_error) {
     return ret;
 }
 
-#endif //PLATFORM_EMSCRIPTEN
+#else //PLATFORM_EMSCRIPTEN
+typedef int avoid_iso_c_empty_translation_unit_warning_a_;
+#endif
 #else //OPTION_FETCH
-typedef int avoid_iso_c_empty_translation_unit_warning_;
+typedef int avoid_iso_c_empty_translation_unit_warning_b_;
 #endif

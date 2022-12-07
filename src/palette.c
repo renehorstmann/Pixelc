@@ -100,12 +100,23 @@ static float swipe_diff(ePointer_s pointer) {
 }
 
 
+static void wheel_event(vec4 pos, bool up, void *user_data) {
+    if(tile.active)
+        return;
+    pos = mat4_mul_vec(camera.matrices.p_inv, pos);
+    if(!palette_contains_pos(pos.xy))
+        return;
+    s_log("switch palette with mouse wheel: %i", up);
+    palette_next_palette(up);
+}
 
 //
 // public
 //
 
 void palette_init() {
+    e_input_register_wheel_event(wheel_event, NULL);
+
     palette.include_transparent_at_set_colors = true;
 
     L.current_pressed = -1;
@@ -455,7 +466,7 @@ void palette_set_info(const char *info) {
 }
 
 void palette_set_colors(const uColor_s *colors, int size, const char *name) {
-    s_log("set_colors: %s", name);
+    s_log("set_colors: %s", name? name : "(null)");
     s_assume(size > 0, "palette set_colors failed");
 
     palette.RO.palette_size = 0;

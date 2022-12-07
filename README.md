@@ -107,15 +107,7 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- palette info show "tileset 0" on startup
-  - just disable it own startup...
-- palette start color is wrong (tileset code?)
-- premium/sponsor version
 - gif decoder?
-- doc
-  - selection color (link from and to kernel stamps)
-  - res template images
-- some problems in some (empty module warning + sanitizer leak?)
 
 ## Author
 René Horstmann

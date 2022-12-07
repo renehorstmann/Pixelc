@@ -116,7 +116,7 @@ const char *io_config_file() {
 void io_config_clear_files() {
     s_log("emptying the files");
     s_file_write(io_config_file(), s_strc(""), true);
-
+    canvas_clear_all_base_tabs();
     e_io_savestate_save();
 }
 

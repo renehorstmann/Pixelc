@@ -111,8 +111,8 @@ ssize s_file_size(sFile *self) {
 #endif
 }
 
-static ssize s__file_stream_read(struct sStream_i stream, void *memory, ssize n) {
-    sFile *self = stream.impl;
+static ssize s__file_stream_read(struct sStream_i *stream, void *memory, ssize n) {
+    sFile *self = stream->impl;
     if (!s_file_valid(self)) {
         return 0;
     }
@@ -128,8 +128,8 @@ static ssize s__file_stream_read(struct sStream_i stream, void *memory, ssize n)
     return read;
 }
 
-static ssize s__file_stream_write(struct sStream_i stream, const void *memory, ssize n) {
-    sFile *self = stream.impl;
+static ssize s__file_stream_write(struct sStream_i *stream, const void *memory, ssize n) {
+    sFile *self = stream->impl;
     if (!s_file_valid(self)) {
         return 0;
     }
@@ -145,8 +145,8 @@ static ssize s__file_stream_write(struct sStream_i stream, const void *memory, s
     return written;
 }
 
-static void s__file_stream_flush(struct sStream_i stream) {
-    sFile *self = stream.impl;
+static void s__file_stream_flush(struct sStream_i *stream) {
+    sFile *self = stream->impl;
     if (!s_file_valid(self)) {
         return;
     }
@@ -156,8 +156,8 @@ static void s__file_stream_flush(struct sStream_i stream) {
 #endif
 }
 
-static bool s__file_stream_valid(struct sStream_i stream) {
-    sFile *self = stream.impl;
+static bool s__file_stream_valid(struct sStream_i *stream) {
+    sFile *self = stream->impl;
     return s_file_valid(self);
 }
 
@@ -179,7 +179,7 @@ sStream_i s_file_stream_from_cfile(FILE *cfile, bool read, bool write) {
 #else
     f.file = cfile;
 #endif
-    sStream_i stream = s_file_stream_out(&f);
+    sStream_i stream = s_file_stream(&f);
     if(!read)
         stream.opt_read_try = NULL;
     if(!write)

@@ -38,8 +38,8 @@ static void s__socketserver_close(sSocketServer *self) {
 }
 
 
-static ssize s__socket_read(struct sStream_i stream, void *memory, ssize n) {
-    sSocket *self = stream.impl;
+static ssize s__socket_read(struct sStream_i *stream, void *memory, ssize n) {
+    sSocket *self = stream->impl;
     if(!s_socket_valid(self))
         return 0;
 
@@ -53,8 +53,8 @@ static ssize s__socket_read(struct sStream_i stream, void *memory, ssize n) {
     return read;
 }
 
-static ssize s__socket_write(struct sStream_i stream, const void *memory, ssize n) {
-    sSocket *self = stream.impl;
+static ssize s__socket_write(struct sStream_i *stream, const void *memory, ssize n) {
+    sSocket *self = stream->impl;
     if(!s_socket_valid(self))
         return 0;
 
@@ -172,6 +172,10 @@ sSocket *s_socket_new(const char *address, su16 port) {
     return self;
 }
 
+void s_socket_set_timeout(sSocket *self, int timeout_ms) {
+    s_log_warn("s_socket_set_timeout not supported in sdl socket (can be done with SDLNet_SocketReady...)");
+}
+
 #else
 
 //
@@ -205,8 +209,8 @@ static void s__socketserver_close(sSocketServer *self) {
     self->so = -1;
 }
 
-static ssize s__socket_read(struct sStream_i stream, void *memory, ssize n) {
-    sSocket *self = stream.impl;
+static ssize s__socket_read(struct sStream_i *stream, void *memory, ssize n) {
+    sSocket *self = stream->impl;
     if(!s_socket_valid(self))
         return 0;
 
@@ -220,8 +224,8 @@ static ssize s__socket_read(struct sStream_i stream, void *memory, ssize n) {
     return read;
 }
 
-static ssize s__socket_write(struct sStream_i stream, const void *memory, ssize n) {
-    sSocket *self = stream.impl;
+static ssize s__socket_write(struct sStream_i *stream, const void *memory, ssize n) {
+    sSocket *self = stream->impl;
     if(!s_socket_valid(self))
         return 0;
 
@@ -385,6 +389,17 @@ sSocket *s_socket_new(const char *address, su16 port) {
     return self;
 }
 
+void s_socket_set_timeout(sSocket *self, int timeout_ms) {
+    if(!s_socket_valid(self))
+        return;
+    struct timeval tv;
+    tv.tv_sec = timeout_ms / 1000;
+    tv.tv_usec = (timeout_ms % 1000) * 1000;
+    setsockopt(self->so, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *) &tv,sizeof tv);
+    setsockopt(self->so, SOL_SOCKET, SO_SNDTIMEO, (struct timeval *) &tv,sizeof tv);
+}
+
+
 #endif // PLATFORM_UNIX
 
 
@@ -420,8 +435,8 @@ static void s__socketserver_close(sSocketServer *self) {
     self->so = INVALID_SOCKET;
 }
 
-static ssize s__socket_read(struct sStream_i stream, void *memory, ssize n) {
-    sSocket *self = stream.impl;
+static ssize s__socket_read(struct sStream_i *stream, void *memory, ssize n) {
+    sSocket *self = stream->impl;
     if(!s_socket_valid(self))
         return 0;
 
@@ -435,8 +450,8 @@ static ssize s__socket_read(struct sStream_i stream, void *memory, ssize n) {
     return read;
 }
 
-static ssize s__socket_write(struct sStream_i stream, const void *memory, ssize n) {
-    sSocket *self = stream.impl;
+static ssize s__socket_write(struct sStream_i *stream, const void *memory, ssize n) {
+    sSocket *self = stream->impl;
     if(!s_socket_valid(self))
         return 0;
 
@@ -628,6 +643,15 @@ sSocket *s_socket_new(const char *address, su16 port) {
     }
     return self;
 }
+
+void s_socket_set_timeout(sSocket *self, int timeout_ms) {
+    if(!s_socket_valid(self))
+        return;
+    DWORD time = timeout_ms;
+    setsockopt(self->so, SOL_SOCKET, SO_RCVTIMEO, (char*) &time, sizeof time);
+    setsockopt(self->so, SOL_SOCKET, SO_SNDTIMEO, (char*) &time, sizeof time);
+}
+
 #endif // Windows
 
 #endif //OPTION_SDL
@@ -638,8 +662,8 @@ sSocket *s_socket_new(const char *address, su16 port) {
 // for all:
 //
 
-static bool s__socket_valid(struct sStream_i stream) {
-    sSocket *self = stream.impl;
+static bool s__socket_valid(struct sStream_i *stream) {
+    sSocket *self = stream->impl;
     return s_socket_valid(self);
 }
 

@@ -59,21 +59,50 @@ uFetch *u_fetch_new_get_a(const char *url, sAllocator_i a) {
     self->a = a;
     L.fetches[idx] = self;
 
-    // retrieve the JNI environment.
-    JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-    // retrieve the Java instance of the SDLActivity
-    jobject activity = (jobject) SDL_AndroidGetActivity();
-    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
-    jclass clazz = (*env)->GetObjectClass(env, activity);
-    // find the identifier of the method to call
-    jmethodID method_id = (*env)->GetMethodID(env, clazz, "u_fetch_request", "(Ljava/lang/String;II)V");
-    // effectively call the Java method
-    jstring jurl = (*env)->NewStringUTF(env, url);
-    (*env)->CallVoidMethod(env, activity, method_id, jurl, (jint) 0, (jint) idx);
-    // clean up the local references.
-    (*env)->DeleteLocalRef(env, jurl);
-    (*env)->DeleteLocalRef(env, activity);
-    (*env)->DeleteLocalRef(env, clazz);
+
+    // JNI CALL
+    {
+        JNIEnv* env = NULL;
+        jobject activity = NULL;
+        jclass clazz = NULL;
+        jstring jurl = NULL;
+
+        env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+        if(!env) {
+            s_log_error("failed to get jni env");
+            goto JNI_CLEAN_UP;
+        }
+
+        activity = (jobject) SDL_AndroidGetActivity();
+        if(!activity) {
+            s_log_error("failed to get activity");
+            goto JNI_CLEAN_UP;
+        }
+
+        clazz = (*env)->GetObjectClass(env, activity);
+        if(!clazz) {
+            s_log_error("failed to get clazz");
+            goto JNI_CLEAN_UP;
+        }
+
+        jmethodID method_id = (*env)->GetMethodID(env, clazz,
+                                                  "u_fetch_request",
+                                                  "(Ljava/lang/String;II)V");
+        if(!method_id) {
+            s_log_error("method not found");
+            goto JNI_CLEAN_UP;
+        }
+
+        jurl = (*env)->NewStringUTF(env, url);
+        (*env)->CallVoidMethod(env, activity, method_id, jurl, (jint) 0, (jint) idx);
+
+        JNI_CLEAN_UP:
+        if(env) {
+            if(jurl) (*env)->DeleteLocalRef(env, jurl);
+            if(activity) (*env)->DeleteLocalRef(env, activity);
+            if(clazz) (*env)->DeleteLocalRef(env, clazz);
+        }
+    }
 
     return self;
 }
@@ -99,21 +128,49 @@ uFetch *u_fetch_new_post_a(const char *url, sStr_s data, sAllocator_i a) {
     snprintf(post_file, sizeof post_file, "u_fetch_post_%04d.bin", idx);
     s_file_write(post_file, data, false);
 
-    // retrieve the JNI environment.
-    JNIEnv* env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-    // retrieve the Java instance of the SDLActivity
-    jobject activity = (jobject) SDL_AndroidGetActivity();
-    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
-    jclass clazz = (*env)->GetObjectClass(env, activity);
-    // find the identifier of the method to call
-    jmethodID method_id = (*env)->GetMethodID(env, clazz, "u_fetch_request", "(Ljava/lang/String;II)V");
-    // effectively call the Java method
-    jstring jurl = (*env)->NewStringUTF(env, url);
-    (*env)->CallVoidMethod(env, activity, method_id, jurl, (jint) 1, (jint) idx);
-    // clean up the local references.
-    (*env)->DeleteLocalRef(env, jurl);
-    (*env)->DeleteLocalRef(env, activity);
-    (*env)->DeleteLocalRef(env, clazz);
+    // JNI CALL
+    {
+        JNIEnv* env = NULL;
+        jobject activity = NULL;
+        jclass clazz = NULL;
+        jstring jurl = NULL;
+
+        env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+        if(!env) {
+            s_log_error("failed to get jni env");
+            goto JNI_CLEAN_UP;
+        }
+
+        activity = (jobject) SDL_AndroidGetActivity();
+        if(!activity) {
+            s_log_error("failed to get activity");
+            goto JNI_CLEAN_UP;
+        }
+
+        clazz = (*env)->GetObjectClass(env, activity);
+        if(!clazz) {
+            s_log_error("failed to get clazz");
+            goto JNI_CLEAN_UP;
+        }
+
+        jmethodID method_id = (*env)->GetMethodID(env, clazz,
+                                                  "u_fetch_request",
+                                                  "(Ljava/lang/String;II)V");
+        if(!method_id) {
+            s_log_error("method not found");
+            goto JNI_CLEAN_UP;
+        }
+
+        jurl = (*env)->NewStringUTF(env, url);
+        (*env)->CallVoidMethod(env, activity, method_id, jurl, (jint) 1, (jint) idx);
+
+        JNI_CLEAN_UP:
+        if(env) {
+            if(jurl) (*env)->DeleteLocalRef(env, jurl);
+            if(activity) (*env)->DeleteLocalRef(env, activity);
+            if(clazz) (*env)->DeleteLocalRef(env, clazz);
+        }
+    }
 
     return self;
 }
@@ -171,7 +228,9 @@ sString *u_fetch_check_response(uFetch **self_ptr, bool *opt_error) {
     return ret;
 }
 
-#endif //PLATFORM_ANDROID
+#else //PLATFORM_ANDROID
+typedef int avoid_iso_c_empty_translation_unit_warning_a_;
+#endif
 #else //OPTION_FETCH
-typedef int avoid_iso_c_empty_translation_unit_warning_;
+typedef int avoid_iso_c_empty_translation_unit_warning_b_;
 #endif

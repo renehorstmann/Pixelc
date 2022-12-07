@@ -6,10 +6,11 @@
 //
 
 #include "core.h"
-#include "window.h"
-#include "input.h"
+#include "definitions.h"
 #include "gui.h"
+#include "input.h"
 #include "io.h"
 #include "simple.h"
+#include "window.h"
 
 #endif //E_E_H

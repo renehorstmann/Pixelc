@@ -3,6 +3,7 @@
 #include "u/pose.h"
 #include "u/image.h"
 #include "u/json.h"
+#include "s/file.h"
 #include "io.h"
 #include "m/sca/int.h"
 #include "m/mat/float.h"
@@ -53,6 +54,12 @@ static struct {
 } L;
 
 _Static_assert(CANVAS_MAX_SAVES <= 999, "see save / load image");
+
+static void clear_image(int tab_id, int save_id) {
+    char file_png[128];
+    snprintf(file_png, sizeof file_png, "image_%02i_%03i.png", tab_id, save_id);
+    s_file_write(e_io_savestate_file_path(file_png), s_strc(""), false);
+}
 
 static void save_image(bool savestate_save) {
     char file_png[128];
@@ -626,6 +633,12 @@ uSprite canvas_get_tab(int id) {
     s_log("id=%i", id);
     s_assume(id >= 0 && id < CANVAS_MAX_TABS, "invalid tab id");
     return load_image_file(id, L.tab_saves[id].save_idx, false);
+}
+
+void canvas_clear_all_base_tabs() {
+    for(int i=0; i<CANVAS_MAX_TABS; i++) {
+        clear_image(i, 0);
+    }
 }
 
 void canvas_save_config() {

@@ -138,7 +138,9 @@ sString *u_fetch_check_response(uFetch **self_ptr, bool *opt_error) {
 }
 
 
-#endif //!defined(PLATFORM_EMSCRIPTEN) && !defined(PLATFORM_ANDROID)
+#else //!defined(PLATFORM_EMSCRIPTEN) && !defined(PLATFORM_ANDROID)
+typedef int avoid_iso_c_empty_translation_unit_warning_a_;
+#endif
 #else //OPTION_FETCH
-typedef int avoid_iso_c_empty_translation_unit_warning_;
+typedef int avoid_iso_c_empty_translation_unit_warning_b_;
 #endif

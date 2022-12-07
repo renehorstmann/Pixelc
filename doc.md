@@ -27,6 +27,7 @@ Its also fine to use on desktops, etc.
 - [Palette](#S-palette)
   - [How to edit a palette](#S-palette__edit)
   - [How load a palette from a file](#S-palette__load)
+  - [Create your own palette, fast](#S-palette__create)
 - [Multitouch Mode](#S-multitouchmode)
 - [Kernel](#S-kernel)
   - [New Brush Size](#S-kernel__brush)
@@ -43,6 +44,9 @@ Its also fine to use on desktops, etc.
 - [Save](#S-save)
 - [Import](#S-import)
 - [Selection](#S-selection)
+  - [Create Selection](#S-selection__create)
+  - [Paste Selection](#S-selection__paste)
+  - [Stamps](#S-selection__stamps)
 - [Image Tabs](#S-image_tabs)
 - [Frames](#S-frames)
 - [Layers](#S-layers)
@@ -138,6 +142,8 @@ Click on the tooltip button again to stop the tooltips.
 ### Side Swipe to change
 Swipe to the left or right on the palette, to change to the previous or next palette.
 
+You can also use the mouse wheel to switch palettes, when the cursor is above it.
+
 ![img](doc/palette_swipe.png)
 
 ### Up Swipe for Multitouch Mode
@@ -174,6 +180,24 @@ In this dialog you can:
 5. hold down on the palette to open the palette dialog
 6. (optional) rename the palette name to a new one
 7. ![img](doc/res2/button_to.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
+
+### <a name="S-palette__create"></a>Create your own palette, fast
+1. ![img](doc/res2/button_tab.png)  use a new image tab, or use the top of your image
+2. Draw some shades of gray
+3. Use the [Selection](#S-selection) tool to crop your shades ![img](doc/res2/button_crop.png)
+
+![img](doc/palette_create_grayshade.png)
+
+4. Create new [Kernel Stamp](#S-kernel__stamps) of that image
+5. ![img](doc/res2/button_tab.png)  use a new image tab, or click undo ![img](doc/res2/button_undo.png)
+6. Select a bright color with the RGB tool ![img](doc/res2/button_rgb.png)
+7. Draw the kernel with the custom color
+8. Repeat until your palette is finished
+9. Crop to your custom palette and set it like in ["How to edit a palette"](#S-palette__edit)
+
+![img](doc/palette_create_palette.png)
+
+> You can also use [Selection Stamps](#S-selection__stamps) to draw the color shades
 
 ## <a name="S-multitouchmode"></a>Multitouch Mode
 > Makes editing pixelart on touch devices a great experience!
@@ -217,12 +241,14 @@ In this dialog you can:
 ![img](doc/kernel_brush_usage.png)
 
 ### <a name="S-kernel__stamps"></a>Stamps
+Also have a look at [Selection Stamps](#S-selection__stamps)
+
 You can also use kernels as image stamps to quickly draw your stamps in different colors:
 1. ![img](doc/res2/button_tab.png)  use a new image tab 
-2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel color * palette color // [0:1]`)
+2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel_color * palette_color // [0:1]`)
 3. Hold on the Kernel preview to start the kernel dialog
 4. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
-5. Select a color from the palette
+5. Select a color from the palette. Or use the ![img](doc/res2/button_rgb.png) RGB tool with a custom color
 6. ![img](doc/res2/button_dot.png)  Use the Dot Mode 
 7. Draw your stamp
 
@@ -524,6 +550,9 @@ Toggle the rotate and flip buttons, to manipulate the image after resizing
 ## <a name="S-selection"></a>Selection
 ![img](doc/res4/button_selection.png)
 
+
+## <a name="S-selection__create"></a>Create Selection
+
 Click on the selection tool, to start a new selection.
 
 Now swipe down on the canvas to create the selection window.
@@ -533,6 +562,9 @@ Now swipe down on the canvas to create the selection window.
 You can now move the selection borders with the arrow keys on the left in the selection toolbar.
 
 While a selection is active, all drawing stuff is only applied inside the selection box.
+
+
+## <a name="S-selection__paste"></a>Paste Selection
 
 ![img](doc/res2/button_copy.png)
 The copy button copies the current selection.
@@ -563,11 +595,29 @@ The ok button copies the selection into the canvas and closes the selection mode
 ![img](doc/res2/button_selection.png)
 Stop the selection mode to cancel the copying.
 
+![img](doc/res2/button_colordrop.png)
+If the color button is activated, the current color will be applied on the selection.
+
+See [Selection Stamps](#S-selection__stamps) below.
+
 ![img](doc/res2/button_blend.png)
 If the blend button is activated, the selections will be blended onto the canvas (using transparency).
 
 ![img](doc/selection_paste_blend.png)
 
+## <a name="S-selection__stamps"></a>Stamps
+Also have a look at [Kernel Stamps](#S-kernel__stamps)
+
+You can also use selections as image stamps to quickly draw your stamps in different colors:
+1. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `pixel_color * palette_color // [0:1]`)
+2. Create a selection on your drawing (In the image below, its the gift in the black box)
+3. ![img](doc/res2/button_copy.png) Copy this selection stamp
+4. ![img](doc/res2/button_colordrop.png) Activate the color mode
+5. Select a color from the palette. Or use the ![img](doc/res2/button_rgb.png) RGB tool with a custom color
+6. ![img](doc/res2/button_copy.png) Drag and copy your stamp
+
+
+![img](doc/selection_stamps.png)
 
 ## <a name="S-image_tabs"></a>Image Tabs
 ![img](doc/res4/button_tab.png)

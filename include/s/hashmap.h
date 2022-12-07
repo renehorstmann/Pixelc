@@ -6,7 +6,7 @@
 //      see hashmap_string.h for an implementation with strings as keys
 //
 
-#include "memory.h"
+#include "allocator.h"
 #include "log.h"
 
 #define S_NAME_CONCAT(a, b) a ## b

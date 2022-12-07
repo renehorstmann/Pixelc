@@ -1,50 +1,37 @@
+#include "u/billing.h"
+#include "e/core.h"
+
 #ifdef PLATFORM_ANDROID
 
 #include <jni.h>
-#include "s/s_full.h"
-#include "e/io.h"
-#include "e/window.h"
-
-
-//
-// private
-//
-
 
 static struct {
-    struct {
-        char file[128];
-        bool ascii;
-        eIoFileUploadCallback cb;
-        void *ud;
-    } file_upload;
+    u_billing_purchased_fn callback;
+    void *callback_user_data;
 } L;
 
-static void run_on_main_looper(void *user_data) {
-    s_log("calling file uploaded callback...");
-    if(L.file_upload.cb)
-        L.file_upload.cb(L.file_upload.file, L.file_upload.ascii, L.file_upload.file, L.file_upload.ud);
-}
-
-JNIEXPORT void JNICALL SOME_ANDROID_INTERFACE(eIoOnFileUploaded)(JNIEnv* env, jobject thisObject) {
-    s_log("file uploaded...");
-    e_window_run_once_on_main_looper(run_on_main_looper, NULL);
+JNIEXPORT bool JNICALL SOME_ANDROID_INTERFACE(uBillingPurchased)(JNIEnv* env, jobject thisObject, jint idx) {
+    s_log("got a purchase!");
+    if(!L.callback) {
+        s_log_error("callback invalid!");
+        return false;
+    }
+    return L.callback(idx, L.callback_user_data);
 }
 
 //
 // public
 //
 
-void e_io_offer_file_as_download(const char *file) {
-    s_log("download file: %s", file);
-
+bool u_billing_loaded() {
+    bool loaded = false;
 
     // JNI CALL
     {
         JNIEnv* env = NULL;
         jobject activity = NULL;
         jclass clazz = NULL;
-        jstring jfile = NULL;
+        jstring jurl = NULL;
 
         env = (JNIEnv*) SDL_AndroidGetJNIEnv();
         if(!env) {
@@ -65,46 +52,36 @@ void e_io_offer_file_as_download(const char *file) {
         }
 
         jmethodID method_id = (*env)->GetMethodID(env, clazz,
-                                                  "e_io_offer_file_as_download",
-                                                  "(Ljava/lang/String;)V");
+                                              "u_billing_loaded",
+                                              "()Z");
+
         if(!method_id) {
             s_log_error("method not found");
             goto JNI_CLEAN_UP;
         }
 
-        jfile = (*env)->NewStringUTF(env, file);
-        (*env)->CallVoidMethod(env, activity, method_id, jfile);
+        jboolean jloaded = (*env)->CallBooleanMethod(env, activity, method_id);
+        loaded = jloaded;
 
         JNI_CLEAN_UP:
         if(env) {
-            if(jfile) (*env)->DeleteLocalRef(env, jfile);
             if(activity) (*env)->DeleteLocalRef(env, activity);
             if(clazz) (*env)->DeleteLocalRef(env, clazz);
         }
     }
+
+    return loaded;
 }
 
-void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallback callback, void *user_data) {
-    s_log("select file: %s", file);
-
-    if(strlen(file) >= sizeof L.file_upload.file || s_str_count(s_strc(file), '/') != 0) {
-        s_log_error("e_io_ask_for_file_upload failed, file length to long, or got some \'/\'");
-        return;
-    }
-    snprintf(L.file_upload.file, sizeof L.file_upload.file, "%s", file);
-    L.file_upload.ascii = ascii;
-    L.file_upload.cb = callback;
-    L.file_upload.ud = user_data;
-
-
-
+void u_billing_buy(int idx, u_billing_purchased_fn callback, void *callback_user_data) {
+    L.callback = callback;
+    L.callback_user_data = callback_user_data;
 
     // JNI CALL
     {
         JNIEnv* env = NULL;
         jobject activity = NULL;
         jclass clazz = NULL;
-        jstring jfile = NULL;
 
         env = (JNIEnv*) SDL_AndroidGetJNIEnv();
         if(!env) {
@@ -125,19 +102,18 @@ void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallbac
         }
 
         jmethodID method_id = (*env)->GetMethodID(env, clazz,
-                                                  "e_io_ask_for_file_upload",
-                                                  "(Ljava/lang/String;)V");
+                                                  "u_billing_buy",
+                                                  "(I)V");
+
         if(!method_id) {
             s_log_error("method not found");
             goto JNI_CLEAN_UP;
         }
 
-        jfile = (*env)->NewStringUTF(env, file);
-        (*env)->CallVoidMethod(env, activity, method_id, jfile);
+        (*env)->CallVoidMethod(env, activity, method_id, (jint) idx);
 
         JNI_CLEAN_UP:
         if(env) {
-            if(jfile) (*env)->DeleteLocalRef(env, jfile);
             if(activity) (*env)->DeleteLocalRef(env, activity);
             if(clazz) (*env)->DeleteLocalRef(env, clazz);
         }
@@ -145,5 +121,12 @@ void e_io_ask_for_file_upload(const char *file, bool ascii, eIoFileUploadCallbac
 }
 
 #else //PLATFORM_ANDROID
-typedef int avoid_iso_c_empty_translation_unit_warning_;
+
+bool u_billing_loaded() {
+    return false;
+}
+
+void u_billing_buy(int idx, u_billing_purchased_fn callback, void *callback_user_data) {
+    s_log_warn("billing not available for this platform");
+}
 #endif

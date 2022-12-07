@@ -7,8 +7,14 @@
 #include "toolbar.h"
 
 
+#ifdef PIXELC_PREMIUM
+#define TB_ACTIVE_BG_A "#e2ce67"
+#define TB_ACTIVE_BG_B "#d1bd56"
+#else
 #define TB_ACTIVE_BG_A "#9999bb"
 #define TB_ACTIVE_BG_B "#8888aa"
+#endif
+
 #define TB_SELECTION_BG_A "#99bb99"
 #define TB_SELECTION_BG_B "#88aa88"
 #define TB_FRAMES_BG_A "#bbbb99"

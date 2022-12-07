@@ -25,9 +25,13 @@
 //
 
 
+#ifdef PIXELC_PREMIUM
+#define BG_COLOR_A "#F3DF76"
+#define BG_COLOR_B "#e2ce67"
+#else
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
-
+#endif
 
 
 // this function will be called at the start of the app
@@ -68,7 +72,10 @@ static void init() {
 
     cameractrl_set_home();
     dialog_create_startup();
-    
+
+    // startup color and hide palette info on startup
+    palette_set_color(s_min(1, palette.RO.palette_size-1));
+    palette_set_info(NULL);
 }
 
 // this functions is called either each frame or at a specific update/s time

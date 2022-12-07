@@ -5,8 +5,7 @@
 // dynamic array like a std::vector
 //
 
-#include "error.h"
-#include "memory.h"
+#include "allocator.h"
 #include "log.h"
 
 

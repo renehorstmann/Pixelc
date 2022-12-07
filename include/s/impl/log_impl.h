@@ -22,6 +22,13 @@
 #define S_LOG_COLORED true
 #endif
 
+
+#if !defined(S_LOG_DO_NOT_USE_MULTILINE) && defined(PLATFORM_MSVC)
+#define S_LOG_OPT_NEWLINE "\n   ->    "
+#else
+#define S_LOG_OPT_NEWLINE ""
+#endif
+
 static struct {
     enum s_log_level level;
     bool quiet;
@@ -53,27 +60,37 @@ static int s_log_to_str_v(char *str, ssize n,
         if (colored) {
             size = snprintf(str, n,
                             "%s %s%-5s "
-            S_TERMINALCOLOR_RESET S_TERMINALCOLOR_HIGHINTENSITY_BLACK
-            "%s:%d"
+                            S_TERMINALCOLOR_RESET S_TERMINALCOLOR_HIGHINTENSITY_BLACK
+                            "%s:%d"
                             S_TERMINALCOLOR_RESET
-            " [%s] ",
-                    time_str, s_log_src_level_colors_[level], s_log_src_level_names_[level], opt_file, line,
-                    opt_func);
+                            S_LOG_OPT_NEWLINE
+                            S_TERMINALCOLOR_HIGHINTENSITY_BLACK
+                            "[%s] "
+                            S_TERMINALCOLOR_RESET,
+                            time_str, s_log_src_level_colors_[level], s_log_src_level_names_[level], opt_file, line,
+                            opt_func);
         } else {
             size = snprintf(str, n,
-                            "%s %-5s %s:%d [%s] ",
+                            "%s %-5s %s:%d"
+                            S_LOG_OPT_NEWLINE
+                            "[%s] ",
                             time_str, s_log_src_level_names_[level], opt_file, line, opt_func);
         }
     } else {
         if (colored) {
             size = snprintf(str, n,
                             "%s %s%-5s"
-            S_TERMINALCOLOR_RESET
-            " [%s] ",
-                    time_str, s_log_src_level_colors_[level], s_log_src_level_names_[level], opt_func);
+                            S_TERMINALCOLOR_RESET
+                            S_LOG_OPT_NEWLINE
+                            S_TERMINALCOLOR_HIGHINTENSITY_BLACK
+                            "[%s] "
+                            S_TERMINALCOLOR_RESET,
+                            time_str, s_log_src_level_colors_[level], s_log_src_level_names_[level], opt_func);
         } else {
             size = snprintf(str, n,
-                            "%s %-5s [%s] ",
+                            "%s %-5s"
+                            S_LOG_OPT_NEWLINE
+                            "[%s] ",
                             time_str, s_log_src_level_names_[level], opt_func);
         }
     }
@@ -122,7 +139,7 @@ void s_log_base(enum s_log_level level, const char *opt_file, int line,
 #endif
 
     va_list args;
-    va_start(args, format);
+            va_start(args, format);
     char msg[S_LOG_MAX_LENGTH];
     s_log_to_str_v(msg, sizeof msg,
                      level, opt_file, line, opt_func, S_LOG_COLORED, time_str,

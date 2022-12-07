@@ -65,6 +65,12 @@ S_EXPORT
 sSocket *s_socket_new(const char *address, su16 port);
 
 
+// Sets the timeout in ms for recv and send
+// not supported for sdl (which will log a warning)
+S_EXPORT
+void s_socket_set_timeout(sSocket *self, int timeout_ms);
+
+
 // kills the socket and sets it invalid
 S_EXPORT
 void s_socket_kill(sSocket **self_ptr);

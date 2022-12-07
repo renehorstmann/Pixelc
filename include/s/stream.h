@@ -17,10 +17,10 @@ struct sString;
 
 struct sStream_i;
 
-typedef ssize (*s_stream_read_try_fn)(struct sStream_i stream, void *memory, ssize n);
-typedef ssize (*s_stream_write_try_fn)(struct sStream_i stream, const void *memory, ssize n);
-typedef void (*s_stream_flush_fn)(struct sStream_i stream);
-typedef bool (*s_stream_valid_fn)(struct sStream_i stream);
+typedef ssize (*s_stream_read_try_fn)(struct sStream_i *stream, void *memory, ssize n);
+typedef ssize (*s_stream_write_try_fn)(struct sStream_i *stream, const void *memory, ssize n);
+typedef void (*s_stream_flush_fn)(struct sStream_i *stream);
+typedef bool (*s_stream_valid_fn)(struct sStream_i *stream);
 
 typedef struct sStream_i {
     void *impl;
@@ -45,27 +45,27 @@ static sStream_i s_stream_new_invalid() {
 // returns bytes read or <=0 on error
 static ssize s_stream_read_try(sStream_i self, void *memory, ssize n) {
     assert(self.opt_read_try);
-    return self.opt_read_try(self, memory, n);
+    return self.opt_read_try(&self, memory, n);
 }
     
 // trys writes up to n bytes into the stream from memory
 // returns bytes written or <=0 on error
 static ssize s_stream_write_try(sStream_i self, const void *memory, ssize n) {
     assert(self.opt_write_try);
-    return self.opt_write_try(self, memory, n);
+    return self.opt_write_try(&self, memory, n);
 }
 
 // flushes the stream, if opt_flush is available
 static void s_stream_flush(sStream_i self) {
     if(self.opt_flush)
-        self.opt_flush(self);
+        self.opt_flush(&self);
 }
 
 // returns true, if the stream (implementation) is in a valid state
 static bool s_stream_valid(sStream_i self) {
     if(!self.valid)
         return false;
-    return self.valid(self);
+    return self.valid(&self);
 }
 
 // reads exactly n bytes from the stream into memory
