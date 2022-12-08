@@ -27,6 +27,11 @@ A documentation / tutorial can be found [here / doc.md](doc.md)
 
 Or just use the tooltip tool. 
 
+## Sponsoring
+You want to support me?
+> Buy Pixelc Premium on [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelcpremium).
+Its just like Pixelc, but with a golden background
+
 ## Highlights:
 - Multitouch Mode for a great touch experience
 - Full mobile friendly [WebApp](https://renehorstmann.github.io/pixelc) compiled with emscripten

@@ -10,6 +10,12 @@
 typedef void (*u_admob_reward_fn)(void *user_data);
 
 // makes an "expensive" jni call
+bool u_admob_ump_loaded();
+
+// reshows the ump form, if available / loaded
+void u_admob_ump_show();
+
+// makes an "expensive" jni call
 bool u_admob_reward_ad_loaded();
 
 // the u_admob_reward_fn callback should always be the same

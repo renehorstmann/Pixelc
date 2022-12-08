@@ -1,11 +1,14 @@
-#ifdef OPTION_FETCH
+// always included, so that the jni can find the functions #ifdef OPTION_FETCH
 #ifdef PLATFORM_ANDROID
 
 #define MAX_PARALLEL_FETCHES 128
 
+// so the include is working
+#define OPTION_FETCH
+#include "u/fetch.h"
+
 #include <jni.h>
 #include "s/str.h"
-#include "u/fetch.h"
 #include "s/file.h"
 #include "e/window.h"
 
@@ -231,6 +234,4 @@ sString *u_fetch_check_response(uFetch **self_ptr, bool *opt_error) {
 #else //PLATFORM_ANDROID
 typedef int avoid_iso_c_empty_translation_unit_warning_a_;
 #endif
-#else //OPTION_FETCH
-typedef int avoid_iso_c_empty_translation_unit_warning_b_;
-#endif
+
