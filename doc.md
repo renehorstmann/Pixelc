@@ -155,31 +155,31 @@ Press on the palette for some time to start the palette dialog.
 
 In this dialog you can:
 - ![img](doc/res2/button_delete.png)  delete the current palette
-- ![img](doc/res2/button_from.png)  copy the current palette as image into the canvas
+- ![img](doc/res2/button_to.png)  copy the current palette as image into the canvas
   - will overwrite the full image (use undo to reset to the old)
   - Good to edit the palatte in the canvas
-- ![img](doc/res2/button_to.png)  Set a (new) palette from the current canvas image
+- ![img](doc/res2/button_from.png)  Set a (new) palette from the current canvas image
   - Will overwrite the palette with the blue name or create a new one
     - click on the blue name to edit the new palette name
 
 ### <a name="S-palette__edit"></a>How to edit a palette
 1. ![img](doc/res2/button_tab.png)  use a new image tab
 2. hold down on the palette to open the palette dialog
-3. ![img](doc/res2/button_from.png)  copy the current palette into the canvas
+3. ![img](doc/res2/button_to.png)  copy the current palette into the canvas
 4. change the [size](#S-size) to add new colors, or replace the colors in the canvas. 
    - ![img](doc/res2/button_rgb.png)  Use the RGB tool to draw with a custom color
 5. hold down on the palette again to open the palette dialog
 6. (optional) rename the palette name to a new one
-7. ![img](doc/res2/button_to.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
+7. ![img](doc/res2/button_from.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
 
 ### <a name="S-palette__load"></a>How to load a palette from a file
 1. Download a palette file as png (for example from [LOSCPEC](https://lospec.com/palette-list) PNG Image 1x)
 2. ![img](doc/res2/button_tab.png)  use a new image tab
 3. ![img](doc/res2/button_import.png) click on the import button 
-4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas" 
+4. ![img](doc/res2/button_to.png)  in the import dialog, load the image and press "copy into canvas" 
 5. hold down on the palette to open the palette dialog
 6. (optional) rename the palette name to a new one
-7. ![img](doc/res2/button_to.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
+7. ![img](doc/res2/button_from.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
 
 ### <a name="S-palette__create"></a>Create your own palette, fast
 1. ![img](doc/res2/button_tab.png)  use a new image tab, or use the top of your image
@@ -223,17 +223,17 @@ If you hold on the kernel preview between minus and plus, the kernel options dia
 
 In this dialog you can:
 - ![img](doc/res2/button_delete.png)   delete the current kernel
-- ![img](doc/res2/button_from.png)   copy the current kernel as image into the canvas
+- ![img](doc/res2/button_to.png)   copy the current kernel as image into the canvas
   - will overwrite the full image (use undo to reset to the old)
   - Good to edit the kernel in the canvas
-- ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image
+- ![img](doc/res2/button_from.png)  Create a new kernel from the current canvas image
 
 ### <a name="S-kernel__brush"></a>New Brush Size
 1. ![img](doc/res2/button_tab.png) use a new image tab
 2. ![img](doc/res2/button_size.png)  Change canvas size to the desired kernel size 
 3. Draw a white circle in the canvas and fill it white
 4. Hold on the Kernel preview to start the kernel dialog
-5. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
+5. ![img](doc/res2/button_from.png)  Create a new kernel from the current canvas image 
 6. Draw with your new brush
 
 ![img](doc/kernel_brush_image.png)
@@ -247,7 +247,7 @@ You can also use kernels as image stamps to quickly draw your stamps in differen
 1. ![img](doc/res2/button_tab.png)  use a new image tab 
 2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel_color * palette_color // [0:1]`)
 3. Hold on the Kernel preview to start the kernel dialog
-4. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
+4. ![img](doc/res2/button_from.png)  Create a new kernel from the current canvas image 
 5. Select a color from the palette. Or use the ![img](doc/res2/button_rgb.png) RGB tool with a custom color
 6. ![img](doc/res2/button_dot.png)  Use the Dot Mode 
 7. Draw your stamp
@@ -371,23 +371,23 @@ Want to view your 3D-Tilemap from a different orientation?
 1. ![img](doc/res2/button_tab.png)  use a new image tab
 2. ![img](doc/res2/button_tile.png) start the tiling mode
 3. hold down on the tile palette to open the tile dialog
-4. ![img](doc/res2/button_from.png)  copy the current tilesheet into the canvas
+4. ![img](doc/res2/button_to.png)  copy the current tilesheet into the canvas
 5. redraw tiles, change the size, draw new tiles, ....
 6. ![img](doc/res2/button_tile.png) start the tiling mode again
 7. (optional) select a different tilesheet to update
 8. hold down on the tile palette again to open the tile dialog
-9. ![img](doc/res2/button_to.png) update tilesheet from canvas
+9. ![img](doc/res2/button_from.png) update tilesheet from canvas
 
 ### <a name="S-tiles__load"></a>How to load a tilesheet from a file
 1. Download a tilesheet file as png (for example from [itch](https://itch.io/game-assets/tag-tileset))
 2. ![img](doc/res2/button_tab.png) use a new image tab
 3. ![img](doc/res2/button_import.png) click on the import button
-4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas"
+4. ![img](doc/res2/button_to.png)  in the import dialog, load the image and press "copy into canvas"
 5. (optional) crop the image out to the tiles you want with a [selection](#S-selection)
 6. ![img](doc/res2/button_tile.png) start the tiling mode
 7. (optional) select a different tilesheet to update
 8. hold down on the tile palette to open the tile dialog
-9. ![img](doc/res2/button_to.png) update tilesheet from canvas
+9. ![img](doc/res2/button_from.png) update tilesheet from canvas
 
 
 ### Tile saving
@@ -608,7 +608,7 @@ If the blend button is activated, the selections will be blended onto the canvas
 ## <a name="S-selection__stamps"></a>Stamps
 Also have a look at [Kernel Stamps](#S-kernel__stamps)
 
-You can also use selections as image stamps to quickly draw your stamps in different colors:
+You can use selections as image stamps to quickly draw your stamps in different colors:
 1. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `pixel_color * palette_color // [0:1]`)
 2. Create a selection on your drawing (In the image below, its the gift in the black box)
 3. ![img](doc/res2/button_copy.png) Copy this selection stamp

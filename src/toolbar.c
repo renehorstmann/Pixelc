@@ -8,19 +8,25 @@
 
 
 #ifdef PIXELC_PREMIUM
-#define TB_ACTIVE_BG_A "#e2ce67"
-#define TB_ACTIVE_BG_B "#d1bd56"
+#define TB_ACTIVE_BG_A "#555555"
+#define TB_ACTIVE_BG_B "#444444"
+#define TB_SELECTION_BG_A "#999999"
+#define TB_SELECTION_BG_B "#888888"
+#define TB_FRAMES_BG_A "#666666"
+#define TB_FRAMES_BG_B "#555555"
+#define TB_LAYER_BG_A "#777777"
+#define TB_LAYER_BG_B "#666666"
 #else
 #define TB_ACTIVE_BG_A "#9999bb"
 #define TB_ACTIVE_BG_B "#8888aa"
-#endif
-
 #define TB_SELECTION_BG_A "#99bb99"
 #define TB_SELECTION_BG_B "#88aa88"
 #define TB_FRAMES_BG_A "#bbbb99"
 #define TB_FRAMES_BG_B "#aaaa88"
 #define TB_LAYER_BG_A "#bb9999"
 #define TB_LAYER_BG_B "#aa8888"
+#endif
+
 
 #define HOVER_TIME 1.0
 

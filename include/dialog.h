@@ -122,4 +122,6 @@ void dialog_create_animation();
 
 void dialog_create_startup();
 
+void dialog_create_premium();
+
 #endif //PIXELC_DIALOG_H

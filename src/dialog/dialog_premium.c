@@ -1,0 +1,178 @@
+#include "e/io.h"
+#include "r/r.h"
+#include "u/pose.h"
+#include "u/button.h"
+#include "u/json.h"
+#include "m/float.h"
+#include "m/utils/color.h"
+#include "io.h"
+#include "dialog.h"
+
+#define STARTUP_COUNTER 20
+
+static const uColor_s BG_A_COLOR = {{136, 136, 126, 255}};
+static const uColor_s BG_B_COLOR = {{143, 143, 136, 255}};
+
+//
+// private
+//
+
+static void save_no_reshow() {
+    s_log("save");
+    uJson *config = u_json_new_file(io_config_file());
+
+    uJson *member = u_json_append_object(config, "dialog_premium");
+
+    u_json_append_bool(member, "reshow", false);
+    u_json_append_int(member, "startups", 0);
+    
+    u_json_save_file(config, io_config_file(), NULL);
+    e_io_savestate_save();
+
+    u_json_kill(&config);
+}
+
+static bool load_and_save_reshow() {
+    uJson *config = u_json_new_file(io_config_file());
+
+    uJson *member = u_json_get_object(config, "dialog_premium");
+
+    bool reshow;
+    const bool *item = u_json_get_object_bool(member, "reshow");
+    if(!item)
+        reshow = true;
+    else
+        reshow = *item;
+
+    int startups;
+    if(!u_json_get_object_int(member, "startups", &startups)) {
+        s_log("init startups for premium");
+        startups = STARTUP_COUNTER;
+    } else if(startups>0){
+        startups--;
+    }
+
+
+    // set and save
+    member = u_json_append_object(config, "dialog_premium");
+    u_json_append_bool(member, "reshow", reshow);
+    u_json_append_int(member, "startups", startups);
+    u_json_save_file(config, io_config_file(), NULL);
+    e_io_savestate_save();
+    
+    s_log("load, reshow: %i, counter: %i", reshow, startups);
+    u_json_kill(&config);
+    return reshow && startups <= 0;
+}
+
+
+typedef struct {
+    RoText info;
+    
+    RoText reshow_txt;
+    RoSingle reshow_toggle;
+    
+} Impl;
+
+static void kill_fn() {
+    Impl *impl = dialog.impl;
+    ro_text_kill(&impl->info);
+    ro_text_kill(&impl->reshow_txt);
+    ro_single_kill(&impl->reshow_toggle);
+    s_free(impl);
+}
+
+static void update(float dtime) {
+    // noop
+}
+
+static void render(const mat4 *cam_mat) {
+    Impl *impl = dialog.impl;
+    ro_text_render(&impl->info, cam_mat);
+    ro_text_render(&impl->reshow_txt, cam_mat);
+    ro_single_render(&impl->reshow_toggle, cam_mat);
+}
+
+
+static bool pointer_event(ePointer_s pointer) {
+    Impl *impl = dialog.impl;
+
+    if(u_button_toggled(&impl->reshow_toggle.rect, pointer)) {
+        s_log("reshow toggled");
+    }
+    
+    return true;
+}
+
+static void on_action(bool ok) {
+    Impl *impl = dialog.impl;
+    
+    if(!u_button_is_pressed(&impl->reshow_toggle.rect)) {
+        save_no_reshow();
+    }
+    dialog_hide();
+}
+
+//
+// public
+//
+
+
+void dialog_create_premium() {
+    if(!load_and_save_reshow())
+        return;
+
+    // should also hide the default startup dialog
+    dialog_hide();
+    
+    s_log("create");
+    Impl *impl = s_malloc0(sizeof *impl);
+    dialog.impl = impl;
+    
+    int pos = 16;
+    
+    impl->info = ro_text_new_font55(256);
+    ro_text_set_text(&impl->info, "Thanks for using\nmy App!\n\n"
+            "Consider\n"
+            "supporting me\n"
+            "and buy\n"
+            "Pixelc Premium!\n\n"
+            "github.com\n"
+            " /renehorstmann\n"
+            " /pixelc\n\n");
+    ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
+    impl->info.pose = u_pose_new(DIALOG_LEFT + 2, DIALOG_TOP - pos, 1, 1);
+    
+    pos += 75;
+    
+    impl->reshow_txt = ro_text_new_font55(32);
+    ro_text_set_color(&impl->reshow_txt, DIALOG_TEXT_COLOR);
+    ro_text_set_text(&impl->reshow_txt, "reshow\n"
+            "this dialog?");
+    impl->reshow_txt.pose = u_pose_new(DIALOG_LEFT+4, DIALOG_TOP - pos, 1, 1);
+    
+    impl->reshow_toggle = ro_single_new(r_texture_new_file(2, 1, "res/button_ok.png"));
+    impl->reshow_toggle.rect.pose = u_pose_new_aa(
+            DIALOG_LEFT + DIALOG_WIDTH - 30, 
+            DIALOG_TOP - pos, 
+            16, 16);
+    impl->reshow_toggle.rect.sprite.x = 1;
+    
+    pos += 10;
+    
+    dialog.impl_height = pos;
+
+    dialog_set_title("Pixelc", vec4_set(1));
+    for(int i=0; i<6; i++) {
+        vec3 hsv = {{i*360.0/6.0, 0.8, 0.8}};
+        dialog.title.ro.rects[i].color.rgb = vec3_hsv2rgb(hsv);
+    }
+    ro_batch_update(&dialog.title.ro);
+    dialog_set_bg_color(BG_A_COLOR, BG_B_COLOR);
+    dialog.kill = kill_fn;
+    dialog.update = update;
+    dialog.render = render;
+    dialog.pointer_event = pointer_event;
+    dialog.opt_on_ok_cb = on_action;
+}
+

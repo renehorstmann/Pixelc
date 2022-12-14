@@ -8,6 +8,11 @@ set(USE_SDL_TTF false)
 set(USE_FETCH false)
 set(USE_SANITIZER true)
 
+# for pixelc premium.
+# Yes, you may build it for yourself.
+# But consider to buy it nevertheless to support me and my work :)
+set(PREMIUM false)
+
 # Platforms definitions:
 # PLATFORM_MSVC         Microsoft C++ Compiler
 # PLATFORM_MINGW        Windows Msys2 Mingw-w64
@@ -106,6 +111,10 @@ if (USE_FETCH)
     message("USE_FETCH")
     add_definitions(-DOPTION_FETCH)
 endif ()
+
+if(PREMIUM)
+    add_definitions(-DPIXELC_PREMIUM)
+endif()
 
 
 # windows mingw
@@ -291,11 +300,22 @@ endif ()
 
 
 # res
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+if(PREMIUM)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res_premium/res
+            DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-if (PLATFORM_MSVC)
-    # also copy res to MSVC subdirs Debug and Release
+    if (PLATFORM_MSVC)
+        # also copy res to MSVC subdirs Debug and Release
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res_premium/res
+                DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+    endif()
+else()
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res
-            DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+            DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+    if (PLATFORM_MSVC)
+        # also copy res to MSVC subdirs Debug and Release
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res
+                DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+    endif()
 endif()

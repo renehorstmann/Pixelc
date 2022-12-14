@@ -216,6 +216,7 @@ void e_window_init(const char *title) {
 //           180*3*16/9, 180*3,
 //           180*3, 180*3*16/9,
 //           480, 480*16/9,
+//           1024, 500,
            SDL_WINDOW_OPENGL
            | SDL_WINDOW_RESIZABLE
 //           | SDL_WINDOW_ALLOW_HIGHDPI

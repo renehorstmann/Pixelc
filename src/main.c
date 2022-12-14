@@ -26,8 +26,8 @@
 
 
 #ifdef PIXELC_PREMIUM
-#define BG_COLOR_A "#F3DF76"
-#define BG_COLOR_B "#e2ce67"
+#define BG_COLOR_A "#222222"
+#define BG_COLOR_B "#111111"
 #else
 #define BG_COLOR_A "#aaaacc"
 #define BG_COLOR_B "#9999dd"
@@ -72,6 +72,9 @@ static void init() {
 
     cameractrl_set_home();
     dialog_create_startup();
+#ifndef PIXELC_PREMIUM
+    dialog_create_premium();
+#endif
 
     // startup color and hide palette info on startup
     palette_set_color(s_min(1, palette.RO.palette_size-1));
