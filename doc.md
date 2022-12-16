@@ -10,9 +10,9 @@ The main target are touch devices such as smartphones and tablets
 
 Its also fine to use on desktops, etc.
 
-> Touch-Users: Use the [Multitouch Mode](#S-multitouchmode) for a great user experience!
+> Touch-Users: Use the [Multitouch Mode](#multitouch-mode) for a great user experience!
 
-> Big Screen? Change the internal [Display](#S-display) size
+> Big Screen? Change the internal [Display](#display-settings) size
 
 > Add the WebApp in your browser to the homescreen, to get the real WebApp fullscreen feeling
 
@@ -22,36 +22,36 @@ Its also fine to use on desktops, etc.
 ![img](example.png)
 
 ## Table of Contents
-- [Draw Modes](#S-draw_modes)
-- [Tooltip](#S-tooltip)
-- [Palette](#S-palette)
-  - [How to edit a palette](#S-palette__edit)
-  - [How load a palette from a file](#S-palette__load)
-  - [Create your own palette, fast](#S-palette__create)
-- [Multitouch Mode](#S-multitouchmode)
-- [Kernel](#S-kernel)
-  - [New Brush Size](#S-kernel__brush)
-  - [Stamps](#S-kernel__stamps)
-- [Funny Rainbow Trick](#S-rainbow)
-- [Secondary Color](#S-secondary_color)
-- [Shading](#S-shading)
-- [Tiles](#S-tiles)
-  - [Isometric Mode](#S-tiles__isometric)
-  - [How to edit a tilesheet](#S-tiles__edit)
-  - [How to load a tilesheet from a file](#S-tiles__load)
-- [Display Settings](#S-display)
-- [Grid](#S-grid)
-- [Save](#S-save)
-- [Import](#S-import)
-- [Selection](#S-selection)
-  - [Create Selection](#S-selection__create)
-  - [Paste Selection](#S-selection__paste)
-  - [Stamps](#S-selection__stamps)
-- [Image Tabs](#S-image_tabs)
-- [Frames](#S-frames)
-- [Layers](#S-layers)
+- [Draw Modes](#draw-modes)
+- [Tooltip](#tooltip)
+- [Palette](#palette)
+  - [How to edit a palette](#how-to-edit-a-palette)
+  - [How load a palette from a file](#how-to-load-a-palette-from-a-file)
+  - [Create your own palette, fast](#create-your-own-palette-fast)
+- [Multitouch Mode](#multitouch-mode)
+- [Kernel](#kernel)
+  - [New Brush Size](#new-brush-size)
+  - [Kernel Stamps](#kernel-stamps)
+- [Funny Rainbow Trick](#funny-rainbow-trick)
+- [Secondary Color](#secondary-color)
+- [Shading](#shading)
+- [Tiles](#tiles)
+  - [Isometric Mode](#isometric-mode)
+  - [How to edit a tilesheet](#how-to-edit-a-tilesheet)
+  - [How to load a tilesheet from a file](#how-to-load-a-tilesheet-from-a-file)
+- [Display Settings](#display-settings)
+- [Grid](#grid)
+- [Save](#save)
+- [Import](#import)
+- [Selection](#selection)
+  - [Create Selection](#create-selection)
+  - [Paste Selection](#paste-selection)
+  - [Selection Stamps](#selection-stamps)
+- [Image Tabs](#image-tabs)
+- [Frames](#frames)
+- [Layers](#layers)
 
-## <a name="S-draw_modes"></a>Draw Modes
+## Draw Modes
 Pixelc supports different modes to draw on the canvas.
 ### Free
 ![img](doc/res4/button_free.png)
@@ -61,7 +61,7 @@ Draws freely on the canvas (default mode).
 ![img](doc/res4/button_dot.png)
 
 Draws on each tip.
-Good to print [stamps](#S-kernel__stamps) on the canvas.
+Good to print [Kernel Stamps](#kernel-stamps) on the canvas.
 ### Line
 ![img](doc/res4/button_line.png)
 
@@ -78,7 +78,7 @@ Start position is the circle center.
 ### Grid
 ![img](doc/res4/button_dither.png)
 
-Draws the current [Kernel](#S-kernel) in a grid on the canvas.
+Draws the current [Kernel](#kernel) in a grid on the canvas.
 Only makes sense for a dithering kernel.
 
 ![img](doc/mode_grid.png)
@@ -86,7 +86,7 @@ Only makes sense for a dithering kernel.
 ### Inverted Grid
 ![img](doc/res4/button_dither_inv.png)
 
-As Mode Grid, but inverts the colors of the [Kernel](#S-kernel).
+As Mode Grid, but inverts the colors of the [Kernel](#kernel).
 So you can fill the opposite colors as with the normal Grid mode.
 Only makes sense for a dithering kernel.
 
@@ -121,14 +121,14 @@ Does nothing on the canvas. Use this mode if you just want to view your pixel ar
 ### Pipette
 ![img](doc/res4/button_pipette.png)
 
-Click on a color in the canvas to set (and select) it as [secondary color](#S-secondary_color). 
+Click on a color in the canvas to set (and select) it as [secondary color](#secondary-color). 
 The app shows a flash effect of that color to show you that the pipette mode is active.
-(Also if [shading](#S-shading) is active)
+(Also if [shading](#shading) is active)
 
 - If the button is half pressed, the last active draw mode will be reset, if a color was picked.
 - If full pressed, the pipette mode stays active
 
-## <a name="S-tooltip"></a>Tooltip
+## Tooltip
 ![img](doc/res4/button_tooltip.png)
 
 Click on the tooltip tool in the toolbar to show tooltips for pressed tools
@@ -138,7 +138,7 @@ Click on the tooltip tool in the toolbar to show tooltips for pressed tools
 You can now click on a tool (or the palette) to get some tipps.
 Click on the tooltip button again to stop the tooltips.
 
-## <a name="S-palette"></a>Palette
+## Palette
 ### Side Swipe to change
 Swipe to the left or right on the palette, to change to the previous or next palette.
 
@@ -147,7 +147,7 @@ You can also use the mouse wheel to switch palettes, when the cursor is above it
 ![img](doc/palette_swipe.png)
 
 ### Up Swipe for Multitouch Mode
-See [Multitouch Mode](#S-multitouchmode).
+See [Multitouch Mode](#multitouch-mode).
 ### Hold for Options
 Press on the palette for some time to start the palette dialog.
 
@@ -155,51 +155,51 @@ Press on the palette for some time to start the palette dialog.
 
 In this dialog you can:
 - ![img](doc/res2/button_delete.png)  delete the current palette
-- ![img](doc/res2/button_to.png)  copy the current palette as image into the canvas
+- ![img](doc/res2/button_from.png)  copy the current palette as image into the canvas
   - will overwrite the full image (use undo to reset to the old)
   - Good to edit the palatte in the canvas
-- ![img](doc/res2/button_from.png)  Set a (new) palette from the current canvas image
+- ![img](doc/res2/button_to.png)  Set a (new) palette from the current canvas image
   - Will overwrite the palette with the blue name or create a new one
     - click on the blue name to edit the new palette name
 
-### <a name="S-palette__edit"></a>How to edit a palette
+### How to edit a palette
 1. ![img](doc/res2/button_tab.png)  use a new image tab
 2. hold down on the palette to open the palette dialog
-3. ![img](doc/res2/button_to.png)  copy the current palette into the canvas
-4. change the [size](#S-size) to add new colors, or replace the colors in the canvas. 
+3. ![img](doc/res2/button_from.png)  copy the current palette into the canvas
+4. change the [size](#size) to add new colors, or replace the colors in the canvas. 
    - ![img](doc/res2/button_rgb.png)  Use the RGB tool to draw with a custom color
 5. hold down on the palette again to open the palette dialog
 6. (optional) rename the palette name to a new one
-7. ![img](doc/res2/button_from.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
+7. ![img](doc/res2/button_to.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
 
-### <a name="S-palette__load"></a>How to load a palette from a file
+### How to load a palette from a file
 1. Download a palette file as png (for example from [LOSCPEC](https://lospec.com/palette-list) PNG Image 1x)
 2. ![img](doc/res2/button_tab.png)  use a new image tab
 3. ![img](doc/res2/button_import.png) click on the import button 
-4. ![img](doc/res2/button_to.png)  in the import dialog, load the image and press "copy into canvas" 
+4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas" 
 5. hold down on the palette to open the palette dialog
 6. (optional) rename the palette name to a new one
-7. ![img](doc/res2/button_from.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
+7. ![img](doc/res2/button_to.png)  set palette from canvas (duplicate colors are ignored, up to 128 colors) 
 
-### <a name="S-palette__create"></a>Create your own palette, fast
+### Create your own palette, fast
 1. ![img](doc/res2/button_tab.png)  use a new image tab, or use the top of your image
 2. Draw some shades of gray
-3. Use the [Selection](#S-selection) tool to crop your shades ![img](doc/res2/button_crop.png)
+3. Use the [Selection](#selection) tool to crop your shades ![img](doc/res2/button_crop.png)
 
 ![img](doc/palette_create_grayshade.png)
 
-4. Create new [Kernel Stamp](#S-kernel__stamps) of that image
+4. Create new [Kernel Stamp](#kernel-stamps) of that image
 5. ![img](doc/res2/button_tab.png)  use a new image tab, or click undo ![img](doc/res2/button_undo.png)
 6. Select a bright color with the RGB tool ![img](doc/res2/button_rgb.png)
 7. Draw the kernel with the custom color
 8. Repeat until your palette is finished
-9. Crop to your custom palette and set it like in ["How to edit a palette"](#S-palette__edit)
+9. Crop to your custom palette and set it like in ["How to edit a palette"](#how-to-edit-a-palette)
 
 ![img](doc/palette_create_palette.png)
 
-> You can also use [Selection Stamps](#S-selection__stamps) to draw the color shades
+> You can also use [Selection Stamps](#selection-stamps) to draw the color shades
 
-## <a name="S-multitouchmode"></a>Multitouch Mode
+## Multitouch Mode
 > Makes editing pixelart on touch devices a great experience!
 
 To start, swipe with your thumb (or a finger) up from the palette.
@@ -209,7 +209,7 @@ You can also press the buttons in the toolbar and in the dialogs, too!
 
 ![img](doc/multitouchmode.png)
 
-## <a name="S-kernel"></a>Kernel
+## Kernel
 The Kernel is drawn in the Modes: Free, Dot, Line, Rect, Cricle, Grid and InvertedGrid.
 
 ![img](doc/res4/button_kernel_minus.png) ![img](doc/res4/button_kernel_plus.png)
@@ -223,31 +223,31 @@ If you hold on the kernel preview between minus and plus, the kernel options dia
 
 In this dialog you can:
 - ![img](doc/res2/button_delete.png)   delete the current kernel
-- ![img](doc/res2/button_to.png)   copy the current kernel as image into the canvas
+- ![img](doc/res2/button_from.png)   copy the current kernel as image into the canvas
   - will overwrite the full image (use undo to reset to the old)
   - Good to edit the kernel in the canvas
-- ![img](doc/res2/button_from.png)  Create a new kernel from the current canvas image
+- ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image
 
-### <a name="S-kernel__brush"></a>New Brush Size
+### New Brush Size
 1. ![img](doc/res2/button_tab.png) use a new image tab
 2. ![img](doc/res2/button_size.png)  Change canvas size to the desired kernel size 
 3. Draw a white circle in the canvas and fill it white
 4. Hold on the Kernel preview to start the kernel dialog
-5. ![img](doc/res2/button_from.png)  Create a new kernel from the current canvas image 
+5. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
 6. Draw with your new brush
 
 ![img](doc/kernel_brush_image.png)
 
 ![img](doc/kernel_brush_usage.png)
 
-### <a name="S-kernel__stamps"></a>Stamps
-Also have a look at [Selection Stamps](#S-selection__stamps)
+### Kernel Stamps
+Also have a look at [Selection Stamps](#selection-stamps)
 
 You can also use kernels as image stamps to quickly draw your stamps in different colors:
 1. ![img](doc/res2/button_tab.png)  use a new image tab 
 2. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `kernel_color * palette_color // [0:1]`)
 3. Hold on the Kernel preview to start the kernel dialog
-4. ![img](doc/res2/button_from.png)  Create a new kernel from the current canvas image 
+4. ![img](doc/res2/button_to.png)  Create a new kernel from the current canvas image 
 5. Select a color from the palette. Or use the ![img](doc/res2/button_rgb.png) RGB tool with a custom color
 6. ![img](doc/res2/button_dot.png)  Use the Dot Mode 
 7. Draw your stamp
@@ -261,7 +261,7 @@ We can now print the fish in different colors onto our image.
 ![img](doc/kernel_stamp_usage.png)
 
 
-## <a name="S-rainbow"></a> Funny Rainbow Trick
+##  Funny Rainbow Trick
 Just to show you what kernels can do for you:
 
 Choose a palette for the rainbow and copy it into the canvas (or draw your own rainbow)
@@ -274,7 +274,7 @@ Create a kernel from that canvas and draw your rainbow.
 
 
 
-## <a name="S-secondary_color"></a>Secondary Color
+## Secondary Color
 An additional color to set and choose from, apart from the palette.
 
 ![img](doc/res4/toolbar_color_bg.png)
@@ -286,7 +286,7 @@ To set the secondary color:
 - ![img](doc/res2/button_rgb.png)  click on the RGB tool to change the current selected color and set it as secondary color 
 - ![img](doc/res2/button_pipette.png)  use the pipette tool and click to the desired color on the canvas 
 
-## <a name="S-shading"></a>Shading 
+## Shading 
 ![img](doc/res4/button_shade.png)
 
 Shading is useful to only paint above a selected color, to shade or highlight edges.
@@ -299,9 +299,9 @@ Shading is useful to only paint above a selected color, to shade or highlight ed
 ![img](doc/shading.png)
 
 The app shows a flash effect of the secondary color to show you that the shading mode is active.
-(Also if the pipette [draw mode](#S-draw_modes) is used)
+(Also if the pipette [draw mode](#draw-modes) is used)
 
-## <a name="S-tiles"></a>Tiles
+## Tiles
 ![img](doc/res4/button_tile.png)
 
 Click on the tile tool to start the tiling mode.
@@ -328,7 +328,7 @@ Tools:
 - ![img](doc/res2/button_next.png) Next tilesheet
 - ![img](doc/res2/button_camera.png) Reset the tilesheet camera
 - ![img](doc/res2/button_tile.png) Render the tiles in the canvas
-- ![img](doc/res2/button_iso.png) Render in [isometric mode](#S-tiles__isometric)
+- ![img](doc/res2/button_iso.png) Render in [isometric mode](#isometric-mode)
 
 > Pixelc supports up to 16 different tilesheets!
 
@@ -345,7 +345,7 @@ Here you can:
   - The image size must be a multiple of 32
     - will be filled with transparency to match `%32==0`
 
-### <a name="S-tiles__isometric"></a>Isometric Mode
+### Isometric Mode
 ![img](doc/res4/button_iso.png)
 
 If the isometric mode is active, the canvas renders the tiles with isometric overlapping:
@@ -360,34 +360,34 @@ In the isometric mode, selections are disabled. Turn it off to use them.
 
 #### Rotating the Isometric Tilemap
 Want to view your 3D-Tilemap from a different orientation?
-1. ![img](doc/res2/button_size.png) Click on the size tool to open the [size](#S-size) dialog
+1. ![img](doc/res2/button_size.png) Click on the size tool to open the [size](#size) dialog
 2. ![img](doc/res2/button_rotate_left.png) Rotate the image
 3. Enjoy your new view:
 
 ![img](doc/tiles_isometric_rotate.png)
 
 
-### <a name="S-tiles__edit"></a>How to edit a tilesheet
+### How to edit a tilesheet
 1. ![img](doc/res2/button_tab.png)  use a new image tab
 2. ![img](doc/res2/button_tile.png) start the tiling mode
 3. hold down on the tile palette to open the tile dialog
-4. ![img](doc/res2/button_to.png)  copy the current tilesheet into the canvas
+4. ![img](doc/res2/button_from.png)  copy the current tilesheet into the canvas
 5. redraw tiles, change the size, draw new tiles, ....
 6. ![img](doc/res2/button_tile.png) start the tiling mode again
 7. (optional) select a different tilesheet to update
 8. hold down on the tile palette again to open the tile dialog
-9. ![img](doc/res2/button_from.png) update tilesheet from canvas
+9. ![img](doc/res2/button_to.png) update tilesheet from canvas
 
-### <a name="S-tiles__load"></a>How to load a tilesheet from a file
+### How to load a tilesheet from a file
 1. Download a tilesheet file as png (for example from [itch](https://itch.io/game-assets/tag-tileset))
 2. ![img](doc/res2/button_tab.png) use a new image tab
 3. ![img](doc/res2/button_import.png) click on the import button
-4. ![img](doc/res2/button_to.png)  in the import dialog, load the image and press "copy into canvas"
-5. (optional) crop the image out to the tiles you want with a [selection](#S-selection)
+4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas"
+5. (optional) crop the image out to the tiles you want with a [selection](#selection)
 6. ![img](doc/res2/button_tile.png) start the tiling mode
 7. (optional) select a different tilesheet to update
 8. hold down on the tile palette to open the tile dialog
-9. ![img](doc/res2/button_from.png) update tilesheet from canvas
+9. ![img](doc/res2/button_to.png) update tilesheet from canvas
 
 
 ### Tile saving
@@ -415,7 +415,7 @@ Here you can:
 - Save the rendered preview of the tilemap in HD, using the **HD MULTIPLYER**
 
 
-## <a name="S-display"></a>Display settings
+## Display settings
 ![img](doc/res4/button_display.png)
 
 Click on the display tool to open the display dialog.
@@ -435,7 +435,7 @@ The rotate mode is in portrait mode as default.
 - In Landscape Mode, the toolbar is aligned left and the palette right.
 - Auto Mode uses the window size to select the mode.
 
-## <a name="S-grid"></a>Grid
+## Grid
 ![img](doc/res4/button_grid.png)
 
 Click on the grid tool to add a little transparency to the canvas, so you can see the background grid.
@@ -457,7 +457,7 @@ Now with a background chess pattern of a 16x16 size, instead of the default 8x8:
 
 ![img](doc/grid_16.png)
 
-## <a name="S-save"></a>Save
+## Save
 ![img](doc/res4/button_save.png)
 
 Click on the save tool to open the save dialog.
@@ -479,7 +479,7 @@ If **SAVE LAYERS MERGED** is activated, all layers are merged into a single imag
 > The gif encoder uses a color palette with max. 256 opaque colors. Color 0 is reserved for transparency.
 > The first 255 different colors in the canvas are used to create the color palette.
 
-## <a name="S-import"></a>Import
+## Import
 ![img](doc/res4/button_import.png)
 
 Click on the import tool to open the import dialog.
@@ -501,7 +501,7 @@ Will copy the image into the canvas directly.
 
 ![img](doc/res2/button_selection.png)
 The button **AS SELECTION** 
-will open the image as a [selection](#S-selection).
+will open the image as a [selection](#selection).
 
 > Zoomed in on your Browser while asked for an image upload?
 > try:
@@ -510,7 +510,7 @@ will open the image as a [selection](#S-selection).
 
 If you know someone who speaks html better than me, tell me :)
 
-## <a name="S-size"></a>Size
+## Size
 ![img](doc/res4/button_size.png)
 
 Click on the size tool to open the size dialog.
@@ -547,11 +547,11 @@ Toggle the rotate and flip buttons, to manipulate the image after resizing
 > - 96 Layers
 > - 64 MiB image size (~16 million pixel)
 
-## <a name="S-selection"></a>Selection
+## Selection
 ![img](doc/res4/button_selection.png)
 
 
-## <a name="S-selection__create"></a>Create Selection
+## Create Selection
 
 Click on the selection tool, to start a new selection.
 
@@ -564,7 +564,7 @@ You can now move the selection borders with the arrow keys on the left in the se
 While a selection is active, all drawing stuff is only applied inside the selection box.
 
 
-## <a name="S-selection__paste"></a>Paste Selection
+## Paste Selection
 
 ![img](doc/res2/button_copy.png)
 The copy button copies the current selection.
@@ -598,17 +598,17 @@ Stop the selection mode to cancel the copying.
 ![img](doc/res2/button_colordrop.png)
 If the color button is activated, the current color will be applied on the selection.
 
-See [Selection Stamps](#S-selection__stamps) below.
+See [Selection Stamps](#selection-stamps) below.
 
 ![img](doc/res2/button_blend.png)
 If the blend button is activated, the selections will be blended onto the canvas (using transparency).
 
 ![img](doc/selection_paste_blend.png)
 
-## <a name="S-selection__stamps"></a>Stamps
-Also have a look at [Kernel Stamps](#S-kernel__stamps)
+## Selection Stamps
+Also have a look at [Kernel Stamps](#kernel-stamps)
 
-You can use selections as image stamps to quickly draw your stamps in different colors:
+You can also use selections as image stamps to quickly draw your stamps in different colors:
 1. Draw your stamp in white, gray and black (other colors work, too. The resulting color is `pixel_color * palette_color // [0:1]`)
 2. Create a selection on your drawing (In the image below, its the gift in the black box)
 3. ![img](doc/res2/button_copy.png) Copy this selection stamp
@@ -619,7 +619,7 @@ You can use selections as image stamps to quickly draw your stamps in different 
 
 ![img](doc/selection_stamps.png)
 
-## <a name="S-image_tabs"></a>Image Tabs
+## Image Tabs
 ![img](doc/res4/button_tab.png)
 
 You can select up to nine different image tabs via the tab tool.
@@ -627,7 +627,7 @@ You can select up to nine different image tabs via the tab tool.
 ![img](doc/tab_dialog.png)
 
 
-## <a name="S-frames"></a>Frames
+## Frames
 ![img](doc/res4/button_play.png)
 
 Open the frames toolbar and show the animated preview.
@@ -638,7 +638,7 @@ If not activated, the frames are side by side on the canvas:
 ![img](doc/frames_off.png)
 
 ![img](doc/res2/button_grid.png)
-Click on the [grid](#S-grid) tool, to show the frame grid in the full image:
+Click on the [grid](#grid) tool, to show the frame grid in the full image:
 
 ![img](doc/frames_grid.png)
 
@@ -679,11 +679,11 @@ Here you can:
 - ![img](doc/res2/button_sec_fps.png)  reset all frame times via seconds or fps 
 
 
-## <a name="S-layers"></a>Layers
+## Layers
 Frames and layers both are located in a grid on the image.
 While frames are set right next to each other on the image, layers are placed below each other.
 The layer options behave exactly the same as the frame options (without the animation dialog and the frame times)
-So have a look at the [Frames](#S-frames) section.
+So have a look at the [Frames](#frames) section.
 
 ![img](doc/res2/button_save.png)
 Layers may be merged down in the save dialog
