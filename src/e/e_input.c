@@ -114,7 +114,7 @@ static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, S
 
         if (action == E_POINTER_MOVE) {
             action = E_POINTER_DOWN;
-            s_log_warn("e_input_update: touch got new id but action==move");
+            s_log_warn("e_input_update: touch got new id but action_pressed==move");
         }
         if (action == E_POINTER_UP) {
             s_log_error("e_input_update: touch got up but unknown id");
@@ -263,6 +263,18 @@ static void input_handle_keys(SDL_Event *event) {
             break;
         case SDLK_SPACE:
             e_input.keys.space = down;
+            break;
+        case SDLK_w:
+            e_input.keys.w = down;
+            break;
+        case SDLK_a:
+            e_input.keys.a = down;
+            break;
+        case SDLK_s:
+            e_input.keys.s = down;
+            break;
+        case SDLK_d:
+            e_input.keys.d = down;
             break;
     }
 }

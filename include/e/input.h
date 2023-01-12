@@ -21,8 +21,9 @@
 
 // Keyboard state
 typedef struct {
-    bool up, left, right, down;
+    bool up, left, down, right;
     bool enter, space;
+    bool w, a, s, d;
 } eInputKeys;
 
 

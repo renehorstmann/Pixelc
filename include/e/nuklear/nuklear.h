@@ -26186,7 +26186,7 @@ nk_str_rune_at(&state->string, u.where + i);
 nk_str_delete_runes(&state->string, u.where, u.delete_length);
 }
 
-/* check type of recorded action: */
+/* check type of recorded action_pressed: */
 if (u.insert_length) {
 /* easy case: was a deletion, so we need to insert n characters */
 nk_str_insert_text_runes(&state->string, u.where,

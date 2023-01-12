@@ -149,7 +149,7 @@ if (PLATFORM_MINGW)
         target_link_libraries(pixelc SDL2_mixer)
     endif ()
     if (USE_SDL_NET)
-        target_link_libraries(pixelc SDL2_net)
+        target_link_libraries(pixelc SDL2_net ws2_32)
     endif ()
     if (USE_SDL_TTF)
         target_link_libraries(pixelc SDL2_ttf)
@@ -170,28 +170,28 @@ if (PLATFORM_MSVC)
     add_definitions(-DOPTION_GLEW)
 
     find_package(SDL2 REQUIRED)
-    find_package(SDL2-image CONFIG REQUIRED)
+    find_package(SDL2_image CONFIG REQUIRED)
     find_package(GLEW REQUIRED)
 
     target_link_libraries(pixelc
             SDL2::SDL2
             SDL2::SDL2main
-            SDL2::SDL2_image
+            SDL2_image::SDL2_image
             GLEW::GLEW
             comdlg32        # e_ext_sfd
             )
 
     if (USE_SDL_MIXER)
-        find_package(SDL2-mixer CONFIG REQUIRED)
-        target_link_libraries(pixelc SDL2::SDL2_mixer)
+        find_package(SDL2_mixer CONFIG REQUIRED)
+        target_link_libraries(pixelc SDL2_mixer::SDL2_mixer)
     endif ()
     if (USE_SDL_NET)
-        find_package(SDL2-net CONFIG REQUIRED)
-        target_link_libraries(pixelc SDL2::SDL2_net)
+        find_package(SDL2_net CONFIG REQUIRED)
+        target_link_libraries(pixelc SDL2_net::SDL2_net ws2_32)
     endif ()
     if (USE_SDL_TTF)
-        find_package(SDL2-ttf CONFIG REQUIRED)
-        target_link_libraries(pixelc SDL2::SDL2_ttf)
+        find_package(SDL2_ttf CONFIG REQUIRED)
+        target_link_libraries(pixelc SDL2_ttf::SDL2_ttf)
     endif ()
     if (USE_FETCH)
         find_package(CURL CONFIG REQUIRED)
