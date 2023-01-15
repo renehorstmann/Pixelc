@@ -30,7 +30,7 @@ Or just use the tooltip tool.
 ## Sponsoring
 You want to support me?
 > Buy Pixelc Premium on [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelcpremium).
-Its just like Pixelc, but with a golden background
+Its just like Pixelc, but with grey scaled tools and background
 
 ## Highlights:
 - Multitouch Mode for a great touch experience
