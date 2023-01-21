@@ -96,7 +96,7 @@ emcc -O3 \
 -I../include/ \
 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s FULL_ES3=1 -s \
 EXPORTED_FUNCTIONS='["_main", "_e_io_idbfs_synced", "_e_io_file_upload_done"]' \
--s EXPORTED_RUNTIME_METHODS=FS \
+-s EXPORTED_RUNTIME_METHODS=FS,ccall \
 -s SDL2_IMAGE_FORMATS='["png"]' \
 --preload-file ./res \
 -s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1 \
