@@ -7,6 +7,7 @@
 #include "u/button.h"
 #include "canvas.h"
 #include "camera.h"
+#include "cameractrl.h"
 #include "selectionctrl.h"
 #include "tool.h"
 
@@ -272,6 +273,7 @@ static void crop_pe(struct Tool *super, ePointer_s pointer) {
         uSprite sprite = crop_selection();
         canvas_set_sprite(sprite, true);
         selectionctrl_stop();
+        cameractrl_set_home();
     }
 } 
 
