@@ -6,6 +6,7 @@
 #include "m/sca/int.h"
 #include "u/button.h"
 #include "brush.h"
+#include "brushmode.h"
 #include "tool.h"
 
 
@@ -149,7 +150,12 @@ static void pipette_pe(struct Tool *super, ePointer_s pointer) {
             brush.pipette_last_mode = brush.mode;
             brush.mode = BRUSH_MODE_PIPETTE_SINGLE;
         }
+        
         s_log("tool mode: %i", brush.mode);
+        
+        // fixes the multitouchcursor bugs with line, rect, ...
+        brushmode_reset();
+        
     }
 }
 
