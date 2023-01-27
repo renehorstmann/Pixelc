@@ -70,12 +70,13 @@ static ivec2 ivec2_set(int s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
 static ivec2 ivec2_new(int v0, int v1
 ) {
-    return (ivec2) {v0, v1
-    };
+    ivec2 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    return self;
 }
 
 /** dst = unit_x */
@@ -92,6 +93,10 @@ static ivec2 ivec2_unit_y() {
     ivecN_unit_y(res.v, 2);
     return res;
 }
+
+
+
+
 
 
 /** dst = -v */
@@ -166,6 +171,24 @@ static ivec2 ivec2_div(ivec2 a, int b) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /** dst = pow(x, y) */
 static ivec2 ivec2_pow(ivec2 x, int y) {
     ivec2 res;
@@ -222,6 +245,8 @@ static ivec2 ivec2_sqrt(ivec2 x) {
 }
 
 
+
+
 /** dst = abs(x) */
 static ivec2 ivec2_abs(ivec2 x) {
     ivec2 res;
@@ -236,6 +261,12 @@ static ivec2 ivec2_sign(ivec2 x) {
     ivecN_sign(res.v, x.v, 2);
     return res;
 }
+
+
+
+
+
+
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -314,7 +345,7 @@ static ivec2 ivec2_clamp_vec(ivec2 x, ivec2 min, ivec2 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ivec2 ivec2_mix(ivec2 a, ivec2 b, float t) {
+static ivec2 ivec2_mix(ivec2 a, ivec2 b, int t) {
     ivec2 res;
     ivecN_mix(res.v, a.v, b.v, t, 2);
     return res;
@@ -335,6 +366,10 @@ static ivec2 ivec2_step_vec(ivec2 x, ivec2 edge) {
     ivecN_step_vec(res.v, x.v, edge.v, 2);
     return res;
 }
+
+
+
+
 
 
 /** returns v[0] + v[1] + ... + v[n-1] */
@@ -381,6 +416,10 @@ static int ivec2_norm_inf(ivec2 v) {
 }
 
 
+
+
+
+
 /** returns length of a vector, see ivecN_norm. Just here to match glsl */
 static int ivec2_length(ivec2 v) {
     return ivecN_length(v.v, 2);
@@ -397,6 +436,12 @@ static int ivec2_distance(ivec2 a, ivec2 b) {
 static int ivec2_sqr_distance(ivec2 a, ivec2 b) {
     return ivecN_sqr_distance(a.v, b.v, 2);
 }
+
+
+
+
+
+
 
 
 /** dst = a < b */
@@ -493,6 +538,21 @@ static bvec2 ivec2_not_equal_vec(ivec2 a, ivec2 b) {
     ivecN_not_equal_vec(res.v, a.v, b.v, 2);
     return res;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif //M_VEC_IVEC2_H

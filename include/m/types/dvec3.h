@@ -3,7 +3,6 @@
 
 
 #include "../publictypes/dvec3.h"
-
 typedef m_dvec3 dvec3;
 
 #endif //M_TYPES_DVEC3_H

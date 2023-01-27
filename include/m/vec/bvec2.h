@@ -14,8 +14,10 @@ static bool bvec2_cmp(bvec2 a, bvec2 b) {
 /** dst = v0, v1, ... */
 static bvec2 bvec2_new(bool v0, bool v1
 ) {
-    return (bvec2) {v0, v1
-    };
+    bvec2 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    return self;
 }
 
 /** dst = scalar */
@@ -40,6 +42,10 @@ static bvec2 bvec2_unit_y() {
     bvecN_unit_y(res.v, 2);
     return res;
 }
+
+
+
+
 
 
 /** dst = !vec */

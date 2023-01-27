@@ -35,15 +35,12 @@ static void m_terminalcolor_stop() {
 }
 
 #else //_WIN32
-
 static void m_terminalcolor_start() {
     // noop
 }
-
 static void m_terminalcolor_stop() {
     // noop
 }
-
 #endif //_WIN32
 
 

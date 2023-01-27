@@ -12,13 +12,23 @@
 
 /** vec4 = [0, 0, 0, 1] */
 static vec4 quat_eye() {
-    return (vec4) {{0, 0, 0, 1}};
+    vec4 self;
+    self.x = 0;
+    self.y = 0;
+    self.z = 0;
+    self.w = 1;
+    return self;
 }
 
 
 /** dst = -x, -y, -z, w */
 static vec4 quat_conj(vec4 q) {
-    return (vec4) {{-q.x, -q.y, -q.z, q.w}};
+    vec4 self;
+    self.x = -q.x;
+    self.y = -q.y;
+    self.z = -q.z;
+    self.w = q.w;
+    return self;
 }
 
 /** dst = inv(vec4) */

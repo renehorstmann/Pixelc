@@ -2,6 +2,7 @@
 #define M_UTILS_DINTERSECTION_H
 
 
+
 #include <stdbool.h>
 #include "../sca/double.h"
 #include "../vec/dvec2.h"
@@ -15,7 +16,7 @@
 
 /** returns false if planes are parallel */
 static bool dintersection_plane_plane(dvec3 *out_pos, dvec3 *out_dir,
-                                      dvec4 plane_hessian_a, dvec4 plane_hessian_b) {
+                                     dvec4 plane_hessian_a, dvec4 plane_hessian_b) {
     *out_pos = *out_dir = dvec3_set(NAN);
 
     // parallel check
@@ -50,7 +51,7 @@ static bool dintersection_plane_plane(dvec3 *out_pos, dvec3 *out_dir,
 
 /** returns false if plane and line are parallel */
 static bool dintersection_plane_line(dvec3 *out_pos, dvec4 plane_hessian,
-                                     dvec3 line_pos, dvec3 line_dir) {
+                                    dvec3 line_pos, dvec3 line_dir) {
     *out_pos = dvec3_set(NAN);
 
     double plane_line_dot = dvec3_dot(plane_hessian.xyz, line_dir);
@@ -73,8 +74,8 @@ static bool dintersection_plane_line(dvec3 *out_pos, dvec4 plane_hessian,
 
 /** returns t (line_pos + line_dir * t), or NAN if not intersecting */
 static double dintersection_triangle_line(dvec3 v0, dvec3 v1, dvec3 v2,
-                                          dvec3 line_pos, dvec3 line_dir,
-                                          bool culling) {
+                                        dvec3 line_pos, dvec3 line_dir,
+                                        bool culling) {
     dvec3 v0v1 = dvec3_sub_vec(v1, v0);
     dvec3 v0v2 = dvec3_sub_vec(v2, v0);
     dvec3 pvec = dvec3_cross(line_dir, v0v2);
@@ -106,8 +107,8 @@ static double dintersection_triangle_line(dvec3 v0, dvec3 v1, dvec3 v2,
 
 /** returns false if lines are parallel, searches for the nearest distance points */
 static bool dintersection_line_line(double *out_tau_a, double *out_tau_b,
-                                    dvec3 line_a_pos, dvec3 line_a_dir,
-                                    dvec3 line_b_pos, dvec3 line_b_dir) {
+                                   dvec3 line_a_pos, dvec3 line_a_dir,
+                                   dvec3 line_b_pos, dvec3 line_b_dir) {
     *out_tau_a = *out_tau_b = NAN;
 
     // Book: Real Time Collision Detection: section 5.1.8 Closest Point of Two Lines
@@ -145,8 +146,8 @@ static double dintersection_line_point(dvec3 line_pos, dvec3 line_dir, dvec3 poi
 
 /** returns false if lines are parallel */
 static bool dintersection2_line_line(double *out_tau_a, double *out_tau_b,
-                                     dvec2 line_a_pos, dvec2 line_a_dir,
-                                     dvec2 line_b_pos, dvec2 line_b_dir) {
+                                   dvec2 line_a_pos, dvec2 line_a_dir,
+                                   dvec2 line_b_pos, dvec2 line_b_dir) {
     *out_tau_a = *out_tau_b = NAN;
 
     // stupid clone of the dvec2 version above:

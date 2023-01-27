@@ -7,6 +7,57 @@
 #include "../vec/ivecn.h"
 
 
+/** dst = (imat2) v */
+static imat2 imat2_cast_from_float(const float *cast) {
+    imat2 res;
+    imatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+/** dst = (imat2) v */
+static imat2 imat2_cast_from_double(const double *cast) {
+    imat2 res;
+    imatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+/** dst = (imat2) v */
+static imat2 imat2_cast_from_int(const int *cast) {
+    imat2 res;
+    imatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+/** dst = (imat2) v */
+static imat2 imat2_cast_from_uchar(const unsigned char *cast) {
+    imat2 res;
+    imatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+
+/** dst = mat * 255 */
+static imat2 imat2_cast_from_float_1(const float *cast) {
+    imat2 res;
+    imatN_cast_from_float_1(res.v, cast, 2);
+    return res;
+}
+
+/** dst = mat * 255 */
+static imat2 imat2_cast_from_double_1(const double *cast) {
+    imat2 res;
+    imatN_cast_from_double_1(res.v, cast, 2);
+    return res;
+}
+
+/** dst = mat * 255 */
+static imat2 imat2_cast_from_longdouble_1(const long double *cast) {
+    imat2 res;
+    imatN_cast_from_longdouble_1(res.v, cast, 2);
+    return res;
+}
+
+
 /** dst = r==c ? 1 : 0 (identity)  */
 static imat2 imat2_eye() {
     imat2 res;
@@ -148,6 +199,7 @@ static imat2 imat2_inv(imat2 m) {
 
     return res;
 }
+
 
 
 #endif //M_MAT_IMAT2_H

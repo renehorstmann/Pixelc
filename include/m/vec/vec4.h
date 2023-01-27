@@ -43,6 +43,8 @@ static vec4 vec4_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
+
+
 /** a == b */
 static bool vec4_cmp(vec4 a, vec4 b) {
     return vecN_cmp(a.v, b.v, 4);
@@ -56,12 +58,17 @@ static vec4 vec4_set(float s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
-static vec4 vec4_new(float v0, float v1, float v2, float v3
+static vec4 vec4_new(float v0, float v1
+         , float v2
+         , float v3
 ) {
-    return (vec4) {v0, v1, v2, v3
-    };
+    vec4 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    self.v2 = v2;
+    self.v3 = v3;
+    return self;
 }
 
 /** dst = unit_x */

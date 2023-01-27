@@ -7,6 +7,57 @@
 #include "../vec/ucvecn.h"
 
 
+/** dst = (ucmat2) v */
+static ucmat2 ucmat2_cast_from_float(const float *cast) {
+    ucmat2 res;
+    ucmatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+/** dst = (ucmat2) v */
+static ucmat2 ucmat2_cast_from_double(const double *cast) {
+    ucmat2 res;
+    ucmatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+/** dst = (ucmat2) v */
+static ucmat2 ucmat2_cast_from_int(const int *cast) {
+    ucmat2 res;
+    ucmatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+/** dst = (ucmat2) v */
+static ucmat2 ucmat2_cast_from_uchar(const unsigned char *cast) {
+    ucmat2 res;
+    ucmatN_cast_into(res.v, cast, 2);
+    return res;
+}
+
+
+/** dst = mat * 255 */
+static ucmat2 ucmat2_cast_from_float_1(const float *cast) {
+    ucmat2 res;
+    ucmatN_cast_from_float_1(res.v, cast, 2);
+    return res;
+}
+
+/** dst = mat * 255 */
+static ucmat2 ucmat2_cast_from_double_1(const double *cast) {
+    ucmat2 res;
+    ucmatN_cast_from_double_1(res.v, cast, 2);
+    return res;
+}
+
+/** dst = mat * 255 */
+static ucmat2 ucmat2_cast_from_longdouble_1(const long double *cast) {
+    ucmat2 res;
+    ucmatN_cast_from_longdouble_1(res.v, cast, 2);
+    return res;
+}
+
+
 /** dst = r==c ? 1 : 0 (identity)  */
 static ucmat2 ucmat2_eye() {
     ucmat2 res;
@@ -148,6 +199,7 @@ static ucmat2 ucmat2_inv(ucmat2 m) {
 
     return res;
 }
+
 
 
 #endif //M_MAT_UCMAT2_H

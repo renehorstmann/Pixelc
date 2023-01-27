@@ -3,9 +3,7 @@
 
 
 #ifndef M_MAX_SIZE
-#ifdef __STDC_NO_VLA__
 #define M_MAX_SIZE 16
-#endif
 #endif
 
 #include <string.h>     // memcmp
@@ -22,10 +20,14 @@ do { \
 
 
 /** dst = v / 255 */
-static void vecN_cast_from_uchar_1(float *dst, const unsigned char *v, int n) {
+static void vecN_cast_from_uchar_1(float *dst_vec, const unsigned char *vec, int n) {
     for (int i = 0; i < n; i++)
-        dst[i] = (float) v[i] / (float) 255;
+        dst_vec[i] = (float) vec[i] / (float) 255;
 }
+
+
+
+
 
 
 /** a == b */
@@ -59,14 +61,14 @@ static void vecN_unit_y(float *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void vecN_unit_z(float *dst, int n) {
-    assert(n >= 3 && "m vec*_unit_z");
+    assert(n>=3 && "m vec*_unit_z");
     vecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void vecN_unit_w(float *dst, int n) {
-    assert(n >= 4 && "m vec*_unit_w");
+    assert(n>=4 && "m vec*_unit_w");
     vecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -382,11 +384,11 @@ static float vecN_dot(const float *a, const float *b, int n) {
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void vecN_cross(float *dst, const float *a, const float *b, int n) {
-    assert(n >= 3 && "m vec*_cross only in 3D");
+    assert(n>=3 && "m vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for (int i = 3; i < n; i++)
+    for(int i=3; i<n; i++)
         dst[i] = 0;
 }
 
@@ -441,24 +443,16 @@ static float vecN_length(const float *v, int n) {
 
 /** returns norm(b-a) */
 static float vecN_distance(const float *a, const float *b, int n) {
-#ifdef M_MAX_SIZE
     assert(n <= M_MAX_SIZE);
     float tmp[M_MAX_SIZE];
-#else
-    float tmp[n];
-#endif
     vecN_sub_vec(tmp, b, a, n);
     return vecN_norm(tmp, n);
 }
 
 /** returns dot(b-a) */
 static float vecN_sqr_distance(const float *a, const float *b, int n) {
-#ifdef M_MAX_SIZE
     assert(n <= M_MAX_SIZE);
     float tmp[M_MAX_SIZE];
-#else
-    float tmp[n];
-#endif
     vecN_sub_vec(tmp, b, a, n);
     return vecN_dot(tmp, tmp, n);
 }

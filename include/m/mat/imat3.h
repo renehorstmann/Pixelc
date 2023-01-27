@@ -8,6 +8,57 @@
 #include "../vec/ivecn.h"
 
 
+/** dst = (imat3) v */
+static imat3 imat3_cast_from_float(const float *cast) {
+    imat3 res;
+    imatN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = (imat3) v */
+static imat3 imat3_cast_from_double(const double *cast) {
+    imat3 res;
+    imatN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = (imat3) v */
+static imat3 imat3_cast_from_int(const int *cast) {
+    imat3 res;
+    imatN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = (imat3) v */
+static imat3 imat3_cast_from_uchar(const unsigned char *cast) {
+    imat3 res;
+    imatN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+
+/** dst = mat * 255 */
+static imat3 imat3_cast_from_float_1(const float *cast) {
+    imat3 res;
+    imatN_cast_from_float_1(res.v, cast, 3);
+    return res;
+}
+
+/** dst = mat * 255 */
+static imat3 imat3_cast_from_double_1(const double *cast) {
+    imat3 res;
+    imatN_cast_from_double_1(res.v, cast, 3);
+    return res;
+}
+
+/** dst = mat * 255 */
+static imat3 imat3_cast_from_longdouble_1(const long double *cast) {
+    imat3 res;
+    imatN_cast_from_longdouble_1(res.v, cast, 3);
+    return res;
+}
+
+
 /** dst = r==c ? 1 : 0 (identity)  */
 static imat3 imat3_eye() {
     imat3 res;

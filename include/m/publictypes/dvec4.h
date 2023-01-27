@@ -4,9 +4,15 @@
 #include <assert.h>     // for static_assert
 
 
+
+
+
+
+
+
+
 #include "dvec2.h"
 #include "dvec3.h"
-
 typedef union {
     double v[4];
     struct {
@@ -49,6 +55,8 @@ typedef union {
         };
     };
 } m_dvec4;
+
+
 
 
 static_assert(sizeof(m_dvec4) == sizeof(double) * 4, "[Mathc] wrong expected size");

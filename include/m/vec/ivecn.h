@@ -3,9 +3,7 @@
 
 
 #ifndef M_MAX_SIZE
-#ifdef __STDC_NO_VLA__
 #define M_MAX_SIZE 16
-#endif
 #endif
 
 #include <string.h>     // memcmp
@@ -19,6 +17,8 @@ do { \
     for(int ivecN_cast_into_i_=0; ivecN_cast_into_i_<(n); ivecN_cast_into_i_++) \
         (dst)[ivecN_cast_into_i_] = (int) (from)[ivecN_cast_into_i_]; \
 } while(0)
+
+
 
 
 /** dst = vec * 255 */
@@ -71,14 +71,14 @@ static void ivecN_unit_y(int *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void ivecN_unit_z(int *dst, int n) {
-    assert(n >= 3 && "m vec*_unit_z");
+    assert(n>=3 && "m vec*_unit_z");
     ivecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void ivecN_unit_w(int *dst, int n) {
-    assert(n >= 4 && "m vec*_unit_w");
+    assert(n>=4 && "m vec*_unit_w");
     ivecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -138,6 +138,14 @@ static void ivecN_div(int *dst, const int *a, int b, int n) {
 }
 
 
+
+
+
+
+
+
+
+
 /** dst = pow(x, y) */
 static void ivecN_pow(int *dst, const int *x, int y, int n) {
     for (int i = 0; i < n; i++)
@@ -192,6 +200,8 @@ static void ivecN_sign(int *dst, const int *x, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = isca_sign(x[i]);
 }
+
+
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -287,6 +297,7 @@ static void ivecN_step_vec(int *dst, const int *x, const int *edge, int n) {
 }
 
 
+
 /** returns v[0] + v[1] + ... + v[n-1] */
 static int ivecN_sum(const int *v, int n) {
     int sum = 0;
@@ -305,11 +316,11 @@ static int ivecN_dot(const int *a, const int *b, int n) {
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void ivecN_cross(int *dst, const int *a, const int *b, int n) {
-    assert(n >= 3 && "m vec*_cross only in 3D");
+    assert(n>=3 && "m vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for (int i = 3; i < n; i++)
+    for(int i=3; i<n; i++)
         dst[i] = 0;
 }
 
@@ -347,6 +358,7 @@ static int ivecN_norm_inf(const int *v, int n) {
 }
 
 
+
 /** returns length of a vector, see ivecN_norm. Just here to match glsl */
 static int ivecN_length(const int *v, int n) {
     return ivecN_norm(v, n);
@@ -354,27 +366,21 @@ static int ivecN_length(const int *v, int n) {
 
 /** returns norm(b-a) */
 static int ivecN_distance(const int *a, const int *b, int n) {
-#ifdef M_MAX_SIZE
     assert(n <= M_MAX_SIZE);
     int tmp[M_MAX_SIZE];
-#else
-    int tmp[n];
-#endif
     ivecN_sub_vec(tmp, b, a, n);
     return ivecN_norm(tmp, n);
 }
 
 /** returns dot(b-a) */
 static int ivecN_sqr_distance(const int *a, const int *b, int n) {
-#ifdef M_MAX_SIZE
     assert(n <= M_MAX_SIZE);
     int tmp[M_MAX_SIZE];
-#else
-    int tmp[n];
-#endif
     ivecN_sub_vec(tmp, b, a, n);
     return ivecN_dot(tmp, tmp, n);
 }
+
+
 
 
 /** dst = a < b */
@@ -448,6 +454,13 @@ static void ivecN_not_equal_vec(bool *dst, const int *a, const int *b, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = a[i] != b[i];
 }
+
+
+
+
+
+
+
 
 
 #endif //M_VEC_IVECN_H

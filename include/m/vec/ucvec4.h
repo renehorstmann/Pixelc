@@ -70,12 +70,17 @@ static ucvec4 ucvec4_set(unsigned char s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
-static ucvec4 ucvec4_new(unsigned char v0, unsigned char v1, unsigned char v2, unsigned char v3
+static ucvec4 ucvec4_new(unsigned char v0, unsigned char v1
+         , unsigned char v2
+         , unsigned char v3
 ) {
-    return (ucvec4) {v0, v1, v2, v3
-    };
+    ucvec4 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    self.v2 = v2;
+    self.v3 = v3;
+    return self;
 }
 
 /** dst = unit_x */
@@ -108,6 +113,8 @@ static ucvec4 ucvec4_unit_w() {
     ucvecN_unit_w(res.v, 4);
     return res;
 }
+
+
 
 
 /** dst = a + b */
@@ -174,6 +181,24 @@ static ucvec4 ucvec4_div(ucvec4 a, unsigned char b) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /** dst = pow(x, y) */
 static ucvec4 ucvec4_pow(ucvec4 x, unsigned char y) {
     ucvec4 res;
@@ -228,6 +253,18 @@ static ucvec4 ucvec4_sqrt(ucvec4 x) {
     ucvecN_sqrt(res.v, x.v, 4);
     return res;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -306,7 +343,7 @@ static ucvec4 ucvec4_clamp_vec(ucvec4 x, ucvec4 min, ucvec4 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ucvec4 ucvec4_mix(ucvec4 a, ucvec4 b, float t) {
+static ucvec4 ucvec4_mix(ucvec4 a, ucvec4 b, unsigned char t) {
     ucvec4 res;
     ucvecN_mix(res.v, a.v, b.v, t, 4);
     return res;
@@ -327,6 +364,10 @@ static ucvec4 ucvec4_step_vec(ucvec4 x, ucvec4 edge) {
     ucvecN_step_vec(res.v, x.v, edge.v, 4);
     return res;
 }
+
+
+
+
 
 
 /** returns v[0] + v[1] + ... + v[n-1] */
@@ -355,6 +396,16 @@ static unsigned char ucvec4_norm(ucvec4 v) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
 /** returns length of a vector, see ucvecN_norm. Just here to match glsl */
 static unsigned char ucvec4_length(ucvec4 v) {
     return ucvecN_length(v.v, 4);
@@ -371,6 +422,12 @@ static unsigned char ucvec4_distance(ucvec4 a, ucvec4 b) {
 static unsigned char ucvec4_sqr_distance(ucvec4 a, ucvec4 b) {
     return ucvecN_sqr_distance(a.v, b.v, 4);
 }
+
+
+
+
+
+
 
 
 /** dst = a < b */
@@ -467,6 +524,21 @@ static bvec4 ucvec4_not_equal_vec(ucvec4 a, ucvec4 b) {
     ucvecN_not_equal_vec(res.v, a.v, b.v, 4);
     return res;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif //M_VEC_UCVEC4_H

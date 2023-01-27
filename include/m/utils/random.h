@@ -2,10 +2,9 @@
 #define M_UTILS_RANDOM
 
 
+
 #ifndef M_RANDOM_FUNCTION
-
 #include <stdlib.h>
-
 #define M_RANDOM_FUNCTION rand
 #endif
 

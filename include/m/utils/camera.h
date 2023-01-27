@@ -64,7 +64,7 @@ static mat4 mat4_camera_frustum(float left, float right,
 static mat4 mat4_camera_perspective(float fovy, float aspect, float near_z, float far_z) {
     // from cglm/cam.h/glm_perspective
     float f = (float) 1 / sca_tan(fovy * (float) 0.5);
-    float fn = (float) 1 / (near_z - far_z);
+    float fn =(float) 1 / (near_z - far_z);
 
     mat4 res = {{0}};
     res.m[0][0] = f / aspect;

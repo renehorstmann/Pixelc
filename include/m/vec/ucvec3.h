@@ -70,12 +70,15 @@ static ucvec3 ucvec3_set(unsigned char s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
-static ucvec3 ucvec3_new(unsigned char v0, unsigned char v1, unsigned char v2
+static ucvec3 ucvec3_new(unsigned char v0, unsigned char v1
+         , unsigned char v2
 ) {
-    return (ucvec3) {v0, v1, v2
-    };
+    ucvec3 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    self.v2 = v2;
+    return self;
 }
 
 /** dst = unit_x */
@@ -100,6 +103,10 @@ static ucvec3 ucvec3_unit_z() {
     ucvecN_unit_z(res.v, 3);
     return res;
 }
+
+
+
+
 
 
 /** dst = a + b */
@@ -166,6 +173,24 @@ static ucvec3 ucvec3_div(ucvec3 a, unsigned char b) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /** dst = pow(x, y) */
 static ucvec3 ucvec3_pow(ucvec3 x, unsigned char y) {
     ucvec3 res;
@@ -220,6 +245,18 @@ static ucvec3 ucvec3_sqrt(ucvec3 x) {
     ucvecN_sqrt(res.v, x.v, 3);
     return res;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -298,7 +335,7 @@ static ucvec3 ucvec3_clamp_vec(ucvec3 x, ucvec3 min, ucvec3 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ucvec3 ucvec3_mix(ucvec3 a, ucvec3 b, float t) {
+static ucvec3 ucvec3_mix(ucvec3 a, ucvec3 b, unsigned char t) {
     ucvec3 res;
     ucvecN_mix(res.v, a.v, b.v, t, 3);
     return res;
@@ -319,6 +356,10 @@ static ucvec3 ucvec3_step_vec(ucvec3 x, ucvec3 edge) {
     ucvecN_step_vec(res.v, x.v, edge.v, 3);
     return res;
 }
+
+
+
+
 
 
 /** returns v[0] + v[1] + ... + v[n-1] */
@@ -347,6 +388,16 @@ static unsigned char ucvec3_norm(ucvec3 v) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
 /** returns length of a vector, see ucvecN_norm. Just here to match glsl */
 static unsigned char ucvec3_length(ucvec3 v) {
     return ucvecN_length(v.v, 3);
@@ -363,6 +414,12 @@ static unsigned char ucvec3_distance(ucvec3 a, ucvec3 b) {
 static unsigned char ucvec3_sqr_distance(ucvec3 a, ucvec3 b) {
     return ucvecN_sqr_distance(a.v, b.v, 3);
 }
+
+
+
+
+
+
 
 
 /** dst = a < b */
@@ -459,6 +516,21 @@ static bvec3 ucvec3_not_equal_vec(ucvec3 a, ucvec3 b) {
     ucvecN_not_equal_vec(res.v, a.v, b.v, 3);
     return res;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endif //M_VEC_UCVEC3_H

@@ -36,14 +36,14 @@ static void bvecN_unit_y(bool *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void bvecN_unit_z(bool *dst, int n) {
-    assert(n >= 3 && "m bvec*_unit_z");
+    assert(n>=3 && "m bvec*_unit_z");
     bvecN_set(dst, false, n);
     dst[2] = true;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void bvecN_unit_w(bool *dst, int n) {
-    assert(n >= 4 && "m bvec*_unit_w");
+    assert(n>=4 && "m bvec*_unit_w");
     bvecN_set(dst, false, n);
     dst[3] = true;
 }

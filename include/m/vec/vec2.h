@@ -43,6 +43,8 @@ static vec2 vec2_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
+
+
 /** a == b */
 static bool vec2_cmp(vec2 a, vec2 b) {
     return vecN_cmp(a.v, b.v, 2);
@@ -56,12 +58,13 @@ static vec2 vec2_set(float s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
 static vec2 vec2_new(float v0, float v1
 ) {
-    return (vec2) {v0, v1
-    };
+    vec2 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    return self;
 }
 
 /** dst = unit_x */
@@ -78,6 +81,10 @@ static vec2 vec2_unit_y() {
     vecN_unit_y(res.v, 2);
     return res;
 }
+
+
+
+
 
 
 /** dst = -v */

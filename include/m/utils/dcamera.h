@@ -11,8 +11,8 @@
  * @param far_z: far flipping plane
  */
 static dmat4 dmat4_camera_ortho(double left, double right,
-                                double bottom, double top,
-                                double near_z, double far_z) {
+                              double bottom, double top,
+                              double near_z, double far_z) {
     // from cglm/cam.h/glm_ortho
     double rl = (double) 1 / (right - left);
     double tb = (double) 1 / (top - bottom);
@@ -35,8 +35,8 @@ static dmat4 dmat4_camera_ortho(double left, double right,
  * @param far_z: far flipping plane
  */
 static dmat4 dmat4_camera_frustum(double left, double right,
-                                  double bottom, double top,
-                                  double near_z, double far_z) {
+                                double bottom, double top,
+                                double near_z, double far_z) {
     // from cglm/cam.h/glm_frustum
     double rl = (double) 1 / (right - left);
     double tb = (double) 1 / (top - bottom);
@@ -64,7 +64,7 @@ static dmat4 dmat4_camera_frustum(double left, double right,
 static dmat4 dmat4_camera_perspective(double fovy, double aspect, double near_z, double far_z) {
     // from cglm/cam.h/glm_perspective
     double f = (double) 1 / dsca_tan(fovy * (double) 0.5);
-    double fn = (double) 1 / (near_z - far_z);
+    double fn =(double) 1 / (near_z - far_z);
 
     dmat4 res = {{0}};
     res.m[0][0] = f / aspect;

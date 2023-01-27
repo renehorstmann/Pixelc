@@ -64,10 +64,18 @@ static bool S_NAME_CONCAT2(FN_NAME, _valid)(CLASS self) {
     return self.array != NULL && s_allocator_valid(self.allocator);
 }
 
+// forward declaration
+// Foo foo_new_invalid_a(sAllocator_i a)
+static CLASS S_NAME_CONCAT2(FN_NAME, _new_invalid_a)(sAllocator_i a);
+
 
 // Foo foo_new_a(ssize start_capacity, sAllocator_i a)
 static CLASS S_NAME_CONCAT2(FN_NAME, _new_a)(ssize start_capacity, sAllocator_i a) {
     s_assume(s_allocator_valid(a), "a needs to be valid");
+
+    if(start_capacity <= 0)
+        return S_NAME_CONCAT2(FN_NAME, _new_invalid_a)(a);
+
     CLASS self = {
             s_a_new(a, TYPE, start_capacity),
             0,

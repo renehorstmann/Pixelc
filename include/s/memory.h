@@ -38,26 +38,29 @@ static void s_free(void *memory) {
 }
 
 // malloc + s_assume
+// returns NULL on n==0
 static void *s_malloc(ssize n) {
-    s_assume(n > 0, "at least 1 byte (could also be an overflow)");
+    s_assume(n >= 0, "overflow?");
     void *mem = s_malloc_try(n);
-    s_assume(mem, "s_malloc failed");
+    s_assume(n==0 || mem, "s_malloc failed");
     return mem;
 }
 
 // calloc + s_assume
+// returns NULL on n==0
 static void *s_malloc0(ssize n) {
-    s_assume(n > 0, "at least 1 byte (could also be an overflow)");
+    s_assume(n >= 0, "overflow?");
     void *mem = s_malloc0_try(n);
-    s_assume(mem, "s_malloc0 failed");
+    s_assume(n==0 || mem, "s_malloc0 failed");
     return mem;
 }
 
 // realloc + s_assume
+// if(n==0) { s_free(memory); return NULL; }
 static void *s_realloc(void *memory, ssize n) {
     s_assume(n >= 0, "overflow?");
     void *mem = s_realloc_try(memory, n);
-    s_assume(n==0||mem, "s_realloc failed");
+    s_assume(n==0 || mem, "s_realloc failed");
     return mem;
 }
 
@@ -96,6 +99,6 @@ do { \
 // calls s_realloc_try with the ssize of the struct
 #define s_renew_try(struct_type, mem, n_structs) \
         ((struct_type *) s_realloc_try (mem, (n_structs) * sizeof (struct_type)))
-        
+
 
 #endif //S_MEMORY_H

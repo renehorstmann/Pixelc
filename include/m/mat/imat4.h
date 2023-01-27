@@ -9,6 +9,57 @@
 #include "../vec/ivecn.h"
 
 
+/** dst = (imat4) v */
+static imat4 imat4_cast_from_float(const float *cast) {
+    imat4 res;
+    imatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = (imat4) v */
+static imat4 imat4_cast_from_double(const double *cast) {
+    imat4 res;
+    imatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = (imat4) v */
+static imat4 imat4_cast_from_int(const int *cast) {
+    imat4 res;
+    imatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = (imat4) v */
+static imat4 imat4_cast_from_uchar(const unsigned char *cast) {
+    imat4 res;
+    imatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+
+/** dst = mat * 255 */
+static imat4 imat4_cast_from_float_1(const float *cast) {
+    imat4 res;
+    imatN_cast_from_float_1(res.v, cast, 4);
+    return res;
+}
+
+/** dst = mat * 255 */
+static imat4 imat4_cast_from_double_1(const double *cast) {
+    imat4 res;
+    imatN_cast_from_double_1(res.v, cast, 4);
+    return res;
+}
+
+/** dst = mat * 255 */
+static imat4 imat4_cast_from_longdouble_1(const long double *cast) {
+    imat4 res;
+    imatN_cast_from_longdouble_1(res.v, cast, 4);
+    return res;
+}
+
+
 /** dst = r==c ? 1 : 0 (identity)  */
 static imat4 imat4_eye() {
     imat4 res;
@@ -125,6 +176,7 @@ static ivec4 ivec4_mul_mat(ivec4 a, imat4 b) {
     ivecN_mul_mat_no_alias(res.v, a.v, b.v, 4);
     return res;
 }
+
 
 
 /** returns = determinant mm */

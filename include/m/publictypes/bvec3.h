@@ -7,8 +7,10 @@
 #include <stdbool.h>
 
 
-#include "bvec2.h"
 
+
+
+#include "bvec2.h"
 typedef union {
     bool v[3];
     struct {
@@ -35,6 +37,10 @@ typedef union {
         };
     };
 } m_bvec3;
+
+
+
+
 
 
 static_assert(sizeof(m_bvec3) == sizeof(bool) * 3, "[Mathc] wrong expected size");

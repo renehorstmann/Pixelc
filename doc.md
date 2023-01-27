@@ -39,6 +39,7 @@ Its also fine to use on desktops, etc.
   - [Isometric Mode](#isometric-mode)
   - [How to edit a tilesheet](#how-to-edit-a-tilesheet)
   - [How to load a tilesheet from a file](#how-to-load-a-tilesheet-from-a-file)
+  - [Tile saving and color codes](#tile-saving-and-color-codes)
 - [Display Settings](#display-settings)
 - [Grid](#grid)
 - [Save](#save)
@@ -390,7 +391,7 @@ Want to view your 3D-Tilemap from a different orientation?
 9. ![img](doc/res2/button_to.png) update tilesheet from canvas
 
 
-### Tile saving
+### Tile saving and color codes
 The tilemap is drawn with color codes for each tile.
 
 The color code is built up as:

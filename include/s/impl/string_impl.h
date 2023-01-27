@@ -64,7 +64,7 @@ sString *s_string_new_cat_a(sStr_s *strs, int n, sAllocator_i a) {
 
     for (int i = 0; i < n; i++) {
         if (!s_str_empty(strs[i])) {
-            s_str_cpy(strs[i], (sStr_s) {res->data + res->size, strs[i].size});
+            s_str_cpy((sStr_s) {res->data + res->size, strs[i].size}, strs[i]);
             res->size += strs[i].size;
         }
     }

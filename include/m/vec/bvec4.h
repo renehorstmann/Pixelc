@@ -12,10 +12,16 @@ static bool bvec4_cmp(bvec4 a, bvec4 b) {
 }
 
 /** dst = v0, v1, ... */
-static bvec4 bvec4_new(bool v0, bool v1, bool v2, bool v3
+static bvec4 bvec4_new(bool v0, bool v1
+         , bool v2
+         , bool v3
 ) {
-    return (bvec4) {v0, v1, v2, v3
-    };
+    bvec4 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    self.v2 = v2;
+    self.v3 = v3;
+    return self;
 }
 
 /** dst = scalar */

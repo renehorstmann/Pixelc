@@ -43,6 +43,8 @@ static dvec4 dvec4_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
+
+
 /** a == b */
 static bool dvec4_cmp(dvec4 a, dvec4 b) {
     return dvecN_cmp(a.v, b.v, 4);
@@ -56,12 +58,17 @@ static dvec4 dvec4_set(double s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
-static dvec4 dvec4_new(double v0, double v1, double v2, double v3
+static dvec4 dvec4_new(double v0, double v1
+         , double v2
+         , double v3
 ) {
-    return (dvec4) {v0, v1, v2, v3
-    };
+    dvec4 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    self.v2 = v2;
+    self.v3 = v3;
+    return self;
 }
 
 /** dst = unit_x */
@@ -420,7 +427,7 @@ static dvec4 dvec4_clamp_vec(dvec4 x, dvec4 min, dvec4 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static dvec4 dvec4_mix(dvec4 a, dvec4 b, float t) {
+static dvec4 dvec4_mix(dvec4 a, dvec4 b, double t) {
     dvec4 res;
     dvecN_mix(res.v, a.v, b.v, t, 4);
     return res;

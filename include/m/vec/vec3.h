@@ -43,6 +43,8 @@ static vec3 vec3_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
+
+
 /** a == b */
 static bool vec3_cmp(vec3 a, vec3 b) {
     return vecN_cmp(a.v, b.v, 3);
@@ -56,12 +58,15 @@ static vec3 vec3_set(float s) {
     return res;
 }
 
-
 /** dst = v0, v1, ... */
-static vec3 vec3_new(float v0, float v1, float v2
+static vec3 vec3_new(float v0, float v1
+         , float v2
 ) {
-    return (vec3) {v0, v1, v2
-    };
+    vec3 self;
+    self.v0 = v0;
+    self.v1 = v1;
+    self.v2 = v2;
+    return self;
 }
 
 /** dst = unit_x */
@@ -86,6 +91,8 @@ static vec3 vec3_unit_z() {
     vecN_unit_z(res.v, 3);
     return res;
 }
+
+
 
 
 /** dst = -v */

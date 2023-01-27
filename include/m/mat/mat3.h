@@ -8,6 +8,45 @@
 #include "../vec/vecn.h"
 
 
+/** dst = (mat3) v */
+static mat3 mat3_cast_from_float(const float *cast) {
+    mat3 res;
+    matN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = (mat3) v */
+static mat3 mat3_cast_from_double(const double *cast) {
+    mat3 res;
+    matN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = (mat3) v */
+static mat3 mat3_cast_from_int(const int *cast) {
+    mat3 res;
+    matN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = (mat3) v */
+static mat3 mat3_cast_from_uchar(const unsigned char *cast) {
+    mat3 res;
+    matN_cast_into(res.v, cast, 3);
+    return res;
+}
+
+/** dst = v / 255 */
+static mat3 mat3_cast_from_uchar_1(const unsigned char *cast) {
+    mat3 res;
+    matN_cast_from_uchar_1(res.v, cast, 3);
+    return res;
+}
+
+
+
+
+
 /** dst = r==c ? 1 : 0 (identity)  */
 static mat3 mat3_eye() {
     mat3 res;

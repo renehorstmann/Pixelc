@@ -9,6 +9,45 @@
 #include "../vec/dvecn.h"
 
 
+/** dst = (dmat4) v */
+static dmat4 dmat4_cast_from_float(const float *cast) {
+    dmat4 res;
+    dmatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = (dmat4) v */
+static dmat4 dmat4_cast_from_double(const double *cast) {
+    dmat4 res;
+    dmatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = (dmat4) v */
+static dmat4 dmat4_cast_from_int(const int *cast) {
+    dmat4 res;
+    dmatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = (dmat4) v */
+static dmat4 dmat4_cast_from_uchar(const unsigned char *cast) {
+    dmat4 res;
+    dmatN_cast_into(res.v, cast, 4);
+    return res;
+}
+
+/** dst = v / 255 */
+static dmat4 dmat4_cast_from_uchar_1(const unsigned char *cast) {
+    dmat4 res;
+    dmatN_cast_from_uchar_1(res.v, cast, 4);
+    return res;
+}
+
+
+
+
+
 /** dst = r==c ? 1 : 0 (identity)  */
 static dmat4 dmat4_eye() {
     dmat4 res;
@@ -125,6 +164,7 @@ static dvec4 dvec4_mul_mat(dvec4 a, dmat4 b) {
     dvecN_mul_mat_no_alias(res.v, a.v, b.v, 4);
     return res;
 }
+
 
 
 /** returns = determinant mm */

@@ -315,6 +315,7 @@ void tile_update(float dtime) {
     selectionctrl.allowed = !(tile.active && tile.iso);
     if (tile.active && !L.was_active) {
         set_color(0);
+        tile.canvas_active = true;
     }
     if (!tile.active && L.was_active) {
         palette_set_color(s_min(1, palette.RO.palette_size-1));

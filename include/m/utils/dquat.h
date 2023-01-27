@@ -12,13 +12,23 @@
 
 /** dvec4 = [0, 0, 0, 1] */
 static dvec4 dquat_eye() {
-    return (dvec4) {{0, 0, 0, 1}};
+    dvec4 self;
+    self.x = 0;
+    self.y = 0;
+    self.z = 0;
+    self.w = 1;
+    return self;
 }
 
 
 /** dst = -x, -y, -z, w */
 static dvec4 dquat_conj(dvec4 q) {
-    return (dvec4) {{-q.x, -q.y, -q.z, q.w}};
+    dvec4 self;
+    self.x = -q.x;
+    self.y = -q.y;
+    self.z = -q.z;
+    self.w = q.w;
+    return self;
 }
 
 /** dst = inv(dvec4) */
@@ -199,8 +209,8 @@ static dvec3 dquat_pose_transform_pos(dvec3 a_pos, dvec4 a_quat, dvec3 pos_b) {
 
 /** returns pose transform of a @ b */
 static void dquat_pose_transform_pose(dvec3 *out_pos, dvec4 *out_quat,
-                                      dvec3 a_pos, dvec4 a_quat,
-                                      dvec3 b_pos, dvec4 b_quat) {
+                                     dvec3 a_pos, dvec4 a_quat,
+                                     dvec3 b_pos, dvec4 b_quat) {
     *out_pos = dquat_pose_transform_pos(a_pos, a_quat, b_pos);
     *out_quat = dquat_mul(a_quat, b_quat);
 }
