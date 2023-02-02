@@ -42,8 +42,19 @@ typedef struct {
     } L;
 } RoBatchRefract;
 
+// returns true if the batch seems to be in a valid state, GL errors ignored
+static bool ro_batchrefract_valid(const RoBatchRefract *self) {
+    return self->rects!=NULL && self->num;
+}
+
+// returns a new invalid batch
+static RoBatchRefract ro_batchrefract_new_invalid() {
+    return (RoBatchRefract) {0};
+}
+
 // creates a new batch with refraction enabled and num rRect's
 // this class takes ownership of tex_*_sink (see .owns_*_tex)
+// returns an invalid, for num<=0
 RoBatchRefract ro_batchrefract_new(int num,
                                    rTexture tex_main_sink, rTexture tex_refraction_sink);
 

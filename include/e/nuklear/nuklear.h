@@ -2901,7 +2901,7 @@ NK_API int nk_tree_push_hashed(struct nk_context*, enum nk_tree_type, const char
 ///     `nk_tree_image_push_hashed` instead.
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
-/// #define nk_tree_image_push(ctx, type, img, title, state)
+/// #define nk_tree_image_push(ctx, type, lvl, title, state)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 /// Parameter   | Description
@@ -2920,7 +2920,7 @@ NK_API int nk_tree_push_hashed(struct nk_context*, enum nk_tree_type, const char
 /// management callable in a look
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
-/// #define nk_tree_image_push_id(ctx, type, img, title, state, id)
+/// #define nk_tree_image_push_id(ctx, type, lvl, title, state, id)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 /// Parameter   | Description
@@ -3873,7 +3873,7 @@ NK_API const char* nk_utf_at(const char *buffer, int length, int index, nk_rune 
         nk_font_atlas_begin(&atlas);
         nk_font *font = nk_font_atlas_add_from_file(&atlas, "Path/To/Your/TTF_Font.ttf", 13, 0);
         nk_font *font2 = nk_font_atlas_add_from_file(&atlas, "Path/To/Your/TTF_Font2.ttf", 16, 0);
-        const void* img = nk_font_atlas_bake(&atlas, &img_width, &img_height, NK_FONT_ATLAS_RGBA32);
+        const void* lvl = nk_font_atlas_bake(&atlas, &img_width, &img_height, NK_FONT_ATLAS_RGBA32);
         nk_font_atlas_end(&atlas, nk_handle_id(texture), 0);
 
         struct nk_context ctx;

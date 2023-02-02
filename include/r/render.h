@@ -20,6 +20,15 @@ struct rRender_Globals {
     // defaults to false
     bool init_textures_as_filtered_linear;
 
+    // set the current scale in your camera, default is 128 (extra high, which may result in wrong / unprecise rendering)
+    // the scale is the ratio between real pixels and internal pixel units.
+    // For example the "some" default camera uses a minimal viewport of 180x180 units.
+    // So for a screen of 540x540 real pixels, the scale would be calculated in the camera as 3.0
+    // the render objects receive the scale and will floor the center position of the pose with it.
+    // in fact they will floor it with a precision of 1/2 units, so at the position of a 5x5 sprite can be set exactly
+    // between 2 pixels
+    float camera_scale;
+
     struct {
         int max_texture_size;
         int max_texture_layers;

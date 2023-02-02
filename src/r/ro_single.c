@@ -50,6 +50,9 @@ void ro_single_render(const RoSingle *self, const mat4 *camera_mat) {
 
     vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
+    
+    // camera_scale_2 = camera_scale*2
+    glUniform1f(glGetUniformLocation(self->L.program, "camera_scale_2"), r_render.camera_scale*2);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);

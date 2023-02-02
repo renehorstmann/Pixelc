@@ -12,10 +12,12 @@ static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 RoBatchRefract ro_batchrefract_new(int num,
                                    rTexture tex_main_sink, rTexture tex_refraction_sink) {
+    if(num <= 0)
+        return ro_batchrefract_new_invalid();
+
     r_render_error_check("ro_batchrefract_newBEGIN");
     RoBatchRefract self;
 
-    s_assume(num > 0, "batch needs atleast 1 rect");
     self.rects = s_malloc(sizeof *self.rects * num);
     for (int i = 0; i < num; i++) {
         self.rects[i] = r_rect_new();
@@ -94,6 +96,8 @@ RoBatchRefract ro_batchrefract_new(int num,
 
 
 void ro_batchrefract_kill(RoBatchRefract *self) {
+    if(!ro_batchrefract_valid(self))
+        return;
     s_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
@@ -106,6 +110,9 @@ void ro_batchrefract_kill(RoBatchRefract *self) {
 }
 
 void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size) {
+    if(!ro_batchrefract_valid(self))
+        return;
+
     r_render_error_check("ro_batchrefract_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
@@ -140,6 +147,9 @@ void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size
 void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat, float scale,
                                 const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
                                 bool update_sub) {
+    if(!ro_batchrefract_valid(self))
+        return;
+
     num = isca_clamp(num, 1, self->num);
 
     if (update_sub)
@@ -161,6 +171,9 @@ void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 
 
     vec2 sprites = vec2_cast_from_int(&self->tex_main.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
+
+    // camera_scale_2 = camera_scale*2
+    glUniform1f(glGetUniformLocation(self->L.program, "camera_scale_2"), r_render.camera_scale*2);
 
     // fragment shader
     glUniform1f(glGetUniformLocation(self->L.program, "scale"), scale);
@@ -191,12 +204,18 @@ void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 
 }
 
 void ro_batchrefract_set_texture_main(RoBatchRefract *self, rTexture tex_main_sink) {
+    if(!ro_batchrefract_valid(self))
+        return;
+
     if (self->owns_tex_main)
         r_texture_kill(&self->tex_main);
     self->tex_main = tex_main_sink;
 }
 
 void ro_batchrefract_set_texture_refraction(RoBatchRefract *self, rTexture tex_refraction_sink) {
+    if(!ro_batchrefract_valid(self))
+        return;
+
     if (self->owns_tex_refraction)
         r_texture_kill(&self->tex_refraction);
     self->tex_refraction = tex_refraction_sink;

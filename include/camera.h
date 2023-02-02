@@ -97,6 +97,14 @@ void camera_save_config();
 void camera_load_config();
 
 
+// in contrast to just using an integer as camera position,
+//      which will be one of the "CAMERA_SIZE" unit pixels
+// this functions returns a position, that is on a real device pixel
+// if the camera position is between real pixels, render objects may calculate their size wrong.
+//      In that case there may be some render issues for (e.g.) tilemaps
+vec2 camera_pos_on_real_pixel(float x, float y);
+
+
 // returns the width in game pixel (!=real pixel)
 static int camera_width() {
     return -camera.RO.left + camera.RO.right;

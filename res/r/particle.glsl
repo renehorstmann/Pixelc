@@ -23,6 +23,7 @@
 
     uniform mat4 vp;
     uniform vec2 sprites;
+    uniform float camera_scale_2;
 
     const vec4 vertices[6] = vec4[](
     vec4(-0.5, -0.5, 0, 1),
@@ -77,6 +78,10 @@
         pos = in_pose * pos;
         pos += in_speed * dt;
         pos += in_acc * (dt * dt);
+
+        // floor into the camera grid (enable half positions for centering uneven sizes)
+        pos.xy = floor(pos.xy * camera_scale_2) / camera_scale_2;
+
         gl_Position = vp * pos;
 
         v_tex_coord.xy = (in_uv * tex_coords[gl_VertexID]).xy;

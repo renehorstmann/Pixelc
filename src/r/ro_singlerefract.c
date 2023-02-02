@@ -70,6 +70,8 @@ void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat
     vec2 sprites = vec2_cast_from_int(&self->tex_main.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
 
+    // camera_scale_2 = camera_scale*2
+    glUniform1f(glGetUniformLocation(self->L.program, "camera_scale_2"), r_render.camera_scale*2);
 
     // fragment shader
     glUniform1f(glGetUniformLocation(self->L.program, "scale"), scale);

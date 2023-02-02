@@ -42,8 +42,19 @@ typedef struct {
     } L;
 } RoParticleRefract;
 
+// returns true if the particle systen seems to be in a valid state, GL errors ignored
+static bool ro_particlerefract_valid(const RoParticleRefract *self) {
+    return self->rects!=NULL && self->num;
+}
+
+// returns a new invalid particle system
+static RoParticleRefract ro_particlerefract_new_invalid() {
+    return (RoParticleRefract) {0};
+}
+
 // creates a particle system with refraction enabled and num rParticleRect's
 // this class takes ownership of tex_*_sink (see .owns_*_tex)
+// returns an invalid, for num<=0
 RoParticleRefract ro_particlerefract_new(int num,
                                          rTexture tex_main_sink, rTexture tex_refraction_sink);
 

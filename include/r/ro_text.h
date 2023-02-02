@@ -22,7 +22,6 @@ typedef struct {
     RoBatch ro;             // internal batch to render
     ro_text_sprite_fn sprite_fn;    // conversion function of character to sprite mapping
     mat4 pose;              // pose (top left) for the text
-    vec2 size;              // character size
     vec2 offset;            // offset to next character
 } RoText;
 

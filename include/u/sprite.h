@@ -24,9 +24,9 @@ static ivec2 u_sprite_pos_from_layer(int sprite_cols, int layer) {
 
 // A sprite adds a dimension to an uImage.
 // instead of cols, rows, layers
-// we get img.cols, img.rows, sprite_cols, sprite_rows
-//    where img.cols .rows is the size for a single sprite
-// img.layers is always == sprite_cols*sprite_rows
+// we get lvl.cols, lvl.rows, sprite_cols, sprite_rows
+//    where lvl.cols .rows is the size for a single sprite
+// lvl.layers is always == sprite_cols*sprite_rows
 typedef struct {
     uImage img;
     int cols;

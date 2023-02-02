@@ -21,8 +21,19 @@ typedef struct {
     } L;
 } RoBatch;
 
+// returns true if the batch seems to be in a valid state, GL errors ignored
+static bool ro_batch_valid(const RoBatch *self) {
+    return self->rects!=NULL && self->num;
+}
+
+// returns a new invalid batch
+static RoBatch ro_batch_new_invalid() {
+    return (RoBatch) {0};
+}
+
 // creates a new batch with num rRect's
 // this class takes ownership of tex_sink (see .owns_tex)
+// returns an invalid, for num<=0
 RoBatch ro_batch_new(int num, rTexture tex_sink);
 
 void ro_batch_kill(RoBatch *self);

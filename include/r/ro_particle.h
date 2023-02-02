@@ -22,8 +22,19 @@ typedef struct {
     } L;
 } RoParticle;
 
+// returns true if the particle systen seems to be in a valid state, GL errors ignored
+static bool ro_particle_valid(const RoParticle *self) {
+    return self->rects!=NULL && self->num;
+}
+
+// returns a new invalid particle system
+static RoParticle ro_particle_new_invalid() {
+    return (RoParticle) {0};
+}
+
 // creates a particle system with num rParticleRect's
 // this class takes ownership of tex_sink (see .owns_tex)
+// returns an invalid, for num<=0
 RoParticle ro_particle_new(int num, rTexture tex_sink);
 
 void ro_particle_kill(RoParticle *self);

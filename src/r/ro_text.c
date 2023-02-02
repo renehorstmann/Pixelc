@@ -41,7 +41,8 @@ static void hide(RoText *self, int from) {
 }
 
 static mat4 pose(const RoText *self, int c, int r) {
-    return u_pose_new_aa(c * self->offset.x, -r * self->offset.y, self->size.x, self->size.y);
+    return u_pose_new_aa(c * self->offset.x, -r * self->offset.y,
+                         self->ro.tex.sprite_size.x, self->ro.tex.sprite_size.y);
 }
 
 
@@ -54,7 +55,6 @@ RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink) {
     RoText self;
     self.sprite_fn = sprite_fn;
     self.pose = mat4_eye();
-    self.size = (vec2) {{5, 5}};
     self.offset = (vec2) {{6, 6}};
     // batch.vp will be set each time before rendering
     self.ro = ro_batch_new(max, tex_sink);
@@ -97,8 +97,8 @@ vec2 ro_text_set_text(RoText *self, const char *text) {
         return vec2_set(0);
 
     return (vec2) {{
-                           (cols - 1) * self->offset.x + self->size.x,
-                           row * self->offset.y + self->size.y
+                           (cols - 1) * self->offset.x + self->ro.tex.sprite_size.x,
+                           row * self->offset.y + self->ro.tex.sprite_size.y
                    }};
 }
 
@@ -123,8 +123,8 @@ vec2 ro_text_get_size(const RoText *self, const char *text) {
         return vec2_set(0);
 
     return (vec2) {{
-                           (cols - 1) * self->offset.x + self->size.x,
-                           rows * self->offset.y + self->size.y
+                           (cols - 1) * self->offset.x + self->ro.tex.sprite_size.x,
+                           rows * self->offset.y + self->ro.tex.sprite_size.y
                    }};
 }
 
@@ -224,7 +224,6 @@ RoText ro_text_new_font85(int max) {
     rTexture tex = r_texture_new_file(columns, rows, "res/r/font85.png");
     r_texture_filter_nearest(tex);
     RoText self = ro_text_new(max, font85_sprite_cb, tex);
-    self.size = (vec2) {{5, 8}};
     self.offset = (vec2) {{6, 9}};
     return self;
 }
@@ -245,7 +244,6 @@ RoText ro_text_new_font85_shadow(int max, ucvec4 *opt_shadow_color) {
     u_sprite_kill(&sprite);
     r_texture_filter_nearest(tex);
     RoText self = ro_text_new(max, font85_sprite_cb, tex);
-    self.size = (vec2) {{5, 8}};
     self.offset = (vec2) {{6, 9}};
     return self;
 }

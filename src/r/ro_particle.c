@@ -30,10 +30,12 @@ static void update_sub(const RoParticle *self, uint32_t time_ms, int num) {
 //
 
 RoParticle ro_particle_new(int num, rTexture tex_sink) {
+    if(num <= 0)
+        return ro_particle_new_invalid();
+
     r_render_error_check("ro_particle_newBEGIN");
     RoParticle self;
 
-    s_assume(num > 0, "particle needs atleast 1 particlerect");
     self.rects = s_malloc(sizeof *self.rects * num);
     for (int i = 0; i < num; i++) {
         self.rects[i] = r_particlerect_new();
@@ -155,6 +157,8 @@ RoParticle ro_particle_new(int num, rTexture tex_sink) {
 
 
 void ro_particle_kill(RoParticle *self) {
+    if(!ro_particle_valid(self))
+        return;
     s_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
@@ -166,6 +170,9 @@ void ro_particle_kill(RoParticle *self) {
 
 
 void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, const mat4 *camera_mat) {
+    if(!ro_particle_valid(self))
+        return;
+
     num = isca_clamp(num, 1, self->num);
 
     update_sub(self, time_ms, num);
@@ -179,6 +186,9 @@ void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, c
 
     vec2 sprites = vec2_cast_from_int(&self->tex.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
+
+    // camera_scale_2 = camera_scale*2
+    glUniform1f(glGetUniformLocation(self->L.program, "camera_scale_2"), r_render.camera_scale*2);
 
     glUniform1i(glGetUniformLocation(self->L.program, "tex"), 0);
     glActiveTexture(GL_TEXTURE0);
@@ -196,6 +206,9 @@ void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, c
 }
 
 void ro_particle_set_texture(RoParticle *self, rTexture tex_sink) {
+    if(!ro_particle_valid(self))
+        return;
+
     if (self->owns_tex)
         r_texture_kill(&self->tex);
     self->tex = tex_sink;

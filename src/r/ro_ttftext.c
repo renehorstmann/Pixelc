@@ -8,16 +8,16 @@ struct RoTtfTextGlobals_s ro_ttftext;
 rTexture ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text, int *opt_out_w, int *opt_out_h) {
 
     // SDL_ttf seems to render in BGRA format, so we just swap r and b
-    SDL_Surface *img = TTF_RenderText_Blended(font, text,
+    SDL_Surface *lvl = TTF_RenderText_Blended(font, text,
                                               (SDL_Color) {color.v2 * 255, color.v1 * 255, color.v0 * 255,
                                                            color.v3 * 255});
-    rTexture tex = r_texture_new_sdl_surface(1, 1, img);
+    rTexture tex = r_texture_new_sdl_surface(1, 1, lvl);
     r_texture_filter_linear(tex);
     if (opt_out_w)
-        *opt_out_w = img->w;
+        *opt_out_w = lvl->w;
     if (opt_out_h)
-        *opt_out_h = img->h;
-    SDL_FreeSurface(img);
+        *opt_out_h = lvl->h;
+    SDL_FreeSurface(lvl);
     return tex;
 }
 

@@ -1,6 +1,7 @@
 #include "e/window.h"
 #include "e/gui.h"
 #include "e/io.h"
+#include "r/render.h"
 #include "u/pose.h"
 #include "u/json.h"
 #include "m/utils/camera.h"
@@ -46,6 +47,10 @@ void camera_update() {
 
     // set nuklear scale for the debug gui windows
     e_gui.scale = camera.RO.scale/3;
+    
+    // set the render scale to fix render issues
+    r_render.camera_scale = camera.RO.scale;
+
 
     float width_2 = wnd_width / (2 * camera.RO.scale);
     float height_2 = wnd_height / (2 * camera.RO.scale);
@@ -75,7 +80,8 @@ void camera_update() {
 
 
 void camera_set_pos(float x, float y) {
-    u_pose_set_xy(&camera.matrices.v, x, y);
+    vec2 pos = camera_pos_on_real_pixel(x, y);
+    u_pose_set_xy(&camera.matrices.v, pos.x, pos.y);
 }
 
 void camera_set_zoom(float size) {
@@ -132,4 +138,10 @@ void camera_load_config() {
     }
 
     u_json_kill(&config);
+}
+
+vec2 camera_pos_on_real_pixel(float x, float y) {
+    x = (float) ((int) (x * camera.RO.scale)) / camera.RO.scale;
+    y = (float) ((int) (y * camera.RO.scale)) / camera.RO.scale;
+    return (vec2) {{x, y}};
 }

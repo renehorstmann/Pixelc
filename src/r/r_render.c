@@ -40,6 +40,9 @@ void r_render_init(SDL_Window *window) {
     r_render.window = window;
     r_render.clear_color = (vec4) {{0, 0, 0, 1}};
 
+    // extra high (may produce render issues / inaccuracies)
+    r_render.camera_scale = 128;
+
     s_log("OpenGL version: %s", glGetString(GL_VERSION));
 
     int max_vertex_attributes;

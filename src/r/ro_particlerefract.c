@@ -35,10 +35,12 @@ static void update_sub(const RoParticleRefract *self, uint32_t time_ms, int num)
 
 RoParticleRefract ro_particlerefract_new(int num,
                                          rTexture tex_main_sink, rTexture tex_refraction_sink) {
+    if(num <= 0)
+        return ro_particlerefract_new_invalid();
+
     r_render_error_check("ro_particlerefract_newBEGIN");
     RoParticleRefract self;
 
-    s_assume(num > 0, "particle needs atleast 1 particlerect");
     self.rects = s_malloc(sizeof *self.rects * num);
     for (int i = 0; i < num; i++) {
         self.rects[i] = r_particlerect_new();
@@ -163,6 +165,8 @@ RoParticleRefract ro_particlerefract_new(int num,
 
 
 void ro_particlerefract_kill(RoParticleRefract *self) {
+    if(!ro_particlerefract_valid(self))
+        return;
     s_free(self->rects);
     glDeleteProgram(self->L.program);
     glDeleteVertexArrays(1, &self->L.vao);
@@ -176,6 +180,9 @@ void ro_particlerefract_kill(RoParticleRefract *self) {
 
 void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_ms, int num, const mat4 *camera_mat,
                                    float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+    if(!ro_particlerefract_valid(self))
+        return;
+
     num = isca_clamp(num, 1, self->num);
 
     update_sub(self, time_ms, num);
@@ -197,6 +204,9 @@ void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_
 
     vec2 sprites = vec2_cast_from_int(&self->tex_main.sprites.v0);
     glUniform2fv(glGetUniformLocation(self->L.program, "sprites"), 1, &sprites.v0);
+
+    // camera_scale_2 = camera_scale*2
+    glUniform1f(glGetUniformLocation(self->L.program, "camera_scale_2"), r_render.camera_scale*2);
 
     // fragment shader
     glUniform1f(glGetUniformLocation(self->L.program, "scale"), scale);
@@ -227,12 +237,18 @@ void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_
 }
 
 void ro_particlerefract_set_texture_main(RoParticleRefract *self, rTexture tex_main_sink) {
+    if(!ro_particlerefract_valid(self))
+        return;
+
     if (self->owns_tex_main)
         r_texture_kill(&self->tex_main);
     self->tex_main = tex_main_sink;
 }
 
 void ro_particlerefract_set_texture_refraction(RoParticleRefract *self, rTexture tex_refraction_sink) {
+    if(!ro_particlerefract_valid(self))
+        return;
+
     if (self->owns_tex_refraction)
         r_texture_kill(&self->tex_refraction);
     self->tex_refraction = tex_refraction_sink;
