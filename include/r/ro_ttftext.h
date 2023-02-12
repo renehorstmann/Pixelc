@@ -25,7 +25,7 @@ rTexture ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
 
 
 
-// creates a new ttf text with the ro.ttftext.default_font as init
+// creates a new ttf text with the ro.ttftext.default_font as active
 RoTtfText ro_ttftext_new(vec4 color, const char *text);
 
 void ro_ttftext_kill(RoTtfText *self);

@@ -163,7 +163,7 @@ void e_window_init(const char *title) {
     s_assume(!e_window.init, "should be called only once");
     e_window.init = true;
 
-    s_log("init");
+    s_log("active");
 
     e_window.allow_pause = true;
 

@@ -51,12 +51,12 @@ void e_simple_start(const char *title,
     e_simple.update_fn = update_fn;
     e_simple.render_fn = render_fn;
 
-    // init e (environment)
+    // active e (environment)
     e_window_init(title);
     e_input_init();
     e_gui_init();
 
-    // init r (render)
+    // active r (render)
     r_render_init(e_window.sdl_window);
 
     // the startup screen acts as loading screen and also checks for render errors
@@ -76,7 +76,7 @@ void e_simple_start(const char *title,
 
 static void init_loop(void *user_data) {
     if (r_render_startup_update(e_window.size, e_window.deltatime)) {
-        s_log("init");
+        s_log("active");
         e_window_set_vsync(true);
         e_window_reset_main_loop(main_loop, NULL);
         L.init_fn();

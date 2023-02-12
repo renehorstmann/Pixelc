@@ -61,7 +61,7 @@ void e_gui_init() {
     s_assume(!e_gui.init, "should be called only once");
     e_gui.init = true;
 
-    s_log("init");
+    s_log("active");
 
     e_gui.ctx = nk_sdl_init(e_window.sdl_window);
 

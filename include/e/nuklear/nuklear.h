@@ -174,7 +174,7 @@
 /// ## Example
 ///
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
-/// // init gui state
+/// // active gui state
 /// enum {EASY, HARD};
 /// static int op = EASY;
 /// static float value = 0.6f;
@@ -10584,7 +10584,7 @@ return nk__draw_list_next(cmd, buffer, &ctx->draw_list);
 /*  This library currently uses the Skyline Bottom-Left algorithm. */
 /*  */
 /*  Please note: better rectangle packers are welcome! Please */
-/*  implement them to the same API, but with a different init */
+/*  implement them to the same API, but with a different active */
 /*  function. */
 /*  */
 /*  Credits */
@@ -10709,15 +10709,15 @@ STBRP_DEF void stbrp_init_target (stbrp_context *context, int width, int height,
 /*  may run out of temporary storage and be unable to pack some rectangles. */
 
 STBRP_DEF void stbrp_setup_allow_out_of_mem (stbrp_context *context, int allow_out_of_mem);
-/*  Optionally call this function after init but before doing any packing to */
+/*  Optionally call this function after active but before doing any packing to */
 /*  change the handling of the out-of-temp-memory scenario, described above. */
-/*  If you call init again, this will be reset to the default (false). */
+/*  If you call active again, this will be reset to the default (false). */
 
 
 STBRP_DEF void stbrp_setup_heuristic (stbrp_context *context, int heuristic);
 /*  Optionally select which packing heuristic the library should use. Different */
 /*  heuristics will produce better/worse results for different data sets. */
-/*  If you call init again, this will be reset to the default. */
+/*  If you call active again, this will be reset to the default. */
 
 enum
 {

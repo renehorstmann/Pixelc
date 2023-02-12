@@ -304,7 +304,7 @@ void e_input_init() {
     s_assume(!e_input.init, "should be called only once");
     e_input.init = true;
 
-    s_log("init");
+    s_log("active");
 
     s_assume(e_window.init, "needs an sdl window to get its size");
 

@@ -11,7 +11,7 @@
 struct rRender_Globals {
     bool init;
     vec4 clear_color;               // used by begin_frame
-    SDL_Window *window;             // window, set by init
+    SDL_Window *window;             // window, set by active
     ivec2 current_window_size;      // window size of the current frame
 
     // 3D (2D_ARRAY) not working in WebGL2
