@@ -172,7 +172,8 @@ static double dsca_step(double x, double edge) {
 
 /** dst = x < edge1 ? 0 : (x > edge2 ? 1 : x * x * (3 - 2 * x)) Hermite polynomials */
 static double dsca_smoothstep(double x, double edge1, double edge2) {
-    return x < edge1 ? 0.0 : (x > edge2 ? 1.0 : x * x * (3.0 - 2.0 * x));
+    x = dsca_clamp((x-edge1) / (edge2-edge1), 0.0, 1.0);
+    return x * x * (3.0 - 2.0 * x);
 }
 
 /** dst = isnan(x) */

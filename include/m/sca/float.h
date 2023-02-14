@@ -172,7 +172,8 @@ static float sca_step(float x, float edge) {
 
 /** dst = x < edge1 ? 0 : (x > edge2 ? 1 : x * x * (3 - 2 * x)) Hermite polynomials */
 static float sca_smoothstep(float x, float edge1, float edge2) {
-    return x < edge1 ? 0.0f : (x > edge2 ? 1.0f : x * x * (3.0f - 2.0f * x));
+    x = sca_clamp((x-edge1) / (edge2-edge1), 0.0f, 1.0f);
+    return x * x * (3.0f - 2.0f * x);
 }
 
 /** dst = isnan(x) */

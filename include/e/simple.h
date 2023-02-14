@@ -2,7 +2,7 @@
 #define E_SIMPLE_H
 
 //
-// a simplified way to active the some framework
+// a simplified way to init the some framework
 // INFO: this module uses not only e/ but also parts of r/ !
 //
 

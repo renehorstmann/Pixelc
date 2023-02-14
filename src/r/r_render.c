@@ -33,7 +33,7 @@ static struct {
 void r_render_init(SDL_Window *window) {
     s_assume(!r_render.init, "r_render_init should be called only once");
     r_render.init = true;
-    s_log("active");
+    s_log("init");
 
     r_render_error_check("r_render_initBEGIN");
 

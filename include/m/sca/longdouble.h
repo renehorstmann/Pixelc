@@ -172,7 +172,8 @@ static long double ldsca_step(long double x, long double edge) {
 
 /** dst = x < edge1 ? 0 : (x > edge2 ? 1 : x * x * (3 - 2 * x)) Hermite polynomials */
 static long double ldsca_smoothstep(long double x, long double edge1, long double edge2) {
-    return x < edge1 ? 0.0L : (x > edge2 ? 1.0L : x * x * (3.0L - 2.0L * x));
+    x = ldsca_clamp((x-edge1) / (edge2-edge1), 0.0L, 1.0L);
+    return x * x * (3.0L - 2.0L * x);
 }
 
 /** dst = isnan(x) */
