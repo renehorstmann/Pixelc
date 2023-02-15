@@ -52,6 +52,11 @@ static struct nk_rect window_rect(float w, float h) {
     return nk_rect(50 + col * 100, 50 + row * 200, w, h);
 }
 
+// wrapper for nk_propertyf that uses the camera scale and auto steps
+static void propertyf(struct nk_context *ctx, const char *name, float min, float *val, float max) {
+    *val = nk_propertyf(ctx, name, min, *val, max, 0, (max - min) / (250.0f));
+}
+
 
 //
 // public
@@ -95,7 +100,7 @@ void e_gui_float(const char *title, float *attribute, float min, float max) {
                  NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
                  NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
         nk_layout_row_dynamic(ctx, 30, 1);
-        *attribute = nk_propertyf(ctx, title, min, *attribute, max, 0, (max - min) / 100);
+        propertyf(ctx, title, min, attribute, max);
     }
     nk_end(ctx);
 }
@@ -111,9 +116,7 @@ void e_gui_vec2(const char *title, vec2 *attribute, vec2 min, vec2 max) {
         for (int i = 0; i < 2; i++) {
             char name[3] = "vX";
             name[1] = '0' + i;
-            attribute->v[i] = nk_propertyf(ctx,
-                                           name,
-                                           min.v[i], attribute->v[i], max.v[i], 0, (max.v[i] - min.v[i]) / 100);
+            propertyf(ctx, name, min.v[i], &attribute->v[i], max.v[i]);
         }
     }
     nk_end(ctx);
@@ -130,9 +133,7 @@ void e_gui_vec3(const char *title, vec3 *attribute, vec3 min, vec3 max) {
         for (int i = 0; i < 3; i++) {
             char name[3] = "vX";
             name[1] = '0' + i;
-            attribute->v[i] = nk_propertyf(ctx,
-                                           name,
-                                           min.v[i], attribute->v[i], max.v[i], 0, (max.v[i] - min.v[i]) / 100);
+            propertyf(ctx, name, min.v[i], &attribute->v[i], max.v[i]);
         }
     }
     nk_end(ctx);
@@ -149,9 +150,7 @@ void e_gui_vec4(const char *title, vec4 *attribute, vec4 min, vec4 max) {
         for (int i = 0; i < 4; i++) {
             char name[3] = "vX";
             name[1] = '0' + i;
-            attribute->v[i] = nk_propertyf(ctx,
-                                           name,
-                                           min.v[i], attribute->v[i], max.v[i], 0, (max.v[i] - min.v[i]) / 100);
+            propertyf(ctx, name, min.v[i], &attribute->v[i], max.v[i]);
         }
     }
     nk_end(ctx);
@@ -174,9 +173,9 @@ void e_gui_rgb(const char *title, vec3 *attribute) {
         nk_layout_row_dynamic(ctx, 120, 1);
         color = nk_color_picker(ctx, color, NK_RGB);
         nk_layout_row_dynamic(ctx, 25, 1);
-        color.r = nk_propertyf(ctx, "red", 0, color.r, 1, 0, 0.01f);
-        color.g = nk_propertyf(ctx, "green", 0, color.g, 1, 0, 0.01f);
-        color.b = nk_propertyf(ctx, "blue", 0, color.b, 1, 0, 0.01f);
+        propertyf(ctx, "red", 0, &color.r, 1);
+        propertyf(ctx, "green", 0, &color.g, 1);
+        propertyf(ctx, "blue", 0, &color.b, 1);
     }
     nk_end(ctx);
 
@@ -203,10 +202,10 @@ void e_gui_rgba(const char *title, vec4 *attribute) {
         nk_layout_row_dynamic(ctx, 120, 1);
         color = nk_color_picker(ctx, color, NK_RGBA);
         nk_layout_row_dynamic(ctx, 25, 1);
-        color.r = nk_propertyf(ctx, "red", 0, color.r, 1, 0, 0.01f);
-        color.g = nk_propertyf(ctx, "green", 0, color.g, 1, 0, 0.01f);
-        color.b = nk_propertyf(ctx, "blue", 0, color.b, 1, 0, 0.01f);
-        color.a = nk_propertyf(ctx, "alpha", 0, color.a, 1, 0, 0.01f);
+        propertyf(ctx, "red", 0, &color.r, 1);
+        propertyf(ctx, "green", 0, &color.g, 1);
+        propertyf(ctx, "blue", 0, &color.b, 1);
+        propertyf(ctx, "alpha", 0, &color.a, 1);
     }
     nk_end(ctx);
 
