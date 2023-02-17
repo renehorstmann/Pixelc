@@ -112,6 +112,14 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
+- save/load project.(zip?)
+  - contains:
+    - all 9 tabs (without history)
+    - all 16 tilemaps
+    - some io settings
+      - layers and frames
+      - display size
+      - ...
 - gif decoder?
 
 ## Author
