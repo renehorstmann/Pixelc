@@ -126,6 +126,8 @@ static bool pointer_event(ePointer_s pointer) {
     if (u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("update tilesheet from canvas");
         uImage tilesheet = canvas.RO.sprite.img;
+        tilesheet.data = u_image_layer(tilesheet, canvas.RO.current_image_layer);
+        tilesheet.layers = 1;
         tile_update_tilesheet(tilesheet, tile.RO.tilesheet_id);
         tile.canvas_active = impl->was_canvas_active;
         dialog_hide();
@@ -170,7 +172,7 @@ void dialog_create_tile() {
     impl->size_y = tile.RO.tile_size_y;
 
 
-    float pos = 16;
+    float pos = 14;
     impl->info = ro_text_new_font55(32);
     ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
 
@@ -221,7 +223,7 @@ void dialog_create_tile() {
 
     impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
     impl->from_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
-    pos += 20;
+    pos += 10;
 
     dialog.impl_height = pos;
 

@@ -19,6 +19,7 @@ static const vec4 TITLE_COLOR = {{0, 0.6, 0.3, 1}};
 
 
 typedef struct {
+
     RoText hd_multiplyer_txt;
     RoText hd_multiplyer_num;
     mat4 hd_multiplyer_hitbox;
@@ -33,6 +34,9 @@ typedef struct {
     RoText gif_txt;
     RoSingle gif_btn;
     RoSingle gif_hd_btn;
+
+    RoText project_txt;
+    RoSingle project_btn;
     
     TextInput *textinput;
 } Impl;
@@ -53,6 +57,9 @@ static void kill_fn() {
     ro_text_kill(&impl->gif_txt);
     ro_single_kill(&impl->gif_btn);
     ro_single_kill(&impl->gif_hd_btn);
+
+    ro_text_kill(&impl->project_txt);
+    ro_single_kill(&impl->project_btn);
     
     textinput_kill(&impl->textinput);
     
@@ -86,7 +93,7 @@ static void update(float dtime) {
 
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
-    
+
     ro_text_render(&impl->hd_multiplyer_txt, cam_mat);
     ro_text_render(&impl->hd_multiplyer_num, cam_mat);
     
@@ -100,6 +107,9 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->gif_txt, cam_mat);
     ro_single_render(&impl->gif_btn, cam_mat);
     ro_single_render(&impl->gif_hd_btn, cam_mat);
+
+    ro_text_render(&impl->project_txt, cam_mat);
+    ro_single_render(&impl->project_btn, cam_mat);
 }
 
 
@@ -151,6 +161,14 @@ static bool pointer_event(ePointer_s pointer) {
         // return after hide, hide kills this dialog
         return true;
     }
+
+    if(u_button_clicked(&impl->project_btn.rect, pointer)) {
+        s_log("project btn");
+        dialog_create_project();
+        // return after create, create hides this dialog, which kills it
+        return true;
+    }
+
     return true;
 }
 
@@ -170,7 +188,7 @@ void dialog_create_save() {
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
     
-    int pos = 24;
+    int pos = 18;
     
     impl->hd_multiplyer_txt = ro_text_new_font55(16);
     ro_text_set_text(&impl->hd_multiplyer_txt, "hd multiplyer:");
@@ -181,7 +199,7 @@ void dialog_create_save() {
     impl->hd_multiplyer_num.pose = u_pose_new(DIALOG_LEFT + 95, DIALOG_TOP - pos, 1, 2);
     impl->hd_multiplyer_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
     
-    pos += 20;
+    pos += 16;
 
     impl->merge_txt = ro_text_new_font55(32);
     ro_text_set_color(&impl->merge_txt, DIALOG_TEXT_COLOR);
@@ -195,7 +213,7 @@ void dialog_create_save() {
             DIALOG_TOP - pos - 4, 
             16, 16);
             
-    pos += 40;
+    pos += 30;
     
     impl->png_txt = ro_text_new_font55(16);
     ro_text_set_text(&impl->png_txt, "save .png:");
@@ -222,8 +240,17 @@ void dialog_create_save() {
     
     impl->gif_hd_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save_hd.png"));
     impl->gif_hd_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
-    
-    pos += 10;
+
+    pos += 18;
+
+    impl->project_txt = ro_text_new_font55(16);
+    ro_text_set_text(&impl->project_txt, "Full Project:");
+    ro_text_set_color(&impl->project_txt, DIALOG_TEXT_COLOR);
+    impl->project_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
+    impl->project_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_project.png"));
+    impl->project_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
+
+    pos += 4;
     
     dialog.impl_height = pos;
 

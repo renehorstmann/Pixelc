@@ -105,6 +105,8 @@ void dialog_create_save_tile();
 
 void dialog_create_import();
 
+void dialog_create_project();
+
 
 void dialog_create_palette();
 

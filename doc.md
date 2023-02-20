@@ -35,11 +35,6 @@ Its also fine to use on desktops, etc.
 - [Funny Rainbow Trick](#funny-rainbow-trick)
 - [Secondary Color](#secondary-color)
 - [Shading](#shading)
-- [Tiles](#tiles)
-  - [Isometric Mode](#isometric-mode)
-  - [How to edit a tilesheet](#how-to-edit-a-tilesheet)
-  - [How to load a tilesheet from a file](#how-to-load-a-tilesheet-from-a-file)
-  - [Tile saving and color codes](#tile-saving-and-color-codes)
 - [Display Settings](#display-settings)
 - [Grid](#grid)
 - [Save](#save)
@@ -51,6 +46,12 @@ Its also fine to use on desktops, etc.
 - [Image Tabs](#image-tabs)
 - [Frames](#frames)
 - [Layers](#layers)
+- [Tiles](#tiles)
+  - [Isometric Mode](#isometric-mode)
+  - [How to edit a tilesheet](#how-to-edit-a-tilesheet)
+  - [How to load a tilesheet from a file](#how-to-load-a-tilesheet-from-a-file)
+  - [Tile saving and color codes](#tile-saving-and-color-codes)
+- [Project Archive](#project-archive)
 
 ## Draw Modes
 Pixelc supports different modes to draw on the canvas.
@@ -302,118 +303,6 @@ Shading is useful to only paint above a selected color, to shade or highlight ed
 The app shows a flash effect of the secondary color to show you that the shading mode is active.
 (Also if the pipette [draw mode](#draw-modes) is used)
 
-## Tiles
-![img](doc/res4/button_tile.png)
-
-Click on the tile tool to start the tiling mode.
-
-![img](doc/tiling_mode.png)
-
-The canvas now renders a tile for each pixel unit.
-
-> (WebApp) limitation:
-> The tile mode creates large textures on the GPU.
-> If the maximal size is reached on your device, the canvas will be rendered with the maximal GPU texture size and your tilemap will get pixelated.
-> If thats the case, a warning will be print as tooltip
-> Use a smaller canvas size or reduce the layers to avoid this.
-
-### Tile Palette
-
-The palette now shows tilesheets and some additional tools.
-
-You can zoom and move the tilesheet like the canvas.
-
-Tools:
-- ![img](doc/res2/toolbar_color_bg.png) Select to clear tiles
-- ![img](doc/res2/button_prev.png) Previous tilesheet
-- ![img](doc/res2/button_next.png) Next tilesheet
-- ![img](doc/res2/button_camera.png) Reset the tilesheet camera
-- ![img](doc/res2/button_tile.png) Render the tiles in the canvas
-- ![img](doc/res2/button_iso.png) Render in [isometric mode](#isometric-mode)
-
-> Pixelc supports up to 16 different tilesheets!
-
-Hold down on the palette to open the tile dialog:
-
-![img](doc/tile_dialog.png)
-
-Here you can:
-- Reset the size of a single tile for x and y (`8, 16, 32 pixel`)
-  - For all tilesheets.
-- ![img](doc/res2/button_to.png) Copy the tilesheet into the canvas
-  - Good for editing the tilesheet
-- ![img](doc/res2/button_from.png) Update the current tilesheet with the canvas image
-  - The image size must be a multiple of 32
-    - will be filled with transparency to match `%32==0`
-
-### Isometric Mode
-![img](doc/res4/button_iso.png)
-
-If the isometric mode is active, the canvas renders the tiles with isometric overlapping:
-
-![img](doc/tiles_isometric.png)
-
-In this example, the tilesize is set as 32x32 pixel
-> Use layers to define the z-height of your tilemap.
-> Layer 1 is the bottom floor.
-
-In the isometric mode, selections are disabled. Turn it off to use them.
-
-#### Rotating the Isometric Tilemap
-Want to view your 3D-Tilemap from a different orientation?
-1. ![img](doc/res2/button_size.png) Click on the size tool to open the [size](#size) dialog
-2. ![img](doc/res2/button_rotate_left.png) Rotate the image
-3. Enjoy your new view:
-
-![img](doc/tiles_isometric_rotate.png)
-
-
-### How to edit a tilesheet
-1. ![img](doc/res2/button_tab.png)  use a new image tab
-2. ![img](doc/res2/button_tile.png) start the tiling mode
-3. hold down on the tile palette to open the tile dialog
-4. ![img](doc/res2/button_from.png)  copy the current tilesheet into the canvas
-5. redraw tiles, change the size, draw new tiles, ....
-6. ![img](doc/res2/button_tile.png) start the tiling mode again
-7. (optional) select a different tilesheet to update
-8. hold down on the tile palette again to open the tile dialog
-9. ![img](doc/res2/button_to.png) update tilesheet from canvas
-
-### How to load a tilesheet from a file
-1. Download a tilesheet file as png (for example from [itch](https://itch.io/game-assets/tag-tileset))
-2. ![img](doc/res2/button_tab.png) use a new image tab
-3. ![img](doc/res2/button_import.png) click on the import button
-4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas"
-5. (optional) crop the image out to the tiles you want with a [selection](#selection)
-6. ![img](doc/res2/button_tile.png) start the tiling mode
-7. (optional) select a different tilesheet to update
-8. hold down on the tile palette to open the tile dialog
-9. ![img](doc/res2/button_to.png) update tilesheet from canvas
-
-
-### Tile saving and color codes
-The tilemap is drawn with color codes for each tile.
-
-The color code is built up as:
-```
-.r = tile_id;
-.g = tile_x;
-.b = tile_y;
-.a = alpha;
-```
-
-`tile_id` is one of the 16 tilesheets.
-
-`tile_x & tile_y` are the position in the tilesheet.
-
-![img](doc/res2/button_save.png) A click on the save tool, opens a new save dialog:
-
-![img](doc/saving_tile_dialog.png)
-
-Here you can:
-- Save the tilemap with its color codes as .png image
-- Save the rendered preview of the tilemap
-- Save the rendered preview of the tilemap in HD, using the **HD MULTIPLYER**
 
 
 ## Display settings
@@ -479,6 +368,8 @@ If **SAVE LAYERS MERGED** is activated, all layers are merged into a single imag
 
 > The gif encoder uses a color palette with max. 256 opaque colors. Color 0 is reserved for transparency.
 > The first 255 different colors in the canvas are used to create the color palette.
+
+![img](doc/res2/button_project.png) Open the [project archive](#project-archive) dialog
 
 ## Import
 ![img](doc/res4/button_import.png)
@@ -688,3 +579,139 @@ So have a look at the [Frames](#frames) section.
 
 ![img](doc/res2/button_save.png)
 Layers may be merged down in the save dialog
+
+
+## Tiles
+![img](doc/res4/button_tile.png)
+
+Click on the tile tool to start the tiling mode.
+
+![img](doc/tiling_mode.png)
+
+The canvas now renders a tile for each pixel unit.
+
+> (WebApp) limitation:
+> The tile mode creates large textures on the GPU.
+> If the maximal size is reached on your device, the canvas will be rendered with the maximal GPU texture size and your tilemap will get pixelated.
+> If thats the case, a warning will be print as tooltip
+> Use a smaller canvas size or reduce the layers to avoid this.
+
+### Tile Palette
+
+The palette now shows tilesheets and some additional tools.
+
+You can zoom and move the tilesheet like the canvas.
+
+Tools:
+- ![img](doc/res2/toolbar_color_bg.png) Select to clear tiles
+- ![img](doc/res2/button_prev.png) Previous tilesheet
+- ![img](doc/res2/button_next.png) Next tilesheet
+- ![img](doc/res2/button_camera.png) Reset the tilesheet camera
+- ![img](doc/res2/button_tile.png) Render the tiles in the canvas
+- ![img](doc/res2/button_iso.png) Render in [isometric mode](#isometric-mode)
+
+> Pixelc supports up to 16 different tilesheets!
+
+Hold down on the palette to open the tile dialog:
+
+![img](doc/tile_dialog.png)
+
+Here you can:
+- Reset the size of a single tile for x and y (`8, 16, 32 pixel`)
+  - For all tilesheets.
+- ![img](doc/res2/button_to.png) Copy the tilesheet into the canvas
+  - Good for editing the tilesheet
+- ![img](doc/res2/button_from.png) Update the current tilesheet with the canvas image
+  - The image size must be a multiple of 32
+    - will be filled with transparency to match `%32==0`
+
+### Isometric Mode
+![img](doc/res4/button_iso.png)
+
+If the isometric mode is active, the canvas renders the tiles with isometric overlapping:
+
+![img](doc/tiles_isometric.png)
+
+In this example, the tilesize is set as 32x32 pixel
+> Use layers to define the z-height of your tilemap.
+> Layer 1 is the bottom floor.
+
+In the isometric mode, selections are disabled. Turn it off to use them.
+
+#### Rotating the Isometric Tilemap
+Want to view your 3D-Tilemap from a different orientation?
+1. ![img](doc/res2/button_size.png) Click on the size tool to open the [size](#size) dialog
+2. ![img](doc/res2/button_rotate_left.png) Rotate the image
+3. Enjoy your new view:
+
+![img](doc/tiles_isometric_rotate.png)
+
+
+### How to edit a tilesheet
+1. ![img](doc/res2/button_tab.png)  use a new image tab
+2. ![img](doc/res2/button_tile.png) start the tiling mode
+3. hold down on the tile palette to open the tile dialog
+4. ![img](doc/res2/button_from.png)  copy the current tilesheet into the canvas
+5. redraw tiles, change the size, draw new tiles, ....
+6. ![img](doc/res2/button_tile.png) start the tiling mode again
+7. (optional) select a different tilesheet to update
+8. hold down on the tile palette again to open the tile dialog
+9. ![img](doc/res2/button_to.png) update tilesheet from canvas
+
+### How to load a tilesheet from a file
+1. Download a tilesheet file as png (for example from [itch](https://itch.io/game-assets/tag-tileset))
+2. ![img](doc/res2/button_tab.png) use a new image tab
+3. ![img](doc/res2/button_import.png) click on the import button
+4. ![img](doc/res2/button_from.png)  in the import dialog, load the image and press "copy into canvas"
+5. (optional) crop the image out to the tiles you want with a [selection](#selection)
+6. ![img](doc/res2/button_tile.png) start the tiling mode
+7. (optional) select a different tilesheet to update
+8. hold down on the tile palette to open the tile dialog
+9. ![img](doc/res2/button_to.png) update tilesheet from canvas
+
+
+### Tile saving and color codes
+The tilemap is drawn with color codes for each tile.
+
+The color code is built up as:
+```
+.r = tile_id;
+.g = tile_x;
+.b = tile_y;
+.a = alpha;
+```
+
+`tile_id` is one of the 16 tilesheets.
+
+`tile_x & tile_y` are the position in the tilesheet.
+
+![img](doc/res2/button_save.png) A click on the save tool, opens a new save dialog:
+
+![img](doc/saving_tile_dialog.png)
+
+Here you can:
+- Save the tilemap with its color codes as .png image
+- Save the rendered preview of the tilemap
+- Save the rendered preview of the tilemap in HD, using the **HD MULTIPLYER**
+- ![img](doc/res2/button_project.png) Open the [project archive](#project-archive) dialog
+
+## Project Archive
+Open the project dialog within the [Save](#save) dialog.
+
+> ![img](doc/res2/button_save.png) --> ![img](doc/res2/button_project.png)
+
+![img](doc/project_dialog.png)
+
+![img](doc/res2/button_save.png) Save the full project as `.tar` archive file.
+> The CxxDroid Version saves the file as `project_save.tar` in the working directory.
+
+A project archive contains:
+- All 9 tab images
+- All 16 tilesheets
+- A config file, that includes the tab frames and layers and the tile sizes
+
+Like with the [import](#import) dialog, you can also upload a project archive `.tar` to restore it.
+Use the **UPLOAD** button to open the archive file in a file dialog 
+and click on ![img](doc/res2/button_import.png) to reload it.
+
+> To open a `.tar` file manually, use an archive reader like WinRar, 7zip, etc.

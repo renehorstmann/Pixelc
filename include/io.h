@@ -13,6 +13,9 @@ struct Io_Globals {
     
     // defaults to 8
     int hd_multiplyer;
+
+    // for io_project_apply_loaded
+    bool project_applicable;
 };
 extern struct Io_Globals io;
 
@@ -47,6 +50,20 @@ void io_tilemap_save();
 // only saves if tile.active && tile.canvas_active
 // always merges layers
 void io_tilemap_hd_save();
+
+// saves the full project as a .tar archive (as project.tar)
+// includes:
+//      - 9 tab images
+//      - 16 tilemaps
+//      - some_settings as json
+void io_project_save();
+
+// loads a .tar project. call apply_loaded to apply it (see io_project_save)
+// returns and sets io.project_applicable
+bool io_project_load();
+
+// loads the file project.tar (see io_project_save)
+void io_project_apply_loaded();
 
 
 #endif //PIXELC_IO_H

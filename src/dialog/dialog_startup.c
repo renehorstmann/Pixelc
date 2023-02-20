@@ -171,7 +171,7 @@ void dialog_create_startup() {
             16, 16);
     impl->reshow_toggle.rect.sprite.x = 1;
     
-    pos += 10;
+    pos += 5;
     
     dialog.impl_height = pos;
 

@@ -13,6 +13,8 @@
 
 #define MAX_DELTA_TIME 5.0 // seconds
 
+// only for some platforms, see block_for_fps_limit
+#define MAX_FPS 60
 
 struct eWindow_Globals e_window;
 
@@ -50,6 +52,7 @@ static struct {
     e_window_main_loop_fn main_loop_fn;
     void *main_loop_user_data;
     su32 last_time_ms;
+    su32 limit_fps_time_ms;
 
     RegPause reg_pause_e[E_WINDOW_MAX_PAUSE_EVENTS];
     int reg_pause_e_size;
@@ -98,6 +101,15 @@ static void loop() {
     SDL_UnlockMutex(L.run_once_lock);
 
     L.main_loop_fn(L.main_loop_user_data);
+}
+
+static void block_for_fps_limit() {
+    L.limit_fps_time_ms += (1000 / MAX_FPS);
+    int time_diff_ms = L.limit_fps_time_ms - e_window.frame_time_ms;
+    if(time_diff_ms>0) {
+        // SDL_Delay uses ms
+        SDL_Delay(time_diff_ms);
+    }
 }
 
 static void pause_wnd() {
@@ -213,8 +225,8 @@ void e_window_init(const char *title) {
            SDL_WINDOWPOS_UNDEFINED,
            SDL_WINDOWPOS_UNDEFINED,
 //           640, 480,
-//           180*3*16/9, 180*3,
-           180*2, 180*2*16/9,
+           180*3*16/9, 180*3,
+//           180*2, 180*2*16/9,
 //           480, 480*16/9,
            SDL_WINDOW_OPENGL
            | SDL_WINDOW_RESIZABLE
@@ -277,8 +289,12 @@ void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
 #ifdef PLATFORM_EMSCRIPTEN
     emscripten_set_main_loop(loop, 0, true);
 #else
-    while (L.running)
+    while (L.running) {
         loop();
+#if defined(PLATFORM_UNIX) || defined(PLATFORM_CXXDROID)
+        block_for_fps_limit();
+#endif
+    }
 #endif
 
 

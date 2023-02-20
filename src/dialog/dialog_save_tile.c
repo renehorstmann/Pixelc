@@ -29,6 +29,9 @@ typedef struct {
     RoText preview_txt;
     RoSingle preview_btn;
     RoSingle preview_hd_btn;
+
+    RoText project_txt;
+    RoSingle project_btn;
     
     TextInput *textinput;
 } Impl;
@@ -45,6 +48,9 @@ static void kill_fn() {
     ro_text_kill(&impl->preview_txt);
     ro_single_kill(&impl->preview_btn);
     ro_single_kill(&impl->preview_hd_btn);
+
+    ro_text_kill(&impl->project_txt);
+    ro_single_kill(&impl->project_btn);
     
     textinput_kill(&impl->textinput);
     
@@ -86,6 +92,9 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->preview_txt, cam_mat);
     ro_single_render(&impl->preview_btn, cam_mat);
     ro_single_render(&impl->preview_hd_btn, cam_mat);
+
+    ro_text_render(&impl->project_txt, cam_mat);
+    ro_single_render(&impl->project_btn, cam_mat);
 }
 
 
@@ -127,6 +136,14 @@ static bool pointer_event(ePointer_s pointer) {
         // return after hide, hide kills this dialog
         return true;
     }
+
+    if(u_button_clicked(&impl->project_btn.rect, pointer)) {
+        s_log("project btn");
+        dialog_create_project();
+        // return after create, create hides this dialog, which kills it
+        return true;
+    }
+
     return true;
 }
 
@@ -183,8 +200,17 @@ void dialog_create_save_tile() {
     
     impl->preview_hd_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_save_hd.png"));
     impl->preview_hd_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
-    
-    pos += 18;
+
+    pos += 32;
+
+    impl->project_txt = ro_text_new_font55(16);
+    ro_text_set_text(&impl->project_txt, "Full Project:");
+    ro_text_set_color(&impl->project_txt, DIALOG_TEXT_COLOR);
+    impl->project_txt.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos - 2, 1, 2);
+    impl->project_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_project.png"));
+    impl->project_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos, 16, 16);
+
+    pos += 4;
     
     dialog.impl_height = pos;
 

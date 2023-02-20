@@ -189,7 +189,7 @@ void dialog_create_palette() {
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
 
-    int pos = 20;
+    int pos = 18;
     impl->info = ro_text_new_font55(2 * PALETTE_NAME_MAX);
     ro_text_set_color(&impl->info, DIALOG_TEXT_COLOR);
 
@@ -243,7 +243,7 @@ void dialog_create_palette() {
 
     impl->from_canvas_btn = ro_single_new(r_texture_new_file(2, 1, "res/button_from.png"));
     impl->from_canvas_btn.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 20, DIALOG_TOP - pos - 10, 16, 16);
-    pos += 32;
+    pos += 28;
 
     dialog.impl_height = pos;
 

@@ -116,11 +116,13 @@ static void main_loop(void *user_data) {
     // renders the debug gui windows
     e_gui_render();
 
+    // calc full_time before r_render_end_frame, some platforms (like PLATFORM_ANDROID) block there
+    double render_time = s_timer_elapsed(timer);
+    double full_time = load_time + render_time;
+
     // swap buffers
     r_render_end_frame();
 
-    double render_time = s_timer_elapsed(timer);
-    double full_time = load_time + render_time;
 
     e_simple.load_update = sca_min(1, smooth_out_value(e_simple.load_update, load_time / e_window.frame_deltatime));
     e_simple.load_render = sca_min(1, smooth_out_value(e_simple.load_render, render_time / e_window.frame_deltatime));

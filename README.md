@@ -27,6 +27,10 @@ A documentation / tutorial can be found [here / doc.md](doc.md)
 
 Or just use the tooltip tool. 
 
+## Up 'n Downloads
+Nothing in Pixelc is sent to any server and all your art is saved locally on your device!
+Even if the WebApp "downloads" and "uploads" the images, they're just saved offline in your browser.
+
 ## Sponsoring
 You want to support me?
 > Buy Pixelc Premium on [Google Play](https://play.google.com/store/apps/details?id=de.horsimann.pixelcpremium).
@@ -112,14 +116,6 @@ python3 -m http.server --bind localhost  # [port]
 ```
 
 ## Todo
-- save/load project.(zip?)
-  - contains:
-    - all 9 tabs (without history)
-    - all 16 tilemaps
-    - some io settings
-      - layers and frames
-      - display size
-      - ...
 - gif decoder?
 
 ## Author
@@ -136,4 +132,5 @@ René Horstmann
       - not used in Pixelc, but is part of some
     - [sfd](https://github.com/rxi/sfd) for simple file dialogs (MIT License)
 - the .gif encoder [gifenc](https://github.com/lecram/gifenc) is licenced under public domain
+- tar .tar archive handler [microtar](https://https://github.com/rxi/microtar) (MIT License)
 - Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
