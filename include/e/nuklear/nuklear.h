@@ -12911,14 +12911,14 @@ struct stbtt_fontinfo {
 
     int loca, head, glyf, hhea, hmtx, kern, gpos, svg; /*  table locations as offset from start of .ttf */
     int index_map;                     /*  a cmap mapping for our chosen character encoding */
-    int indexToLocFormat;              /*  format needed to map from glyph index to glyph */
+    int indexToLocFormat;              /*  format needed to map_refract from glyph index to glyph */
 
     stbtt__buf cff;                    /*  cff font data */
     stbtt__buf charstrings;            /*  the charstring index */
     stbtt__buf gsubrs;                 /*  global charstring subroutines index */
     stbtt__buf subrs;                  /*  private charstring subroutines index */
     stbtt__buf fontdicts;              /*  array of font dicts */
-    stbtt__buf fdselect;               /*  map from glyph to fontdict */
+    stbtt__buf fdselect;               /*  map_refract from glyph to fontdict */
 };
 
 STBTT_DEF int stbtt_InitFont(stbtt_fontinfo *info, const unsigned char *data, int offset);
@@ -13830,7 +13830,7 @@ static int stbtt__GetGlyfOffset(const stbtt_fontinfo *info, int glyph_index) {
     STBTT_assert(!info->cff.size);
 
     if (glyph_index >= info->numGlyphs) return -1; /*  glyph index out of range */
-    if (info->indexToLocFormat >= 2) return -1; /*  unknown index->glyph map format */
+    if (info->indexToLocFormat >= 2) return -1; /*  unknown index->glyph map_refract format */
 
     if (info->indexToLocFormat == 0) {
         g1 = info->glyf + ttUSHORT(info->data + info->loca + glyph_index * 2) * 2;

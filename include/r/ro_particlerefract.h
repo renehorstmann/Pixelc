@@ -7,7 +7,7 @@
 //
 //// uses 3 textures in total
 //// 1: default texture
-//// 2: refraction map
+//// 2: refraction map_refract
 ////    r: 128+offset for x refraction
 ////    g: 128+offset for y
 ////    b: x_stretch_value + y_stretch_value * 16
@@ -55,8 +55,7 @@ static RoParticleRefract ro_particlerefract_new_invalid() {
 // creates a particle system with refraction enabled and num rParticleRect's
 // this class takes ownership of tex_*_sink (see .owns_*_tex)
 // returns an invalid, for num<=0
-RoParticleRefract ro_particlerefract_new(int num,
-                                         rTexture tex_main_sink, rTexture tex_refraction_sink);
+RoParticleRefract ro_particlerefract_new(int num, rTexture tex_main_sink, rTexture tex_refraction_sink);
 
 
 void ro_particlerefract_kill(RoParticleRefract *self);

@@ -86,7 +86,7 @@
 
         v_tex_coord.xy = (in_uv * tex_coords[gl_VertexID]).xy;
         
-        // glsl: actual_layer = max(0, min(d​ - 1, floor(layer​ + 0.5)) )
+        // glsl: actual_layer = max(0, min(d - 1, floor(layer + 0.5)) )
         vec2 sprite = in_sprite + in_sprite_speed * dt;
         vec2 s_pos = floor(mod(sprite+0.5, sprites));
         s_pos = clamp(s_pos, vec2(0), sprites-1.0);

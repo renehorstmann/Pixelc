@@ -1,9 +1,11 @@
-#ifndef R_RO_BATCHREFRACT_H
-#define R_RO_BATCHREFRACT_H
+#ifndef R_RO_BATCHSTATICREFRACT_H
+#define R_RO_BATCHSTATICREFRACT_H
 
 //
 // class to render multiple rects with a single draw call.
 // its like ro_batch, but with additional reflection / refraction support.
+// renders much faster than the default RoBatchStaticRefract, but the update call is more heavy
+// so good to use it for large static batches, like tilemaps
 //
 //// uses 3 textures in total
 //// 1: default texture
@@ -36,62 +38,63 @@ typedef struct {
     bool owns_tex_refraction;   // if true (default), tex_refraction will be killer by this clasd
 
     struct {
+        struct rRectStatic_s *srects;
         GLuint program;         // shader
         GLuint vao;             // internal vertex array object
         GLuint vbo;             // internal vertex buffer object
     } L;
-} RoBatchRefract;
+} RoBatchStaticRefract;
 
 // returns true if the batch seems to be in a valid state, GL errors ignored
-static bool ro_batchrefract_valid(const RoBatchRefract *self) {
+static bool ro_batchstaticrefract_valid(const RoBatchStaticRefract *self) {
     return self->rects!=NULL && self->num;
 }
 
 // returns a new invalid batch
-static RoBatchRefract ro_batchrefract_new_invalid() {
-    return (RoBatchRefract) {0};
+static RoBatchStaticRefract ro_batchstaticrefract_new_invalid() {
+    return (RoBatchStaticRefract) {0};
 }
 
 // creates a new batch with refraction enabled and num rRect's
 // this class takes ownership of tex_*_sink (see .owns_*_tex)
 // returns an invalid, for num<=0
-RoBatchRefract ro_batchrefract_new(int num, rTexture tex_main_sink, rTexture tex_refraction_sink);
+RoBatchStaticRefract ro_batchstaticrefract_new(int num, rTexture tex_main_sink, rTexture tex_refraction_sink);
 
 
-void ro_batchrefract_kill(RoBatchRefract *self);
+void ro_batchstaticrefract_kill(RoBatchStaticRefract *self);
 
 // updates a subset of the batch into the gpu
-void ro_batchrefract_update_sub(const RoBatchRefract *self, int offset, int size);
+void ro_batchstaticrefract_update_sub(const RoBatchStaticRefract *self, int offset, int size);
 
 // renders a subset of the batch with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
 // if update is true, update is called before rendering
-void ro_batchrefract_render_sub(const RoBatchRefract *self, int num, const mat4 *camera_mat, float scale,
+void ro_batchstaticrefract_render_sub(const RoBatchStaticRefract *self, int num, const mat4 *camera_mat, float scale,
                                 const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
                                 bool update_sub);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
-void ro_batchrefract_set_texture_main(RoBatchRefract *self, rTexture tex_main_sink);
+void ro_batchstaticrefract_set_texture_main(RoBatchStaticRefract *self, rTexture tex_main_sink);
 
 // resets the texture, if .owns_tex_refraction is true, it will delete the old texture
-void ro_batchrefract_set_texture_refraction(RoBatchRefract *self, rTexture tex_refraction_sink);
+void ro_batchstaticrefract_set_texture_refraction(RoBatchStaticRefract *self, rTexture tex_refraction_sink);
 
 // updates the natch into the gpu
-static void ro_batchrefract_update(const RoBatchRefract *self) {
-    ro_batchrefract_update_sub(self, 0, self->num);
+static void ro_batchstaticrefract_update(const RoBatchStaticRefract *self) {
+    ro_batchstaticrefract_update_sub(self, 0, self->num);
 }
 
 // rensers the batch with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
 // if update is true, update is called before rendering
-static void ro_batchrefract_render(const RoBatchRefract *self, const mat4 *camera_mat, float scale,
+static void ro_batchstaticrefract_render(const RoBatchStaticRefract *self, const mat4 *camera_mat, float scale,
                                    const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer,
                                    bool update) {
-    ro_batchrefract_render_sub(self, self->num, camera_mat, scale,
+    ro_batchstaticrefract_render_sub(self, self->num, camera_mat, scale,
                                opt_view_aabb, opt_framebuffer, update);
 }
 
 
-#endif //R_RO_BATCHREFRACT_H
+#endif //R_RO_BATCHSTATICREFRACT_H

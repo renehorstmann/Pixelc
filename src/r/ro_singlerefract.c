@@ -9,9 +9,7 @@
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 
-RoSingleRefract ro_singlerefract_new(
-        const float *scale_ptr,
-        rTexture tex_main_sink, rTexture tex_refraction_sink) {
+RoSingleRefract ro_singlerefract_new(rTexture tex_main_sink, rTexture tex_refraction_sink) {
 
     r_render_error_check("ro_singlerefract_newBEGIN");
     RoSingleRefract self;
@@ -82,7 +80,7 @@ void ro_singlerefract_render(const RoSingleRefract *self, const mat4 *camera_mat
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_main.tex);
 
-    glUniform1i(glGetUniformLocation(self->L.program, "tex_refract"), 1);
+    glUniform1i(glGetUniformLocation(self->L.program, "tex_refraction"), 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_refraction.tex);
 

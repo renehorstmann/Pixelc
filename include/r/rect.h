@@ -10,7 +10,7 @@
 // Basic rect for rendering
 typedef struct {
     mat4 pose;      // 3d pose for the rect position (see u/pose.h)
-    mat4 uv;        // 3d pose for the uv texture map (see u/pose.h)
+    mat4 uv;        // 3d pose for the uv texture map_refract (see u/pose.h)
     vec4 color;     // additional color (texture_color * color)
     vec2 sprite;    // position of the sprite in the grid
 } rRect_s;
@@ -44,6 +44,14 @@ _Static_assert(offsetof(rParticleRect_s, sprite_speed)
                - offsetof(rParticleRect_s, sprite)
                == 2 * sizeof(float),
                "sprite_speed must not be padded");
+
+// for internal use...
+struct rRectStatic_s {
+    vec2 pos;
+    vec2 uv;
+    vec4 color;
+    vec2 sprite;
+};
 
 
 // creates a new rect with:

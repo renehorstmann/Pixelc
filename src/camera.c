@@ -80,8 +80,7 @@ void camera_update() {
 
 
 void camera_set_pos(float x, float y) {
-    vec2 pos = camera_pos_on_real_pixel(x, y);
-    u_pose_set_xy(&camera.matrices.v, pos.x, pos.y);
+    u_pose_set_xy(&camera.matrices.v, x, y);
 }
 
 void camera_set_zoom(float size) {

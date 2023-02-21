@@ -7,7 +7,7 @@
 //
 //// uses 3 textures in total
 //// 1: default texture
-//// 2: refraction map
+//// 2: refraction map_refract
 ////    r: 128+offset for x refraction
 ////    g: 128+offset for y
 ////    b: x_stretch_value + y_stretch_value * 16
@@ -44,7 +44,6 @@ typedef struct {
 // creates a single with refraction enabled for one rRect
 // this class takes ownership of tex_sink (see .owns_tex)
 RoSingleRefract ro_singlerefract_new(
-        const float *scale_ptr,
         rTexture tex_main_sink, rTexture tex_refraction_sink);
 
 void ro_singlerefract_kill(RoSingleRefract *self);
