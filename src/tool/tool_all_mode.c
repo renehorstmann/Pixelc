@@ -135,6 +135,15 @@ Tool *tool_new_mode_replace() {
                     BRUSH_MODE_REPLACE);
 }
 
+Tool *tool_new_mode_outline() {
+    return mode_new("outline",
+                    "Creates an outline\n"
+                    "on the clicked\n"
+                    "color (background)",
+                    "res/button_outline.png",
+                    BRUSH_MODE_OUTLINE);
+}
+
 //
 // pipette
 //

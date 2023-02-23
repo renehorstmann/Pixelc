@@ -302,7 +302,8 @@ void toolbar_init() {
     add_tool(tool_new_mode_fill());
     add_tool(tool_new_mode_fill8());
     add_tool(tool_new_mode_replace());
-    
+    add_tool(tool_new_mode_outline());
+
     add_tool(tool_new_kernel());
 
     for(int i=0; i<TOOL_FRAMES_SELECT_NUM; i++) {

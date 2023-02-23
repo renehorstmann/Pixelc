@@ -116,6 +116,18 @@ Good to replace thin lines.
 ![img](doc/res4/button_replace.png)
 
 Replaces the touched color.
+
+### Outline
+![img](doc/res4/button_outline.png)
+
+Creates an outline with the pressed color.
+Uses the kernel to determine if a pixel belongs to the outline.
+Functions like the "opening/closing" computer vision algorithm.
+
+> A 1x1 kernel will be replaced by a 3x3 "+" kernel
+
+![img](doc/mode_outline.png)
+
 ### None
 ![img](doc/res4/button_cross.png)
 

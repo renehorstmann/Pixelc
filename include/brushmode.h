@@ -39,4 +39,6 @@ bool brushmode_fill(ePointer_s pointer, bool mode8);
 
 bool brushmode_replace(ePointer_s pointer);
 
+bool brushmode_outline(ePointer_s pointer);
+
 #endif //PIXELC_BRUSHMODE_H

@@ -138,6 +138,8 @@ Tool *tool_new_mode_replace();
 
 Tool *tool_new_mode_pipette();
 
+Tool *tool_new_mode_outline();
+
 Tool *tool_new_layer_select(int pos);
 
 Tool *tool_new_layer_blend();
