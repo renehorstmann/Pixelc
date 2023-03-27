@@ -19,6 +19,10 @@
 #define E_POINTER_BUTTON_RIGHT -2
 #define E_POINTER_BUTTON_NUM 3
 
+
+// seconds of no touch updates to reset em
+#define E_INPUT_DEFAULT_TOUCH_RESET_TIME 5.0
+
 // Keyboard state
 typedef struct {
     bool up, left, down, right;
@@ -57,6 +61,11 @@ struct eInput_Globals {
     bool init;
     bool is_touch;
 
+    // defaults to E_INPUT_DEFAULT_TOUCH_RESET_TIME
+    // if nothing happens in that time, all pointers are set up
+    // sometimes UP is not coming...
+    float reset_touch_time;
+
     // acceleration sensor (mobile)
     bool accel_active;
     vec3 accel;
@@ -72,7 +81,10 @@ void e_input_init();
 void e_input_kill();
 
 // runs the sdl event loop
-void e_input_update();
+void e_input_update(float dt);
+
+// will emit UP for all pointer and restarts counting
+void e_input_reset_touch();
 
 // registers a callback for mouse and touch
 void e_input_register_pointer_event(ePointerEventFn event, void *user_data);

@@ -11,7 +11,6 @@
 #include "terminalcolor.h"
 
 
-
 /**
  * Example:
  * bool v[5] = {1.1, 2.2, 3.3, 4.4, 5.5};
@@ -21,28 +20,28 @@
  */
 static size_t bvecN_snprint(char *str, size_t size, const bool *v, int n) {
     setlocale(LC_ALL, "C");
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = 0;
     used += snprintf(str, size, "(bool[%i]) { ", n);
-    for(int i=0; i<n; i++) {
-        used += snprintf(!str? NULL : str+used, !size? 0 : size - used,
-                         "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i<n-1? ", " : "");
+    for (int i = 0; i < n; i++) {
+        used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
+                         "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i < n - 1 ? ", " : "");
     }
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, " }");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }");
     return used;
 }
 
 /** Calls bvecN_snprint and adds a newline */
 static size_t bvecN_snprintln(char *str, size_t size, const bool *v, int n) {
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = bvecN_snprint(str, size, v, n);
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, "\n");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
 
@@ -62,8 +61,8 @@ static size_t bvecN_fprint(FILE *stream, const bool *v, int n) {
     used += fprintf(stream, M_TERMINALCOLOR_CYAN);
 #endif
     used += fprintf(stream, "{ ");
-    for(int i=0; i<n; i++) {
-        used += fprintf(stream,"%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i<n-1? ", " : "");
+    for (int i = 0; i < n; i++) {
+        used += fprintf(stream, "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i < n - 1 ? ", " : "");
     }
     used += fprintf(stream, " }");
 #ifndef M_NO_PRINT_COLOR

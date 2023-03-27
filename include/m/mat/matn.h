@@ -25,29 +25,25 @@ do { \
 
 /** dst = v / 255 */
 static void matN_cast_from_uchar_1(float *dst_mat, const unsigned char *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (float) mat[i] / (float) 255;
 }
 
 
-
-
-
-
 /** a == b */
 static bool matN_cmp(const float *a, const float *b, int n) {
-    return memcmp(a, b, (n*n) * sizeof(float)) == 0;
+    return memcmp(a, b, (n * n) * sizeof(float)) == 0;
 }
 
 /** dst = v */
 static void matN_copy(float *dst, const float *v, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = v[i];
 }
 
 /** dst = s */
 static void matN_set(float *dst, float s, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = s;
 }
 

@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // SHRT_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define SSCA_MAX SHRT_MAX

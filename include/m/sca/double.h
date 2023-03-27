@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <float.h>  // for DBL_MAX, ...
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define DSCA_MAX DBL_MAX
@@ -172,9 +173,31 @@ static double dsca_step(double x, double edge) {
 
 /** dst = x < edge1 ? 0 : (x > edge2 ? 1 : x * x * (3 - 2 * x)) Hermite polynomials */
 static double dsca_smoothstep(double x, double edge1, double edge2) {
-    x = dsca_clamp((x-edge1) / (edge2-edge1), 0.0, 1.0);
+    x = dsca_clamp((x - edge1) / (edge2 - edge1), 0.0, 1.0);
     return x * x * (3.0 - 2.0 * x);
 }
+
+// dst = sin(x*2pi)
+static double dsca_signal_wave(double x) {
+    return dsca_sin(x * 2.0 * DSCA_PI);
+}
+
+// dst = linear up and down signal, x: [0:1] -> dst [-1:1]
+static double dsca_signal_ramp(double x) {
+    x = dsca_mod(x + 0.75f, 1.0);
+    return 4.0 * dsca_abs(x - 0.5f) - 1.0;
+}
+
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+static double dsca_signal_saw(double x) {
+    return 2.0 * dsca_mod(x + 0.5, 1.0) - 1.0;
+}
+
+// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
+static double dsca_signal_block(double x) {
+    return 2.0 * (dsca_mod(x, 1.0) > 0.5) - 1.0;
+}
+
 
 /** dst = isnan(x) */
 static bool dsca_isnan(double x) {

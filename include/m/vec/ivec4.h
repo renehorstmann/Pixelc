@@ -71,9 +71,7 @@ static ivec4 ivec4_set(int s) {
 }
 
 /** dst = v0, v1, ... */
-static ivec4 ivec4_new(int v0, int v1
-         , int v2
-         , int v3
+static ivec4 ivec4_new(int v0, int v1, int v2, int v3
 ) {
     ivec4 self;
     self.v0 = v0;
@@ -186,23 +184,19 @@ static ivec4 ivec4_div(ivec4 a, int b) {
     return res;
 }
 
+/** dst = a + b * c */
+static ivec4 ivec4_add_scaled_vec(ivec4 a, ivec4 b, ivec4 c) {
+    ivec4 res;
+    ivecN_add_scaled_vec(res.v, a.v, b.v, c.v, 4);
+    return res;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** dst = a + b * c */
+static ivec4 ivec4_add_scaled(ivec4 a, ivec4 b, int c) {
+    ivec4 res;
+    ivecN_add_scaled(res.v, a.v, b.v, c, 4);
+    return res;
+}
 
 
 /** dst = pow(x, y) */
@@ -261,8 +255,6 @@ static ivec4 ivec4_sqrt(ivec4 x) {
 }
 
 
-
-
 /** dst = abs(x) */
 static ivec4 ivec4_abs(ivec4 x) {
     ivec4 res;
@@ -277,12 +269,6 @@ static ivec4 ivec4_sign(ivec4 x) {
     ivecN_sign(res.v, x.v, 4);
     return res;
 }
-
-
-
-
-
-
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -384,10 +370,6 @@ static ivec4 ivec4_step_vec(ivec4 x, ivec4 edge) {
 }
 
 
-
-
-
-
 /** returns v[0] + v[1] + ... + v[n-1] */
 static int ivec4_sum(ivec4 v) {
     return ivecN_sum(v.v, 4);
@@ -432,10 +414,6 @@ static int ivec4_norm_inf(ivec4 v) {
 }
 
 
-
-
-
-
 /** returns length of a vector, see ivecN_norm. Just here to match glsl */
 static int ivec4_length(ivec4 v) {
     return ivecN_length(v.v, 4);
@@ -452,12 +430,6 @@ static int ivec4_distance(ivec4 a, ivec4 b) {
 static int ivec4_sqr_distance(ivec4 a, ivec4 b) {
     return ivecN_sqr_distance(a.v, b.v, 4);
 }
-
-
-
-
-
-
 
 
 /** dst = a < b */
@@ -554,21 +526,6 @@ static bvec4 ivec4_not_equal_vec(ivec4 a, ivec4 b) {
     ivecN_not_equal_vec(res.v, a.v, b.v, 4);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif //M_VEC_IVEC4_H

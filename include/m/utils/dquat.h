@@ -209,8 +209,8 @@ static dvec3 dquat_pose_transform_pos(dvec3 a_pos, dvec4 a_quat, dvec3 pos_b) {
 
 /** returns pose transform of a @ b */
 static void dquat_pose_transform_pose(dvec3 *out_pos, dvec4 *out_quat,
-                                     dvec3 a_pos, dvec4 a_quat,
-                                     dvec3 b_pos, dvec4 b_quat) {
+                                      dvec3 a_pos, dvec4 a_quat,
+                                      dvec3 b_pos, dvec4 b_quat) {
     *out_pos = dquat_pose_transform_pos(a_pos, a_quat, b_pos);
     *out_quat = dquat_mul(a_quat, b_quat);
 }

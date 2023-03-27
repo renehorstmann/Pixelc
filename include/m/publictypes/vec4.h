@@ -4,15 +4,9 @@
 #include <assert.h>     // for static_assert
 
 
-
-
-
-
-
-
-
 #include "vec2.h"
 #include "vec3.h"
+
 typedef union {
     float v[4];
     struct {
@@ -55,8 +49,6 @@ typedef union {
         };
     };
 } m_vec4;
-
-
 
 
 static_assert(sizeof(m_vec4) == sizeof(float) * 4, "[Mathc] wrong expected size");

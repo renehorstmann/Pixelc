@@ -66,6 +66,9 @@ void ro_batchstaticrefract_kill(RoBatchStaticRefract *self);
 // updates a subset of the batch into the gpu
 void ro_batchstaticrefract_update_sub(const RoBatchStaticRefract *self, int offset, int size);
 
+// updates only color and sprite values (faster, because the static pos and uv positions are not recomputed on the cpu)
+void ro_batchstaticrefract_update_color_sprite_sub(const RoBatchStaticRefract *self, int offset, int size);
+
 // renders a subset of the batch with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
@@ -83,6 +86,11 @@ void ro_batchstaticrefract_set_texture_refraction(RoBatchStaticRefract *self, rT
 // updates the natch into the gpu
 static void ro_batchstaticrefract_update(const RoBatchStaticRefract *self) {
     ro_batchstaticrefract_update_sub(self, 0, self->num);
+}
+// updates the natch into the gpu
+// updates only color and sprite values (faster, because the static pos and uv positions are not recomputed on the cpu)
+static void ro_batchstaticrefract_update_color_sprite(const RoBatchStaticRefract *self) {
+    ro_batchstaticrefract_update_color_sprite_sub(self, 0, self->num);
 }
 
 // rensers the batch with refraction enabled

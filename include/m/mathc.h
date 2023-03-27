@@ -1,6 +1,8 @@
 #ifndef M_M_H
 #define M_M_H
 
+#include "common.h"
+
 #include "bool.h"
 #include "float.h"
 #include "double.h"

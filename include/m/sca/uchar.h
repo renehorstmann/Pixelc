@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // UCHAR_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define UCSCA_MAX UCHAR_MAX

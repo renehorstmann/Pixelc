@@ -43,8 +43,6 @@ static dvec4 dvec4_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
 /** a == b */
 static bool dvec4_cmp(dvec4 a, dvec4 b) {
     return dvecN_cmp(a.v, b.v, 4);
@@ -59,9 +57,7 @@ static dvec4 dvec4_set(double s) {
 }
 
 /** dst = v0, v1, ... */
-static dvec4 dvec4_new(double v0, double v1
-         , double v2
-         , double v3
+static dvec4 dvec4_new(double v0, double v1, double v2, double v3
 ) {
     dvec4 self;
     self.v0 = v0;
@@ -171,6 +167,20 @@ static dvec4 dvec4_div_vec(dvec4 a, dvec4 b) {
 static dvec4 dvec4_div(dvec4 a, double b) {
     dvec4 res;
     dvecN_div(res.v, a.v, b, 4);
+    return res;
+}
+
+/** dst = a + b * c */
+static dvec4 dvec4_add_scaled_vec(dvec4 a, dvec4 b, dvec4 c) {
+    dvec4 res;
+    dvecN_add_scaled_vec(res.v, a.v, b.v, c.v, 4);
+    return res;
+}
+
+/** dst = a + b * c */
+static dvec4 dvec4_add_scaled(dvec4 a, dvec4 b, double c) {
+    dvec4 res;
+    dvecN_add_scaled(res.v, a.v, b.v, c, 4);
     return res;
 }
 
@@ -522,6 +532,13 @@ static dvec4 dvec4_normalize_unsafe(dvec4 v) {
 static dvec4 dvec4_normalize(dvec4 v) {
     dvec4 res;
     dvecN_normalize(res.v, v.v, 4);
+    return res;
+}
+
+/** dst = normalize(cross(a, b)) */
+static dvec4 dvec4_cross_normalized(dvec4 a, dvec4 b) {
+    dvec4 res;
+    dvecN_cross_normalized(res.v, a.v, b.v, 4);
     return res;
 }
 

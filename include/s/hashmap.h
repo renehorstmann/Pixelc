@@ -142,7 +142,7 @@ static void S_NAME_CONCAT2(FN_NAME, _kill)(CLASS *self) {
     // valid
     if(S_NAME_CONCAT2(FN_NAME, _valid)(*self)) {
         for(int i=0; i<self->size; i++) {
-            // first item in hash map_refract array
+            // first item in hash map array
             ITEM *item = self->map[i];
             while(item) {
                 ITEM *next = item->next;
@@ -161,7 +161,7 @@ static TYPE *S_NAME_CONCAT2(FN_NAME, _get)(CLASS *self, KEY key) {
     // key hash
     su32 hash = KEY_HASH_FN(key) % self->size;
     
-    // first item in hash map_refract array
+    // first item in hash map array
     ITEM **item = &self->map[hash];
     
     // if item is available, get the right item in the linked list
@@ -187,7 +187,7 @@ void S_NAME_CONCAT2(FN_NAME, _remove)(CLASS *self, KEY key) {
     // key hash
     su32 hash = KEY_HASH_FN(key) % self->size;
 
-    // first item in hash map_refract array
+    // first item in hash map array
     ITEM **item = &self->map[hash];
 
     // if item is available, get the right item in the linked list
@@ -227,7 +227,7 @@ ITEM *S_NAME_CONCAT2(FN_NAME, _iter_next)(ITER *self) {
         return item;
     }
     
-    // find next item in the map_refract array
+    // find next item in the map array
     do {
         self->map_index++;
         if(self->map_index >= self->hashmap->size) {

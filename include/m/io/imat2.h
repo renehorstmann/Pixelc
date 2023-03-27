@@ -9,6 +9,24 @@
 #include "../types/imat2.h"
 #include "terminalcolor.h"
 
+#define IMAT2_PRINT_FORMAT "(imat2) {{"\
+ "\n%12" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define IMAT2_PRINT_FORMAT_COLORED "(imat2)"\
+ M_TERMINALCOLOR_CYAN" {{"\
+ "\n%12" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER" }}"\
+ M_TERMINALCOLOR_RESET
+
+#define IMAT2_PRINT_FORMAT_LINE "(imat2) {{"\
+ "%" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER\
+ ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define IMAT2_PRINT_FORMAT_VALUES \
+ "%" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER\
+ ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER
+
 
 /**
  * Prints the imat2 in a single line
@@ -54,10 +72,10 @@ static size_t imat2_snprintln_line(char *str, size_t size, imat2 m) {
  * imat2 m = imat2_eye();
  * char buf[128];
  * imat2_snprint(buf, sizeof buf, m);
- * // (imat2) {
+ * // (imat2) {{
  * //        1.0,          0.0,
  * //        0.0,          1.0,
- * //        ...,          ... }
+ * //        ...,          ... }}
  */
 static size_t imat2_snprint(char *str, size_t size, imat2 m) {
     setlocale(LC_ALL, "C");

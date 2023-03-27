@@ -10,6 +10,17 @@
 #include "terminalcolor.h"
 
 
+#define IVEC4_PRINT_FORMAT "(ivec4) {{  %" ISCA_PRINT_FORMAT_SPECIFIER \
+ ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER " }}"
+
+#define IVEC4_PRINT_FORMAT_COLORED "(ivec4)" \
+ M_TERMINALCOLOR_CYAN " {{  %" ISCA_PRINT_FORMAT_SPECIFIER \
+ ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER " }}"\
+ M_TERMINALCOLOR_RESET
+
+#define IVEC4_PRINT_FORMAT_VALUES "%" ISCA_PRINT_FORMAT_SPECIFIER \
+ ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER ", %" ISCA_PRINT_FORMAT_SPECIFIER
+
 /**
  * Example:
  * ivec4 v = ivec4_unit_x();
@@ -19,28 +30,28 @@
  */
 static size_t ivec4_snprint(char *str, size_t size, ivec4 v) {
     setlocale(LC_ALL, "C");
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = 0;
     used += snprintf(str, size, "(ivec4) {{ ");
-    for(int i=0; i<4; i++) {
-        used += snprintf(!str? NULL : str+used, !size? 0 : size - used,
-                         "%" ISCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<4-1? ", " : "");
+    for (int i = 0; i < 4; i++) {
+        used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
+                         "%" ISCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 4 - 1 ? ", " : "");
     }
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, " }}");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
 }
 
 /** Calls ivec4_snprint and adds a newline */
 static size_t ivec4_snprintln(char *str, size_t size, ivec4 v) {
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = ivec4_snprint(str, size, v);
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, "\n");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
 
@@ -60,8 +71,8 @@ static size_t ivec4_fprint(FILE *stream, ivec4 v) {
     used += fprintf(stream, M_TERMINALCOLOR_CYAN);
 #endif
     used += fprintf(stream, "{{ ");
-    for(int i=0; i<4; i++) {
-        used += fprintf(stream,"%" ISCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<4-1? ", " : "");
+    for (int i = 0; i < 4; i++) {
+        used += fprintf(stream, "%" ISCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 4 - 1 ? ", " : "");
     }
     used += fprintf(stream, " }}");
 #ifndef M_NO_PRINT_COLOR

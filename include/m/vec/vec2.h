@@ -43,8 +43,6 @@ static vec2 vec2_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
 /** a == b */
 static bool vec2_cmp(vec2 a, vec2 b) {
     return vecN_cmp(a.v, b.v, 2);
@@ -81,10 +79,6 @@ static vec2 vec2_unit_y() {
     vecN_unit_y(res.v, 2);
     return res;
 }
-
-
-
-
 
 
 /** dst = -v */
@@ -155,6 +149,20 @@ static vec2 vec2_div_vec(vec2 a, vec2 b) {
 static vec2 vec2_div(vec2 a, float b) {
     vec2 res;
     vecN_div(res.v, a.v, b, 2);
+    return res;
+}
+
+/** dst = a + b * c */
+static vec2 vec2_add_scaled_vec(vec2 a, vec2 b, vec2 c) {
+    vec2 res;
+    vecN_add_scaled_vec(res.v, a.v, b.v, c.v, 2);
+    return res;
+}
+
+/** dst = a + b * c */
+static vec2 vec2_add_scaled(vec2 a, vec2 b, float c) {
+    vec2 res;
+    vecN_add_scaled(res.v, a.v, b.v, c, 2);
     return res;
 }
 
@@ -506,6 +514,13 @@ static vec2 vec2_normalize_unsafe(vec2 v) {
 static vec2 vec2_normalize(vec2 v) {
     vec2 res;
     vecN_normalize(res.v, v.v, 2);
+    return res;
+}
+
+/** dst = normalize(cross(a, b)) */
+static vec2 vec2_cross_normalized(vec2 a, vec2 b) {
+    vec2 res;
+    vecN_cross_normalized(res.v, a.v, b.v, 2);
     return res;
 }
 

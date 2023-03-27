@@ -20,9 +20,10 @@ void e_gui_handle_sdl_event_(SDL_Event *event);
 void e_gui_input_end_();
 
 typedef struct {
-    SDL_FingerID id;
-    bool active;
-} TouchID;
+    int pointer_id;
+    SDL_FingerID finger_id;
+    vec4 pos;
+} Touch;
 
 typedef struct {
     ePointerEventFn cb;
@@ -59,8 +60,10 @@ typedef struct {
 
 
 static struct {
-    TouchID touch_ids[E_MAX_TOUCH_IDS];
-    int touch_ids_size;
+    Touch touchs[E_MAX_TOUCH_IDS];
+    int touchs_size;
+
+    float last_touched_time;
     
     bool mouse_pressed[E_POINTER_BUTTON_NUM];
 
@@ -92,60 +95,6 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
     return res;
 }
 
-static ePointer_s pointer_finger(enum ePointerAction action, float x, float y, SDL_FingerID finger_id) {
-
-    // check finger ids to cast to pointer id
-    int id = -1;
-    for (int i = 0; i < L.touch_ids_size; i++) {
-        if (L.touch_ids[i].id == finger_id) {
-            id = i;
-            break;
-        }
-    }
-    if (id < 0) {
-        if (L.touch_ids_size >= E_MAX_TOUCH_IDS) {
-            s_log_warn("e_input_update: to many touch ids, reset to 0!");
-            L.touch_ids_size = 0;
-        }
-
-        L.touch_ids[L.touch_ids_size].id = finger_id;
-        L.touch_ids[L.touch_ids_size].active = true;
-        id = L.touch_ids_size++;
-
-        if (action == E_POINTER_MOVE) {
-            action = E_POINTER_DOWN;
-            s_log_warn("e_input_update: touch got new id but action_pressed==move");
-        }
-        if (action == E_POINTER_UP) {
-            s_log_error("e_input_update: touch got up but unknown id");
-            id--;
-            L.touch_ids_size--;
-        }
-    }
-
-    if (action == E_POINTER_UP) {
-        L.touch_ids[id].active = false;
-        if (id + 1 >= L.touch_ids_size) {
-            while (L.touch_ids_size > 0
-                   && !L.touch_ids[L.touch_ids_size - 1].active) {
-
-                L.touch_ids_size--;
-            }
-        }
-    }
-
-
-    ePointer_s res;
-    res.action = action;
-    res.id = id;
-
-    res.pos.x = 2.0f * x - 1.0f;
-    res.pos.y = 1.0f - 2.0f * y;
-    res.pos.z = 0;
-    res.pos.w = 1;
-
-    return res;
-}
 
 static void emit_pointer_events(ePointer_s action) {
     if(action.id == 0)
@@ -179,21 +128,92 @@ static void emit_wheel_events(bool up) {
         array.array[i].cb(L.current_pointer_0.pos, up, array.array[i].ud);
 }
 
+
+static bool touch_pointer_id_already_exists(int pointer_id) {
+    for(int i=0; i<L.touchs_size; i++) {
+        if(L.touchs[i].pointer_id == pointer_id)
+            return true;
+    }
+    return false;
+}
+
 static void input_handle_pointer_touch(SDL_Event *event) {
+    float x = event->tfinger.x;
+    float y = event->tfinger.y;
+    SDL_FingerID finger_id = event->tfinger.fingerId;
+    enum ePointerAction action;
     switch (event->type) {
         case SDL_FINGERDOWN:
-            emit_pointer_events(pointer_finger(E_POINTER_DOWN,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
+            action = E_POINTER_DOWN;
             break;
         case SDL_FINGERMOTION:
-            emit_pointer_events(pointer_finger(E_POINTER_MOVE,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
+            action = E_POINTER_MOVE;
             break;
         case SDL_FINGERUP:
-            emit_pointer_events(pointer_finger(E_POINTER_UP,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
+            action = E_POINTER_UP;
             break;
+        default:
+            return;
     }
+
+    L.last_touched_time = 0;
+
+    vec4 pos;
+    pos.x = 2.0f * x - 1.0f;
+    pos.y = 1.0f - 2.0f * y;
+    pos.z = 0;
+    pos.w = 1;
+
+    // check finger ids to cast to touch id
+    int id = -1;
+    for (int i = 0; i < L.touchs_size; i++) {
+        if (L.touchs[i].finger_id == finger_id) {
+            id = i;
+            break;
+        }
+    }
+    if (id < 0) {
+        if(action == E_POINTER_UP) {
+            s_log_warn("got an up without an active touch id, ignoring...");
+            return;
+        }
+        if (L.touchs_size >= E_MAX_TOUCH_IDS) {
+            e_input_reset_touch();
+        }
+
+        // create new id
+        int pointer_id = 0;
+        while(touch_pointer_id_already_exists(pointer_id)) {
+            pointer_id++;
+        }
+
+        id = L.touchs_size++;
+        L.touchs[id].pointer_id = pointer_id;
+        L.touchs[id].finger_id = finger_id;
+
+        if (action == E_POINTER_MOVE) {
+            action = E_POINTER_DOWN;
+            s_log_warn("e_input_update: touch got new id but action_pressed==move");
+        }
+    }
+
+    // update pos
+    L.touchs[id].pos = pos;
+
+    if (action == E_POINTER_UP) {
+        for(int i=id; i<L.touchs_size-1; i++) {
+            L.touchs[i] = L.touchs[i+1];
+        }
+        L.touchs_size--;
+    }
+
+
+    ePointer_s res;
+    res.action = action;
+    res.id = id;
+    res.pos = pos;
+
+    emit_pointer_events(res);
 }
 
 static void input_handle_pointer_mouse(SDL_Event *event) {
@@ -308,6 +328,8 @@ void e_input_init() {
 
     s_assume(e_window.init, "needs an sdl window to get its size");
 
+    e_input.reset_touch_time = E_INPUT_DEFAULT_TOUCH_RESET_TIME;
+
 #ifdef OPTION_GYRO
     int num_sensors = SDL_NumSensors();
     bool accel_opened = false;
@@ -336,7 +358,7 @@ void e_input_kill() {
 }
 
 
-void e_input_update() {
+void e_input_update(float dt) {
     e_input.is_touch = SDL_GetNumTouchDevices() > 0;
 
     e_gui_input_begin_();
@@ -375,6 +397,29 @@ void e_input_update() {
     }
 
     e_gui_input_end_();
+
+    if (e_input.is_touch && L.last_touched_time < e_input.reset_touch_time) {
+        L.last_touched_time += dt;
+        if (L.last_touched_time >= e_input.reset_touch_time) {
+            e_input_reset_touch();
+        }
+    }
+}
+
+
+void e_input_reset_touch() {
+    if(L.touchs_size>0) {
+        s_log_warn("resetting touch pointers");
+    }
+    for(int i=0; i<L.touchs_size; i++) {
+        ePointer_s action = {
+                L.touchs[i].pos,
+                E_POINTER_UP,
+                L.touchs[i].pointer_id
+        };
+        emit_pointer_events(action);
+    }
+    L.touchs_size = 0;
 }
 
 

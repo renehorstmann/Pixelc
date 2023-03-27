@@ -46,6 +46,9 @@ void ro_batchstatic_kill(RoBatchStatic *self);
 // updates a subset of the batch into the gpu
 void ro_batchstatic_update_sub(const RoBatchStatic *self, int offset, int size);
 
+// updates only color and sprite values (faster, because the static pos and uv positions are not recomputed on the cpu)
+void ro_batchstatic_update_color_sprite_sub(const RoBatchStatic *self, int offset, int size);
+
 // renders a subset of the batch
 // if update is true, update is called before rendering
 void ro_batchstatic_render_sub(const RoBatchStatic *self, int num, const mat4 *camera_mat, bool update_sub);
@@ -56,6 +59,11 @@ void ro_batchstatic_set_texture(RoBatchStatic *self, rTexture tex_sink);
 // updates the batch into the gpu
 static void ro_batchstatic_update(const RoBatchStatic *self) {
     ro_batchstatic_update_sub(self, 0, self->num);
+}
+// updates the batch into the gpu
+// updates only color and sprite values (faster, because the static pos and uv positions are not recomputed on the cpu)
+static void ro_batchstatic_update_color_sprite(const RoBatchStatic *self) {
+    ro_batchstatic_update_color_sprite_sub(self, 0, self->num);
 }
 
 // renders the batch

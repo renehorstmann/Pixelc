@@ -201,5 +201,4 @@ static imat2 imat2_inv(imat2 m) {
 }
 
 
-
 #endif //M_MAT_IMAT2_H

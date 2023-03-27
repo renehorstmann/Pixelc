@@ -95,12 +95,6 @@ static ucvec2 ucvec2_unit_y() {
 }
 
 
-
-
-
-
-
-
 /** dst = a + b */
 static ucvec2 ucvec2_add_vec(ucvec2 a, ucvec2 b) {
     ucvec2 res;
@@ -164,23 +158,19 @@ static ucvec2 ucvec2_div(ucvec2 a, unsigned char b) {
     return res;
 }
 
+/** dst = a + b * c */
+static ucvec2 ucvec2_add_scaled_vec(ucvec2 a, ucvec2 b, ucvec2 c) {
+    ucvec2 res;
+    ucvecN_add_scaled_vec(res.v, a.v, b.v, c.v, 2);
+    return res;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** dst = a + b * c */
+static ucvec2 ucvec2_add_scaled(ucvec2 a, ucvec2 b, unsigned char c) {
+    ucvec2 res;
+    ucvecN_add_scaled(res.v, a.v, b.v, c, 2);
+    return res;
+}
 
 
 /** dst = pow(x, y) */
@@ -237,18 +227,6 @@ static ucvec2 ucvec2_sqrt(ucvec2 x) {
     ucvecN_sqrt(res.v, x.v, 2);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -350,10 +328,6 @@ static ucvec2 ucvec2_step_vec(ucvec2 x, ucvec2 edge) {
 }
 
 
-
-
-
-
 /** returns v[0] + v[1] + ... + v[n-1] */
 static unsigned char ucvec2_sum(ucvec2 v) {
     return ucvecN_sum(v.v, 2);
@@ -380,16 +354,6 @@ static unsigned char ucvec2_norm(ucvec2 v) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 /** returns length of a vector, see ucvecN_norm. Just here to match glsl */
 static unsigned char ucvec2_length(ucvec2 v) {
     return ucvecN_length(v.v, 2);
@@ -406,12 +370,6 @@ static unsigned char ucvec2_distance(ucvec2 a, ucvec2 b) {
 static unsigned char ucvec2_sqr_distance(ucvec2 a, ucvec2 b) {
     return ucvecN_sqr_distance(a.v, b.v, 2);
 }
-
-
-
-
-
-
 
 
 /** dst = a < b */
@@ -508,21 +466,6 @@ static bvec2 ucvec2_not_equal_vec(ucvec2 a, ucvec2 b) {
     ucvecN_not_equal_vec(res.v, a.v, b.v, 2);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif //M_VEC_UCVEC2_H

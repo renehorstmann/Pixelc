@@ -171,11 +171,19 @@ const char *e_window_get_title() {
 // public
 //
 
-void e_window_init(const char *title) {
+void e_window_init(const char *title, eWindowStartUpOptions_s *opt_options) {
     s_assume(!e_window.init, "should be called only once");
     e_window.init = true;
 
     s_log("init");
+
+    eWindowStartUpOptions_s options = {
+            360, 640,
+            E_WINDOW_MODE_WINDOW
+    };
+    if(opt_options) {
+        options = *opt_options;
+    }
 
     e_window.allow_pause = true;
 
@@ -224,10 +232,8 @@ void e_window_init(const char *title) {
     e_window.sdl_window = SDL_CreateWindow(title,
            SDL_WINDOWPOS_UNDEFINED,
            SDL_WINDOWPOS_UNDEFINED,
-//           640, 480,
-//           180*3*16/9, 180*3,
-           180*2, 180*2*16/9,
-//           480, 480*16/9,
+           options.window_width,
+           options.window_height,
            SDL_WINDOW_OPENGL
            | SDL_WINDOW_RESIZABLE
 //           | SDL_WINDOW_ALLOW_HIGHDPI
@@ -237,6 +243,8 @@ void e_window_init(const char *title) {
         e_exit_failure();
     }
     SDL_SetWindowMinimumSize(e_window.sdl_window, 1, 1);
+
+    e_window_set_screen_mode(options.screen_mode);
 
 
     // Not necessary, but recommended to create a gl context:

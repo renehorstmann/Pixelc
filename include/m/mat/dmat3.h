@@ -44,9 +44,6 @@ static dmat3 dmat3_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
-
 /** dst = r==c ? 1 : 0 (identity)  */
 static dmat3 dmat3_eye() {
     dmat3 res;

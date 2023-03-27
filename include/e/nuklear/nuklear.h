@@ -4686,7 +4686,7 @@ NK_API int nk_str_len_char(struct nk_str *);
  * ways of doing it and a balance between control and ease of use with memory
  * as well as functionality controlled by flags.
  *
- * This library generally allows three different levels of memory control:
+ * This library generally allows three different levels_finished of memory control:
  * First of is the most basic way of just providing a simple char array with
  * string length. This method is probably the easiest way of handling simple
  * user text input. Main upside is complete control over memory while the biggest
@@ -30496,7 +30496,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args) {
 ///                        both varargs as well as stdio is selected I try to use
 ///                        vsnprintf if not possible I will revert to vsprintf. If
 ///                        varargs but not stdio was defined I will use my own function.
-/// - 2016/09/15 (1.21.2) - Fixed panel `close` behavior for deeper panel levels.
+/// - 2016/09/15 (1.21.2) - Fixed panel `close` behavior for deeper panel levels_finished.
 /// - 2016/09/15 (1.21.1) - Fixed C++ errors and wrong argument to `nk_panel_get_xxxx`.
 /// - 2016/09/13 (1.21.0) - !BREAKING! Fixed nonblocking popup behavior in menu, combo,
 ///                        and contextual which prevented closing in y-direction if
@@ -30562,7 +30562,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args) {
 ///                        to account for key press and release happening in one frame.
 /// - 2016/08/25 (1.10.0) - Added additional nk_edit flag to directly jump to the end on activate.
 /// - 2016/08/17 (1.09.6) - Removed invalid check for value zero in `nk_propertyx`.
-/// - 2016/08/16 (1.09.5) - Fixed ROM mode for deeper levels of popup windows parents.
+/// - 2016/08/16 (1.09.5) - Fixed ROM mode for deeper levels_finished of popup windows parents.
 /// - 2016/08/15 (1.09.4) - Editbox are now still active if enter was pressed with flag
 ///                        `NK_EDIT_SIG_ENTER`. Main reasoning is to be able to keep
 ///                        typing after commiting.

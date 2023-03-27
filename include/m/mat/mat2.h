@@ -43,9 +43,6 @@ static mat2 mat2_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
-
 /** dst = r==c ? 1 : 0 (identity)  */
 static mat2 mat2_eye() {
     mat2 res;
@@ -187,7 +184,6 @@ static mat2 mat2_inv(mat2 m) {
 
     return res;
 }
-
 
 
 #endif //M_MAT_MAT2_H

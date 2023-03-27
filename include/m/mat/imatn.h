@@ -23,41 +23,39 @@ do { \
 } while(0)
 
 
-
-
 /** dst = mat * 255 */
 static void imatN_cast_from_float_1(int *dst_mat, const float *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (int) (mat[i] * 255.0f);
 }
 
 /** dst = mat * 255 */
 static void imatN_cast_from_double_1(int *dst_mat, const double *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (int) (mat[i] * 255.0);
 }
 
 /** dst = mat * 255 */
 static void imatN_cast_from_longdouble_1(int *dst_mat, const long double *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (int) (mat[i] * 255.0);
 }
 
 
 /** a == b */
 static bool imatN_cmp(const int *a, const int *b, int n) {
-    return memcmp(a, b, (n*n) * sizeof(int)) == 0;
+    return memcmp(a, b, (n * n) * sizeof(int)) == 0;
 }
 
 /** dst = v */
 static void imatN_copy(int *dst, const int *v, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = v[i];
 }
 
 /** dst = s */
 static void imatN_set(int *dst, int s, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = s;
 }
 
@@ -140,7 +138,7 @@ static void imatN_transpose(int *dst, const int *m, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void imatN_mul_mat_no_alias(int *restrict dst, const int *restrict a,
-                                  const int *restrict b, int n) {
+                                   const int *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst[c * n + r] = 0;
@@ -161,7 +159,7 @@ static void imatN_mul_mat(int *dst, const int *a, const int *b, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void imatN_mul_vec_no_alias(int *restrict dst_vec, const int *restrict a,
-                                  const int *restrict b, int n) {
+                                   const int *restrict b, int n) {
     for (int r = 0; r < n; r++) {
         dst_vec[r] = 0;
         for (int c = 0; c < n; c++) {
@@ -181,7 +179,7 @@ static void imatN_mul_vec(int *dst_vec, const int *a, const int *b, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void ivecN_mul_mat_no_alias(int *restrict dst_vec, const int *restrict a,
-                                  const int *restrict b, int n) {
+                                   const int *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         dst_vec[c] = 0;
         for (int r = 0; r < n; r++) {

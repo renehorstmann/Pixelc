@@ -189,6 +189,7 @@ static void camera(TextInput *self, ivec2 window_size) {
 TextInput *textinput_new(const char *title, int opt_max_chars) {
     TextInput *self = s_new0(TextInput, 1);
 
+    e_input_reset_touch();
     e_input_set_vip_pointer_event(pointer_event, self);
     e_input_set_vip_key_raw_event(key_raw_event, self);
 

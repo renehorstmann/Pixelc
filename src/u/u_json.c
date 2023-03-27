@@ -213,7 +213,7 @@ static char *eat_string_to_heap(sStr_s *remaining, sAllocator_i a) {
     // must begin with " and end with " (not \")
     *remaining = s_str_eat(*remaining, 1);
     ssize len = 0;
-    while (len < remaining->size && !(remaining->data[len] == '\"' && remaining->data[len - 1] != '\"'))
+    while (len < remaining->size && !(remaining->data[len] == '\"' && remaining->data[len - 1] != '\\'))
         len++;
 
     if (len == remaining->size && remaining->data[len - 1] != '\"') {

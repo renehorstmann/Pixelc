@@ -25,29 +25,25 @@ do { \
 
 /** dst = v / 255 */
 static void dmatN_cast_from_uchar_1(double *dst_mat, const unsigned char *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (double) mat[i] / (double) 255;
 }
 
 
-
-
-
-
 /** a == b */
 static bool dmatN_cmp(const double *a, const double *b, int n) {
-    return memcmp(a, b, (n*n) * sizeof(double)) == 0;
+    return memcmp(a, b, (n * n) * sizeof(double)) == 0;
 }
 
 /** dst = v */
 static void dmatN_copy(double *dst, const double *v, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = v[i];
 }
 
 /** dst = s */
 static void dmatN_set(double *dst, double s, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = s;
 }
 
@@ -130,7 +126,7 @@ static void dmatN_transpose(double *dst, const double *m, int n) {
 
 /** dst = a @ b  (restrict data) */
 static void dmatN_mul_mat_no_alias(double *restrict dst, const double *restrict a,
-                                  const double *restrict b, int n) {
+                                   const double *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst[c * n + r] = 0;
@@ -151,7 +147,7 @@ static void dmatN_mul_mat(double *dst, const double *a, const double *b, int n) 
 
 /** dst = a @ b  (restrict data) */
 static void dmatN_mul_vec_no_alias(double *restrict dst_vec, const double *restrict a,
-                                  const double *restrict b, int n) {
+                                   const double *restrict b, int n) {
     for (int r = 0; r < n; r++) {
         dst_vec[r] = 0;
         for (int c = 0; c < n; c++) {
@@ -171,7 +167,7 @@ static void dmatN_mul_vec(double *dst_vec, const double *a, const double *b, int
 
 /** dst = a @ b  (restrict data) */
 static void dvecN_mul_mat_no_alias(double *restrict dst_vec, const double *restrict a,
-                                  const double *restrict b, int n) {
+                                   const double *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         dst_vec[c] = 0;
         for (int r = 0; r < n; r++) {
@@ -190,7 +186,8 @@ static void dvecN_mul_mat(double *dst_vec, const double *a, const double *b, int
 }
 
 /** block<block_n*block_n> = m<n*n>[col:col+block_n, row:row+block_n] */
-static void dmatN_get_block(double *restrict dst_block, const double *restrict m, int row, int col, int block_n, int n) {
+static void
+dmatN_get_block(double *restrict dst_block, const double *restrict m, int row, int col, int block_n, int n) {
     assert(row >= 0 && row + block_n <= n);
     assert(col >= 0 && col + block_n <= n);
     for (int c = 0; c < block_n; c++) {

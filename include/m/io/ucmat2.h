@@ -9,6 +9,24 @@
 #include "../types/ucmat2.h"
 #include "terminalcolor.h"
 
+#define UCMAT2_PRINT_FORMAT "(ucmat2) {{"\
+ "\n%12" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define UCMAT2_PRINT_FORMAT_COLORED "(ucmat2)"\
+ M_TERMINALCOLOR_CYAN" {{"\
+ "\n%12" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER" }}"\
+ M_TERMINALCOLOR_RESET
+
+#define UCMAT2_PRINT_FORMAT_LINE "(ucmat2) {{"\
+ "%" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER\
+ ", %" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define UCMAT2_PRINT_FORMAT_VALUES \
+ "%" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER\
+ ", %" UCSCA_PRINT_FORMAT_SPECIFIER ", %" UCSCA_PRINT_FORMAT_SPECIFIER
+
 
 /**
  * Prints the ucmat2 in a single line
@@ -54,10 +72,10 @@ static size_t ucmat2_snprintln_line(char *str, size_t size, ucmat2 m) {
  * ucmat2 m = ucmat2_eye();
  * char buf[128];
  * ucmat2_snprint(buf, sizeof buf, m);
- * // (ucmat2) {
+ * // (ucmat2) {{
  * //        1.0,          0.0,
  * //        0.0,          1.0,
- * //        ...,          ... }
+ * //        ...,          ... }}
  */
 static size_t ucmat2_snprint(char *str, size_t size, ucmat2 m) {
     setlocale(LC_ALL, "C");

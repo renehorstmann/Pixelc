@@ -178,7 +178,6 @@ static ivec4 ivec4_mul_mat(ivec4 a, imat4 b) {
 }
 
 
-
 /** returns = determinant mm */
 static int imat4_det(imat4 mm) {
     // from cglm/imat4.h/glm_mat4_det

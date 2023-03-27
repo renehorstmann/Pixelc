@@ -23,41 +23,39 @@ do { \
 } while(0)
 
 
-
-
 /** dst = mat * 255 */
 static void ucmatN_cast_from_float_1(unsigned char *dst_mat, const float *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (unsigned char) (mat[i] * 255.0f);
 }
 
 /** dst = mat * 255 */
 static void ucmatN_cast_from_double_1(unsigned char *dst_mat, const double *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (unsigned char) (mat[i] * 255.0);
 }
 
 /** dst = mat * 255 */
 static void ucmatN_cast_from_longdouble_1(unsigned char *dst_mat, const long double *mat, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst_mat[i] = (unsigned char) (mat[i] * 255.0);
 }
 
 
 /** a == b */
 static bool ucmatN_cmp(const unsigned char *a, const unsigned char *b, int n) {
-    return memcmp(a, b, (n*n) * sizeof(unsigned char)) == 0;
+    return memcmp(a, b, (n * n) * sizeof(unsigned char)) == 0;
 }
 
 /** dst = v */
 static void ucmatN_copy(unsigned char *dst, const unsigned char *v, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = v[i];
 }
 
 /** dst = s */
 static void ucmatN_set(unsigned char *dst, unsigned char s, int n) {
-    for (int i = 0; i < n*n; i++)
+    for (int i = 0; i < n * n; i++)
         dst[i] = s;
 }
 
@@ -140,7 +138,7 @@ static void ucmatN_transpose(unsigned char *dst, const unsigned char *m, int n) 
 
 /** dst = a @ b  (restrict data) */
 static void ucmatN_mul_mat_no_alias(unsigned char *restrict dst, const unsigned char *restrict a,
-                                  const unsigned char *restrict b, int n) {
+                                    const unsigned char *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         for (int r = 0; r < n; r++) {
             dst[c * n + r] = 0;
@@ -161,7 +159,7 @@ static void ucmatN_mul_mat(unsigned char *dst, const unsigned char *a, const uns
 
 /** dst = a @ b  (restrict data) */
 static void ucmatN_mul_vec_no_alias(unsigned char *restrict dst_vec, const unsigned char *restrict a,
-                                  const unsigned char *restrict b, int n) {
+                                    const unsigned char *restrict b, int n) {
     for (int r = 0; r < n; r++) {
         dst_vec[r] = 0;
         for (int c = 0; c < n; c++) {
@@ -181,7 +179,7 @@ static void ucmatN_mul_vec(unsigned char *dst_vec, const unsigned char *a, const
 
 /** dst = a @ b  (restrict data) */
 static void ucvecN_mul_mat_no_alias(unsigned char *restrict dst_vec, const unsigned char *restrict a,
-                                  const unsigned char *restrict b, int n) {
+                                    const unsigned char *restrict b, int n) {
     for (int c = 0; c < n; c++) {
         dst_vec[c] = 0;
         for (int r = 0; r < n; r++) {
@@ -200,7 +198,9 @@ static void ucvecN_mul_mat(unsigned char *dst_vec, const unsigned char *a, const
 }
 
 /** block<block_n*block_n> = m<n*n>[col:col+block_n, row:row+block_n] */
-static void ucmatN_get_block(unsigned char *restrict dst_block, const unsigned char *restrict m, int row, int col, int block_n, int n) {
+static void
+ucmatN_get_block(unsigned char *restrict dst_block, const unsigned char *restrict m, int row, int col, int block_n,
+                 int n) {
     assert(row >= 0 && row + block_n <= n);
     assert(col >= 0 && col + block_n <= n);
     for (int c = 0; c < block_n; c++) {
@@ -211,7 +211,9 @@ static void ucmatN_get_block(unsigned char *restrict dst_block, const unsigned c
 }
 
 /** dst<n*n>[col:col+block_n, row:row+block_n] = block<block_n*block_n> */
-static void ucmatN_set_block(unsigned char *restrict dst, const unsigned char *restrict block, int row, int col, int block_n, int n) {
+static void
+ucmatN_set_block(unsigned char *restrict dst, const unsigned char *restrict block, int row, int col, int block_n,
+                 int n) {
     assert(row >= 0 && row + block_n <= n);
     assert(col >= 0 && col + block_n <= n);
     for (int c = 0; c < block_n; c++) {

@@ -18,6 +18,16 @@ enum e_window_screen_modes {
 #define E_WINDOW_MAX_PAUSE_EVENTS 32
 #define E_WINDOW_MAX_RUN_ONCE_EVENTS 32
 
+
+typedef struct {
+    // only for desktop platforms (and web if embedded and not fullscreen)
+    // defaults to: 360x640
+    int window_width, window_height;
+
+    // defaults fo: E_WINDOW_MODE_WINDOW
+    enum e_window_screen_modes screen_mode;
+} eWindowStartUpOptions_s;
+
 // callback, that will be called every frame
 typedef void (*e_window_main_loop_fn)(void *user_data);
 
@@ -52,7 +62,7 @@ struct eWindow_Globals {
 extern struct eWindow_Globals e_window;
 
 // creates the window and inits SDL and its components
-void e_window_init(const char *title);
+void e_window_init(const char *title, eWindowStartUpOptions_s *opt_options);
 
 void e_window_kill();
 
@@ -63,7 +73,7 @@ void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data);
 // call this function, if the main loop has been set
 void e_window_reset_main_loop(e_window_main_loop_fn main_loop, void *user_data);
 
-// if activate is false, vsync is disables
+// if activate is false, vsync is disabled
 // if activate is true, adaptive-vsync is tried and if not available, normal vsync is applied
 // call this function, if the main loop has been set
 void e_window_set_vsync(bool activate);

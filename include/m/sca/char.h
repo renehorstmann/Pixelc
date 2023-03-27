@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // SCHAR_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define CSCA_MAX SCHAR_MAX

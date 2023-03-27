@@ -10,6 +10,15 @@
 #include "terminalcolor.h"
 
 
+#define BVEC2_PRINT_FORMAT "(bvec2) {{ %" BSCA_PRINT_FORMAT_SPECIFIER ", %" BSCA_PRINT_FORMAT_SPECIFIER " }}"
+
+#define BVEC2_PRINT_FORMAT_COLORED "(bvec2)"\
+ M_TERMINALCOLOR_CYAN " {{ %" BSCA_PRINT_FORMAT_SPECIFIER ", %" BSCA_PRINT_FORMAT_SPECIFIER " }}"\
+ M_TERMINALCOLOR_RESET
+
+#define BVEC2_PRINT_FORMAT_VALUES "%" BSCA_PRINT_FORMAT_SPECIFIER ", %" BSCA_PRINT_FORMAT_SPECIFIER
+
+
 /**
  * Example:
  * bvec2 v = bvec2_unit_x();
@@ -19,28 +28,28 @@
  */
 static size_t bvec2_snprint(char *str, size_t size, bvec2 v) {
     setlocale(LC_ALL, "C");
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = 0;
     used += snprintf(str, size, "(bvec2) {{ ");
-    for(int i=0; i<2; i++) {
-        used += snprintf(!str? NULL : str+used, !size? 0 : size - used,
-                         "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<2-1? ", " : "");
+    for (int i = 0; i < 2; i++) {
+        used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
+                         "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 2 - 1 ? ", " : "");
     }
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, " }}");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
 }
 
 /** Calls bvec2_snprint and adds a newline */
 static size_t bvec2_snprintln(char *str, size_t size, bvec2 v) {
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = bvec2_snprint(str, size, v);
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, "\n");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
 
@@ -60,8 +69,8 @@ static size_t bvec2_fprint(FILE *stream, bvec2 v) {
     used += fprintf(stream, M_TERMINALCOLOR_CYAN);
 #endif
     used += fprintf(stream, "{{ ");
-    for(int i=0; i<2; i++) {
-        used += fprintf(stream,"%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<2-1? ", " : "");
+    for (int i = 0; i < 2; i++) {
+        used += fprintf(stream, "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 2 - 1 ? ", " : "");
     }
     used += fprintf(stream, " }}");
 #ifndef M_NO_PRINT_COLOR

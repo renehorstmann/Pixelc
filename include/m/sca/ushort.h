@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // USHRT_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define USSCA_MAX USHRT_MAX

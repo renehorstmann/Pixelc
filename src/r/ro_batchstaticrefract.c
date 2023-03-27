@@ -128,22 +128,26 @@ void ro_batchstaticrefract_update_sub(const RoBatchStaticRefract *self, int offs
     if(!ro_batchstaticrefract_valid(self))
         return;
 
-    for(int i=0; i<self->num*6; i++) {
-        int r_i = i/6;
-        int v_i = i%6;
-        self->L.srects[i].pos =
-                mat4_mul_vec(self->rects[r_i].pose, VERTICES[v_i]).xy;
-        self->L.srects[i].uv =
-                mat4_mul_vec(self->rects[r_i].uv, TEX_COORDS[v_i]).xy;
-        self->L.srects[i].color = self->rects[r_i].color;
-        self->L.srects[i].sprite = self->rects[r_i].sprite;
+    offset = isca_clamp(offset, 0, self->num - 1);
+    size = isca_clamp(size, 1, self->num);
+
+    for(int idx=0; idx<size; idx++) {
+        int rect = ((idx+offset) % self->num);
+        for(int v=0; v<6; v++) {
+            int i = v + rect * 6;
+            int r_i = i/6;
+            int v_i = i%6;
+            self->L.srects[i].pos =
+                    mat4_mul_vec(self->rects[r_i].pose, VERTICES[v_i]).xy;
+            self->L.srects[i].uv =
+                    mat4_mul_vec(self->rects[r_i].uv, TEX_COORDS[v_i]).xy;
+            self->L.srects[i].color = self->rects[r_i].color;
+            self->L.srects[i].sprite = self->rects[r_i].sprite;
+        }
     }
 
     r_render_error_check("ro_batchstaticrefract_updateBEGIN");
     glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
-
-    offset = isca_clamp(offset, 0, self->num - 1);
-    size = isca_clamp(size, 1, self->num);
 
     if (offset + size > self->num) {
         int to_end = self->num - offset;
@@ -167,6 +171,50 @@ void ro_batchstaticrefract_update_sub(const RoBatchStaticRefract *self, int offs
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     r_render_error_check("ro_batchstaticrefract_update");
+}
+
+void ro_batchstaticrefract_update_color_sprite_sub(const RoBatchStaticRefract *self, int offset, int size) {
+    if(!ro_batchstaticrefract_valid(self))
+        return;
+
+    offset = isca_clamp(offset, 0, self->num - 1);
+    size = isca_clamp(size, 1, self->num);
+
+    for(int idx=0; idx<size; idx++) {
+        int rect = ((idx+offset) % self->num);
+        for(int v=0; v<6; v++) {
+            int i = v + rect * 6;
+            int r_i = i/6;
+            self->L.srects[i].color = self->rects[r_i].color;
+            self->L.srects[i].sprite = self->rects[r_i].sprite;
+        }
+    }
+
+    r_render_error_check("ro_batchstaticrefract_update_color_spriteBEGIN");
+    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
+
+    if (offset + size > self->num) {
+        int to_end = self->num - offset;
+        int from_start = size - to_end;
+        glBufferSubData(GL_ARRAY_BUFFER,
+                        offset * 6 * sizeof(struct rRectStatic_s),
+                        to_end * 6 * sizeof(struct rRectStatic_s),
+                        self->L.srects + offset * 6);
+
+        glBufferSubData(GL_ARRAY_BUFFER,
+                        0,
+                        from_start * 6 *sizeof(struct rRectStatic_s),
+                        self->L.srects);
+    } else {
+        glBufferSubData(GL_ARRAY_BUFFER,
+                        offset * 6 * sizeof(struct rRectStatic_s),
+                        size * 6 * sizeof(struct rRectStatic_s),
+                        self->L.srects + offset * 6);
+
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    r_render_error_check("ro_batchstaticrefract_update_color_sprite");
 }
 
 

@@ -9,6 +9,24 @@
 #include "../types/dmat2.h"
 #include "terminalcolor.h"
 
+#define DMAT2_PRINT_FORMAT "(dmat2) {{"\
+ "\n%12" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define DMAT2_PRINT_FORMAT_COLORED "(dmat2)"\
+ M_TERMINALCOLOR_CYAN" {{"\
+ "\n%12" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER" }}"\
+ M_TERMINALCOLOR_RESET
+
+#define DMAT2_PRINT_FORMAT_LINE "(dmat2) {{"\
+ "%" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER\
+ ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define DMAT2_PRINT_FORMAT_VALUES \
+ "%" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER\
+ ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER
+
 
 /**
  * Prints the dmat2 in a single line
@@ -54,10 +72,10 @@ static size_t dmat2_snprintln_line(char *str, size_t size, dmat2 m) {
  * dmat2 m = dmat2_eye();
  * char buf[128];
  * dmat2_snprint(buf, sizeof buf, m);
- * // (dmat2) {
+ * // (dmat2) {{
  * //        1.0,          0.0,
  * //        0.0,          1.0,
- * //        ...,          ... }
+ * //        ...,          ... }}
  */
 static size_t dmat2_snprint(char *str, size_t size, dmat2 m) {
     setlocale(LC_ALL, "C");

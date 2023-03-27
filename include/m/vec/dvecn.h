@@ -26,10 +26,6 @@ static void dvecN_cast_from_uchar_1(double *dst_vec, const unsigned char *vec, i
 }
 
 
-
-
-
-
 /** a == b */
 static bool dvecN_cmp(const double *a, const double *b, int n) {
     return memcmp(a, b, n * sizeof(double)) == 0;
@@ -61,14 +57,14 @@ static void dvecN_unit_y(double *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void dvecN_unit_z(double *dst, int n) {
-    assert(n>=3 && "m vec*_unit_z");
+    assert(n >= 3 && "m vec*_unit_z");
     dvecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void dvecN_unit_w(double *dst, int n) {
-    assert(n>=4 && "m vec*_unit_w");
+    assert(n >= 4 && "m vec*_unit_w");
     dvecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -125,6 +121,18 @@ static void dvecN_div_vec(double *dst, const double *a, const double *b, int n) 
 static void dvecN_div(double *dst, const double *a, double b, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = a[i] / b;
+}
+
+/** dst = a + b * c */
+static void dvecN_add_scaled_vec(double *dst, const double *a, const double *b, const double *c, int n) {
+    for (int i = 0; i < n; i++)
+        dst[i] = a[i] + b[i] * c[i];
+}
+
+/** dst = a + b * c */
+static void dvecN_add_scaled(double *dst, const double *a, const double *b, double c, int n) {
+    for (int i = 0; i < n; i++)
+        dst[i] = a[i] + b[i] * c;
 }
 
 /** dst = a * M_PI / 180 */
@@ -384,11 +392,11 @@ static double dvecN_dot(const double *a, const double *b, int n) {
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void dvecN_cross(double *dst, const double *a, const double *b, int n) {
-    assert(n>=3 && "m vec*_cross only in 3D");
+    assert(n >= 3 && "m vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for(int i=3; i<n; i++)
+    for (int i = 3; i < n; i++)
         dst[i] = 0;
 }
 
@@ -434,6 +442,12 @@ static void dvecN_normalize_unsafe(double *dst, const double *v, int n) {
 static void dvecN_normalize(double *dst, const double *v, int n) {
     double norm = dvecN_norm(v, n);
     dvecN_scale(dst, v, (double) 1 / (norm > (double) 0 ? norm : (double) 1), n);
+}
+
+/** dst = normalize(cross(a, b)) */
+static void dvecN_cross_normalized(double *dst, const double *a, const double *b, int n) {
+    dvecN_cross(dst, a, b, n);
+    dvecN_normalize(dst, dst, n);
 }
 
 /** returns length of a vector, see dvecN_norm. Just here to match glsl */

@@ -44,9 +44,6 @@ static mat3 mat3_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
-
 /** dst = r==c ? 1 : 0 (identity)  */
 static mat3 mat3_eye() {
     mat3 res;

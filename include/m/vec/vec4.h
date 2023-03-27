@@ -43,8 +43,6 @@ static vec4 vec4_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
 /** a == b */
 static bool vec4_cmp(vec4 a, vec4 b) {
     return vecN_cmp(a.v, b.v, 4);
@@ -59,9 +57,7 @@ static vec4 vec4_set(float s) {
 }
 
 /** dst = v0, v1, ... */
-static vec4 vec4_new(float v0, float v1
-         , float v2
-         , float v3
+static vec4 vec4_new(float v0, float v1, float v2, float v3
 ) {
     vec4 self;
     self.v0 = v0;
@@ -171,6 +167,20 @@ static vec4 vec4_div_vec(vec4 a, vec4 b) {
 static vec4 vec4_div(vec4 a, float b) {
     vec4 res;
     vecN_div(res.v, a.v, b, 4);
+    return res;
+}
+
+/** dst = a + b * c */
+static vec4 vec4_add_scaled_vec(vec4 a, vec4 b, vec4 c) {
+    vec4 res;
+    vecN_add_scaled_vec(res.v, a.v, b.v, c.v, 4);
+    return res;
+}
+
+/** dst = a + b * c */
+static vec4 vec4_add_scaled(vec4 a, vec4 b, float c) {
+    vec4 res;
+    vecN_add_scaled(res.v, a.v, b.v, c, 4);
     return res;
 }
 
@@ -522,6 +532,13 @@ static vec4 vec4_normalize_unsafe(vec4 v) {
 static vec4 vec4_normalize(vec4 v) {
     vec4 res;
     vecN_normalize(res.v, v.v, 4);
+    return res;
+}
+
+/** dst = normalize(cross(a, b)) */
+static vec4 vec4_cross_normalized(vec4 a, vec4 b) {
+    vec4 res;
+    vecN_cross_normalized(res.v, a.v, b.v, 4);
     return res;
 }
 

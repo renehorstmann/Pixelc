@@ -9,6 +9,24 @@
 #include "../types/mat2.h"
 #include "terminalcolor.h"
 
+#define MAT2_PRINT_FORMAT "(mat2) {{"\
+ "\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define MAT2_PRINT_FORMAT_COLORED "(mat2)"\
+ M_TERMINALCOLOR_CYAN" {{"\
+ "\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER" }}"\
+ M_TERMINALCOLOR_RESET
+
+#define MAT2_PRINT_FORMAT_LINE "(mat2) {{"\
+ "%" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define MAT2_PRINT_FORMAT_VALUES \
+ "%" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER
+
 
 /**
  * Prints the mat2 in a single line
@@ -54,10 +72,10 @@ static size_t mat2_snprintln_line(char *str, size_t size, mat2 m) {
  * mat2 m = mat2_eye();
  * char buf[128];
  * mat2_snprint(buf, sizeof buf, m);
- * // (mat2) {
+ * // (mat2) {{
  * //        1.0,          0.0,
  * //        0.0,          1.0,
- * //        ...,          ... }
+ * //        ...,          ... }}
  */
 static size_t mat2_snprint(char *str, size_t size, mat2 m) {
     setlocale(LC_ALL, "C");

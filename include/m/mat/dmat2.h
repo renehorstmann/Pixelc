@@ -43,9 +43,6 @@ static dmat2 dmat2_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
-
 /** dst = r==c ? 1 : 0 (identity)  */
 static dmat2 dmat2_eye() {
     dmat2 res;
@@ -187,7 +184,6 @@ static dmat2 dmat2_inv(dmat2 m) {
 
     return res;
 }
-
 
 
 #endif //M_MAT_DMAT2_H

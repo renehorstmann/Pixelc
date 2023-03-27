@@ -44,10 +44,6 @@ static bvec2 bvec2_unit_y() {
 }
 
 
-
-
-
-
 /** dst = !vec */
 static bvec2 bvec2_not(bvec2 vec) {
     bvec2 res;

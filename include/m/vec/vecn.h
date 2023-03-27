@@ -26,10 +26,6 @@ static void vecN_cast_from_uchar_1(float *dst_vec, const unsigned char *vec, int
 }
 
 
-
-
-
-
 /** a == b */
 static bool vecN_cmp(const float *a, const float *b, int n) {
     return memcmp(a, b, n * sizeof(float)) == 0;
@@ -61,14 +57,14 @@ static void vecN_unit_y(float *dst, int n) {
 
 /** assert(n>=3); dst = unit_z */
 static void vecN_unit_z(float *dst, int n) {
-    assert(n>=3 && "m vec*_unit_z");
+    assert(n >= 3 && "m vec*_unit_z");
     vecN_set(dst, 0, n);
     dst[2] = 1;
 }
 
 /** assert(n>=4); dst = unit_w */
 static void vecN_unit_w(float *dst, int n) {
-    assert(n>=4 && "m vec*_unit_w");
+    assert(n >= 4 && "m vec*_unit_w");
     vecN_set(dst, 0, n);
     dst[3] = 1;
 }
@@ -125,6 +121,18 @@ static void vecN_div_vec(float *dst, const float *a, const float *b, int n) {
 static void vecN_div(float *dst, const float *a, float b, int n) {
     for (int i = 0; i < n; i++)
         dst[i] = a[i] / b;
+}
+
+/** dst = a + b * c */
+static void vecN_add_scaled_vec(float *dst, const float *a, const float *b, const float *c, int n) {
+    for (int i = 0; i < n; i++)
+        dst[i] = a[i] + b[i] * c[i];
+}
+
+/** dst = a + b * c */
+static void vecN_add_scaled(float *dst, const float *a, const float *b, float c, int n) {
+    for (int i = 0; i < n; i++)
+        dst[i] = a[i] + b[i] * c;
 }
 
 /** dst = a * M_PI / 180 */
@@ -384,11 +392,11 @@ static float vecN_dot(const float *a, const float *b, int n) {
 
 /** assert(n>=3) ; dst = a x b , dst.w... = 0 */
 static void vecN_cross(float *dst, const float *a, const float *b, int n) {
-    assert(n>=3 && "m vec*_cross only in 3D");
+    assert(n >= 3 && "m vec*_cross only in 3D");
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
-    for(int i=3; i<n; i++)
+    for (int i = 3; i < n; i++)
         dst[i] = 0;
 }
 
@@ -434,6 +442,12 @@ static void vecN_normalize_unsafe(float *dst, const float *v, int n) {
 static void vecN_normalize(float *dst, const float *v, int n) {
     float norm = vecN_norm(v, n);
     vecN_scale(dst, v, (float) 1 / (norm > (float) 0 ? norm : (float) 1), n);
+}
+
+/** dst = normalize(cross(a, b)) */
+static void vecN_cross_normalized(float *dst, const float *a, const float *b, int n) {
+    vecN_cross(dst, a, b, n);
+    vecN_normalize(dst, dst, n);
 }
 
 /** returns length of a vector, see vecN_norm. Just here to match glsl */

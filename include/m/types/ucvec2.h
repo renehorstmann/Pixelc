@@ -3,6 +3,7 @@
 
 
 #include "../publictypes/ucvec2.h"
+
 typedef m_ucvec2 ucvec2;
 
 #endif //M_TYPES_UCVEC2_H

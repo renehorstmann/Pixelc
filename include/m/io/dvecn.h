@@ -2,13 +2,11 @@
 #define M_IO_DVECN_H
 
 
-
 #include <stdio.h>
 #include <locale.h>
 
 #include "../sca/double.h"
 #include "terminalcolor.h"
-
 
 
 /**
@@ -20,28 +18,28 @@
  */
 static size_t dvecN_snprint(char *str, size_t size, const double *v, int n) {
     setlocale(LC_ALL, "C");
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = 0;
     used += snprintf(str, size, "(double[%i]) { ", n);
-    for(int i=0; i<n; i++) {
-        used += snprintf(!str? NULL : str+used, !size? 0 : size - used,
-                         "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i<n-1? ", " : "");
+    for (int i = 0; i < n; i++) {
+        used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
+                         "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i < n - 1 ? ", " : "");
     }
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, " }");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }");
     return used;
 }
 
 /** Calls dvecN_snprint and adds a newline */
 static size_t dvecN_snprintln(char *str, size_t size, const double *v, int n) {
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = dvecN_snprint(str, size, v, n);
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, "\n");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
 
@@ -61,8 +59,8 @@ static size_t dvecN_fprint(FILE *stream, const double *v, int n) {
     used += fprintf(stream, M_TERMINALCOLOR_CYAN);
 #endif
     used += fprintf(stream, "{ ");
-    for(int i=0; i<n; i++) {
-        used += fprintf(stream,"%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i<n-1? ", " : "");
+    for (int i = 0; i < n; i++) {
+        used += fprintf(stream, "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i < n - 1 ? ", " : "");
     }
     used += fprintf(stream, " }");
 #ifndef M_NO_PRINT_COLOR

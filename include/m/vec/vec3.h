@@ -43,8 +43,6 @@ static vec3 vec3_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
 /** a == b */
 static bool vec3_cmp(vec3 a, vec3 b) {
     return vecN_cmp(a.v, b.v, 3);
@@ -59,8 +57,7 @@ static vec3 vec3_set(float s) {
 }
 
 /** dst = v0, v1, ... */
-static vec3 vec3_new(float v0, float v1
-         , float v2
+static vec3 vec3_new(float v0, float v1, float v2
 ) {
     vec3 self;
     self.v0 = v0;
@@ -91,8 +88,6 @@ static vec3 vec3_unit_z() {
     vecN_unit_z(res.v, 3);
     return res;
 }
-
-
 
 
 /** dst = -v */
@@ -163,6 +158,20 @@ static vec3 vec3_div_vec(vec3 a, vec3 b) {
 static vec3 vec3_div(vec3 a, float b) {
     vec3 res;
     vecN_div(res.v, a.v, b, 3);
+    return res;
+}
+
+/** dst = a + b * c */
+static vec3 vec3_add_scaled_vec(vec3 a, vec3 b, vec3 c) {
+    vec3 res;
+    vecN_add_scaled_vec(res.v, a.v, b.v, c.v, 3);
+    return res;
+}
+
+/** dst = a + b * c */
+static vec3 vec3_add_scaled(vec3 a, vec3 b, float c) {
+    vec3 res;
+    vecN_add_scaled(res.v, a.v, b.v, c, 3);
     return res;
 }
 
@@ -514,6 +523,13 @@ static vec3 vec3_normalize_unsafe(vec3 v) {
 static vec3 vec3_normalize(vec3 v) {
     vec3 res;
     vecN_normalize(res.v, v.v, 3);
+    return res;
+}
+
+/** dst = normalize(cross(a, b)) */
+static vec3 vec3_cross_normalized(vec3 a, vec3 b) {
+    vec3 res;
+    vecN_cross_normalized(res.v, a.v, b.v, 3);
     return res;
 }
 

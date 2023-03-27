@@ -178,7 +178,6 @@ static ucvec4 ucvec4_mul_mat(ucvec4 a, ucmat4 b) {
 }
 
 
-
 /** returns = determinant mm */
 static unsigned char ucmat4_det(ucmat4 mm) {
     // from cglm/ucmat4.h/glm_mat4_det

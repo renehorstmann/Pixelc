@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <float.h>  // for LDBL_MAX, ...
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define LDSCA_MAX LDBL_MAX
@@ -172,8 +173,29 @@ static long double ldsca_step(long double x, long double edge) {
 
 /** dst = x < edge1 ? 0 : (x > edge2 ? 1 : x * x * (3 - 2 * x)) Hermite polynomials */
 static long double ldsca_smoothstep(long double x, long double edge1, long double edge2) {
-    x = ldsca_clamp((x-edge1) / (edge2-edge1), 0.0L, 1.0L);
+    x = ldsca_clamp((x - edge1) / (edge2 - edge1), 0.0L, 1.0L);
     return x * x * (3.0L - 2.0L * x);
+}
+
+// dst = sin(x*2pi)
+static long double ldsca_signal_wave(long double x) {
+    return ldsca_sin(x * 2.0L * LDSCA_PI);
+}
+
+// dst = linear up and down signal, x: [0:1] -> dst [-1:1]
+static long double ldsca_signal_ramp(long double x) {
+    x = ldsca_mod(x + 0.75f, 1.0L);
+    return 4.0L * ldsca_abs(x - 0.5f) - 1.0L;
+}
+
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+static long double ldsca_signal_saw(long double x) {
+    return 2.0L * ldsca_mod(x + 0.5, 1.0L) - 1.0L;
+}
+
+// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
+static long double ldsca_signal_block(long double x) {
+    return 2.0L * (ldsca_mod(x, 1.0L) > 0.5) - 1.0L;
 }
 
 /** dst = isnan(x) */

@@ -2,7 +2,6 @@
 #define M_UTILS_INTERSECTION_H
 
 
-
 #include <stdbool.h>
 #include "../sca/float.h"
 #include "../vec/vec2.h"
@@ -146,8 +145,8 @@ static float intersection_line_point(vec3 line_pos, vec3 line_dir, vec3 point) {
 
 /** returns false if lines are parallel */
 static bool intersection2_line_line(float *out_tau_a, float *out_tau_b,
-                                   vec2 line_a_pos, vec2 line_a_dir,
-                                   vec2 line_b_pos, vec2 line_b_dir) {
+                                    vec2 line_a_pos, vec2 line_a_dir,
+                                    vec2 line_b_pos, vec2 line_b_dir) {
     *out_tau_a = *out_tau_b = NAN;
 
     // stupid clone of the vec2 version above:

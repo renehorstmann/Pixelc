@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <float.h>  // for FLT_MAX, ...
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define SCA_MAX FLT_MAX
@@ -172,8 +173,29 @@ static float sca_step(float x, float edge) {
 
 /** dst = x < edge1 ? 0 : (x > edge2 ? 1 : x * x * (3 - 2 * x)) Hermite polynomials */
 static float sca_smoothstep(float x, float edge1, float edge2) {
-    x = sca_clamp((x-edge1) / (edge2-edge1), 0.0f, 1.0f);
+    x = sca_clamp((x - edge1) / (edge2 - edge1), 0.0f, 1.0f);
     return x * x * (3.0f - 2.0f * x);
+}
+
+// dst = sin(x*2pi)
+static float sca_signal_wave(float x) {
+    return sca_sin(x * 2.0f * SCA_PI);
+}
+
+// dst = linear up and down signal, x: [0:1] -> dst [-1:1]
+static float sca_signal_ramp(float x) {
+    x = sca_mod(x + 0.75f, 1.0f);
+    return 4.0f * sca_abs(x - 0.5f) - 1.0f;
+}
+
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+static float sca_signal_saw(float x) {
+    return 2.0f * sca_mod(x + 0.5, 1.0f) - 1.0f;
+}
+
+// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
+static float sca_signal_block(float x) {
+    return 2.0f * (sca_mod(x, 1.0) > 0.5) - 1.0f;
 }
 
 /** dst = isnan(x) */

@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // INT_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define ISCA_MAX INT_MAX

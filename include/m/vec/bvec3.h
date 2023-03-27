@@ -12,8 +12,7 @@ static bool bvec3_cmp(bvec3 a, bvec3 b) {
 }
 
 /** dst = v0, v1, ... */
-static bvec3 bvec3_new(bool v0, bool v1
-         , bool v2
+static bvec3 bvec3_new(bool v0, bool v1, bool v2
 ) {
     bvec3 self;
     self.v0 = v0;
@@ -52,8 +51,6 @@ static bvec3 bvec3_unit_z() {
     bvecN_unit_z(res.v, 3);
     return res;
 }
-
-
 
 
 /** dst = !vec */

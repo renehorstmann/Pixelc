@@ -56,7 +56,8 @@ void e_simple_start(const char *title,
                     int update_deltatime_ms,
                     e_simple_init_fn init_fn,
                     e_simple_update_fn update_fn,
-                    e_simple_render_fn render_fn);
+                    e_simple_render_fn render_fn,
+                    eWindowStartUpOptions_s *opt_options);
 
 
 #endif //E_SIMPLE_H

@@ -201,5 +201,4 @@ static ucmat2 ucmat2_inv(ucmat2 m) {
 }
 
 
-
 #endif //M_MAT_UCMAT2_H

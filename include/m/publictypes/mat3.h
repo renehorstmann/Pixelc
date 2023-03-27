@@ -4,12 +4,10 @@
 #include <assert.h>     // for static_assert
 
 
-
-
-
 #include "vec3.h"
+
 typedef union {
-    float v[3*3];
+    float v[3 * 3];
     float m[3][3];
     m_vec3 col[3];
     struct {
@@ -23,10 +21,6 @@ typedef union {
         float m20, m21, m22;
     };
 } m_mat3;
-
-
-
-
 
 
 static_assert(sizeof(m_mat3) == sizeof(float) * 3 * 3, "[Mathc] wrong expected size");

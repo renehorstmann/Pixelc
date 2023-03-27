@@ -33,7 +33,8 @@ void e_simple_start(const char *title,
                     int update_deltatime_ms,
                     e_simple_init_fn init_fn,
                     e_simple_update_fn update_fn,
-                    e_simple_render_fn render_fn) {
+                    e_simple_render_fn render_fn,
+                    eWindowStartUpOptions_s *opt_options) {
 #ifdef NDEBUG
     s_log_set_min_level(S_LOG_WARN);
 #else
@@ -52,7 +53,7 @@ void e_simple_start(const char *title,
     e_simple.render_fn = render_fn;
 
     // init e (environment)
-    e_window_init(title);
+    e_window_init(title, opt_options);
     e_input_init();
     e_gui_init();
 
@@ -89,7 +90,7 @@ static void main_loop(void *user_data) {
     e_simple.fps = smooth_out_value(e_simple.fps, 1 / e_window.frame_deltatime);
 
     // e updates
-    e_input_update();
+    e_input_update(e_window.frame_deltatime);
 
     // if updates_per_second is disabled, use delta time
     if (L.update_deltatime_ms <= 0) {

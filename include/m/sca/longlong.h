@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // LLONG_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define LLSCA_MAX LLONG_MAX

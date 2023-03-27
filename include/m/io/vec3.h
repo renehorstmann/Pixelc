@@ -10,6 +10,18 @@
 #include "terminalcolor.h"
 
 
+#define VEC3_PRINT_FORMAT "(vec3) {{  %" SCA_PRINT_FORMAT_SPECIFIER \
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER " }}"
+
+#define VEC3_PRINT_FORMAT_COLORED "(vec3)"\
+ M_TERMINALCOLOR_CYAN " {{  %" SCA_PRINT_FORMAT_SPECIFIER \
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER " }}"\
+ M_TERMINALCOLOR_RESET
+
+#define VEC3_PRINT_FORMAT_VALUES  "%" SCA_PRINT_FORMAT_SPECIFIER \
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER
+
+
 /**
  * Example:
  * vec3 v = vec3_unit_x();
@@ -19,28 +31,28 @@
  */
 static size_t vec3_snprint(char *str, size_t size, vec3 v) {
     setlocale(LC_ALL, "C");
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = 0;
     used += snprintf(str, size, "(vec3) {{ ");
-    for(int i=0; i<3; i++) {
-        used += snprintf(!str? NULL : str+used, !size? 0 : size - used,
-                         "%" SCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<3-1? ", " : "");
+    for (int i = 0; i < 3; i++) {
+        used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
+                         "%" SCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 3 - 1 ? ", " : "");
     }
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, " }}");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
 }
 
 /** Calls vec3_snprint and adds a newline */
 static size_t vec3_snprintln(char *str, size_t size, vec3 v) {
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = vec3_snprint(str, size, v);
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, "\n");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
 
@@ -60,8 +72,8 @@ static size_t vec3_fprint(FILE *stream, vec3 v) {
     used += fprintf(stream, M_TERMINALCOLOR_CYAN);
 #endif
     used += fprintf(stream, "{{ ");
-    for(int i=0; i<3; i++) {
-        used += fprintf(stream,"%" SCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<3-1? ", " : "");
+    for (int i = 0; i < 3; i++) {
+        used += fprintf(stream, "%" SCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 3 - 1 ? ", " : "");
     }
     used += fprintf(stream, " }}");
 #ifndef M_NO_PRINT_COLOR

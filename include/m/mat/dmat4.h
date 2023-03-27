@@ -45,9 +45,6 @@ static dmat4 dmat4_cast_from_uchar_1(const unsigned char *cast) {
 }
 
 
-
-
-
 /** dst = r==c ? 1 : 0 (identity)  */
 static dmat4 dmat4_eye() {
     dmat4 res;
@@ -164,7 +161,6 @@ static dvec4 dvec4_mul_mat(dvec4 a, dmat4 b) {
     dvecN_mul_mat_no_alias(res.v, a.v, b.v, 4);
     return res;
 }
-
 
 
 /** returns = determinant mm */

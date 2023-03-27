@@ -95,10 +95,6 @@ static ivec2 ivec2_unit_y() {
 }
 
 
-
-
-
-
 /** dst = -v */
 static ivec2 ivec2_neg(ivec2 v) {
     ivec2 res;
@@ -170,23 +166,19 @@ static ivec2 ivec2_div(ivec2 a, int b) {
     return res;
 }
 
+/** dst = a + b * c */
+static ivec2 ivec2_add_scaled_vec(ivec2 a, ivec2 b, ivec2 c) {
+    ivec2 res;
+    ivecN_add_scaled_vec(res.v, a.v, b.v, c.v, 2);
+    return res;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** dst = a + b * c */
+static ivec2 ivec2_add_scaled(ivec2 a, ivec2 b, int c) {
+    ivec2 res;
+    ivecN_add_scaled(res.v, a.v, b.v, c, 2);
+    return res;
+}
 
 
 /** dst = pow(x, y) */
@@ -245,8 +237,6 @@ static ivec2 ivec2_sqrt(ivec2 x) {
 }
 
 
-
-
 /** dst = abs(x) */
 static ivec2 ivec2_abs(ivec2 x) {
     ivec2 res;
@@ -261,12 +251,6 @@ static ivec2 ivec2_sign(ivec2 x) {
     ivecN_sign(res.v, x.v, 2);
     return res;
 }
-
-
-
-
-
-
 
 
 /** dst = (x % y + y) % y (always positive, if y>0) **/
@@ -368,10 +352,6 @@ static ivec2 ivec2_step_vec(ivec2 x, ivec2 edge) {
 }
 
 
-
-
-
-
 /** returns v[0] + v[1] + ... + v[n-1] */
 static int ivec2_sum(ivec2 v) {
     return ivecN_sum(v.v, 2);
@@ -416,10 +396,6 @@ static int ivec2_norm_inf(ivec2 v) {
 }
 
 
-
-
-
-
 /** returns length of a vector, see ivecN_norm. Just here to match glsl */
 static int ivec2_length(ivec2 v) {
     return ivecN_length(v.v, 2);
@@ -436,12 +412,6 @@ static int ivec2_distance(ivec2 a, ivec2 b) {
 static int ivec2_sqr_distance(ivec2 a, ivec2 b) {
     return ivecN_sqr_distance(a.v, b.v, 2);
 }
-
-
-
-
-
-
 
 
 /** dst = a < b */
@@ -538,21 +508,6 @@ static bvec2 ivec2_not_equal_vec(ivec2 a, ivec2 b) {
     ivecN_not_equal_vec(res.v, a.v, b.v, 2);
     return res;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif //M_VEC_IVEC2_H

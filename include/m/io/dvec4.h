@@ -10,6 +10,17 @@
 #include "terminalcolor.h"
 
 
+#define DVEC4_PRINT_FORMAT "(dvec4) {{  %" DSCA_PRINT_FORMAT_SPECIFIER \
+ ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER " }}"
+
+#define DVEC4_PRINT_FORMAT_COLORED "(dvec4)" \
+ M_TERMINALCOLOR_CYAN " {{  %" DSCA_PRINT_FORMAT_SPECIFIER \
+ ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER " }}"\
+ M_TERMINALCOLOR_RESET
+
+#define DVEC4_PRINT_FORMAT_VALUES "%" DSCA_PRINT_FORMAT_SPECIFIER \
+ ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER ", %" DSCA_PRINT_FORMAT_SPECIFIER
+
 /**
  * Example:
  * dvec4 v = dvec4_unit_x();
@@ -19,28 +30,28 @@
  */
 static size_t dvec4_snprint(char *str, size_t size, dvec4 v) {
     setlocale(LC_ALL, "C");
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = 0;
     used += snprintf(str, size, "(dvec4) {{ ");
-    for(int i=0; i<4; i++) {
-        used += snprintf(!str? NULL : str+used, !size? 0 : size - used,
-                         "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<4-1? ", " : "");
+    for (int i = 0; i < 4; i++) {
+        used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
+                         "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 4 - 1 ? ", " : "");
     }
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, " }}");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
 }
 
 /** Calls dvec4_snprint and adds a newline */
 static size_t dvec4_snprintln(char *str, size_t size, dvec4 v) {
-    if(!str || !size) {
+    if (!str || !size) {
         str = NULL;
         size = 0;
     }
     size_t used = dvec4_snprint(str, size, v);
-    used += snprintf(!str? NULL : str+used, !size? 0 : size - used, "\n");
+    used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
 
@@ -60,8 +71,8 @@ static size_t dvec4_fprint(FILE *stream, dvec4 v) {
     used += fprintf(stream, M_TERMINALCOLOR_CYAN);
 #endif
     used += fprintf(stream, "{{ ");
-    for(int i=0; i<4; i++) {
-        used += fprintf(stream,"%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i<4-1? ", " : "");
+    for (int i = 0; i < 4; i++) {
+        used += fprintf(stream, "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 4 - 1 ? ", " : "");
     }
     used += fprintf(stream, " }}");
 #ifndef M_NO_PRINT_COLOR

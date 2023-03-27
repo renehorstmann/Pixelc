@@ -10,6 +10,29 @@
 #include "terminalcolor.h"
 
 
+#define MAT3_PRINT_FORMAT "(mat3) {{"\
+ "\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define MAT3_PRINT_FORMAT_COLORED "(mat3)"\
+ M_TERMINALCOLOR_CYAN " {{"\
+ "\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ",\n%12" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER" }}"\
+ M_TERMINALCOLOR_RESET
+
+#define MAT3_PRINT_FORMAT_LINE "(mat3) {{"\
+ "%" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER" }}"
+
+#define MAT3_PRINT_FORMAT_VALUES \
+ "%" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER\
+ ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER ", %" SCA_PRINT_FORMAT_SPECIFIER
+
+
 /**
  * Prints the mat3 in a single line
  * Example:
@@ -54,10 +77,10 @@ static size_t mat3_snprintln_line(char *str, size_t size, mat3 m) {
  * mat3 m = mat3_eye();
  * char buf[128];
  * mat3_snprint(buf, sizeof buf, m);
- * // (mat3) {
+ * // (mat3) {{
  * //        1.0,          0.0,
  * //        0.0,          1.0,
- * //        ...,          ... }
+ * //        ...,          ... }}
  */
 static size_t mat3_snprint(char *str, size_t size, mat3 m) {
     setlocale(LC_ALL, "C");

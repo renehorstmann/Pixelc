@@ -4,6 +4,7 @@
 #include <stdlib.h>  // abs
 #include <limits.h>  // ULLONG_MAX
 #include <math.h>
+#include "../common.h"
 
 /** maximum possible value */
 #define ULLSCA_MAX ULLONG_MAX
