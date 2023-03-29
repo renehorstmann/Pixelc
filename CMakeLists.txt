@@ -29,6 +29,7 @@ set(PREMIUM false)
 # OPTION_SOCKET         to use s sockets (SDL_net needed if OPTION_SDL)
 # OPTION_TTF            to use ro_ttftext (SDL_ttf needed)
 # OPTION_GYRO           if gyro sensor is available
+# OPTION_GAMEPAD        loads a gamepad (game controller) if available
 # OPTION_SANITIZER      use sanitizer checks for debugging
 # -not used- OPTION_GL_ERROR       if set, functions use r_render_check_error (heavy op, if summed up)
 #

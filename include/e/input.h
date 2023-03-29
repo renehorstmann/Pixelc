@@ -30,6 +30,15 @@ typedef struct {
     bool w, a, s, d;
 } eInputKeys;
 
+typedef struct {
+    // is NULL if not available
+    SDL_GameController *controller;
+
+    vec2 stick_l, stick_r;
+    bool btn_shoulder_l, btn_shoulder_r;
+    bool btn_stick_l, btn_stick_r;
+    bool btn_x, btn_y, btn_a, btn_b;
+} eInputGamepad;
 
 enum ePointerAction {
     E_POINTER_DOWN,       // start of a press
@@ -71,6 +80,7 @@ struct eInput_Globals {
     vec3 accel;
 
     eInputKeys keys;
+    eInputGamepad gamepad;
 };
 extern struct eInput_Globals e_input;
 
@@ -105,6 +115,9 @@ void e_input_set_vip_pointer_event(ePointerEventFn event, void *user_data);
 // mouse events will receive E_POINTER_HOVER if no button is pressed while moving
 void e_input_set_vip_pointer_event_with_hovering(ePointerEventFn event, void *user_data);
 
+// calls each registered pointer event with the given pointer, usable for virtual cursors, etc.
+void e_input_emit_pointer_event(ePointer_s pointer);
+
 // registers a callback for mouse wheel
 void e_input_register_wheel_event(eWheelEventFn event, void *user_data);
 
@@ -114,6 +127,9 @@ void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister);
 // sets a wheel event to a vip call, pass event=NULL to reset
 // a vip event will block all other events
 void e_input_set_vip_wheel_event(eWheelEventFn event, void *user_data);
+
+// calls each registered wheel event with the given pointer pos and wheel up, usable for virtual cursors, etc.
+void e_input_emit_wheel_event(bool up, vec4 *opt_cursor_pos);
 
 // registers a callback for sdl key events
 void e_input_register_key_raw_event(eKeyRawEventFn event, void *user_data);

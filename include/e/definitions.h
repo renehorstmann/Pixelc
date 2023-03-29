@@ -9,7 +9,13 @@
 
 
 #ifdef PLATFORM_EMSCRIPTEN
+
+#ifdef OPTION_GAMEPAD
+static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER;
+#else
 static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_VIDEO;
+#endif
+
 #else
 static const Uint32 E_SDL_INIT_FLAGS = SDL_INIT_EVERYTHING;
 #endif

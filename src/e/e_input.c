@@ -116,7 +116,7 @@ static void emit_pointer_events(ePointer_s action) {
     }
 }
 
-static void emit_wheel_events(bool up) {
+static void emit_wheel_events(vec4 pos, bool up) {
     if (L.reg_wheel_e_vip.cb) {
         L.reg_wheel_e_vip.cb(L.current_pointer_0.pos, up, L.reg_wheel_e_vip.ud);
         return;
@@ -199,21 +199,23 @@ static void input_handle_pointer_touch(SDL_Event *event) {
 
     // update pos
     L.touchs[id].pos = pos;
+    
+    
+    // emit
+    ePointer_s res;
+    res.action = action;
+    res.id = L.touchs[id].pointer_id;
+    res.pos = pos;
+    emit_pointer_events(res);
 
+
+    // remove ups
     if (action == E_POINTER_UP) {
         for(int i=id; i<L.touchs_size-1; i++) {
             L.touchs[i] = L.touchs[i+1];
         }
         L.touchs_size--;
-    }
-
-
-    ePointer_s res;
-    res.action = action;
-    res.id = id;
-    res.pos = pos;
-
-    emit_pointer_events(res);
+    }    
 }
 
 static void input_handle_pointer_mouse(SDL_Event *event) {
@@ -250,7 +252,7 @@ static void input_handle_wheel(SDL_Event *event) {
     // it could be possible that y==0, (e. g. x!=0)
     if (event->wheel.y == 0)
         return;
-    emit_wheel_events(event->wheel.y > 0);
+    emit_wheel_events(L.current_pointer_0.pos, event->wheel.y > 0);
 }
 
 static void input_handle_keys(SDL_Event *event) {
@@ -330,6 +332,18 @@ void e_input_init() {
 
     e_input.reset_touch_time = E_INPUT_DEFAULT_TOUCH_RESET_TIME;
 
+#ifdef OPTION_GAMEPAD
+    int num_joysticks = SDL_NumJoysticks();
+    s_log("found %i joysticks", num_joysticks);
+    for (int i = 0; i < SDL_NumJoysticks(); i++) {
+        e_input.gamepad.controller = SDL_GameControllerOpen(i);
+        if (e_input.gamepad.controller) {
+            s_log("opened GameController: %s (%i/%i)", SDL_GameControllerName(e_input.gamepad.controller), i, num_joysticks);
+            break;
+        }
+    }
+#endif
+
 #ifdef OPTION_GYRO
     int num_sensors = SDL_NumSensors();
     bool accel_opened = false;
@@ -404,6 +418,29 @@ void e_input_update(float dt) {
             e_input_reset_touch();
         }
     }
+
+#ifdef OPTION_GAMEPAD
+    // gamepad
+    if(e_input.gamepad.controller) {
+        SDL_GameController *c = e_input.gamepad.controller;
+        vec2 stick;
+        stick.x = SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_LEFTX);
+        stick.y = -SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_LEFTY);
+        e_input.gamepad.stick_l = vec2_div(stick, 32768.0f);
+        stick.x = SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_RIGHTX);
+        stick.y = -SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_RIGHTY);
+        e_input.gamepad.stick_r = vec2_div(stick, 32768.0f);
+        e_input.gamepad.btn_stick_l = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+        e_input.gamepad.btn_shoulder_l = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+        e_input.gamepad.btn_stick_r = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+        e_input.gamepad.btn_shoulder_r = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+        e_input.gamepad.btn_x = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_X);
+        e_input.gamepad.btn_y = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_Y);
+        e_input.gamepad.btn_a = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_A);
+        e_input.gamepad.btn_b = SDL_GameControllerGetButton(c, SDL_CONTROLLER_BUTTON_B);
+    }
+#endif
+
 }
 
 
@@ -463,6 +500,10 @@ void e_input_set_vip_pointer_event_with_hovering(ePointerEventFn event, void *us
     L.reg_pointer_e_vip.hover = true;
 }
 
+void e_input_emit_pointer_event(ePointer_s pointer) {
+    emit_pointer_events(pointer);
+}
+
 void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
     s_assume(L.reg_wheel.size < E_MAX_WHEEL_EVENTS, "too many registered wheel events");
     L.reg_wheel.array[L.reg_wheel.size++] = (RegWheel) {event, user_data};
@@ -489,6 +530,14 @@ void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
 void e_input_set_vip_wheel_event(eWheelEventFn event, void *user_data) {
     L.reg_wheel_e_vip.cb = event;
     L.reg_wheel_e_vip.ud = user_data;
+}
+
+void e_input_emit_wheel_event(bool up, vec4 *opt_cursor_pos) {
+    vec4 pos = L.current_pointer_0.pos;
+    if(opt_cursor_pos) {
+        pos = *opt_cursor_pos;
+    }
+    emit_wheel_events(pos, up);
 }
 
 void e_input_register_key_raw_event(eKeyRawEventFn event, void *user_data) {
