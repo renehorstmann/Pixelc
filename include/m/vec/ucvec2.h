@@ -305,7 +305,7 @@ static ucvec2 ucvec2_clamp_vec(ucvec2 x, ucvec2 min, ucvec2 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ucvec2 ucvec2_mix(ucvec2 a, ucvec2 b, unsigned char t) {
+static ucvec2 ucvec2_mix(ucvec2 a, ucvec2 b, float t) {
     ucvec2 res;
     ucvecN_mix(res.v, a.v, b.v, t, 2);
     return res;

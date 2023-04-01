@@ -419,7 +419,7 @@ static dvec2 dvec2_clamp_vec(dvec2 x, dvec2 min, dvec2 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static dvec2 dvec2_mix(dvec2 a, dvec2 b, double t) {
+static dvec2 dvec2_mix(dvec2 a, dvec2 b, float t) {
     dvec2 res;
     dvecN_mix(res.v, a.v, b.v, t, 2);
     return res;

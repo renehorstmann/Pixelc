@@ -1,4 +1,5 @@
 #include "m/int.h"
+#include "m/uchar.h"
 #include "u/sprite.h"
 
 // grid to vertical
@@ -79,8 +80,7 @@ uSprite u_sprite_new_clone_merge_col_down_a(uSprite from, int col_to_merge_down,
             for (int c = 0; c < self.img.cols; c++) {
                 uColor_s col_a = *u_sprite_pixel(from, c, r, col_to_merge_down - 1, row);
                 uColor_s col_b = *u_sprite_pixel(from, c, r, col_to_merge_down, row);
-                *u_sprite_pixel(self, c, r, col_to_merge_down - 1, row) =
-                        ucvec4_mix(col_a, col_b, col_b.a / 255.0f);
+                *u_sprite_pixel(self, c, r, col_to_merge_down - 1, row) = u_color_blend(col_a, col_b);
             }
         }
     }
@@ -136,8 +136,7 @@ uSprite u_sprite_new_clone_merge_row_down_a(uSprite from, int row_to_merge_down,
             for (int c = 0; c < self.img.cols; c++) {
                 uColor_s col_a = *u_sprite_pixel(from, c, r, col,row_to_merge_down - 1);
                 uColor_s col_b = *u_sprite_pixel(from, c, r, col, row_to_merge_down);
-                *u_sprite_pixel(self, c, r, col, row_to_merge_down - 1) =
-                        ucvec4_mix(col_a, col_b, col_b.a / 255.0f);
+                *u_sprite_pixel(self, c, r, col, row_to_merge_down - 1) = u_color_blend(col_a, col_b);
             }
         }
     }

@@ -76,8 +76,7 @@ uImage u_image_new_clone_merge_down_a(uImage from, int layer_to_merge_down, sAll
         for (int c = 0; c < self.cols; c++) {
             uColor_s col_a = *u_image_pixel(from, c, r, layer_to_merge_down - 1);
             uColor_s col_b = *u_image_pixel(from, c, r, layer_to_merge_down);
-            *u_image_pixel(self, c, r, layer_to_merge_down - 1) =
-                    ucvec4_mix(col_a, col_b, col_b.a / 255.0f);
+            *u_image_pixel(self, c, r, layer_to_merge_down - 1) = u_color_blend(col_a, col_b);
         }
     }
     return self;

@@ -347,7 +347,7 @@ static ivec4 ivec4_clamp_vec(ivec4 x, ivec4 min, ivec4 max) {
 
 
 /** dst = a * (1-t) + b * t */
-static ivec4 ivec4_mix(ivec4 a, ivec4 b, int t) {
+static ivec4 ivec4_mix(ivec4 a, ivec4 b, float t) {
     ivec4 res;
     ivecN_mix(res.v, a.v, b.v, t, 4);
     return res;

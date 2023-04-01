@@ -6,6 +6,7 @@
 //
 
 #include "s/s.h"
+#include "m/vec/ucvec3.h"
 #include "m/vec/ucvec4.h"
 #include "m/vec/vec4.h"
 
@@ -16,6 +17,14 @@ typedef ucvec4 uColor_s;
 // returns a == b
 static bool u_color_equals(uColor_s a, uColor_s b) {
     return ucvec4_cmp(a, b);
+}
+
+// blends color b onto color a
+static uColor_s u_color_blend(uColor_s a, uColor_s b) {
+    uColor_s res;
+    res.rgb = ucvec3_mix(a.rgb, b.rgb, b.a / 255.0f);
+    res.a = ucsca_max(a.a, b.a);
+    return res;
 }
 
 // casts a color into a vec4 in the range [0:1]
