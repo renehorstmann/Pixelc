@@ -220,6 +220,10 @@ void e_window_init(const char *title, eWindowStartUpOptions_s *opt_options) {
         }
 #endif
 
+#ifdef OPTION_GAMEPAD
+    SDL_SetHintWithPriority(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0", SDL_HINT_OVERRIDE);
+#endif
+
     // setup OpenGL usage
     s_log("OpenGL minimal version: %d.%d", E_GL_MAJOR_VERSION, E_GL_MINOR_VERSION);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, E_GL_MAJOR_VERSION);

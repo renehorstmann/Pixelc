@@ -286,6 +286,7 @@ void toolbar_init() {
     add_tool(tool_new_undo());
     add_tool(tool_new_redo());
     add_tool(tool_new_selection());
+    add_tool(tool_new_find());
     add_tool(tool_new_rgb());
     add_tool(tool_new_shading());
     add_tool(tool_new_secondary_color());

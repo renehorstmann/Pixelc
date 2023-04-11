@@ -3,6 +3,7 @@
 #include "u/pose.h"
 #include "u/button.h"
 #include "io.h"
+#include "canvas.h"
 #include "dialog.h"
 
 static const uColor_s BG_A_COLOR = {{136, 136, 102, 255}};
@@ -104,6 +105,7 @@ static void on_action(bool ok) {
 
 void dialog_create_project() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
     Impl *impl = s_new0(Impl, 1);
     dialog.impl = impl;

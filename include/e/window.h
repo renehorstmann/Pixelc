@@ -50,7 +50,7 @@ struct eWindow_Globals {
     ivec2 size;
     
     // time between frames
-    uint32_t frame_time_ms;
+    su32 frame_time_ms;
     int frame_deltatime_ms;
     float frame_deltatime;
     // time between updates

@@ -8,6 +8,15 @@
 #include "../types/dmat3.h"
 #include "../vec/dvecn.h"
 
+// macro to create a dmat4
+#define dmat4_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+, v9, v10, v11, v12, v13, v14, v15\
+) (dmat4) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+, (v9), (v10), (v11), (v12), (v13), (v14), (v15)\
+}}
+
 
 /** dst = (dmat4) v */
 static dmat4 dmat4_cast_from_float(const float *cast) {

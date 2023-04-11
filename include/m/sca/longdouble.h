@@ -177,25 +177,97 @@ static long double ldsca_smoothstep(long double x, long double edge1, long doubl
     return x * x * (3.0L - 2.0L * x);
 }
 
+
 // dst = sin(x*2pi)
+//  X   ->   Y
+// 0.00 ->  0.0
+// 0.25 -> +1.0
+// 0.50 ->  0.0
+// 0.75 -> -1.0
 static long double ldsca_signal_wave(long double x) {
     return ldsca_sin(x * 2.0L * LDSCA_PI);
 }
 
+// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
+//  X   ->   Y
+// 0.25 -> -1.0
+// 0.75 -> +1.0
+static long double ldsca_signal_block(long double x) {
+    return 2.0L * (ldsca_mod(x, 1.0L) > 0.5f) - 1.0L;
+}
+
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.50 ->  0.0
+static long double ldsca_signal_saw(long double x) {
+    return 2.0L * ldsca_mod(x, 1.0L) - 1.0L;
+}
+
 // dst = linear up and down signal, x: [0:1] -> dst [-1:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.25 ->  0.0
+// 0.50 -> +1.0
+// 0.75 ->  0.0
 static long double ldsca_signal_ramp(long double x) {
-    x = ldsca_mod(x + 0.75f, 1.0L);
+    x = ldsca_mod(x + 0.5f, 1.0L);
     return 4.0L * ldsca_abs(x - 0.5f) - 1.0L;
 }
 
 // dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
-static long double ldsca_signal_saw(long double x) {
-    return 2.0L * ldsca_mod(x + 0.5, 1.0L) - 1.0L;
+// smoothed edge at [1-edge:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 1.00 -> +1.0
+static long double ldsca_signal_smoothsaw_single(long double x, long double edge) {
+    x = ldsca_mod(x, 1.0L);
+
+    // linear: y = a*x
+    // smooth: y = 1-b*(x-1)^2
+    // equations solved, so that f==(1-edge) -> y and derivate are equal
+    long double f = 1.0L - edge;
+    long double b = -1.0L / (2.0L * (f - 1.0L));
+    long double a = (1.0L - b * ldsca_pow(f - 1.0L, 2.0L)) / f;
+
+    long double signal;
+    // linear up
+    if (x < f) {
+        signal = a * x;
+    } else {
+        // smooth end
+        signal = 1.0L - b * ldsca_pow(x - 1.0L, 2.0L);
+    }
+    return -1.0L + 2.0L * signal;
 }
 
-// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
-static long double ldsca_signal_block(long double x) {
-    return 2.0L * (ldsca_mod(x, 1.0L) > 0.5) - 1.0L;
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+// smoothed edges between [0:edge] , [1-edge:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.50 ->  0.0
+static long double ldsca_signal_smoothsaw(long double x, long double edge) {
+    x = ldsca_mod(x, 1.0L);
+    if (x < 0.5L) {
+        // 0.5*2 is exactly 1.0f, which will mod to 0, which will result in 1.0 instead of -1.0
+        return -0.5L - ldsca_signal_smoothsaw_single((0.5L - x) * 1.99999L, edge * 2.0L) / 2.0L;
+    }
+    return 0.5L + ldsca_signal_smoothsaw_single((x - 0.5L) * 2.0L, edge * 2.0L) / 2.0L;
+}
+
+// dst = ramp like signal, linear up, linear down, x: [0:1] -> dst [-1:1]
+// smoothed edges between [0:edge] , [0.5-edge:0.5+edge] , [1-edge:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.25 ->  0.0
+// 0.50 -> +1.0
+// 0.75 ->  0.0
+static long double ldsca_signal_smoothramp(long double x, long double edge) {
+    x = ldsca_mod(x, 1.0L);
+    if (x < 0.5L) {
+        return ldsca_signal_smoothsaw(x * 2.0L, edge * 2.0L);
+    }
+    return -ldsca_signal_smoothsaw((x - 0.5L) * 2.0L, edge * 2.0L);
 }
 
 /** dst = isnan(x) */

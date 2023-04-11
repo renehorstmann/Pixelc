@@ -6,6 +6,11 @@
 #include "../types/ucmat2.h"
 #include "../vec/ucvecn.h"
 
+// macro to create a ucmat2
+#define ucmat2_(v0, v1, v2, v3 \
+) (ucmat2) {{(v0), (v1), (v2), (v3)\
+}}
+
 
 /** dst = (ucmat2) v */
 static ucmat2 ucmat2_cast_from_float(const float *cast) {

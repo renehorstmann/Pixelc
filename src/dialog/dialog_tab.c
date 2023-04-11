@@ -94,6 +94,7 @@ static void on_action(bool ok) {
 
 void dialog_create_tab() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;

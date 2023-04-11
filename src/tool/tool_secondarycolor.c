@@ -5,6 +5,7 @@
 #include "palette.h"
 #include "feedback.h"
 #include "tool.h"
+#include "tile.h"
 
 //
 // private
@@ -15,6 +16,7 @@ typedef struct {
     Tool super;
     RoSingle bg;
     RoSingle color_drop;
+    RoSingle tile;
     vec4 padding_lrbt; // left, right, bottom, top
     float long_press_time;
     bool pressed;
@@ -27,6 +29,7 @@ static void kill_fn(Tool **super_ptr) {
         return;
     ro_single_kill(&self->bg);
     ro_single_kill(&self->color_drop);
+    ro_single_kill(&self->tile);
     s_free(self);
     *super_ptr = NULL;
 }
@@ -56,6 +59,7 @@ static void update(struct Tool *super, float dtime) {
     u_pose_aa_set_left(&self->bg.rect.pose, super->in.pos.x + self->padding_lrbt.v0);
     u_pose_aa_set_top(&self->bg.rect.pose, super->in.pos.y - self->padding_lrbt.v3);
     self->color_drop.rect.pose = self->bg.rect.pose;
+    self->tile.rect.pose = self->bg.rect.pose;
 
     super->size.x = self->bg.tex.sprite_size.x + self->padding_lrbt.v0 + self->padding_lrbt.v1;
     super->size.y = self->bg.tex.sprite_size.y + self->padding_lrbt.v2 + self->padding_lrbt.v3;
@@ -78,12 +82,24 @@ static void update(struct Tool *super, float dtime) {
                                 col);
         }
     }
+
+    self->bg.rect.color.a = 1;
+    if(tile.active && tile.canvas_active) {
+        bool found = tile_get_tile_from_colorcode(&self->tile.tex, &self->tile.rect, brush.secondary_color);
+        if(found) {
+            self->bg.rect.color.a = 0;
+        }
+    }
 }
 
 static void render(const struct Tool *super, const mat4 *cam_mat) {
     const Impl *self = (const Impl *) super;
     ro_single_render(&self->bg, cam_mat);
-    ro_single_render(&self->color_drop, cam_mat);
+    if(tile.active && tile.canvas_active) {
+        ro_single_render(&self->tile, cam_mat);
+    } else {
+        ro_single_render(&self->color_drop, cam_mat);
+    }
 }
 
 //
@@ -100,6 +116,11 @@ Tool *tool_new_secondary_color() {
                                     self->bg.tex.sprite_size.y
     );
     self->color_drop.rect.pose = self->bg.rect.pose;
+
+    // borrows tex from tile module
+    self->tile = ro_single_new(r_texture_new_invalid());
+    self->tile.owns_tex = false;
+    self->tile.rect.pose = self->bg.rect.pose;
 
     snprintf(self->super.name, TOOL_NAME_LEN, "secondary color");
     snprintf(self->super.tip, TOOL_TIP_LEN, "Tip to use\n\nHold to set");

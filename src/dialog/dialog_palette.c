@@ -185,6 +185,7 @@ static void on_action(bool ok) {
 
 void dialog_create_palette() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;
@@ -253,7 +254,7 @@ void dialog_create_palette() {
     dialog.update = update;
     dialog.render = render;
     dialog.pointer_event = pointer_event;
-    dialog.opt_on_cancel_cb = on_action;
-//    dialog.opt_on_ok_cb = on_action;
+//    dialog.opt_on_cancel_cb = on_action;
+    dialog.opt_on_ok_cb = on_action;
 }
 

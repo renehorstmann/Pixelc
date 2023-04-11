@@ -6,6 +6,11 @@
 #include "../types/dmat2.h"
 #include "../vec/dvecn.h"
 
+// macro to create a dmat2
+#define dmat2_(v0, v1, v2, v3 \
+) (dmat2) {{(v0), (v1), (v2), (v3)\
+}}
+
 
 /** dst = (dmat2) v */
 static dmat2 dmat2_cast_from_float(const float *cast) {

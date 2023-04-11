@@ -6,6 +6,12 @@
 #include "../types/ucvec3.h"
 #include "../types/bvec3.h"
 
+// macro to create a ucvec3
+#define ucvec3_(x, y \
+, z\
+) (ucvec3) {{(x), (y)\
+, (z)\
+}}
 
 /** dst = (ucvec3) v */
 static ucvec3 ucvec3_cast_from_float(const float *cast) {

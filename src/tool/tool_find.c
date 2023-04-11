@@ -1,6 +1,6 @@
 #include "u/button.h"
 #include "u/pose.h"
-#include "canvas.h"
+#include "find.h"
 #include "feedback.h"
 #include "dialog.h"
 #include "tool.h"
@@ -22,26 +22,24 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
         *longpress_time = 0;
     }
 
-    if (!u_button_toggled(&self->ro.rect, pointer))
-        return;
-
-    // only passed if button state toggled
-    bool pressed = u_button_is_pressed(&self->ro.rect);
-    s_log("tool grid: %i", pressed);
-    canvas.show_grid = pressed;
+    if (u_button_clicked(&self->ro.rect, pointer)) {
+        if(!find_is_valid()) {
+            dialog_create_find();
+        } else {
+            find_run();
+        }
+    }
 }
 
 static bool is_active(struct Tool *super, float dtime) {
     ToolButton *self = (ToolButton *) super;
-    u_button_set_pressed(&self->ro.rect, canvas.show_grid);
-
     float *longpress_time = (float *) self->additional_data;
     if (*longpress_time > 0) {
         *longpress_time -= dtime;
         if (*longpress_time <= 0) {
             feedback_longpress(u_pose_get_xy(self->ro.rect.pose),
-                               R_COLOR_GREEN);
-            dialog_create_grid();
+                               R_COLOR_YELLOW);
+            dialog_create_find();
         }
     }
 
@@ -53,15 +51,13 @@ static bool is_active(struct Tool *super, float dtime) {
 // public
 //
 
-Tool *tool_new_grid() {
-    return tool_button_new("grid",
-                           "Blends in the\n"
-                           "background\n"
-                           "pixel grid\n\n"
-                           "Shows the borders\n"
-                           "of frames, layers\n\n"
+Tool *tool_new_find() {
+    return tool_button_new("find",
+                           "Find n replace\n"
+                           "with a pattern\n"
+                           "template image\n\n"
                            "hold for options",
-                           "res/button_grid.png",
+                           "res/button_find.png",
                            pointer_event,
                            is_active);
 }

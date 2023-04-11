@@ -8,6 +8,15 @@
 #include "../types/ucmat3.h"
 #include "../vec/ucvecn.h"
 
+// macro to create a ucmat4
+#define ucmat4_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+, v9, v10, v11, v12, v13, v14, v15\
+) (ucmat4) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+, (v9), (v10), (v11), (v12), (v13), (v14), (v15)\
+}}
+
 
 /** dst = (ucmat4) v */
 static ucmat4 ucmat4_cast_from_float(const float *cast) {

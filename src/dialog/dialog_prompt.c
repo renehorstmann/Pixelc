@@ -6,6 +6,7 @@
 #include "m/int.h"
 #include "palette.h"
 #include "dialog.h"
+#include "canvas.h"
 
 static const uColor_s BG_A_COLOR = {{136, 136, 136, 255}};
 static const uColor_s BG_B_COLOR = {{143, 143, 143, 255}};
@@ -51,6 +52,7 @@ static bool pointer_event(ePointer_s pointer) {
 void dialog_create_prompt(const char *title, const char *msg, 
         dialog_on_action_cb on_action, void *user_data) {
     dialog_hide();
+    canvas_reload();
     s_log("prompt: %s", title);
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;

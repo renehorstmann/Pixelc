@@ -6,6 +6,11 @@
 #include "../types/mat2.h"
 #include "../vec/vecn.h"
 
+// macro to create a mat2
+#define mat2_(v0, v1, v2, v3 \
+) (mat2) {{(v0), (v1), (v2), (v3)\
+}}
+
 
 /** dst = (mat2) v */
 static mat2 mat2_cast_from_float(const float *cast) {

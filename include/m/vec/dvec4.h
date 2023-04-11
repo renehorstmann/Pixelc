@@ -6,6 +6,14 @@
 #include "../types/dvec4.h"
 #include "../types/bvec4.h"
 
+// macro to create a dvec4
+#define dvec4_(x, y \
+, z\
+, w\
+) (dvec4) {{(x), (y)\
+, (z)\
+, (w)\
+}}
 
 /** dst = (dvec4) v */
 static dvec4 dvec4_cast_from_float(const float *cast) {

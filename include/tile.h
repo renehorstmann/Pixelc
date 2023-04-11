@@ -6,6 +6,8 @@
 #include "m/types/float.h"
 #include "e/input.h"
 #include "u/image.h"
+#include "r/texture.h"
+#include "r/rect.h"
 
 
 enum tile_size_modes {
@@ -37,6 +39,10 @@ void tile_update(float dtime);
 // returns an invalid image, if !tile.active || !tile.canvas_active
 uImage tile_get_tilemap_preview();
 
+// get the tile texture from a colorcode
+// returns false if not found
+bool tile_get_tile_from_colorcode(rTexture *out_tex_ref, rRect_s *inout_rect, uColor_s colorcode);
+
 vec2 tile_tilesheet_size();
 
 ivec2 tile_canvas_get_size();
@@ -44,7 +50,6 @@ ivec2 tile_canvas_get_size();
 ivec2 tile_canvas_get_cr(vec2 pointer_pos);
 
 void tile_on_canvas_update();
-
 
 void tile_palette_update(float dtime);
 

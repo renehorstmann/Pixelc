@@ -6,6 +6,14 @@
 #include "../types/ucvec4.h"
 #include "../types/bvec4.h"
 
+// macro to create a ucvec4
+#define ucvec4_(x, y \
+, z\
+, w\
+) (ucvec4) {{(x), (y)\
+, (z)\
+, (w)\
+}}
 
 /** dst = (ucvec4) v */
 static ucvec4 ucvec4_cast_from_float(const float *cast) {

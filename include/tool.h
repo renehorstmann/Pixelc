@@ -100,6 +100,8 @@ Tool *tool_new_tab();
 
 Tool *tool_new_kernel();
 
+Tool *tool_new_find();
+
 Tool *tool_new_rgb();
 
 Tool *tool_new_secondary_color();

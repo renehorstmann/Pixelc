@@ -6,6 +6,12 @@
 #include "../types/dvec3.h"
 #include "../types/bvec3.h"
 
+// macro to create a dvec3
+#define dvec3_(x, y \
+, z\
+) (dvec3) {{(x), (y)\
+, (z)\
+}}
 
 /** dst = (dvec3) v */
 static dvec3 dvec3_cast_from_float(const float *cast) {

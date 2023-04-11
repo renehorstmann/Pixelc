@@ -6,6 +6,11 @@
 #include "../types/imat2.h"
 #include "../vec/ivecn.h"
 
+// macro to create a imat2
+#define imat2_(v0, v1, v2, v3 \
+) (imat2) {{(v0), (v1), (v2), (v3)\
+}}
+
 
 /** dst = (imat2) v */
 static imat2 imat2_cast_from_float(const float *cast) {

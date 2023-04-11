@@ -157,6 +157,7 @@ static void on_action(bool ok) {
 
 void dialog_create_tile() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
 
     // show image in the background

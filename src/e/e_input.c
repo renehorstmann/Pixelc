@@ -332,10 +332,20 @@ void e_input_init() {
 
     e_input.reset_touch_time = E_INPUT_DEFAULT_TOUCH_RESET_TIME;
 
+    e_input.gamepad.controller = NULL;
 #ifdef OPTION_GAMEPAD
     int num_joysticks = SDL_NumJoysticks();
-    s_log("found %i joysticks", num_joysticks);
+    int num_gamecontroller = 0;
     for (int i = 0; i < SDL_NumJoysticks(); i++) {
+        if(SDL_IsGameController(i)) {
+            num_gamecontroller++;
+        }
+    }
+    s_log("found %i joysticks from which are %i gamecontroller", num_joysticks, num_gamecontroller);
+    for (int i = 0; i < SDL_NumJoysticks(); i++) {
+        if(!SDL_IsGameController(i)) {
+            continue;
+        }
         e_input.gamepad.controller = SDL_GameControllerOpen(i);
         if (e_input.gamepad.controller) {
             s_log("opened GameController: %s (%i/%i)", SDL_GameControllerName(e_input.gamepad.controller), i, num_joysticks);

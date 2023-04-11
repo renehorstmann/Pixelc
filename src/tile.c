@@ -4,6 +4,7 @@
 #include "u/pose.h"
 #include "u/json.h"
 #include "m/int.h"
+#include "m/float.h"
 #include "m/utils/camera.h"
 #include "io.h"
 #include "canvas.h"
@@ -331,6 +332,25 @@ uImage tile_get_tilemap_preview() {
     uImage img = u_sprite_reorder_to_new_image(sprite);
     u_sprite_kill(&sprite);
     return img;
+}
+
+bool tile_get_tile_from_colorcode(rTexture *out_tex_ref, rRect_s *inout_rect, uColor_s colorcode) {
+    int tile_id = colorcode.r;
+    int tile_x = colorcode.g;
+    int tile_y = colorcode.b;
+    float u = (float) tile_x / L.max_tile_cols;
+    float v = (float) tile_y / L.max_tile_rows;
+    *out_tex_ref = L.tiles_tex;
+
+    if (tile_id >= 0 && tile_id < TILE_MAX_TILESHEETS) {
+        inout_rect->uv = u_pose_new(u, v, 1.0 / L.max_tile_cols, 1.0 / L.max_tile_rows);
+        inout_rect->sprite = vec2_(0, tile_id);
+        inout_rect->color = vec4_(1, 1, 1, colorcode.a / 255.0);
+        return colorcode.a > 0;
+    }
+
+    inout_rect->color.a = 0;
+    return false;
 }
 
 vec2 tile_tilesheet_size() {

@@ -6,6 +6,14 @@
 #include "../types/ivec4.h"
 #include "../types/bvec4.h"
 
+// macro to create a ivec4
+#define ivec4_(x, y \
+, z\
+, w\
+) (ivec4) {{(x), (y)\
+, (z)\
+, (w)\
+}}
 
 /** dst = (ivec4) v */
 static ivec4 ivec4_cast_from_float(const float *cast) {

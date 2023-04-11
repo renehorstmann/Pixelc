@@ -6,6 +6,10 @@
 #include "../types/ucvec2.h"
 #include "../types/bvec2.h"
 
+// macro to create a ucvec2
+#define ucvec2_(x, y \
+) (ucvec2) {{(x), (y)\
+}}
 
 /** dst = (ucvec2) v */
 static ucvec2 ucvec2_cast_from_float(const float *cast) {

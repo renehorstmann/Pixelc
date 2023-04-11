@@ -40,22 +40,27 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 
     // only UP in all cases
     bool go = true;
-    bool set_go = pointer.action == E_POINTER_UP;
+    bool set_go = pointer.action == E_POINTER_UP ;
 
-    if (go && toolbar_pointer_event(hud_pointer))
+    if (go && toolbar_pointer_event(hud_pointer)) {
         go = set_go;
+    }
 
-    if (go && !multitouchcursor.active && palette_pointer_event(hud_pointer))
+    if (go && !multitouchcursor.active && palette_pointer_event(hud_pointer)) {
         go = set_go;
+    }
 
-    if (go && !multitouchcursor.active && cameractrl_pointer_event(c_pointer))
+    if (go && !multitouchcursor.active && cameractrl_pointer_event(c_pointer)) {
         go = set_go;
+    }
 
-    if (go && selectionctrl_pointer_event(c_pointer))
+    if (go && selectionctrl_pointer_event(c_pointer)) {
         go = set_go;
+    }
 
-    if (go)
+    if (go) {
         brush_pointer_event(c_pointer);
+    }
 }
 
 static void key_event(const SDL_Event *event, void *user_data) {

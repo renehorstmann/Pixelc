@@ -6,6 +6,10 @@
 #include "../types/dvec2.h"
 #include "../types/bvec2.h"
 
+// macro to create a dvec2
+#define dvec2_(x, y \
+) (dvec2) {{(x), (y)\
+}}
 
 /** dst = (dvec2) v */
 static dvec2 dvec2_cast_from_float(const float *cast) {

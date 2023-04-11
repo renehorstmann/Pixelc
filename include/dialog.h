@@ -99,6 +99,8 @@ void dialog_create_display();
 
 void dialog_create_grid();
 
+void dialog_create_find();
+
 void dialog_create_save();
 
 void dialog_create_save_tile();

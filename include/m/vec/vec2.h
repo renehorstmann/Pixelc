@@ -6,6 +6,10 @@
 #include "../types/vec2.h"
 #include "../types/bvec2.h"
 
+// macro to create a vec2
+#define vec2_(x, y \
+) (vec2) {{(x), (y)\
+}}
 
 /** dst = (vec2) v */
 static vec2 vec2_cast_from_float(const float *cast) {

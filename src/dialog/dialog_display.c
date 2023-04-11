@@ -6,6 +6,7 @@
 #include "cameractrl.h"
 #include "modal.h"
 #include "dialog.h"
+#include "canvas.h"
 
 static const uColor_s BG_A_COLOR = {{136, 102, 136, 255}};
 static const uColor_s BG_B_COLOR = {{143, 102, 143, 255}};
@@ -154,6 +155,7 @@ static void on_action(bool ok) {
 
 void dialog_create_display() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
     Impl *impl = s_malloc0(sizeof *impl);
     dialog.impl = impl;

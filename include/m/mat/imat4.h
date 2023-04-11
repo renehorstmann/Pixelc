@@ -8,6 +8,15 @@
 #include "../types/imat3.h"
 #include "../vec/ivecn.h"
 
+// macro to create a imat4
+#define imat4_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+, v9, v10, v11, v12, v13, v14, v15\
+) (imat4) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+, (v9), (v10), (v11), (v12), (v13), (v14), (v15)\
+}}
+
 
 /** dst = (imat4) v */
 static imat4 imat4_cast_from_float(const float *cast) {

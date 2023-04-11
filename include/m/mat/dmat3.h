@@ -7,6 +7,13 @@
 #include "../types/dmat2.h"
 #include "../vec/dvecn.h"
 
+// macro to create a dmat3
+#define dmat3_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+) (dmat3) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+}}
+
 
 /** dst = (dmat3) v */
 static dmat3 dmat3_cast_from_float(const float *cast) {

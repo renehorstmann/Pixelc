@@ -178,24 +178,95 @@ static float sca_smoothstep(float x, float edge1, float edge2) {
 }
 
 // dst = sin(x*2pi)
+//  X   ->   Y
+// 0.00 ->  0.0
+// 0.25 -> +1.0
+// 0.50 ->  0.0
+// 0.75 -> -1.0
 static float sca_signal_wave(float x) {
     return sca_sin(x * 2.0f * SCA_PI);
 }
 
+// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
+//  X   ->   Y
+// 0.25 -> -1.0
+// 0.75 -> +1.0
+static float sca_signal_block(float x) {
+    return 2.0f * (sca_mod(x, 1.0f) > 0.5f) - 1.0f;
+}
+
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.50 ->  0.0
+static float sca_signal_saw(float x) {
+    return 2.0f * sca_mod(x, 1.0f) - 1.0f;
+}
+
 // dst = linear up and down signal, x: [0:1] -> dst [-1:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.25 ->  0.0
+// 0.50 -> +1.0
+// 0.75 ->  0.0
 static float sca_signal_ramp(float x) {
-    x = sca_mod(x + 0.75f, 1.0f);
+    x = sca_mod(x + 0.5f, 1.0f);
     return 4.0f * sca_abs(x - 0.5f) - 1.0f;
 }
 
 // dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
-static float sca_signal_saw(float x) {
-    return 2.0f * sca_mod(x + 0.5, 1.0f) - 1.0f;
+// smoothed edge at [1-edge:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 1.00 -> +1.0
+static float sca_signal_smoothsaw_single(float x, float edge) {
+    x = sca_mod(x, 1.0f);
+
+    // linear: y = a*x
+    // smooth: y = 1-b*(x-1)^2
+    // equations solved, so that f==(1-edge) -> y and derivate are equal
+    float f = 1.0f - edge;
+    float b = -1.0f / (2.0f * (f - 1.0f));
+    float a = (1.0f - b * sca_pow(f - 1.0f, 2.0f)) / f;
+
+    float signal;
+    // linear up
+    if (x < f) {
+        signal = a * x;
+    } else {
+        // smooth end
+        signal = 1.0f - b * sca_pow(x - 1.0f, 2.0f);
+    }
+    return -1.0f + 2.0f * signal;
 }
 
-// dst = -1 or 1, x: [0:1] (0-0.5 is -1)
-static float sca_signal_block(float x) {
-    return 2.0f * (sca_mod(x, 1.0) > 0.5) - 1.0f;
+// dst = saw like signal, linear up, step down, x: [0:1] -> dst [-1:1]
+// smoothed edges between [0:edge] , [1-edge:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.50 ->  0.0
+static float sca_signal_smoothsaw(float x, float edge) {
+    x = sca_mod(x, 1.0f);
+    if (x < 0.5f) {
+        // 0.5*2 is exactly 1.0f, which will mod to 0, which will result in 1.0 instead of -1.0
+        return -0.5f - sca_signal_smoothsaw_single((0.5f - x) * 1.99999f, edge * 2.0f) / 2.0f;
+    }
+    return 0.5f + sca_signal_smoothsaw_single((x - 0.5f) * 2.0f, edge * 2.0f) / 2.0f;
+}
+
+// dst = ramp like signal, linear up, linear down, x: [0:1] -> dst [-1:1]
+// smoothed edges between [0:edge] , [0.5-edge:0.5+edge] , [1-edge:1]
+//  X   ->   Y
+// 0.00 -> -1.0
+// 0.25 ->  0.0
+// 0.50 -> +1.0
+// 0.75 ->  0.0
+static float sca_signal_smoothramp(float x, float edge) {
+    x = sca_mod(x, 1.0f);
+    if (x < 0.5f) {
+        return sca_signal_smoothsaw(x * 2.0f, edge * 2.0f);
+    }
+    return -sca_signal_smoothsaw((x - 0.5f) * 2.0f, edge * 2.0f);
 }
 
 /** dst = isnan(x) */

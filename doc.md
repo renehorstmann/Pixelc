@@ -46,12 +46,13 @@ Its also fine to use on desktops, etc.
 - [Image Tabs](#image-tabs)
 - [Frames](#frames)
 - [Layers](#layers)
+- [Project Archive](#project-archive)
 - [Tiles](#tiles)
   - [Isometric Mode](#isometric-mode)
   - [How to edit a tilesheet](#how-to-edit-a-tilesheet)
   - [How to load a tilesheet from a file](#how-to-load-a-tilesheet-from-a-file)
   - [Tile saving and color codes](#tile-saving-and-color-codes)
-- [Project Archive](#project-archive)
+- [Find and Replace / Autotile](#find-and-replace)
 
 ## Draw Modes
 Pixelc supports different modes to draw on the canvas.
@@ -592,6 +593,27 @@ So have a look at the [Frames](#frames) section.
 ![img](doc/res2/button_save.png)
 Layers may be merged down in the save dialog
 
+## Project Archive
+Open the project dialog within the [Save](#save) dialog.
+
+> ![img](doc/res2/button_save.png) --> ![img](doc/res2/button_project.png)
+
+![img](doc/project_dialog.png)
+
+![img](doc/res2/button_save.png) Save the full project as `.tar` archive file.
+> The CxxDroid Version saves the file as `project_save.tar` in the working directory.
+
+A project archive contains:
+- All 9 tab images
+- All 16 tilesheets
+- A config file, that includes the tab frames and layers and the tile sizes
+
+Like with the [import](#import) dialog, you can also upload a project archive `.tar` to restore it.
+Use the **UPLOAD** button to open the archive file in a file dialog
+and click on ![img](doc/res2/button_import.png) to reload it.
+
+> To open a `.tar` file manually, use an archive reader like WinRar, 7zip, etc.
+
 
 ## Tiles
 ![img](doc/res4/button_tile.png)
@@ -707,23 +729,59 @@ Here you can:
 - Save the rendered preview of the tilemap in HD, using the **HD MULTIPLYER**
 - ![img](doc/res2/button_project.png) Open the [project archive](#project-archive) dialog
 
-## Project Archive
-Open the project dialog within the [Save](#save) dialog.
+## Find and Replace
+![img](doc/res4/button_find.png)
 
-> ![img](doc/res2/button_save.png) --> ![img](doc/res2/button_project.png)
+With the find tool, you can search for patterns in your image and replace them.
 
-![img](doc/project_dialog.png)
+> When using the right choice of pattern, you can also create **Auto Tiled Maps**!
 
-![img](doc/res2/button_save.png) Save the full project as `.tar` archive file.
-> The CxxDroid Version saves the file as `project_save.tar` in the working directory.
+Long press ![img](doc/res2/button_find.png) to open the find dialog:
 
-A project archive contains:
-- All 9 tab images
-- All 16 tilesheets
-- A config file, that includes the tab frames and layers and the tile sizes
+![img](doc/find_dialog.png)
 
-Like with the [import](#import) dialog, you can also upload a project archive `.tar` to restore it.
-Use the **UPLOAD** button to open the archive file in a file dialog 
-and click on ![img](doc/res2/button_import.png) to reload it.
+In this dialog you can:
+- ![img](doc/res2/button_from.png)   copy the current pattern as image into the canvas
+  - will overwrite the full image (use undo to reset to the old)
+  - Good to edit the pattern in the canvas
+- ![img](doc/res2/button_to.png)  Create a new pattern from the current canvas image
 
-> To open a `.tar` file manually, use an archive reader like WinRar, 7zip, etc.
+> A pattern needs 2 or more frames!
+
+**TARGETS** is the amount of replace frames (pattern.frames -1)
+
+**RUNS** is the amount of layers in the pattern image. Layers are evaluated one by one.
+
+In a nutshell, the find tool looks for patterns in the first frame of the pattern image.
+
+This frame may look like the following (default):
+
+![img](doc/find_pattern_0.png)
+
+The top left color in each pattern frame/layer (or here tile) is set as the ignore color (here the small cross).
+
+> So you can search for transparency as well
+
+> Each pattern must have a border of the ignore colors / tiles!
+
+When the ![img](doc/res2/button_find.png) is pressed on an image like this:
+
+![img](doc/find_template.png)
+
+Each pattern is replaced with the next frame in the pattern image:
+
+![img](doc/find_pattern_1.png)
+
+Turn on blending frame ![img](doc/res2/button_blend3.png) to see the searched pattern:
+
+![img](doc/find_pattern_1b.png)
+
+> If your pattern image has more than 2 frames, a random frame is used for each match.
+> But only if that target has >= 1 not ignored color, else the previous frame is used
+
+The resulting image will look like this:
+
+![img](doc/find_result.png)
+
+> The default tileset and autotiling pattern are just to play around.
+> If you see a template tile that was not replaced, add that condition to the pattern image

@@ -7,6 +7,13 @@
 #include "../types/imat2.h"
 #include "../vec/ivecn.h"
 
+// macro to create a imat3
+#define imat3_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+) (imat3) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+}}
+
 
 /** dst = (imat3) v */
 static imat3 imat3_cast_from_float(const float *cast) {

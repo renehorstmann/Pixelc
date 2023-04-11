@@ -6,6 +6,14 @@
 #include "../types/vec4.h"
 #include "../types/bvec4.h"
 
+// macro to create a vec4
+#define vec4_(x, y \
+, z\
+, w\
+) (vec4) {{(x), (y)\
+, (z)\
+, (w)\
+}}
 
 /** dst = (vec4) v */
 static vec4 vec4_cast_from_float(const float *cast) {

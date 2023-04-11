@@ -6,6 +6,12 @@
 #include "../types/vec3.h"
 #include "../types/bvec3.h"
 
+// macro to create a vec3
+#define vec3_(x, y \
+, z\
+) (vec3) {{(x), (y)\
+, (z)\
+}}
 
 /** dst = (vec3) v */
 static vec3 vec3_cast_from_float(const float *cast) {

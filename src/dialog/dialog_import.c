@@ -126,6 +126,7 @@ static void on_action(bool ok) {
 
 void dialog_create_import() {
     dialog_hide();
+    canvas_reload();
     s_log("create");
     Impl *impl = s_new0(Impl, 1);
     dialog.impl = impl;

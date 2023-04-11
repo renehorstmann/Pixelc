@@ -8,6 +8,15 @@
 #include "../types/mat3.h"
 #include "../vec/vecn.h"
 
+// macro to create a mat4
+#define mat4_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+, v9, v10, v11, v12, v13, v14, v15\
+) (mat4) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+, (v9), (v10), (v11), (v12), (v13), (v14), (v15)\
+}}
+
 
 /** dst = (mat4) v */
 static mat4 mat4_cast_from_float(const float *cast) {

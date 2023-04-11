@@ -6,6 +6,10 @@
 #include "../types/ivec2.h"
 #include "../types/bvec2.h"
 
+// macro to create a ivec2
+#define ivec2_(x, y \
+) (ivec2) {{(x), (y)\
+}}
 
 /** dst = (ivec2) v */
 static ivec2 ivec2_cast_from_float(const float *cast) {

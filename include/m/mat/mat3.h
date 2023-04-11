@@ -7,6 +7,13 @@
 #include "../types/mat2.h"
 #include "../vec/vecn.h"
 
+// macro to create a mat3
+#define mat3_(v0, v1, v2, v3 \
+, v4, v5, v6, v7, v8\
+) (mat3) {{(v0), (v1), (v2), (v3)\
+, (v4), (v5), (v6), (v7), (v8)\
+}}
+
 
 /** dst = (mat3) v */
 static mat3 mat3_cast_from_float(const float *cast) {
