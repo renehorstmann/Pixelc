@@ -59,7 +59,7 @@ struct Canvas_Globals {
         // if frames or layers are not enabled, the sprite image contains the full canvas
         uSprite sprite;
 
-        // The texture used to draw the canvsa
+        // The texture used to draw the canvas
         // will normally be generated from sprite (but can be reset for mods, e. g. Tilec)
         // is always reset to the default in canvas_update
         rTexture tex;

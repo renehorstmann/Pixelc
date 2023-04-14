@@ -25,6 +25,7 @@ static struct {
     bool init;
     int frames;
     int layers;
+    ivec2 max;
 } L;
 
 static bool in_aabb(ivec4 aabb, int c, int r) {
@@ -41,16 +42,17 @@ static void add_in_array(PatternItemArray *rects, int col, int row, uSprite patt
             return;
         }
     }
+
     // grow aabb
     ivec4 aabb = ivec4_(col, row, 1, 1);
     bool has_grown;
     do {
         has_grown = false;
 
-        int x1 = s_min(0, aabb.x-1);
-        int x2 = s_max(pattern.img.cols-1, aabb.x+aabb.v2);
-        int y1 = s_min(0, aabb.y-1);
-        int y2 = s_max(pattern.img.rows-1, aabb.y+aabb.v3);
+        int x1 = s_max(0, aabb.x-1);
+        int x2 = s_min(pattern.img.cols-1, aabb.x+aabb.v2);
+        int y1 = s_max(0, aabb.y-1);
+        int y2 = s_min(pattern.img.rows-1, aabb.y+aabb.v3);
 
         // check up
         if (aabb.y >= 1) {
@@ -210,7 +212,9 @@ static void draw_buffer(uImage buffer) {
     }
 }
 
-static void run_layer(uSprite pattern, int layer) {
+static void run_layer(int *out_matches, int *out_replaced, uSprite pattern, int layer) {
+    *out_matches = *out_replaced = 0;
+
     uImage img = canvas.RO.image;
     uImage buffer;
     {
@@ -238,7 +242,8 @@ static void run_layer(uSprite pattern, int layer) {
         }
     }
 
-    bool replaced = false;
+    int matches = 0;
+    int replaced = 0;
 
     // search backwards from bottom right to top left
     // so bigger patterns can overwrite the smallest
@@ -248,18 +253,24 @@ static void run_layer(uSprite pattern, int layer) {
             // check rects backwards
             for (int i = rects.size - 1; i >= 0; i--) {
                 if (is_match(c, r, pattern, layer, rects.array[i].aabb)) {
-                    replaced |= replace(buffer, c, r, pattern, layer, rects.array[i].aabb, rects.array[i].max_targets);
+                    matches++;
+                    if(replace(buffer, c, r, pattern, layer, rects.array[i].aabb, rects.array[i].max_targets)) {
+                        replaced++;
+                    }
                 }
             }
         }
     }
 
-    if(replaced) {
+    if(replaced>0) {
         draw_buffer(buffer);
     }
     u_image_kill(&buffer);
 
     patternitemarray_kill(&rects);
+
+    *out_matches = matches;
+    *out_replaced = replaced;
 }
 
 //
@@ -276,6 +287,7 @@ uSprite find_get_pattern_template() {
         s_log_warn("invalid pattern size");
         L.frames = 2;
         L.layers = 1;
+        L.max = ivec2_set(1);
         return u_sprite_new_file(2, 1, "res/find_pattern_example.png");
     }
 
@@ -284,22 +296,26 @@ uSprite find_get_pattern_template() {
     return u_sprite_new_reorder_from_image(L.frames, img);
 }
 
+ivec2 find_get_max_targets_runs() {
+    if (!L.init) {
+        find_load_config();
+        L.init = true;
+    }
+    return L.max;
+}
 
-void find_set_pattern_template(uSprite sprite) {
+void find_set_pattern_template(uSprite sprite, int max_targets, int max_runs) {
     s_log("set pattern template");
-    if (!find_sprite_as_pattern_valid(sprite)) {
+    if (!u_sprite_valid(sprite) || sprite.cols < FIND_MIN_COLS || sprite.rows > FIND_MAX_RUNS) {
         s_log_warn("invalid sprite, ignoring");
         return;
     }
     u_sprite_save_file(sprite, e_io_savestate_file_path("find_pattern.png"));
     L.frames = sprite.cols;
     L.layers = sprite.rows;
+    L.max.x = max_targets;
+    L.max.y = max_runs;
     find_save_config();
-}
-
-
-bool find_sprite_as_pattern_valid(uSprite sprite) {
-    return u_sprite_valid(sprite) && sprite.cols > 1;
 }
 
 bool find_is_valid() {
@@ -308,12 +324,12 @@ bool find_is_valid() {
         L.init = true;
     }
     uSprite sprite = find_get_pattern_template();
-    bool valid = find_sprite_as_pattern_valid(sprite);
+    bool valid = u_sprite_valid(sprite) && sprite.cols >= FIND_MIN_COLS;
     u_sprite_kill(&sprite);
     return valid;
 }
 
-void find_run() {
+FindRunResult_s find_run() {
     if (!L.init) {
         find_load_config();
         L.init = true;
@@ -324,14 +340,19 @@ void find_run() {
     uColor_s prev_color = brush.current_color;
     canvas_reload();
 
+    FindRunResult_s res = {0};
+    res.runs = L.layers;
+
     for (int i = 0; i < L.layers; i++) {
-        run_layer(pattern, i);
+        run_layer(&res.matches[i], &res.replaced[i], pattern, i);
     }
 
     // restore old color
     brush.current_color = prev_color;
 
     canvas_save();
+
+    return res;
 }
 
 
@@ -347,6 +368,9 @@ void find_save_config() {
     uJson *member = u_json_append_object(config, "find");
     u_json_append_int(member, "frames", L.frames);
     u_json_append_int(member, "layers", L.layers);
+
+    u_json_append_int(member, "max_targets", L.max.x);
+    u_json_append_int(member, "max_runs", L.max.y);
 
     u_json_save_file(config, io_config_file(), NULL);
     e_io_savestate_save();
@@ -373,6 +397,19 @@ void find_load_config() {
 
     L.frames = frames;
     L.layers = layers;
+
+    ivec2 max;
+    if (!u_json_get_object_int(member, "max_targets", &max.x)
+        || !u_json_get_object_int(member, "max_runs", &max.y)) {
+        goto CLEAN_UP;
+    }
+
+    if(max.x < 1 || max.y < 1) {
+        s_log_warn("invalid max targets, runs");
+        goto CLEAN_UP;
+    }
+
+    L.max = max;
 
     CLEAN_UP:
     u_json_kill(&config);

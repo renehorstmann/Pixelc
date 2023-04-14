@@ -53,7 +53,7 @@ static void render(const mat4 *cam_mat) {
     ro_text_render(&impl->to_canvas_txt, cam_mat);
     ro_single_render(&impl->to_canvas_btn, cam_mat);
 
-    if(find_sprite_as_pattern_valid(canvas.RO.sprite)) {
+    if(canvas.RO.frames >= FIND_MIN_COLS) {
         ro_text_render(&impl->from_canvas_txt, cam_mat);
         ro_single_render(&impl->from_canvas_btn, cam_mat);
     }
@@ -73,11 +73,37 @@ static bool pointer_event(ePointer_s pointer) {
         return true;
     }
 
-    if (find_sprite_as_pattern_valid(canvas.RO.sprite) && u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
+    if (canvas.RO.frames >= FIND_MIN_COLS && u_button_clicked(&impl->from_canvas_btn.rect, pointer)) {
         s_log("new pattern from canvas");
-        find_set_pattern_template(canvas.RO.sprite);
-        dialog_hide();
-        // return after hide, hide kills this dialog
+        uSprite sprite = canvas_get_sprite();
+
+        // for both if layers or frames are disabled, useful, else up to the current frame, layer
+        // easier for frames, because current_frame 0 is equal to frames off
+        int targets = canvas.RO.current_frame>0? canvas.RO.current_frame : sprite.cols-1;
+        int runs;
+        if(canvas.RO.sprite.rows == 1) {
+            runs = canvas.RO.layers;
+        } else {
+            runs = canvas.RO.current_layer+1;
+        }
+
+        // copy up to targets(+1) and runs
+        uSprite pattern = u_sprite_new_empty(sprite.img.cols, sprite.img.rows, targets+1, runs);
+        for(int r=0; r<pattern.rows; r++) {
+            for(int c=0; c<pattern.cols; c++) {
+                memcpy(u_sprite_sprite(pattern, c, r), u_sprite_sprite(sprite, c, r), u_sprite_sprite_data_size(pattern));
+            }
+        }
+
+        // pattern and max target, run
+        find_set_pattern_template(pattern, sprite.cols-1, sprite.rows);
+
+        u_sprite_kill(&pattern);
+        u_sprite_kill(&sprite);
+
+        // restart dialog
+        dialog_create_find();
+        // return after hide, create calls hide that kills this dialog
         return true;
     }
 
@@ -106,8 +132,11 @@ void dialog_create_find() {
 
     char text[64];
     uSprite sprite = find_get_pattern_template();
-    snprintf(text, sizeof text, "targets: %i\n"
-                                "runs: %i", sprite.cols-1, sprite.rows);
+    ivec2 max = find_get_max_targets_runs();
+    snprintf(text, sizeof text, "targets: %i/%i\n"
+                                "runs:    %i/%i",
+                                sprite.cols-1, max.x,
+                                sprite.rows, max.y);
     ro_text_set_text(&impl->info, text);
     impl->info.pose = u_pose_new(DIALOG_LEFT + 42, DIALOG_TOP - pos - 4, 1, 2);
 

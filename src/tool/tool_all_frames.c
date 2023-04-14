@@ -15,6 +15,9 @@
 
 #define SELECT_CURRENT 3
 
+#define ONION_SKINNING_PREV_ALPHA 0.33
+#define ONION_SKINNING_REM_ALPHA 0.1
+
 typedef struct {
     Tool super;
     RoSingle bg;
@@ -129,10 +132,13 @@ static void select_render(const struct Tool *super, const mat4 *cam_mat) {
 
     ro_single_set_texture(&self->frame, canvas.RO.tex);
     self->frame.rect.sprite.x = frame;
-    for (int i = 0; i <= canvas.RO.current_layer; i++) {
-        self->frame.rect.sprite.y = i;
-        ro_single_render(&self->frame, cam_mat);
-    }
+    self->frame.rect.sprite.y = canvas.RO.current_layer;
+    ro_single_render(&self->frame, cam_mat);
+
+//    for (int i = 0; i <= canvas.RO.current_layer; i++) {
+//        self->frame.rect.sprite.y = i;
+//        ro_single_render(&self->frame, cam_mat);
+//    }
 
     ro_text_render(&self->num, cam_mat);
 

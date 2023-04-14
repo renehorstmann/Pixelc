@@ -66,7 +66,8 @@ static void update(float dtime) {
     if(impl->textinput) {
         char *end;
         float value = (float) strtod(impl->textinput->text, &end);
-        bool ok = end && end != impl->textinput->text && value>0 && value<=128;
+        bool ok = end && end != impl->textinput->text
+                && value>ANIMATION_SIZE_MIN && value<=ANIMATION_SIZE_MAX;
         
         impl->textinput->ok_active = ok;
         
@@ -74,6 +75,7 @@ static void update(float dtime) {
             if(impl->textinput_reason == 0) {
                 s_log("set animation size: %f", value);
                 animation.size = value;
+                animation_save_config();
             } else if(impl->textinput_reason == 1) {
                 s_log("set time field: %f", value);
                 impl->time = value;
@@ -101,6 +103,7 @@ static void update(float dtime) {
             || animation.mode == ANIMATION_MODE_REPEAT_HV) ? 1: 0);
 
     animation.show = animation.auto_show;
+
 }
 
 static void render(const mat4 *cam_mat) {
@@ -124,6 +127,7 @@ static bool pointer_event(ePointer_s pointer) {
     if(u_button_toggled(&impl->show.rect, pointer)) {
         s_log("animation auto_show");
         animation.auto_show = u_button_is_pressed(&impl->show.rect);
+        animation_save_config();
     }
     
     if(pointer.id == 0 
@@ -160,6 +164,8 @@ static bool pointer_event(ePointer_s pointer) {
             else
                 animation.mode = ANIMATION_MODE_REPEAT_V;
         }
+
+        animation_save_config();
     }
     
     if(u_button_toggled(&impl->repeat_v.rect, pointer)) {
@@ -174,6 +180,8 @@ static bool pointer_event(ePointer_s pointer) {
             else
                 animation.mode = ANIMATION_MODE_REPEAT_H;
         }
+
+        animation_save_config();
     }
     
     if(u_button_clicked(&impl->time_sec_btn.rect, pointer)) {

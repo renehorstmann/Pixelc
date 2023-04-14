@@ -4,6 +4,7 @@
 #include "feedback.h"
 #include "dialog.h"
 #include "tool.h"
+#include "tooltip.h"
 
 //
 // private
@@ -26,7 +27,17 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
         if(!find_is_valid()) {
             dialog_create_find();
         } else {
-            find_run();
+            FindRunResult_s result = find_run();
+            char text[256];
+            int written = 0;
+            for(int i=0; i<result.runs; i++) {
+                written += snprintf(text+written, (sizeof text) - written,
+                         "run: %2i  matches: %i\n"
+                         "        replaced: %i\n",
+                         i+1, result.matches[i],
+                         result.replaced[i]);
+            }
+            tooltip_set("find", text);
         }
     }
 }
@@ -41,6 +52,12 @@ static bool is_active(struct Tool *super, float dtime) {
                                R_COLOR_YELLOW);
             dialog_create_find();
         }
+    }
+
+    if(strcmp(dialog.id, "find") == 0) {
+        // reset press if dialog is active,
+        //      else it remains active if dialog finishs
+        self->ro.rect.sprite.x = 0;
     }
 
     // always active

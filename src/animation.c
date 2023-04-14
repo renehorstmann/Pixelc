@@ -1,9 +1,11 @@
 #include "r/r.h"
+#include "e/io.h"
 #include "u/pose.h"
+#include "u/json.h"
 #include "canvas.h"
 #include "camera.h"
 #include "palette.h"
-#include "selectionctrl.h"
+#include "io.h"
 #include "animation.h"
 
 
@@ -110,4 +112,50 @@ void animation_render(const mat4 *cam_mat) {
         L.ro.rect.sprite.y = i;
         ro_single_render(&L.ro, cam_mat);
     }
+}
+
+void animation_save_config() {
+    s_log("save");
+
+    uJson *config = u_json_new_file(io_config_file());
+
+    uJson *member = u_json_append_object(config, "animation");
+
+    u_json_append_float(member, "size", animation.size);
+    u_json_append_int(member, "mode", animation.mode);
+    u_json_append_bool(member, "auto_show", animation.auto_show);
+
+    u_json_save_file(config, io_config_file(), NULL);
+    e_io_savestate_save();
+
+    u_json_kill(&config);
+}
+
+void animation_load_config() {
+    s_log("load");
+
+    uJson *config = u_json_new_file(io_config_file());
+
+    uJson *member = u_json_get_object(config, "animation");
+
+    float size;
+    if(u_json_get_object_float(member, "size", &size)) {
+        if(size > ANIMATION_SIZE_MIN && size <= ANIMATION_SIZE_MAX) {
+            animation.size = size;
+        }
+    }
+
+    int mode;
+    if(u_json_get_object_int(member, "mode", &mode)) {
+        if(mode >= ANIMATION_MODE_SINGLE && mode < ANIMATION_NUM_MODES) {
+            animation.mode = mode;
+        }
+    }
+
+    const bool *autoshow = u_json_get_object_bool(member, "auto_show");
+    if(autoshow) {
+        animation.auto_show = *autoshow;
+    }
+
+    u_json_kill(&config);
 }

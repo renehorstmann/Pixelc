@@ -67,17 +67,9 @@ static void select_update(struct Tool *super, float dtime) {
     
     uSprite sprite = canvas.RO.sprite;
     int layer = self->pos - SELECT_CURRENT + canvas.RO.current_layer;
-    if(layer<0 || layer>=sprite.rows) {
-        // empty
-        self->bg.rect.color.a = 0;
-        self->layer.rect.color.a = 0;
-        ro_text_set_text(&self->num, "");
-    } else {
+    if(layer >= 0 && layer < sprite.rows) {
         self->bg.rect.color.a = self->pos==SELECT_CURRENT? 0.5 : 0.25;
         self->layer.rect.color.a = 1;
-
-        self->layer.rect.sprite.x = canvas.RO.current_frame;
-        self->layer.rect.sprite.y = layer;
         
         char num[4];
         const char *format;
@@ -126,9 +118,18 @@ static void select_update(struct Tool *super, float dtime) {
 
 static void select_render(const struct Tool *super, const mat4 *cam_mat) {
     Select *self = (Select *) super;
+
+
+    uSprite sprite = canvas.RO.sprite;
+    int layer = self->pos - SELECT_CURRENT + canvas.RO.current_layer;
+    if (layer < 0 || layer >= sprite.rows)
+        return;
+
     ro_single_render(&self->bg, cam_mat);
 
     ro_single_set_texture(&self->layer, canvas.RO.tex);
+    self->layer.rect.sprite.x = canvas.RO.current_frame;
+    self->layer.rect.sprite.y = layer;
     ro_single_render(&self->layer, cam_mat);
 
     ro_text_render(&self->num, cam_mat);

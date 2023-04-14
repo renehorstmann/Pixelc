@@ -40,13 +40,19 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 
     // only UP in all cases
     bool go = true;
-    bool set_go = pointer.action == E_POINTER_UP ;
+    bool set_go = pointer.action == E_POINTER_UP;
+
+    bool selectionctrl_acquired = selectionctrl.mode == SELECTIONCTRL_ACQUIRE;
+    bool toolbar_used = false;
+    bool palette_used = false;
 
     if (go && toolbar_pointer_event(hud_pointer)) {
+        toolbar_used = true;
         go = set_go;
     }
 
     if (go && !multitouchcursor.active && palette_pointer_event(hud_pointer)) {
+        palette_used = true;
         go = set_go;
     }
 
@@ -60,6 +66,15 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
 
     if (go) {
         brush_pointer_event(c_pointer);
+    }
+
+    if(pointer.action == E_POINTER_DOWN && (toolbar_used || palette_used)) {
+
+        // if selectionctrl is aquiring, we stop it if not pressed down in the canvas
+        // dont test mode here, because it may be aquired during the pointer events...
+        if(selectionctrl_acquired) {
+            selectionctrl_stop();
+        }
     }
 }
 

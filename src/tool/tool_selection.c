@@ -1,4 +1,5 @@
 #include "u/button.h"
+#include "u/pose.h"
 #include "selectionctrl.h"
 #include "canvas.h"
 #include "tool.h"
@@ -9,12 +10,18 @@
 
 static void pointer_event(struct Tool *super, ePointer_s pointer) {
     ToolButton *self = (ToolButton *) super;
-    if (!u_button_toggled(&self->ro.rect, pointer))
-        return;
 
-    // only passed if button state toggled
-    bool pressed = u_button_is_pressed(&self->ro.rect);
-    if (pressed) {
+    // special button, becaus inputctrl stops selectionctrl on a press down in the toolbar, if it was active
+    // after handling this stuff here...
+
+    if(pointer.action != E_POINTER_DOWN) {
+        return;
+    }
+    if (!u_pose_aa_contains(self->ro.rect.pose, pointer.pos.xy)) {
+        return;
+    }
+
+    if(selectionctrl.mode == SELECTIONCTRL_NONE) {
         s_log("tool selection: start");
         selectionctrl_acquire();
     } else {
@@ -22,7 +29,6 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
         selectionctrl_stop();
         canvas_reload();
     }
-
 }
 
 static bool is_active(struct Tool *super, float dtime) {

@@ -49,6 +49,8 @@ static void init() {
     canvas_load_config();
 
     animation_init();
+    animation_load_config();
+
     selectionctrl_init();
 
     brush_init();

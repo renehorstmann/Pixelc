@@ -278,8 +278,8 @@ void toolbar_init() {
     add_tool(tool_new_size());
     add_tool(tool_new_tile());
     add_tool(tool_new_tab());
-    add_tool(tool_new_frames());
     add_tool(tool_new_layer());
+    add_tool(tool_new_frames());
     add_tool(tool_new_camera());
     add_tool(tool_new_grid());
     add_tool(tool_new_clear());
@@ -368,11 +368,11 @@ void toolbar_update(float dtime) {
     toolbar_container_update(&toolbar.active, start_pos, dtime);
     start_pos += toolbar_constainer_size(&toolbar.active);
 
-    toolbar_container_update(&toolbar.frames, start_pos, dtime);
-    start_pos += toolbar_constainer_size(&toolbar.frames);
-
     toolbar_container_update(&toolbar.layer, start_pos, dtime);
     start_pos += toolbar_constainer_size(&toolbar.layer);
+
+    toolbar_container_update(&toolbar.frames, start_pos, dtime);
+    start_pos += toolbar_constainer_size(&toolbar.frames);
      
 
     toolbar_container_update(&toolbar.selection, start_pos, dtime);
@@ -380,8 +380,8 @@ void toolbar_update(float dtime) {
 
 void toolbar_render(const mat4 *cam_mat) {
     toolbar_container_render(&toolbar.active, cam_mat);
-    toolbar_container_render(&toolbar.frames, cam_mat);
     toolbar_container_render(&toolbar.layer, cam_mat);
+    toolbar_container_render(&toolbar.frames, cam_mat);
     toolbar_container_render(&toolbar.selection, cam_mat);
 }
 
@@ -397,11 +397,11 @@ bool toolbar_pointer_event(ePointer_s pointer) {
         contains = true;
         go = set_go;
     }
-    if (go && toolbar_container_pointer_event(&toolbar.frames, pointer)) {
+    if (go && toolbar_container_pointer_event(&toolbar.layer, pointer)) {
         contains = true;
         go = set_go;
     }
-    if (go && toolbar_container_pointer_event(&toolbar.layer, pointer)) {
+    if (go && toolbar_container_pointer_event(&toolbar.frames, pointer)) {
         contains = true;
         go = set_go;
     }
@@ -413,15 +413,15 @@ bool toolbar_pointer_event(ePointer_s pointer) {
 
 float toolbar_size() {
     return toolbar_constainer_size(&toolbar.active)
-           + toolbar_constainer_size(&toolbar.frames)
            + toolbar_constainer_size(&toolbar.layer)
+           + toolbar_constainer_size(&toolbar.frames)
            + toolbar_constainer_size(&toolbar.selection);
 }
 
 bool toolbar_contains(vec2 pos) {
     return toolbar_container_contains(&toolbar.active, pos)
-           || toolbar_container_contains(&toolbar.frames, pos)
            || toolbar_container_contains(&toolbar.layer, pos)
+           || toolbar_container_contains(&toolbar.frames, pos)
            || toolbar_container_contains(&toolbar.selection, pos);
 }
 
@@ -430,33 +430,17 @@ Tool *toolbar_get_tool_by_pos(vec2 pos) {
     t = toolbar_container_get_tool_by_pos(&toolbar.active, pos);
     if (t)
         return t;
+
+    t = toolbar_container_get_tool_by_pos(&toolbar.layer, pos);
+    if (t)
+        return t;
          
     t = toolbar_container_get_tool_by_pos(&toolbar.frames, pos);
     if (t)
         return t;
 
-    t = toolbar_container_get_tool_by_pos(&toolbar.layer, pos);
-    if (t)
-        return t;
-
     t = toolbar_container_get_tool_by_pos(&toolbar.selection, pos);
     return t;
-}
-
-void toolbar_hide_frames() {
-    s_log("hide");
-    toolbar_container_kill(&toolbar.frames);
-}
-
-void toolbar_show_frames() {
-    s_log("show");
-    toolbar_container_kill(&toolbar.frames);
-    toolbar.frames = toolbar_container_new(
-            toolbar.frames_tools,
-            toolbar.frames_tools_size,
-            u_color_from_hex(TB_FRAMES_BG_A),
-            u_color_from_hex(TB_FRAMES_BG_B));
-    toolbar.frames.align = U_CONTAINER_ALIGN_CENTER;
 }
 
 void toolbar_hide_layer() {
@@ -475,4 +459,20 @@ void toolbar_show_layer() {
     toolbar.layer.align = U_CONTAINER_ALIGN_CENTER;
 }
 
+
+void toolbar_hide_frames() {
+    s_log("hide");
+    toolbar_container_kill(&toolbar.frames);
+}
+
+void toolbar_show_frames() {
+    s_log("show");
+    toolbar_container_kill(&toolbar.frames);
+    toolbar.frames = toolbar_container_new(
+            toolbar.frames_tools,
+            toolbar.frames_tools_size,
+            u_color_from_hex(TB_FRAMES_BG_A),
+            u_color_from_hex(TB_FRAMES_BG_B));
+    toolbar.frames.align = U_CONTAINER_ALIGN_CENTER;
+}
 

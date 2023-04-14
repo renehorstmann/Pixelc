@@ -6,7 +6,8 @@
 #include "s/file.h"
 #include "io.h"
 #include "m/sca/int.h"
-#include "m/mat/float.h"
+#include "m/float.h"
+#include "m/bool.h"
 
 #include "canvas.h"
 
@@ -43,12 +44,22 @@ static struct {
 
     rTexture default_tex;
 
+    vec2 prev_scale;
+
     struct {
+        float frame_times[CANVAS_MAX_FRAMES];
         int current_layer;
         int current_frame;
+        bool enable_layers;
+        bool enable_frames;
         int save_idx;
         int save_idx_max;
         int save_idx_min;
+        struct {
+            bool active;
+            bool canvas_active;
+            bool iso;
+        } tile;
     } tab_saves[CANVAS_MAX_TABS];
 
 } L;
@@ -78,11 +89,6 @@ static void save_image(bool savestate_save) {
     u_json_append_int(state, "layer", canvas.RO.layers);
     u_json_append_int(state, "frames", canvas.RO.frames);
 
-    uJson *frame_times = u_json_append_array(state, "frame_times");
-    for (int i = 0; i < canvas.RO.sprite.cols; i++) {
-        u_json_append_float(frame_times, NULL, canvas.frame_times[i]);
-    }
-
     // saves same space in the config file
     struct uJson_Options options = {0};
     options.array_single_line = true;
@@ -98,7 +104,7 @@ static void save_image(bool savestate_save) {
 }
 
 
-static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_frame_times) {
+static uSprite load_image_file(int tab_id, int save_idx) {
     if (tab_id < 0
         || tab_id >= CANVAS_MAX_TABS
         || save_idx < 0
@@ -121,21 +127,6 @@ static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_fra
         layers = frames = 1;
     }
 
-    if (update_curennt_frame_times) {
-        uJson *frame_times = u_json_get_object(state, "frame_times");
-        bool ok = u_json_get_size(frame_times) >= frames;
-        for (int i = 0; ok && i < frames; i++) {
-            ok &= u_json_get_id_float(frame_times, i, &canvas.frame_times[i]) != NULL;
-        }
-
-        if (!ok) {
-            s_log_warn("failed to grep frame times");
-            for (int i = 0; i < CANVAS_MAX_FRAMES; i++) {
-                canvas.frame_times[i] = DEFAULT_FRAME_TIME;
-            }
-        }
-    }
-
     u_json_kill(&state);
 
     uSprite sprite = u_sprite_new_file(
@@ -152,8 +143,7 @@ static uSprite load_image_file(int tab_id, int save_idx, bool update_curennt_fra
 static void load_image() {
     uSprite sprite = load_image_file(
             canvas.RO.current_tab_id,
-            L.tab_saves[canvas.RO.current_tab_id].save_idx,
-            true);
+            L.tab_saves[canvas.RO.current_tab_id].save_idx);
     canvas.RO.frames = sprite.cols;
     canvas.RO.layers = sprite.rows;
     canvas_set_sprite(sprite, false);
@@ -178,11 +168,15 @@ static void update_render_objects() {
     }
 
     int idx = 0;
+    vec2 scale = canvas_get_unit_scale();
     if (!canvas.RO.frames_enabled) {
         int img_cols = canvas.RO.sprite.img.cols / canvas.RO.frames;
         for (int i = 1; i < canvas.RO.frames; i++) {
             L.sprite_grid.rects[idx].pose = u_pose_new_aa(
-                    i * img_cols - 0.5, 0, 1, canvas.RO.sprite.img.rows
+                    (i * img_cols - 0.5) * scale.x,
+                    0,
+                    1 * scale.x,
+                    canvas.RO.sprite.img.rows * scale.y
             );
             L.sprite_grid.rects[idx].sprite.x = 0;
             idx++;
@@ -192,7 +186,10 @@ static void update_render_objects() {
         int img_rows = canvas.RO.sprite.img.rows / canvas.RO.layers;
         for (int i = 1; i < canvas.RO.layers; i++) {
             L.sprite_grid.rects[idx].pose = u_pose_new_aa(
-                    0, -(i * img_rows - 0.5), canvas.RO.sprite.img.cols, 1
+                    0,
+                    -(i * img_rows - 0.5) * scale.y,
+                    canvas.RO.sprite.img.cols * scale.x,
+                    1 * scale.y
             );
             L.sprite_grid.rects[idx].sprite.x = 1;
             idx++;
@@ -329,6 +326,14 @@ void canvas_update(float dtime) {
 
     if (tile.active && tile.canvas_active)
         tile_on_canvas_update();
+
+    // update render objects if scale differs too much (tile on off, etc.)
+    vec2 scale = canvas_get_unit_scale();
+    if(!bvec2_all(vec2_equal_eps_vec(scale, L.prev_scale, 0.01))) {
+        s_log("scale changed");
+        update_render_objects();
+    }
+    L.prev_scale = scale;
 }
 
 void canvas_render(const mat4 *canvascam_mat) {
@@ -627,12 +632,26 @@ void canvas_set_tab_id(int id) {
 
     canvas_set_frame(L.tab_saves[id].current_frame);
     canvas_set_layer(L.tab_saves[id].current_layer);
+    tile.active = L.tab_saves[id].tile.active;
+    tile.canvas_active = L.tab_saves[id].tile.canvas_active;
+    tile.iso = L.tab_saves[id].tile.iso;
+
+    vecN_copy(canvas.frame_times, L.tab_saves[id].frame_times, CANVAS_MAX_FRAMES);
+
+    // a call to canvas_enable_* may save with the wrong current setting,
+    // so that the second call may be wrong
+    // we save the settings and call them with these values instead
+    bool enable_frames = L.tab_saves[id].enable_frames;
+    bool enable_layers = L.tab_saves[id].enable_layers;
+    s_log("enable frames, layers: %i, %i", enable_frames, enable_layers);
+    canvas_enable_frames(enable_frames);
+    canvas_enable_layers(enable_layers);
 }
 
 uSprite canvas_get_tab(int id) {
     s_log("id=%i", id);
     s_assume(id >= 0 && id < CANVAS_MAX_TABS, "invalid tab id");
-    return load_image_file(id, L.tab_saves[id].save_idx, false);
+    return load_image_file(id, L.tab_saves[id].save_idx);
 }
 
 void canvas_clear_all_base_tabs() {
@@ -652,11 +671,15 @@ void canvas_save_config() {
 
     u_json_append_int(member, "current_tab_id", canvas.RO.current_tab_id);
 
-    u_json_append_bool(member, "frames_enabled", canvas.RO.frames_enabled);
-    u_json_append_bool(member, "layers_enabled", canvas.RO.layers_enabled);
-
-    L.tab_saves[canvas.RO.current_tab_id].current_layer = canvas.RO.current_layer;
-    L.tab_saves[canvas.RO.current_tab_id].current_frame = canvas.RO.current_frame;
+    int tab = canvas.RO.current_tab_id;
+    L.tab_saves[tab].current_layer = canvas.RO.current_layer;
+    L.tab_saves[tab].current_frame = canvas.RO.current_frame;
+    L.tab_saves[tab].enable_layers = canvas.RO.layers_enabled;
+    L.tab_saves[tab].enable_frames = canvas.RO.frames_enabled;
+    L.tab_saves[tab].tile.active = tile.active;
+    L.tab_saves[tab].tile.canvas_active = tile.canvas_active;
+    L.tab_saves[tab].tile.iso = tile.iso;
+    vecN_copy(L.tab_saves[tab].frame_times, canvas.frame_times, CANVAS_MAX_FRAMES);
 
     for (int t = 0; t < CANVAS_MAX_TABS; t++) {
         char name[16];
@@ -666,9 +689,22 @@ void canvas_save_config() {
 
         u_json_append_int(tab, "current_layer", L.tab_saves[t].current_layer);
         u_json_append_int(tab, "current_frame", L.tab_saves[t].current_frame);
+
+        u_json_append_bool(tab, "enable_layers", L.tab_saves[t].enable_layers);
+        u_json_append_bool(tab, "enable_frames", L.tab_saves[t].enable_frames);
+
         u_json_append_int(tab, "save_idx", L.tab_saves[t].save_idx);
         u_json_append_int(tab, "save_idx_max", L.tab_saves[t].save_idx_max);
         u_json_append_int(tab, "save_idx_min", L.tab_saves[t].save_idx_min);
+
+        u_json_append_bool(tab, "tile_active", L.tab_saves[t].tile.active);
+        u_json_append_bool(tab, "tile_canvas_active", L.tab_saves[t].tile.canvas_active);
+        u_json_append_bool(tab, "tile_iso", L.tab_saves[t].tile.iso);
+
+        uJson *frame_times = u_json_append_array(tab, "frame_times");
+        for (int i = 0; i < CANVAS_MAX_FRAMES; i++) {
+            u_json_append_float(frame_times, NULL, L.tab_saves[t].frame_times[i]);
+        }
     }
 
     u_json_append_int(member, "pattern_cols", canvas.RO.pattern_size.x);
@@ -688,7 +724,6 @@ void canvas_load_config() {
 
     uJson *member = u_json_get_object(config, "canvas");
 
-
     for (int t = 0; t < CANVAS_MAX_TABS; t++) {
         char name[16];
         snprintf(name, sizeof name, "tab_%02i", t);
@@ -697,14 +732,42 @@ void canvas_load_config() {
         bool ok = true;
         ok &= u_json_get_object_int(tab, "current_layer", &L.tab_saves[t].current_layer) != NULL;
         ok &= u_json_get_object_int(tab, "current_frame", &L.tab_saves[t].current_frame) != NULL;
+
+        const bool *enable_layers = u_json_get_object_bool(tab, "enable_layers");
+        const bool *enable_frames = u_json_get_object_bool(tab, "enable_frames");
+
+        ok &= enable_layers && enable_frames;
+        if(ok) {
+            L.tab_saves[t].enable_layers = *enable_layers;
+            L.tab_saves[t].enable_frames = *enable_frames;
+        }
+
         ok &= u_json_get_object_int(tab, "save_idx", &L.tab_saves[t].save_idx) != NULL;
         ok &= u_json_get_object_int(tab, "save_idx_max", &L.tab_saves[t].save_idx_max) != NULL;
         ok &= u_json_get_object_int(tab, "save_idx_min", &L.tab_saves[t].save_idx_min) != NULL;
 
+        const bool *tile_active = u_json_get_object_bool(tab, "tile_active");
+        const bool *tile_canvas_active = u_json_get_object_bool(tab, "tile_canvas_active");
+        const bool *tile_iso = u_json_get_object_bool(tab, "tile_iso");
+
+        ok &= tile_active && tile_canvas_active && tile_iso;
+        if(ok) {
+            L.tab_saves[t].tile.active = *tile_active;
+            L.tab_saves[t].tile.canvas_active = *tile_canvas_active;
+            L.tab_saves[t].tile.iso = *tile_iso;
+        }
+
+        uJson *frame_times = u_json_get_object(tab, "frame_times");
+        for (int i = 0; i < CANVAS_MAX_FRAMES; i++) {
+            if(!u_json_get_id_float(frame_times, i, &L.tab_saves[t].frame_times[i])) {
+                L.tab_saves[t].frame_times[i] = DEFAULT_FRAME_TIME;
+            }
+        }
+
         if (!ok) {
             s_log_debug("failed to load tab %i info, resetting to 0", t);
             memset(&L.tab_saves[t], 0, sizeof L.tab_saves[t]);
-            break;
+            vecN_set(L.tab_saves[t].frame_times, DEFAULT_FRAME_TIME, CANVAS_MAX_FRAMES);
         }
     }
 
@@ -724,16 +787,9 @@ void canvas_load_config() {
         canvas_set_pattern_size(pattern_cols, pattern_rows);
     }
 
-    const bool *frames_enabled = u_json_get_object_bool(member, "frames_enabled");
-    const bool *layers_enabled = u_json_get_object_bool(member, "layers_enabled");
+    vecN_copy(canvas.frame_times, L.tab_saves[canvas.RO.current_tab_id].frame_times, CANVAS_MAX_FRAMES);
 
-    if (frames_enabled && layers_enabled) {
-        // will call update_render_objects
-        canvas_enable_frames(*frames_enabled);
-        canvas_enable_layers(*layers_enabled);
-    } else {
-        update_render_objects();
-    }
+    update_render_objects();
 
     u_json_kill(&config);
 }

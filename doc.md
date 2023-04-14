@@ -752,13 +752,57 @@ In this dialog you can:
 
 **RUNS** is the amount of layers in the pattern image. Layers are evaluated one by one.
 
-In a nutshell, the find tool looks for patterns in the first frame of the pattern image.
+> If your canvas had frames or layers enabled, only up to the current frame/layer is used as targets/runs in the pattern.
+> So thats where these **TARGETS: 1/2** come from: "2 maximal targets, but only the first is used."
 
-This frame may look like the following (default):
+In a nutshell, the find tool looks for patterns in the first frame of the pattern image 
+and replaces it with the following target frames.
+
+Suppose you have the following image where you want to replace the eyes:
+
+![img](doc/find_color_blob_before.png)
+
+Your pattern image should look like the following:
+
+On the left is the search frame.
+On the right the target (position of the eyes must match)
+
+![img](doc/find_pattern_color_eyes.png)
+
+> The first pixel on the top left is the ignore color. Do NOT place your search patterns on that pixel
+
+After pressing the ![img](doc/res2/button_find.png) find tool, the resulting image will look like this:
+
+![img](doc/find_color_blob_after.png)
+
+> The tooltip will show the match and replace results for each run (pattern image layer)
+
+You can also search for multiple patterns:
+
+> Each pattern must have a border (box) of at least 1 pixel in the ignore color (top left pixel color)
+
+![img](doc/find_pattern_color_shoes.png)
+
+The result will look like this:
+
+![img](doc/find_color_blob_after_2.png)
+
+If you define more than one target frame, the result is randomly chosen:
+
+> Up to valid pattern targets, so the shoe is always replaced with the first target
+
+![img](doc/find_pattern_color_random.png)
+
+![img](doc/find_color_blob_after_3.png)
+
+### Autotiling
+
+The find tool can be used to create auto tile pattern maps.
+The default find pattern image is a very simple autotile map for the first default tilesheet:
 
 ![img](doc/find_pattern_0.png)
 
-The top left color in each pattern frame/layer (or here tile) is set as the ignore color (here the small cross).
+The ignore color (tile) is here set as the small cross (top left pixel in the pattern image)
 
 > So you can search for transparency as well
 

@@ -9,6 +9,9 @@
 #include "m/types/float.h"
 
 
+#define ANIMATION_SIZE_MIN 0.0
+#define ANIMATION_SIZE_MAX 128.0
+
 enum animation_mode {
     ANIMATION_MODE_SINGLE,
     ANIMATION_MODE_REPEAT_H,
@@ -37,5 +40,14 @@ void animation_init();
 void animation_update(float dtime);
 
 void animation_render(const mat4 *camera_mat);
+
+
+// saves the config to the savestate config.json
+// uses object "animation"
+void animation_save_config();
+
+// loads the config from the savestate config.json
+// uses object "animation"
+void animation_load_config();
 
 #endif //PIXELC_ANIMATION_H
