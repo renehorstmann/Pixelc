@@ -10,7 +10,7 @@
 
 
 #define TOOLTIP_TITLE_MAX 16
-#define TOOLTIP_TIP_MAX 128
+#define TOOLTIP_TIP_MAX 256
 
 struct Tooltip_Globals {
     bool show;

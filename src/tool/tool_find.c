@@ -31,11 +31,17 @@ static void pointer_event(struct Tool *super, ePointer_s pointer) {
             char text[256];
             int written = 0;
             for(int i=0; i<result.runs; i++) {
-                written += snprintf(text+written, (sizeof text) - written,
+                written += snprintf(text+written, sizeof text - written,
                          "run: %2i  matches: %i\n"
                          "        replaced: %i\n",
                          i+1, result.matches[i],
                          result.replaced[i]);
+
+                // snprintf returns the would have been written size, if buffer is big enough.
+                // so written may be larger than the buffer
+                if(written>=sizeof text) {
+                    break;
+                }
             }
             tooltip_set("find", text);
         }

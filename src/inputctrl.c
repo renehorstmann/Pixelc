@@ -68,7 +68,7 @@ static void pointer_event(ePointer_s pointer, void *user_data) {
         brush_pointer_event(c_pointer);
     }
 
-    if(pointer.action == E_POINTER_DOWN && (toolbar_used || palette_used)) {
+    if(pointer.action == E_POINTER_DOWN && (toolbar_used)) {
 
         // if selectionctrl is aquiring, we stop it if not pressed down in the canvas
         // dont test mode here, because it may be aquired during the pointer events...

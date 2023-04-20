@@ -13,6 +13,7 @@
 #include "tooltip.h"
 #include "tile.h"
 #include "multitouchcursor.h"
+#include "selectionctrl.h"
 #include "palette.h"
 
 
@@ -442,6 +443,11 @@ void palette_set_color(int index) {
     L.select_ro.rect.pose = L.palette_ro.rects[index].pose;
     L.last_selected = index;
     L.custom_select_active = false;
+    
+    // stop aqcuiring
+    if(selectionctrl.mode == SELECTIONCTRL_ACQUIRE) {
+        selectionctrl_stop();
+    }
 }
 
 void palette_set_custom_select(mat4 select_pose) {
