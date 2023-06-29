@@ -19,7 +19,7 @@ struct sStream_i;
 
 // sStr_s from a c string
 static sStr_s s_strc(const char *cstring) {
-    return (sStr_s) {(char *) cstring, strlen(cstring)};
+    return (sStr_s) {(char *) cstring, cstring? strlen(cstring) : 0};
 }
 
 // returns true if the str is empty

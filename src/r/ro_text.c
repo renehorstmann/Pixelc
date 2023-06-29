@@ -141,7 +141,7 @@ void ro_text_set_color(RoText *self, vec4 color) {
 // private
 //
 
-static bool font55_sprite_cb(vec2 *sprite, char c) {
+static bool font53_sprite_cb(vec2 *sprite, char c) {
     const int columns = 12;
     const int rows = 5;
 
@@ -162,6 +162,10 @@ static bool font55_sprite_cb(vec2 *sprite, char c) {
     sprite->y = row;
 
     return nl;
+}
+
+static bool font55_sprite_cb(vec2 *sprite, char c) {
+    return font53_sprite_cb(sprite, c);
 }
 
 
@@ -192,12 +196,44 @@ static bool font85_sprite_cb(vec2 *sprite, char c) {
 // public
 //
 
+RoText ro_text_new_font53(int max) {
+    const int columns = 12;
+    const int rows = 5;
+    rTexture tex = r_texture_new_file(columns, rows, "res/r/font53.png");
+    r_texture_filter_nearest(tex);
+    RoText self = ro_text_new(max, font53_sprite_cb, tex);
+    self.offset = (vec2) {{4, 6}};
+    return self;
+}
+
+RoText ro_text_new_font53_shadow(int max, ucvec4 *opt_shadow_color) {
+    const int columns = 12;
+    const int rows = 5;
+    uSprite sprite = u_sprite_new_file(columns, rows, "res/r/font53_shadow.png");
+    if(opt_shadow_color) {
+        int size = sprite.img.cols*sprite.img.rows*sprite.img.layers;
+        for(int i=0; i<size; i++) {
+            uColor_s *col = u_image_pixel_index(sprite.img, i, 0);
+            if(u_color_equals(*col, RO_TEXT_SHADOW_COLOR))
+                *col = *opt_shadow_color;
+        }
+    }
+    rTexture tex = r_texture_new_sprite_buffer(sprite.img.cols, sprite.img.rows, columns, rows, sprite.img.data);
+    u_sprite_kill(&sprite);
+    r_texture_filter_nearest(tex);
+    RoText self = ro_text_new(max, font53_sprite_cb, tex);
+    self.offset = (vec2) {{4, 6}};
+    return self;
+}
+
 RoText ro_text_new_font55(int max) {
     const int columns = 12;
     const int rows = 5;
     rTexture tex = r_texture_new_file(columns, rows, "res/r/font55.png");
     r_texture_filter_nearest(tex);
-    return ro_text_new(max, font55_sprite_cb, tex);
+    RoText self = ro_text_new(max, font55_sprite_cb, tex);
+    self.offset = (vec2) {{6, 6}};
+    return self;
 }
 
 RoText ro_text_new_font55_shadow(int max, ucvec4 *opt_shadow_color) {
@@ -215,7 +251,9 @@ RoText ro_text_new_font55_shadow(int max, ucvec4 *opt_shadow_color) {
     rTexture tex = r_texture_new_sprite_buffer(sprite.img.cols, sprite.img.rows, columns, rows, sprite.img.data);
     u_sprite_kill(&sprite);
     r_texture_filter_nearest(tex);
-    return ro_text_new(max, font55_sprite_cb, tex);
+    RoText self =  ro_text_new(max, font55_sprite_cb, tex);
+    self.offset = (vec2) {{6, 6}};
+    return self;
 }
 
 RoText ro_text_new_font85(int max) {

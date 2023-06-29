@@ -25,8 +25,14 @@ static size_t dvecN_snprint(char *str, size_t size, const double *v, int n) {
     size_t used = 0;
     used += snprintf(str, size, "(double[%i]) { ", n);
     for (int i = 0; i < n; i++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                          "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i < n - 1 ? ", " : "");
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }");
     return used;
@@ -39,6 +45,9 @@ static size_t dvecN_snprintln(char *str, size_t size, const double *v, int n) {
         size = 0;
     }
     size_t used = dvecN_snprint(str, size, v, n);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

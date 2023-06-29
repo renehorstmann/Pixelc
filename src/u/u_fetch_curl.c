@@ -6,6 +6,10 @@
 #include "s/str.h"
 #include "u/fetch.h"
 
+static struct {
+   bool init;
+} L;
+
 struct uFetch {
     SDL_mutex *lock;
     
@@ -14,6 +18,8 @@ struct uFetch {
     bool error;
     
     bool fetch_completed;
+
+    bool kill_me;
 
     sAllocator_i a;
 };
@@ -28,10 +34,18 @@ static ssize response_writer(void *ptr, ssize size, ssize nmemb, void *ud) {
 static int request_thread(void *ud) {
     uFetch *self = ud;
 
+    if(!L.init) {
+        L.init = true;
+        curl_global_init(CURL_GLOBAL_ALL);
+    }
+
     CURL *curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, self->url->data);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, response_writer);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, self);
+
+    // dont use signals in multi threads
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
     sString *post_data = s_string_new_invalid();
     if(!s_str_empty(s_string_get_str(self->data))) {
@@ -54,8 +68,10 @@ static int request_thread(void *ud) {
     long http_code = 0;
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
+    bool kill_me;
     SDL_LockMutex(self->lock);
     {
+        kill_me = self->kill_me;
         self->error = perform_res != CURLE_OK || http_code != 200;
         self->fetch_completed = true;
         if (self->data->size == 0 || self->error)
@@ -63,9 +79,19 @@ static int request_thread(void *ud) {
     }
     SDL_UnlockMutex(self->lock);
 
-    s_log_trace("succeded, error: %i", self->error);
+    if(!self->error) {
+        s_log_trace("fetched: %i bytes", self->data->size);
+    } else {
+        s_log_warn("failed with http code: %i", http_code);
+    }
     curl_easy_cleanup(curl);
     s_string_kill(&post_data);
+
+
+    // kill the thread if client has killed it while it was fetching
+    if(kill_me) {
+        u_fetch_kill(&self);
+    }
 
     return 0;
 }
@@ -105,9 +131,15 @@ void u_fetch_kill(uFetch **self_ptr) {
     uFetch *self = *self_ptr;
     if(!self)
         return;
-    s_string_kill(&self->url);
-    SDL_DestroyMutex(self->lock);
-    s_a_free(self->a,self);
+
+    // if thread is still running, the thread kills the fetch...
+    if(!self->fetch_completed) {
+        self->kill_me = true;
+    } else {
+        s_string_kill(&self->url);
+        SDL_DestroyMutex(self->lock);
+        s_a_free(self->a, self);
+    }
     *self_ptr = NULL;
 }
 

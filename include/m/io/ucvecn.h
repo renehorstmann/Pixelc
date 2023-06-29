@@ -25,8 +25,14 @@ static size_t ucvecN_snprint(char *str, size_t size, const unsigned char *v, int
     size_t used = 0;
     used += snprintf(str, size, "(unsigned char[%i]) { ", n);
     for (int i = 0; i < n; i++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                          "%" UCSCA_PRINT_FORMAT_SPECIFIER "%s", v[i], i < n - 1 ? ", " : "");
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }");
     return used;
@@ -39,6 +45,9 @@ static size_t ucvecN_snprintln(char *str, size_t size, const unsigned char *v, i
         size = 0;
     }
     size_t used = ucvecN_snprint(str, size, v, n);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

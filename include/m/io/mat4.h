@@ -54,11 +54,20 @@ static size_t mat4_snprint_line(char *str, size_t size, mat4 m) {
     size_t used = 0;
     used += snprintf(str, size, "(mat4) {{ ");
     for (int c = 0; c < 4; c++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "%s", c > 0 ? ",   " : "");
         for (int r = 0; r < 4; r++) {
+            if (used >= size) {
+                str = NULL;
+            }
             used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                              "%" SCA_PRINT_FORMAT_SPECIFIER "%s", m.m[c][r], r < 4 - 1 ? ", " : "");
         }
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -71,6 +80,9 @@ static size_t mat4_snprintln_line(char *str, size_t size, mat4 m) {
         size = 0;
     }
     size_t used = mat4_snprint_line(str, size, m);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
@@ -95,11 +107,20 @@ static size_t mat4_snprint(char *str, size_t size, mat4 m) {
     size_t used = 0;
     used += snprintf(str, size, "(mat4) {{ ");
     for (int c = 0; c < 4; c++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "%s\n    ", c > 0 ? "," : "");
         for (int r = 0; r < 4; r++) {
+            if (used >= size) {
+                str = NULL;
+            }
             used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                              "%12" SCA_PRINT_FORMAT_SPECIFIER "%s", m.m[c][r], r < 4 - 1 ? ", " : "");
         }
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -112,6 +133,9 @@ static size_t mat4_snprintln(char *str, size_t size, mat4 m) {
         size = 0;
     }
     size_t used = mat4_snprint(str, size, m);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

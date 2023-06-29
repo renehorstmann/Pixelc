@@ -377,6 +377,7 @@ uJson *u_json_new_empty_a(sAllocator_i a) {
     uJson *self = s_a_malloc0(a, sizeof *self);
     self->a = a;
     self->type = U_JSON_TYPE_OBJECT;
+    u_json_set_name(self, "root");
     return self;
 }
 
@@ -397,13 +398,14 @@ uJson *u_json_new_str_a(sStr_s s_str_to_parse, sAllocator_i a) {
         return u_json_new_empty_a(a);
     }
     uJson *self = root->data_arr;
+    s_a_free(a, root->name);
     s_a_free(a, root);
     return self;
 }
 
 uJson *u_json_new_file_a(const char *file, sAllocator_i a) {
     sString *s = s_file_read(file, true);
-    uJson *self = u_json_new_str(s_string_get_str(s));
+    uJson *self = u_json_new_str_a(s_string_get_str(s), a);
     s_string_kill(&s);
     return self;
 }

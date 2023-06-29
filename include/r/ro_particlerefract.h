@@ -65,6 +65,16 @@ void ro_particlerefract_kill(RoParticleRefract *self);
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
 // if update is true, update is called before rendering
+// particles delta_time are just read, not set
+void ro_particlerefract_render_raw_sub(const RoParticleRefract *self, int num, const mat4 *camera_mat,
+                                   float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
+
+
+// renders a subset of the particles with refraction enabled
+// scale: real pixels per pixel
+// opt_view_aabb, opt_framebuffer: see note at the top of the file
+// if update is true, update is called before rendering
+// particles delta_time = (time_ms - start_time_ms) / 1000.0f
 void ro_particlerefract_render_sub(const RoParticleRefract *self, su32 time_ms, int num, const mat4 *camera_mat,
                                    float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer);
 
@@ -77,6 +87,16 @@ void ro_particlerefract_set_texture_refraction(RoParticleRefract *self, rTexture
 // renders the particles with refraction enabled
 // scale: real pixels per pixel
 // opt_view_aabb, opt_framebuffer: see note at the top of the file
+// particles delta_time are just read, not set
+static void ro_particlerefract_render_raw(const RoParticleRefract *self, const mat4 *camera_mat,
+                                      float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+    ro_particlerefract_render_raw_sub(self, self->num, camera_mat, scale, opt_view_aabb, opt_framebuffer);
+}
+
+// renders the particles with refraction enabled
+// scale: real pixels per pixel
+// opt_view_aabb, opt_framebuffer: see note at the top of the file
+// particles delta_time = (time_ms - start_time_ms) / 1000.0f
 static void ro_particlerefract_render(const RoParticleRefract *self, su32 time_ms, const mat4 *camera_mat,
                                       float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
     ro_particlerefract_render_sub(self, time_ms, self->num, camera_mat, scale, opt_view_aabb, opt_framebuffer);

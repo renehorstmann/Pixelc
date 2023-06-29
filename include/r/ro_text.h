@@ -30,6 +30,14 @@ typedef struct {
 // sprite_fn should set the sprite from a char and return true for newline
 RoText ro_text_new(int max, ro_text_sprite_fn sprite_fn, rTexture tex_sink);
 
+// inits text with the r/font53.png sprite sheet
+RoText ro_text_new_font53(int max);
+
+// inits text with the r/font53_shadow.png sprite sheet
+// adds a dark transparent shadow
+// uColer_s := ucvec4
+RoText ro_text_new_font53_shadow(int max, ucvec4 *opt_shadow_color);
+
 // inits text with the r/font55.png sprite sheet
 RoText ro_text_new_font55(int max);
 

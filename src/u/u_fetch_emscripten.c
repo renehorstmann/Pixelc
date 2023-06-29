@@ -26,7 +26,7 @@ static void ems_fetch_success(emscripten_fetch_t *fetch) {
     self->error = false;
 
     s_log("fetching succeded");
-    s_log_trace("fetched: %i %s", (int) fetch->numBytes, fetch->data);
+    s_log_trace("fetched: %i bytes", (int) fetch->numBytes);
     
     emscripten_fetch_close(self->fetch);
     self->fetch = NULL;

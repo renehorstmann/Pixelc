@@ -26,11 +26,20 @@ static size_t dmatN_snprint_line(char *str, size_t size, const double *m, int n)
     size_t used = 0;
     used += snprintf(str, size, "(double[%i*%i]) { ", n, n);
     for (int c = 0; c < n; c++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "%s", c > 0 ? ",   " : "");
         for (int r = 0; r < n; r++) {
+            if (used >= size) {
+                str = NULL;
+            }
             used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                              "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", m[r + c * n], r < n - 1 ? ", " : "");
         }
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }");
     return used;
@@ -43,6 +52,9 @@ static size_t dmatN_snprintln_line(char *str, size_t size, const double *m, int 
         size = 0;
     }
     size_t used = dmatN_snprint_line(str, size, m, n);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
@@ -66,11 +78,20 @@ static size_t dmatN_snprint(char *str, size_t size, const double *m, int n) {
     size_t used = 0;
     used += snprintf(str, size, "(double[%i*%i]) { ", n, n);
     for (int c = 0; c < n; c++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "%s\n    ", c > 0 ? "," : "");
         for (int r = 0; r < n; r++) {
+            if (used >= size) {
+                str = NULL;
+            }
             used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                              "%12" DSCA_PRINT_FORMAT_SPECIFIER "%s", m[r + c * n], r < n - 1 ? ", " : "");
         }
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }");
     return used;
@@ -83,6 +104,9 @@ static size_t dmatN_snprintln(char *str, size_t size, const double *m, int n) {
         size = 0;
     }
     size_t used = dmatN_snprint(str, size, m, n);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

@@ -50,11 +50,20 @@ static size_t imat3_snprint_line(char *str, size_t size, imat3 m) {
     size_t used = 0;
     used += snprintf(str, size, "(imat3) {{ ");
     for (int c = 0; c < 3; c++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "%s", c > 0 ? ",   " : "");
         for (int r = 0; r < 3; r++) {
+            if (used >= size) {
+                str = NULL;
+            }
             used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                              "%" ISCA_PRINT_FORMAT_SPECIFIER "%s", m.m[c][r], r < 3 - 1 ? ", " : "");
         }
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -67,6 +76,9 @@ static size_t imat3_snprintln_line(char *str, size_t size, imat3 m) {
         size = 0;
     }
     size_t used = imat3_snprint_line(str, size, m);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }
@@ -91,11 +103,20 @@ static size_t imat3_snprint(char *str, size_t size, imat3 m) {
     size_t used = 0;
     used += snprintf(str, size, "(imat3) {{ ");
     for (int c = 0; c < 3; c++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "%s\n    ", c > 0 ? "," : "");
         for (int r = 0; r < 3; r++) {
+            if (used >= size) {
+                str = NULL;
+            }
             used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                              "%12" ISCA_PRINT_FORMAT_SPECIFIER "%s", m.m[c][r], r < 3 - 1 ? ", " : "");
         }
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -108,6 +129,9 @@ static size_t imat3_snprintln(char *str, size_t size, imat3 m) {
         size = 0;
     }
     size_t used = imat3_snprint(str, size, m);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

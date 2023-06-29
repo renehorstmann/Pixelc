@@ -28,11 +28,15 @@ typedef struct {
     bool up, left, down, right;
     bool enter, space;
     bool w, a, s, d;
+    bool ac_back;
 } eInputKeys;
 
 typedef struct {
     // is NULL if not available
     SDL_GameController *controller;
+
+    // heap copy of sdls name
+    char *name;
 
     vec2 stick_l, stick_r;
     bool btn_shoulder_l, btn_shoulder_r;

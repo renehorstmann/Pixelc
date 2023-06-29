@@ -38,8 +38,14 @@ static size_t dvec3_snprint(char *str, size_t size, dvec3 v) {
     size_t used = 0;
     used += snprintf(str, size, "(dvec3) {{ ");
     for (int i = 0; i < 3; i++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                          "%" DSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 3 - 1 ? ", " : "");
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -52,6 +58,9 @@ static size_t dvec3_snprintln(char *str, size_t size, dvec3 v) {
         size = 0;
     }
     size_t used = dvec3_snprint(str, size, v);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

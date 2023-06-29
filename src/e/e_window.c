@@ -133,6 +133,7 @@ static void resume_wnd() {
     // delta_time should not be near infinity...
     L.last_time_ms = SDL_GetTicks();
     L.pause = false;
+    s_log_trace("e_window: resume callbacks finished");
 }
 
 
@@ -287,8 +288,6 @@ void e_window_kill() {
     emscripten_cancel_main_loop();
     EM_ASM(set_error_img(););
 #endif
-
-    SDL_DestroyMutex(L.run_once_lock);
 }
 
 void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
@@ -308,6 +307,8 @@ void e_window_main_loop(e_window_main_loop_fn main_loop, void *user_data) {
 #endif
     }
 #endif
+
+    SDL_DestroyMutex(L.run_once_lock);
 
 
 #ifdef OPTION_SANITIZER

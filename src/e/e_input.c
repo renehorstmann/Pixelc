@@ -4,6 +4,8 @@
 #include "e/gui_nk.h"
 #include "e/gui.h"
 #include "e/input.h"
+#include "s/string.h"
+#include "s/str.h"
 
 struct eInput_Globals e_input;
 
@@ -64,7 +66,7 @@ static struct {
     int touchs_size;
 
     float last_touched_time;
-    
+
     bool mouse_pressed[E_POINTER_BUTTON_NUM];
 
     ePointer_s current_pointer_0;
@@ -97,11 +99,11 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
 
 
 static void emit_pointer_events(ePointer_s action) {
-    if(action.id == 0)
+    if (action.id == 0)
         L.current_pointer_0 = action;
 
     if (L.reg_pointer_e_vip.cb) {
-        if(action.action == E_POINTER_HOVER && !L.reg_pointer_e_vip.hover)
+        if (action.action == E_POINTER_HOVER && !L.reg_pointer_e_vip.hover)
             return;
         L.reg_pointer_e_vip.cb(action, L.reg_pointer_e_vip.ud);
         return;
@@ -110,7 +112,7 @@ static void emit_pointer_events(ePointer_s action) {
     // copy to be safe to unregister in an event
     RegPointerArray array = L.reg_pointer;
     for (int i = 0; i < array.size; i++) {
-        if(action.action == E_POINTER_HOVER && !array.array[i].hover)
+        if (action.action == E_POINTER_HOVER && !array.array[i].hover)
             continue;
         array.array[i].cb(action, array.array[i].ud);
     }
@@ -130,11 +132,22 @@ static void emit_wheel_events(vec4 pos, bool up) {
 
 
 static bool touch_pointer_id_already_exists(int pointer_id) {
-    for(int i=0; i<L.touchs_size; i++) {
-        if(L.touchs[i].pointer_id == pointer_id)
+    for (int i = 0; i < L.touchs_size; i++) {
+        if (L.touchs[i].pointer_id == pointer_id)
             return true;
     }
     return false;
+}
+
+static void touch_id_remove(int id) {
+    if (id < 0 || id >= L.touchs_size) {
+        s_log_error("invalid id: %i/%i", id, L.touchs_size);
+        return;
+    }
+    for (int i = id; i < L.touchs_size - 1; i++) {
+        L.touchs[i] = L.touchs[i + 1];
+    }
+    L.touchs_size--;
 }
 
 static void input_handle_pointer_touch(SDL_Event *event) {
@@ -172,9 +185,24 @@ static void input_handle_pointer_touch(SDL_Event *event) {
             break;
         }
     }
+
+    if (id >= 0 && action == E_POINTER_DOWN) {
+        s_log_trace("e_input_update: got down, but also an id ==> emit up first");
+        ePointer_s up = {
+                L.touchs[id].pos,
+                E_POINTER_UP,
+                L.touchs[id].pointer_id
+        };
+
+        // may call e_input_reset_touch
+        emit_pointer_events(up);
+        touch_id_remove(id);
+        id = -1;
+    }
+
     if (id < 0) {
-        if(action == E_POINTER_UP) {
-            s_log_warn("got an up without an active touch id, ignoring...");
+        if (action == E_POINTER_UP) {
+            s_log_trace("got an up without an active touch id, ignoring...");
             return;
         }
         if (L.touchs_size >= E_MAX_TOUCH_IDS) {
@@ -183,7 +211,7 @@ static void input_handle_pointer_touch(SDL_Event *event) {
 
         // create new id
         int pointer_id = 0;
-        while(touch_pointer_id_already_exists(pointer_id)) {
+        while (touch_pointer_id_already_exists(pointer_id)) {
             pointer_id++;
         }
 
@@ -192,30 +220,28 @@ static void input_handle_pointer_touch(SDL_Event *event) {
         L.touchs[id].finger_id = finger_id;
 
         if (action == E_POINTER_MOVE) {
+            s_log_trace("e_input_update: got move, but not an id ==> down");
             action = E_POINTER_DOWN;
-            s_log_warn("e_input_update: touch got new id but action_pressed==move");
         }
     }
 
     // update pos
     L.touchs[id].pos = pos;
-    
-    
+
+
     // emit
     ePointer_s res;
     res.action = action;
     res.id = L.touchs[id].pointer_id;
     res.pos = pos;
-    emit_pointer_events(res);
 
-
-    // remove ups
+    // remove ups ( emitting may call e_input_reset_touch)
     if (action == E_POINTER_UP) {
-        for(int i=id; i<L.touchs_size-1; i++) {
-            L.touchs[i] = L.touchs[i+1];
-        }
-        L.touchs_size--;
-    }    
+        touch_id_remove(id);
+    }
+
+    // may call e_input_reset_touch
+    emit_pointer_events(res);
 }
 
 static void input_handle_pointer_mouse(SDL_Event *event) {
@@ -225,7 +251,7 @@ static void input_handle_pointer_mouse(SDL_Event *event) {
     bool pressed = bvecN_any(L.mouse_pressed, E_POINTER_BUTTON_NUM);
     switch (event->type) {
         case SDL_MOUSEBUTTONDOWN:
-            if (btn_idx<0 || btn_idx>=E_POINTER_BUTTON_NUM)
+            if (btn_idx < 0 || btn_idx >= E_POINTER_BUTTON_NUM)
                 break;
             emit_pointer_events(pointer_mouse(
                     E_POINTER_DOWN,
@@ -233,12 +259,18 @@ static void input_handle_pointer_mouse(SDL_Event *event) {
             L.mouse_pressed[btn_idx] = true;
             break;
         case SDL_MOUSEMOTION:
-            emit_pointer_events(pointer_mouse(
-                    pressed? E_POINTER_MOVE : E_POINTER_HOVER,
-                    0));
+            if(pressed) {
+                for(int i=0; i<E_POINTER_BUTTON_NUM; i++) {
+                    if(L.mouse_pressed[i]) {
+                        emit_pointer_events(pointer_mouse(E_POINTER_MOVE, -i));
+                    }
+                }
+            } else {
+                emit_pointer_events(pointer_mouse(E_POINTER_HOVER, 0));
+            }
             break;
         case SDL_MOUSEBUTTONUP:
-            if (btn_idx<0 || btn_idx>=E_POINTER_BUTTON_NUM)
+            if (btn_idx < 0 || btn_idx >= E_POINTER_BUTTON_NUM)
                 break;
             emit_pointer_events(pointer_mouse(
                     E_POINTER_UP,
@@ -263,7 +295,7 @@ static void input_handle_keys(SDL_Event *event) {
 
     // copy to be safe to unregister in an event
     RegKeyRawArray array = L.reg_key_raw;
-    for (int i = 0; i<array.size; i++) {
+    for (int i = 0; i < array.size; i++) {
         array.array[i].cb(event, array.array[i].ud);
     }
     bool down = event->type == SDL_KEYDOWN;
@@ -297,6 +329,9 @@ static void input_handle_keys(SDL_Event *event) {
             break;
         case SDLK_d:
             e_input.keys.d = down;
+            break;
+        case SDLK_AC_BACK:
+            e_input.keys.ac_back = down;
             break;
     }
 }
@@ -334,22 +369,62 @@ void e_input_init() {
 
     e_input.gamepad.controller = NULL;
 #ifdef OPTION_GAMEPAD
-    int num_joysticks = SDL_NumJoysticks();
-    int num_gamecontroller = 0;
-    for (int i = 0; i < SDL_NumJoysticks(); i++) {
-        if(SDL_IsGameController(i)) {
-            num_gamecontroller++;
+    {
+        int num_joysticks = SDL_NumJoysticks();
+        int num_gamecontroller = 0;
+        for (int i = 0; i < SDL_NumJoysticks(); i++) {
+            if (SDL_IsGameController(i)) {
+                num_gamecontroller++;
+            }
         }
-    }
-    s_log("found %i joysticks from which are %i gamecontroller", num_joysticks, num_gamecontroller);
-    for (int i = 0; i < SDL_NumJoysticks(); i++) {
-        if(!SDL_IsGameController(i)) {
-            continue;
-        }
-        e_input.gamepad.controller = SDL_GameControllerOpen(i);
-        if (e_input.gamepad.controller) {
-            s_log("opened GameController: %s (%i/%i)", SDL_GameControllerName(e_input.gamepad.controller), i, num_joysticks);
-            break;
+        s_log("found %i joysticks from which are %i gamecontroller", num_joysticks, num_gamecontroller);
+        for (int i = 0; i < SDL_NumJoysticks(); i++) {
+            if (!SDL_IsGameController(i)) {
+                continue;
+            }
+            const char *gc_name = SDL_GameControllerNameForIndex(i);
+            if (!gc_name) {
+                s_log_wtf("joystick is a controller, but got no name? %i", i);
+                continue;
+            }
+
+            bool name_valid = true;
+            {
+                sString *name = s_string_new_clone(s_strc(gc_name));
+                s_str_tolower(s_string_get_str(name));
+
+                const char *blacklist[] = {
+                        "uinput-fortsense",     // android 12 virtual gamecontroller, sebi bug
+                        "uinput-fpc",           // finger print controller? according to a bug in libgdx
+                        "uinput-goodixfp",      // reddit guy stating that...
+                        "uinput-goodix",        // ...
+                        NULL
+                };
+
+                for (const char **it = blacklist; *it; it++) {
+                    if (s_str_equals(s_string_get_str(name), s_strc(*it))) {
+                        name_valid = false;
+                        break;
+                    }
+                }
+                if (!name_valid) {
+                    s_log("GameController on blacklist: %s", name->data);
+                }
+
+                s_string_kill(&name);
+            }
+            if(!name_valid) {
+                continue;
+            }
+
+            e_input.gamepad.controller = SDL_GameControllerOpen(i);
+            if (e_input.gamepad.controller) {
+                const char *name = SDL_GameControllerName(e_input.gamepad.controller);
+                e_input.gamepad.name = s_new(char, strlen(name) + 1);
+                strcpy(e_input.gamepad.name, name);
+                s_log("opened GameController: %s (%i/%i)", name, i, num_joysticks);
+                break;
+            }
         }
     }
 #endif
@@ -431,7 +506,7 @@ void e_input_update(float dt) {
 
 #ifdef OPTION_GAMEPAD
     // gamepad
-    if(e_input.gamepad.controller) {
+    if (e_input.gamepad.controller) {
         SDL_GameController *c = e_input.gamepad.controller;
         vec2 stick;
         stick.x = SDL_GameControllerGetAxis(c, SDL_CONTROLLER_AXIS_LEFTX);
@@ -455,10 +530,10 @@ void e_input_update(float dt) {
 
 
 void e_input_reset_touch() {
-    if(L.touchs_size>0) {
+    if (L.touchs_size > 0) {
         s_log_warn("resetting touch pointers");
     }
-    for(int i=0; i<L.touchs_size; i++) {
+    for (int i = 0; i < L.touchs_size; i++) {
         ePointer_s action = {
                 L.touchs[i].pos,
                 E_POINTER_UP,
@@ -544,7 +619,7 @@ void e_input_set_vip_wheel_event(eWheelEventFn event, void *user_data) {
 
 void e_input_emit_wheel_event(bool up, vec4 *opt_cursor_pos) {
     vec4 pos = L.current_pointer_0.pos;
-    if(opt_cursor_pos) {
+    if (opt_cursor_pos) {
         pos = *opt_cursor_pos;
     }
     emit_wheel_events(pos, up);

@@ -37,8 +37,14 @@ static size_t vec4_snprint(char *str, size_t size, vec4 v) {
     size_t used = 0;
     used += snprintf(str, size, "(vec4) {{ ");
     for (int i = 0; i < 4; i++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                          "%" SCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 4 - 1 ? ", " : "");
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -51,6 +57,9 @@ static size_t vec4_snprintln(char *str, size_t size, vec4 v) {
         size = 0;
     }
     size_t used = vec4_snprint(str, size, v);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

@@ -35,8 +35,14 @@ static size_t bvec2_snprint(char *str, size_t size, bvec2 v) {
     size_t used = 0;
     used += snprintf(str, size, "(bvec2) {{ ");
     for (int i = 0; i < 2; i++) {
+        if (used >= size) {
+            str = NULL;
+        }
         used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used,
                          "%" BSCA_PRINT_FORMAT_SPECIFIER "%s", v.v[i], i < 2 - 1 ? ", " : "");
+    }
+    if (used >= size) {
+        str = NULL;
     }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, " }}");
     return used;
@@ -49,6 +55,9 @@ static size_t bvec2_snprintln(char *str, size_t size, bvec2 v) {
         size = 0;
     }
     size_t used = bvec2_snprint(str, size, v);
+    if (used >= size) {
+        str = NULL;
+    }
     used += snprintf(!str ? NULL : str + used, !size ? 0 : size - used, "\n");
     return used;
 }

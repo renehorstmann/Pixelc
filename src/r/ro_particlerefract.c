@@ -9,16 +9,18 @@
 
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
-// update needs to be called each time before rendering to update the time values
-static void update_sub(const RoParticleRefract *self, uint32_t time_ms, int num) {
-    r_render_error_check("ro_particlerefract_updateBEGIN");
-    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
 
+static void calc_deltatime_sub(const RoParticleRefract *self, su32 time_ms, int num) {
     for (int i = 0; i < num; i++) {
         rParticleRect_s *r = &self->rects[i];
         r->delta_time = (time_ms - r->start_time_ms) / 1000.0f;
     }
+}
 
+// update needs to be called each time before rendering to update the time values
+static void update_sub(const RoParticleRefract *self, int num) {
+    r_render_error_check("ro_particlerefract_updateBEGIN");
+    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
     glBufferSubData(GL_ARRAY_BUFFER,
                     0,
                     num * sizeof(rParticleRect_s),
@@ -178,16 +180,17 @@ void ro_particlerefract_kill(RoParticleRefract *self) {
     *self = (RoParticleRefract) {0};
 }
 
-void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_ms, int num, const mat4 *camera_mat,
-                                   float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+
+void ro_particlerefract_render_raw_sub(const RoParticleRefract *self, int num, const mat4 *camera_mat,
+                                       float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
     if(!ro_particlerefract_valid(self))
         return;
 
     num = isca_clamp(num, 1, self->num);
 
-    update_sub(self, time_ms, num);
+    update_sub(self, num);
 
-    r_render_error_check("ro_particlerefract_renderBEGIN");
+    r_render_error_check("ro_particlerefract_render_rawBEGIN");
 
     if (!opt_view_aabb)
         opt_view_aabb = &VIEW_AABB_FULLSCREEN;
@@ -233,7 +236,17 @@ void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_
     }
 
     glUseProgram(0);
-    r_render_error_check("ro_particlerefract_render");
+    r_render_error_check("ro_particlerefract_render_raw");
+}
+
+void ro_particlerefract_render_sub(const RoParticleRefract *self, uint32_t time_ms, int num, const mat4 *camera_mat,
+                                   float scale, const vec4 *opt_view_aabb, const rTexture2D *opt_framebuffer) {
+    if(!ro_particlerefract_valid(self))
+        return;
+
+    num = isca_clamp(num, 1, self->num);
+    calc_deltatime_sub(self, time_ms, num);
+    ro_particlerefract_render_raw_sub(self, num, camera_mat, scale, opt_view_aabb, opt_framebuffer);
 }
 
 void ro_particlerefract_set_texture_main(RoParticleRefract *self, rTexture tex_main_sink) {

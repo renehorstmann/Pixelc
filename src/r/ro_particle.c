@@ -6,16 +6,17 @@
 #include "r/texture.h"
 #include "r/ro_particle.h"
 
-// update needs to be called each time before rendering to update the time values
-static void update_sub(const RoParticle *self, uint32_t time_ms, int num) {
-    r_render_error_check("ro_particle_updateBEGIN");
-    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
-
+static void calc_deltatime_sub(const RoParticle *self, su32 time_ms, int num) {
     for (int i = 0; i < num; i++) {
         rParticleRect_s *r = &self->rects[i];
         r->delta_time = (time_ms - r->start_time_ms) / 1000.0f;
     }
+}
 
+// update needs to be called each time before rendering to update the time values
+static void update_sub(const RoParticle *self, int num) {
+    r_render_error_check("ro_particle_updateBEGIN");
+    glBindBuffer(GL_ARRAY_BUFFER, self->L.vbo);
     glBufferSubData(GL_ARRAY_BUFFER,
                     0,
                     num * sizeof(rParticleRect_s),
@@ -168,16 +169,15 @@ void ro_particle_kill(RoParticle *self) {
     *self = (RoParticle) {0};
 }
 
-
-void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, const mat4 *camera_mat) {
+void ro_particle_render_raw_sub(const RoParticle *self, int num, const mat4 *camera_mat) {
     if(!ro_particle_valid(self))
         return;
 
+    update_sub(self, num);
+
     num = isca_clamp(num, 1, self->num);
 
-    update_sub(self, time_ms, num);
-
-    r_render_error_check("ro_particle_renderBEGIN");
+    r_render_error_check("ro_particle_render_rawBEGIN");
     glUseProgram(self->L.program);
 
     // base
@@ -202,7 +202,15 @@ void ro_particle_render_sub(const RoParticle *self, uint32_t time_ms, int num, c
     }
 
     glUseProgram(0);
-    r_render_error_check("ro_particle_render");
+    r_render_error_check("ro_particle_render_raw");
+}
+
+void ro_particle_render_sub(const RoParticle *self, su32 time_ms, int num, const mat4 *camera_mat) {
+    if(!ro_particle_valid(self))
+        return;
+    num = isca_clamp(num, 1, self->num);
+    calc_deltatime_sub(self, time_ms, num);
+    ro_particle_render_raw_sub(self, num, camera_mat);
 }
 
 void ro_particle_set_texture(RoParticle *self, rTexture tex_sink) {
