@@ -863,6 +863,10 @@ void tile_load_config() {
         tile.canvas_active = *canvas_active;
         tile.iso = *iso;
     }
+    
+    // bug for large tilemaps...
+    // don't restart in tilemode...
+    tile.active = false;
 
     int id;
     if (!u_json_get_object_int(member, "id", &id)) {

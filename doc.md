@@ -622,6 +622,8 @@ Click on the tile tool to start the tiling mode.
 
 ![img](doc/tiling_mode.png)
 
+> In the newest version of Pixelc, the tile button has moved into the grid dialog!
+
 The canvas now renders a tile for each pixel unit.
 
 > (WebApp) limitation:

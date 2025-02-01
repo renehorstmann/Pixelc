@@ -3,6 +3,7 @@
 #include "u/button.h"
 #include "textinput.h"
 #include "canvas.h"
+#include "tile.h"
 #include "cameractrl.h"
 #include "modal.h"
 #include "dialog.h"
@@ -16,6 +17,9 @@ static const vec4 TITLE_COLOR = {{0.6, 0.8, 0.6, 1}};
 //
 
 typedef struct {
+    RoText tile_txt;
+    RoSingle tile;
+    
     RoText show_txt;
     RoSingle show;
     
@@ -35,6 +39,8 @@ typedef struct {
 
 static void kill_fn() {
     Impl *impl = dialog.impl;
+    ro_text_kill(&impl->tile_txt);
+    ro_single_kill(&impl->tile);
     ro_text_kill(&impl->show_txt);
     ro_single_kill(&impl->show);
     ro_text_kill(&impl->pattern_cols_text);
@@ -82,11 +88,15 @@ static void update(float dtime) {
     snprintf(buf, sizeof buf, "%i", impl->pattern_rows);
     ro_text_set_text(&impl->pattern_rows_num, buf);
     
+    u_button_set_pressed(&impl->tile.rect, tile.active);
+    
     u_button_set_pressed(&impl->show.rect, canvas.show_bg);
 }
 
 static void render(const mat4 *cam_mat) {
     Impl *impl = dialog.impl;
+    ro_text_render(&impl->tile_txt, cam_mat);
+    ro_single_render(&impl->tile, cam_mat);
     ro_text_render(&impl->show_txt, cam_mat);
     ro_single_render(&impl->show, cam_mat);
     ro_text_render(&impl->pattern_cols_text, cam_mat);
@@ -97,6 +107,15 @@ static void render(const mat4 *cam_mat) {
 
 static bool pointer_event(ePointer_s pointer) {
     Impl *impl = dialog.impl;
+    
+    if(u_button_toggled(&impl->tile.rect, pointer)) {
+        // only passed if button state toggled
+        bool pressed = u_button_is_pressed(&impl->tile.rect);
+        s_log("tile button");
+        tile.active = pressed;
+        tile_save_config();
+        cameractrl_set_home();
+    }
     
     if(u_button_toggled(&impl->show.rect, pointer)) {
         s_log("canvas show_bg");
@@ -155,6 +174,16 @@ void dialog_create_grid() {
 
     int pos = 20;
     
+    impl->tile_txt = ro_text_new_font55(32);
+    ro_text_set_text(&impl->tile_txt, "tilemode:");
+    ro_text_set_color(&impl->tile_txt, DIALOG_TEXT_COLOR);
+    impl->tile_txt.pose = u_pose_new(DIALOG_LEFT + 6, DIALOG_TOP - pos - 2, 1, 2);
+
+    impl->tile = ro_single_new(r_texture_new_file(2, 1, "res/button_tile.png"));
+    impl->tile.rect.pose = u_pose_new_aa(DIALOG_LEFT + DIALOG_WIDTH - 30, DIALOG_TOP - pos + 2, 16, 16);
+
+    pos += 15;
+    
     impl->show_txt = ro_text_new_font55(32);
     ro_text_set_text(&impl->show_txt, "show\n"
             "  background:");
@@ -186,7 +215,7 @@ void dialog_create_grid() {
     impl->pattern_rows_text.pose = u_pose_new(DIALOG_LEFT + 8, DIALOG_TOP - pos, 1, 2);
     impl->pattern_rows_num.pose = u_pose_new(DIALOG_LEFT + 90, DIALOG_TOP - pos, 1, 2);
     impl->pattern_rows_hitbox = u_pose_new_aa(DIALOG_LEFT, DIALOG_TOP - pos + 4, DIALOG_WIDTH, 10 + 8);
-    pos += 10;
+    pos += 5;
 
 
     dialog_set_title("grid", TITLE_COLOR);

@@ -276,7 +276,10 @@ void toolbar_init() {
     add_tool(tool_new_import());
     add_tool(tool_new_display());
     add_tool(tool_new_size());
-    add_tool(tool_new_tile());
+    
+    // removed here and added in the grid dialog
+    //add_tool(tool_new_tile());
+    
     add_tool(tool_new_tab());
     add_tool(tool_new_layer());
     add_tool(tool_new_frames());
