@@ -13,6 +13,7 @@ struct rRender_Globals {
     vec4 clear_color;               // used by begin_frame
     SDL_Window *window;             // window, set by active
     ivec2 current_window_size;      // window size of the current frame
+    vec2 current_viewport_offset;
 
     // 3D (2D_ARRAY) not working in WebGL2
     rTexture2D framebuffer_tex;         // copy of the framebuffer, after blit_framebuffer
@@ -50,11 +51,12 @@ void r_render_show_startup(float block_time, const char *author);
 // updates and renders the startup screen, if created.
 // calls begin and end frame itself
 // returns true if the startup finished
-bool r_render_startup_update(ivec2 window_size, float delta_time);
+bool r_render_startup_update(ivec2 window_size, ivec2 full_window_size, ivec2 size_offset_lb, float delta_time);
 
 // starts a new frame
 // cols and rows of the current screen, see e_window
-void r_render_begin_frame(ivec2 window_size);
+// full_window_size + size_offset_lb are for unsafe regions like camera notches
+void r_render_begin_frame(ivec2 window_size, ivec2 full_window_size, ivec2 size_offset_lb);
 
 // swaps the framebuffer
 void r_render_end_frame();

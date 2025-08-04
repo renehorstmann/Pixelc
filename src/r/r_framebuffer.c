@@ -5,7 +5,7 @@
 
 rFramebuffer r_framebuffer_new(int cols, int rows) {
     r_render_error_check("r_framebuffer_newBEGIN");
-    rFramebuffer self;
+    rFramebuffer self = {0};
     glGenFramebuffers(1, &self.fbo);
     self.tex = r_texture2d_new(cols, rows, NULL);
 

@@ -48,6 +48,11 @@ struct eWindow_Globals {
 
     // will read from sdl at the start of each frame:
     ivec2 size;
+
+    // full size for android that also makes use of the none interactive area like behind camera notched
+    // size is in the interactive safe zone and applied as a viewport to the backbuffer (with "size_offset_lb")
+    ivec2 full_size;
+    ivec2 size_offset_lb;
     
     // time between frames
     su32 frame_time_ms;

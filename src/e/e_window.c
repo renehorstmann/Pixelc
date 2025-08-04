@@ -11,10 +11,20 @@
 #include "e/definitions.h"
 
 
+#ifdef PLATFORM_ANDROID
+#include <jni.h>
+// fn at end of file
+static void android_get_unsafe_viewport(int *out_borders4);
+#endif
+
+
 #define MAX_DELTA_TIME 5.0 // seconds
 
 // only for some platforms, see block_for_fps_limit
 #define MAX_FPS 60
+
+// define to use a custom unsafe border for testing
+//#define DEBUG_UNSAFE_BORDER
 
 struct eWindow_Globals e_window;
 
@@ -92,6 +102,32 @@ static void loop() {
     e_window.deltatime = e_window.frame_deltatime;
     e_window.deltatime_ms = e_window.frame_deltatime_ms;
     e_window.time_ms = e_window.frame_time_ms;
+
+
+    // safe sizes
+    e_window.full_size = e_window.size;
+    e_window.size_offset_lb = (ivec2) {0, 0};
+
+    // left bottom right top
+    int unsafe_borders[4] = {0};
+#ifdef PLATFORM_ANDROID
+    // fn at end of file
+    android_get_unsafe_viewport(unsafe_borders);
+#else
+#  ifdef DEBUG_UNSAFE_BORDER
+    unsafe_borders[0] = 80;
+    unsafe_borders[1] = 120;
+    unsafe_borders[2] = 40;
+    unsafe_borders[3] = 64;
+#  endif
+#endif
+
+
+    // apply unsafe borders
+    e_window.size.x -= unsafe_borders[0] + unsafe_borders[2];
+    e_window.size.y -= unsafe_borders[1] + unsafe_borders[3];
+    e_window.size_offset_lb.x = (int) unsafe_borders[0];
+    e_window.size_offset_lb.y = (int) unsafe_borders[1];
 
     SDL_LockMutex(L.run_once_lock);
     for(int i=0; i<L.reg_run_once_e_size; i++) {
@@ -483,3 +519,117 @@ static void log_window_event(const SDL_Event *event) {
     }
 }
 
+
+
+#ifdef PLATFORM_ANDROID
+#include <jni.h>
+// fn at end of file
+static void android_get_unsafe_viewport(int *out_borders4) {
+    // JNI CALL
+    {
+        JNIEnv* env = NULL;
+        jobject activity = NULL;
+        jclass clazz = NULL;
+        jintArray result = NULL;
+        jint* borders = NULL;
+
+
+        env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+        if(!env) {
+            s_log_error("failed to get jni env");
+            goto JNI_CLEAN_UP;
+        }
+
+        activity = (jobject) SDL_AndroidGetActivity();
+        if(!activity) {
+            s_log_error("failed to get activity");
+            goto JNI_CLEAN_UP;
+        }
+
+        clazz = (*env)->GetObjectClass(env, activity);
+        if(!clazz) {
+            s_log_error("failed to get clazz");
+            goto JNI_CLEAN_UP;
+        }
+
+        jmethodID method_id = (*env)->GetMethodID(env, clazz,
+                                                  "e_window_get_unsafe_viewport",
+                                                  "()[I");
+        if(!method_id) {
+            s_log_error("method not found");
+            goto JNI_CLEAN_UP;
+        }
+
+        result = (jintArray)(*env)->CallObjectMethod
+(env, activity, method_id);
+        if(!result) {
+            s_log_error("failed to call method and get result");
+            goto JNI_CLEAN_UP;
+        }
+
+        if ((*env)->GetArrayLength(env, result) != 4) {
+            s_log_error("array length != 4");
+            goto JNI_CLEAN_UP;
+        }
+
+        borders = (*env)->GetIntArrayElements(env, result, 0);
+        if (!borders) {
+            s_log_error("failed to get float array elements");
+            goto JNI_CLEAN_UP;
+        }
+
+        out_borders4[0] = borders[0];
+        out_borders4[1] = borders[1];
+        out_borders4[2] = borders[2];
+        out_borders4[3] = borders[3];
+
+        JNI_CLEAN_UP:
+        if(env) {
+            if(activity) (*env)->DeleteLocalRef(env, activity);
+            if(clazz) (*env)->DeleteLocalRef(env, clazz);
+            if (result) (*env)->DeleteLocalRef(env, result);
+            if (borders) (*env)->ReleaseFloatArrayElements(env, result, borders, 0);
+        }
+    }
+}
+
+
+/* reference android vibed function:
+
+public int[] e_window_get_unsafe_viewport() {
+    int left = 0, top = 0, right = 0, bottom = 0;
+
+    // Check for Android version (API 21 or later for WindowInsets support)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // For API 30+ (Android 11+), use WindowMetrics and getInsets
+            WindowMetrics metrics = getWindowManager().getCurrentWindowMetrics();
+            WindowInsets insets = metrics.getWindowInsets();
+            if (insets != null) {
+                left = insets.getInsets(WindowInsets.Type.systemBars()).left;
+                top = insets.getInsets(WindowInsets.Type.systemBars()).top;
+                right = insets.getInsets(WindowInsets.Type.systemBars()).right;
+                bottom = insets.getInsets(WindowInsets.Type.systemBars()).bottom;
+            }
+        } else {
+            // For API 21 - 29, use getWindow().getDecorView().getRootWindowInsets()
+            WindowInsets insets = getWindow().getDecorView().getRootWindowInsets();
+            if (insets != null) {
+                left = insets.getSystemWindowInsetLeft();
+                top = insets.getSystemWindowInsetTop();
+                right = insets.getSystemWindowInsetRight();
+                bottom = insets.getSystemWindowInsetBottom();
+            }
+        }
+    }
+
+    // Log or debug to ensure values are correct
+    //System.out.println("Unsafe Viewport: Left=" + left + " Bottom=" + bottom + " Right=" + right + " Top=" + top);
+
+    // Return the values as an array
+    return new int[]{left, bottom, right, top};
+}
+
+
+*/
+#endif

@@ -50,6 +50,8 @@
     // example for fullscreen: 0.5, 0.5, 0.5, 0.5
     uniform vec4 view_aabb;
 
+    uniform vec2 viewport_offset;
+
 
     uniform sampler2DArray tex_main;
     uniform sampler2DArray tex_refraction;
@@ -90,8 +92,8 @@
 
         // grab coords for framebuffer
         vec2 r_coord;
-        r_coord.x = (gl_FragCoord.x + offset.x) / tex_framebuffer_size.x;
-        r_coord.y = 1.0f - (gl_FragCoord.y + offset.y) / tex_framebuffer_size.y;
+        r_coord.x = (gl_FragCoord.x - viewport_offset.x + offset.x) / tex_framebuffer_size.x;
+        r_coord.y = 1.0f - (gl_FragCoord.y - viewport_offset.y + offset.y) / tex_framebuffer_size.y;
 
         // if the coords are near the view space, or out of it, mix alpha to 0
         float alpha = mix(refract.a, 0.0f,

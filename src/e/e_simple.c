@@ -76,7 +76,7 @@ void e_simple_start(const char *title,
 }
 
 static void init_loop(void *user_data) {
-    if (r_render_startup_update(e_window.size, e_window.deltatime)) {
+    if (r_render_startup_update(e_window.size, e_window.full_size, e_window.size_offset_lb, e_window.deltatime)) {
         s_log("init");
         e_window_set_vsync(true);
         e_window_reset_main_loop(main_loop, NULL);
@@ -110,7 +110,7 @@ static void main_loop(void *user_data) {
     double load_time = s_timer_reset(&timer);
 
     // render
-    r_render_begin_frame(e_window.size);
+    r_render_begin_frame(e_window.size, e_window.full_size, e_window.size_offset_lb);
 
     e_simple.render_fn(e_window.frame_deltatime);
 

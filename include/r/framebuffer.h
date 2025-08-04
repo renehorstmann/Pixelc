@@ -13,6 +13,7 @@
 typedef struct {
     GLuint fbo;         // GL_FRAMEBUFFER
     rTexture2D tex;
+    ivec2 viewport_offset;
 } rFramebuffer;
 
 

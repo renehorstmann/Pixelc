@@ -216,6 +216,8 @@ void ro_particlerefract_render_raw_sub(const RoParticleRefract *self, int num, c
 
     glUniform4fv(glGetUniformLocation(self->L.program, "view_aabb"), 1, opt_view_aabb->v);
 
+    glUniform2fv(glGetUniformLocation(self->L.program, "viewport_offset"), 1, r_render.current_viewport_offset.v);
+
     glUniform1i(glGetUniformLocation(self->L.program, "tex_main"), 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, self->tex_main.tex);

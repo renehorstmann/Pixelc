@@ -89,8 +89,9 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    res.pos.x = (2.0f * x) / e_window.size.x - 1.0f;
-    res.pos.y = 1.0f - (2.0f * y) / e_window.size.y;
+    // pos according to full screen
+    res.pos.x = (2.0f * x) / e_window.full_size.x - 1.0f;
+    res.pos.y = 1.0f - (2.0f * y) / e_window.full_size.y;
     res.pos.z = 0;
     res.pos.w = 1;
 
@@ -99,6 +100,15 @@ static ePointer_s pointer_mouse(enum ePointerAction action, int btn_id) {
 
 
 static void emit_pointer_events(ePointer_s action) {
+
+    // apply unsafe viewport
+    float x_pixels_lb = (0.5f + 0.5f *action.pos.x) * e_window.full_size.x;
+    float y_pixels_lb = (0.5f + 0.5f *action.pos.y) * e_window.full_size.y;
+    x_pixels_lb -= e_window.size_offset_lb.x;
+    y_pixels_lb -= e_window.size_offset_lb.y;
+    action.pos.x = -1.0f + 2.0f * x_pixels_lb / e_window.size.x;
+    action.pos.y = -1.0f + 2.0f * y_pixels_lb / e_window.size.y;
+
     if (action.id == 0)
         L.current_pointer_0 = action;
 

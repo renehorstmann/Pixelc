@@ -5,6 +5,8 @@
 #include "r/ro_particlerefract.h"
 #include "r/render.h"
 
+
+
 struct rRender_Globals r_render;
 
 //
@@ -19,6 +21,7 @@ typedef struct {
 
 static struct {
     rFramebuffer framebuffer_window;
+    ivec2 current_viewport_offset;
 
     GLuint framebuffer_tex_fbo;
     // if not null, startup screen was created
@@ -85,14 +88,18 @@ void r_render_kill() {
     memset(&L, 0, sizeof L);
 }
 
-void r_render_begin_frame(ivec2 window_size) {
+void r_render_begin_frame(ivec2 window_size, ivec2 full_window_size, ivec2 size_offset_lb) {
     r_render_error_check("r_render_begin_frameBEGIN");
 
     // update window framebuffer reference
     L.framebuffer_window.tex.size = window_size;
+    L.framebuffer_window.viewport_offset = size_offset_lb;
 
     r_render.current_window_size = window_size;
+    r_render.current_viewport_offset.x = size_offset_lb.x;
+    r_render.current_viewport_offset.y = size_offset_lb.y;
 
+    // unsafe viewport set in restore framebuffer
     r_render_restore_framebuffer();
 
     r_render_clear(r_render.clear_color);
@@ -138,11 +145,14 @@ void r_render_blit_framebuffer() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    ivec2 off = L.current_viewport_offset;
+
     // actual blit calls
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, L.framebuffer_tex_fbo);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, current_draw_fbo);
     // src x0, y0, x1, y1; dst x0, y0, x1, y1   -> seems to be mirrored, so swapping dst y0 <> y1
-    glBlitFramebuffer(0, 0, cols, rows, 0, rows, cols, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(off.x, off.y, off.x + cols, off.y + rows,
+        0, rows, cols, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     // restore
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_draw_fbo);
@@ -154,7 +164,8 @@ void r_render_blit_framebuffer() {
 void r_render_set_framebuffer(rFramebuffer fbo) {
     r_render_error_check("r_render_set_framebufferBEGIN");
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo.fbo);
-    glViewport(0, 0, fbo.tex.size.x, fbo.tex.size.y);
+    glViewport(fbo.viewport_offset.x, fbo.viewport_offset.y, fbo.tex.size.x, fbo.tex.size.y);
+    L.current_viewport_offset = fbo.viewport_offset;
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
@@ -281,12 +292,12 @@ void r_render_show_startup(float block_time, const char *author) {
     L.start_up->test.rects[0].color.a = 0;
 }
 
-bool r_render_startup_update(ivec2 window_size, float delta_time) {
+bool r_render_startup_update(ivec2 window_size, ivec2 full_window_size, ivec2 size_offset_lb, float delta_time) {
     if (!L.start_up)
         return true;
 
     // render
-    r_render_begin_frame(window_size);
+    r_render_begin_frame(window_size, full_window_size, size_offset_lb);
     mat4 cam = camera(window_size.x, window_size.y);
     ro_text_render(&L.start_up->author_text, &cam);
     r_render_blit_framebuffer();
