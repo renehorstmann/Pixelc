@@ -422,6 +422,9 @@ void e_window_set_screen_mode(enum e_window_screen_modes mode) {
         sdl_mode = SDL_WINDOW_FULLSCREEN;
     }
 #endif
+#ifdef PLATFORM_ANDROID
+    sdl_mode = SDL_WINDOW_FULLSCREEN;
+#endif
     SDL_SetWindowFullscreen(e_window.sdl_window, sdl_mode);
 }
 
@@ -585,51 +588,11 @@ static void android_get_unsafe_viewport(int *out_borders4) {
 
         JNI_CLEAN_UP:
         if(env) {
-            if(activity) (*env)->DeleteLocalRef(env, activity);
-            if(clazz) (*env)->DeleteLocalRef(env, clazz);
+            if (borders) (*env)->ReleaseIntArrayElements(env, result, borders, 0);
             if (result) (*env)->DeleteLocalRef(env, result);
-            if (borders) (*env)->ReleaseFloatArrayElements(env, result, borders, 0);
+            if(clazz) (*env)->DeleteLocalRef(env, clazz);
+            if(activity) (*env)->DeleteLocalRef(env, activity);
         }
     }
 }
-
-
-/* reference android vibed function:
-
-public int[] e_window_get_unsafe_viewport() {
-    int left = 0, top = 0, right = 0, bottom = 0;
-
-    // Check for Android version (API 21 or later for WindowInsets support)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // For API 30+ (Android 11+), use WindowMetrics and getInsets
-            WindowMetrics metrics = getWindowManager().getCurrentWindowMetrics();
-            WindowInsets insets = metrics.getWindowInsets();
-            if (insets != null) {
-                left = insets.getInsets(WindowInsets.Type.systemBars()).left;
-                top = insets.getInsets(WindowInsets.Type.systemBars()).top;
-                right = insets.getInsets(WindowInsets.Type.systemBars()).right;
-                bottom = insets.getInsets(WindowInsets.Type.systemBars()).bottom;
-            }
-        } else {
-            // For API 21 - 29, use getWindow().getDecorView().getRootWindowInsets()
-            WindowInsets insets = getWindow().getDecorView().getRootWindowInsets();
-            if (insets != null) {
-                left = insets.getSystemWindowInsetLeft();
-                top = insets.getSystemWindowInsetTop();
-                right = insets.getSystemWindowInsetRight();
-                bottom = insets.getSystemWindowInsetBottom();
-            }
-        }
-    }
-
-    // Log or debug to ensure values are correct
-    //System.out.println("Unsafe Viewport: Left=" + left + " Bottom=" + bottom + " Right=" + right + " Top=" + top);
-
-    // Return the values as an array
-    return new int[]{left, bottom, right, top};
-}
-
-
-*/
 #endif
