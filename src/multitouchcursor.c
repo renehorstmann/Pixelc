@@ -1,7 +1,10 @@
 #include "r/r.h"
 #include "u/pose.h"
 #include "m/float.h"
+#include "brush.h"
 #include "camera.h"
+#include "canvas.h"
+#include "feedback.h"
 #include "palette.h"
 #include "tooltip.h"
 #include "multitouchcursor.h"
@@ -11,6 +14,8 @@
 #define STROKE_RADIUS 1.0
 #define START_DISTANCE 32
 #define CURSOR_REL_DISTANCE 0.33
+#define GUESTURE_DIST 64.0
+#define GUESTURE_TIME 0.33
 
 struct MultiTouchCursor_Globals multitouchcursor;
 
@@ -23,6 +28,8 @@ static struct {
     vec2 start_pos;
     bool start;
     bool pressed;
+    vec2 guesture_start;
+    float guesture_time;
 } L;
 
 static const vec4 COLOR_NORMAL = {{0.9, 0.9, 0.9, 0.5}};
@@ -67,6 +74,8 @@ void multitouchcursor_update(float dtime) {
     float right = camera.RO.right;
     float bottom = camera.RO.bottom;
     float top = camera.RO.top;
+    
+    L.guesture_time += dtime;
 
     // so it looks like the multitouchcursor is rendered behind the palette
     if(camera_is_portrait_mode()) {
@@ -172,6 +181,8 @@ bool multitouchcursor_pointer_event(ePointer_s *in_out_pointer) {
                         .action = E_POINTER_DOWN,
                         .id = 0
                 };
+                L.guesture_start = pointer.pos.xy;
+                L.guesture_time = 0;
             }
             if (pointer.action == E_POINTER_UP) {
                 L.pressed = false;
@@ -180,6 +191,48 @@ bool multitouchcursor_pointer_event(ePointer_s *in_out_pointer) {
                         .action = E_POINTER_UP,
                         .id = 0
                 };
+            }
+            
+            // gurstured
+            if (pointer.action == E_POINTER_MOVE
+                    && L.guesture_time <= GUESTURE_TIME) {
+                vec2 dist = vec2_sub_vec(pointer.pos.xy, L.guesture_start);
+                if(dist.x <= -GUESTURE_DIST) {
+                    brush_abort_current_draw();
+                    L.guesture_time = 999;
+                    if(canvas_undo_available()) {
+                        canvas_undo();
+                        palette_set_info("UNDO");
+                        feedback_flash((vec4){{0, 0, 0, 0.5}}, 0.2);
+                    }
+                }
+                if(dist.x >= +GUESTURE_DIST) {
+                    brush_abort_current_draw();
+                    L.guesture_time = 999;
+                    if(canvas_redo_available()) {
+                        canvas_redo();
+                        palette_set_info("REDO");
+                        feedback_flash((vec4){{1, 1, 1, 0.5}}, 0.2);
+                    }
+                }
+                if(dist.y <= -GUESTURE_DIST) {
+                    brush_abort_current_draw();
+                    L.guesture_time = 999;
+                    if(brush.RO.kernel_id>0) {
+                        brush_load_kernel(brush.RO.kernel_id-1);
+                        palette_set_info("KERNEL -");
+                        feedback_flash((vec4){{0, 0, 1, 0.5}}, 0.2);
+                    }
+                }
+                if(dist.y >= +GUESTURE_DIST) {
+                    brush_abort_current_draw();
+                    L.guesture_time = 999;
+                    if(brush.RO.kernel_id<brush.RO.max_kernels-1) {
+                        brush_load_kernel(brush.RO.kernel_id+1);
+                        palette_set_info("KERNEL +");
+                        feedback_flash((vec4){{0, 0, 1, 0.5}}, 0.2);
+                    }
+                }
             }
         }
     }

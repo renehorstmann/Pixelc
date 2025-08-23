@@ -222,6 +222,14 @@ Hold down that finger and move to move the cursor.
 Use a second thumb (or finger...) to press the cursors "button".
 You can also press the buttons in the toolbar and in the dialogs, too!
 
+### Guestures in Multitouch Mode
+While the multitouch cursor is active, swipe with the second thumb (or finger...) to call:
+- left -> *UNDO*
+- right -> *REDO*
+- down -> *KERNEL -*
+- up -> *KERNEL +*
+
+
 ![img](doc/multitouchmode.png)
 
 ## Kernel
