@@ -216,10 +216,13 @@ void palette_update(float dtime) {
     int cols = palette_cols();
     int last_row = (palette.RO.palette_size - 1) /cols;
     
+    // at least 2 rows
+    last_row = s_max(1, last_row);
+    
     for (int i = 0; i < PALETTE_SPACE; i++) {
         int r = i / cols;
         int c = i % cols;
-
+        
         // pose
         mat4 pose = mat4_eye();
         if (r <= last_row)
@@ -415,6 +418,9 @@ float palette_get_hud_size() {
     }
     int cols = palette_cols();
     int rows = 1 + (palette.RO.palette_size - 1) / cols;
+    
+    // at least 2 rows
+    rows = s_max(2, rows);
     return rows * COLOR_DROP_SIZE;
 }
 
